@@ -5,3 +5,4 @@ export * from './trade-config';
 export * from './job-scope-builder';
 export * from './image-analyzer';
 export * from './voice-transcriber';
+export * from './seo-content';
