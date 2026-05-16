@@ -8,7 +8,7 @@ import {
   DollarSign, BarChart3, Settings, Menu, X,
   ShieldCheck, AlertOctagon, Scale, Ban,
   Settings2, LifeBuoy, Bell,
-  Globe, Megaphone, TrendingUp,
+  Globe, Megaphone, TrendingUp, Phone,
 } from 'lucide-react';
 
 const NAV_MAIN = [
@@ -26,6 +26,10 @@ const NAV_INTELLIGENCE = [
   { label: 'Fraud Detection', href: '/fraud', icon: <AlertOctagon size={18} /> },
   { label: 'Disputes', href: '/disputes', icon: <Scale size={18} /> },
   { label: 'Moderation', href: '/moderation', icon: <Ban size={18} /> },
+];
+
+const NAV_VOICE = [
+  { label: 'Call Center', href: '/calls', icon: <Phone size={18} /> },
 ];
 
 const NAV_PLATFORM = [
@@ -81,6 +85,27 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               )}
               <div className="space-y-1">
                 {NAV_INTELLIGENCE.map((item) => (
+                  <SidebarNavItem
+                    key={item.href}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    active={pathname.startsWith(item.href)}
+                    collapsed={collapsed}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Voice section */}
+            <div className="mt-6">
+              {!collapsed && (
+                <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Voice
+                </p>
+              )}
+              <div className="space-y-1">
+                {NAV_VOICE.map((item) => (
                   <SidebarNavItem
                     key={item.href}
                     icon={item.icon}

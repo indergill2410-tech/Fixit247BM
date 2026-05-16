@@ -1,0 +1,93 @@
+import OpenAI from 'openai';
+import { SYSTEM_PROMPT, ConversationTurn, ExtractedJobData, ConversationContext } from './conversation';
+import { detectEmergency } from './emergency-detector';
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+export interface AIResponse {
+  message: string;
+  isJobReady: boolean;
+  extractedJobData?: Partial<ExtractedJobData>;
+  emergencyDetected: boolean;
+  emergencyScore: number;
+  requiresHumanTakeover: boolean;
+  safetyInstructions?: string[];
+}
+
+export async function processConversationTurn(
+  userMessage: string,
+  context: ConversationContext,
+): Promise<AIResponse> {
+  // Run emergency detection on user message
+  const emergency = detectEmergency(userMessage);
+
+  // Build messages array
+  const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
+    { role: 'system', content: SYSTEM_PROMPT },
+    ...context.messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
+    { role: 'user', content: userMessage },
+  ];
+
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages,
+    max_tokens: 300,
+    temperature: 0.7,
+  });
+
+  const rawResponse = response.choices[0].message.content ?? '';
+
+  // Parse job_ready block if present
+  let isJobReady = false;
+  let extractedJobData: Partial<ExtractedJobData> | undefined;
+  const jobReadyMatch = rawResponse.match(/```job_ready\n([\s\S]+?)\n```/);
+  if (jobReadyMatch) {
+    try {
+      extractedJobData = JSON.parse(jobReadyMatch[1]);
+      isJobReady = true;
+    } catch { /* ignore parse errors */ }
+  }
+
+  // Clean response (remove JSON block from display)
+  const cleanMessage = rawResponse.replace(/```job_ready[\s\S]+?```/g, '').trim();
+
+  // Determine if human takeover needed (low AI confidence on complex situations)
+  const requiresHumanTakeover = emergency.riskLevel === 'LIFE_THREATENING' && context.turnCount > 3;
+
+  return {
+    message: cleanMessage,
+    isJobReady,
+    extractedJobData: isJobReady ? extractedJobData : undefined,
+    emergencyDetected: emergency.isEmergency,
+    emergencyScore: emergency.emergencyScore,
+    requiresHumanTakeover,
+    safetyInstructions: emergency.safetyInstructions.length > 0 ? emergency.safetyInstructions : undefined,
+  };
+}
+
+export async function generateJobSummary(context: ConversationContext): Promise<string> {
+  const transcript = context.messages.filter(m => m.role !== 'system').map(m => `${m.role}: ${m.content}`).join('\n');
+
+  const response = await openai.chat.completions.create({
+    model: 'gpt-4o',
+    messages: [{
+      role: 'user',
+      content: `Based on this conversation, write a concise job description for a tradie (2-3 sentences, professional tone):\n\n${transcript}`,
+    }],
+    max_tokens: 150,
+    temperature: 0.5,
+  });
+
+  return response.choices[0].message.content ?? 'Emergency service required.';
+}
+
+export async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
+  const file = new File([audioBuffer], 'audio.webm', { type: 'audio/webm' });
+  const response = await openai.audio.transcriptions.create({
+    file,
+    model: 'whisper-1',
+    language: 'en',
+    prompt: 'Australian emergency home services. Trade terms: plumber, electrician, locksmith, HVAC.',
+  });
+  return response.text;
+}

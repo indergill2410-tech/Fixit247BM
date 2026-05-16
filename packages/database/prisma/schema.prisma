@@ -200,6 +200,7 @@ model User {
   creditsWallet     CreditsWallet?
   referralsSent     Referral[]         @relation("ReferralInviter")
   referralsReceived Referral[]         @relation("ReferralInvited")
+  voiceCalls        VoiceCall[]        @relation("CustomerVoiceCalls")
 
   @@index([email])
   @@index([role])
@@ -514,10 +515,12 @@ model Job {
   payment       Payment?
   review        Review?
   dispute       Dispute?
-  matchingQueue JobMatchingQueue[]
-  events        JobEvent[]
-  aiInsight     AIJobInsight?
-  reviewRequest ReviewRequest?
+  matchingQueue        JobMatchingQueue[]
+  events               JobEvent[]
+  aiInsight            AIJobInsight?
+  reviewRequest        ReviewRequest?
+  emergencyAssessment  EmergencyAssessment?
+  aiConversation       AIConversation?
 
   @@index([customerId])
   @@index([tradieId])
@@ -1673,4 +1676,157 @@ model ReferralProgram {
   updatedAt          DateTime           @updatedAt
 
   @@map("referral_programs")
+}
+
+// ─── Phase 8: Voice AI Enums ───────────────────────────────────────────────────
+
+enum CallStatus {
+  INITIATED
+  RINGING
+  IN_PROGRESS
+  AI_HANDLING
+  HUMAN_TAKEOVER
+  COMPLETED
+  FAILED
+  ABANDONED
+}
+
+enum CallDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum VoiceEventType {
+  CALL_STARTED
+  CALL_ANSWERED
+  SPEECH_DETECTED
+  TRANSCRIPTION_RECEIVED
+  EMERGENCY_DETECTED
+  JOB_CREATED
+  DISPATCH_TRIGGERED
+  TRADIE_ASSIGNED
+  HUMAN_TAKEOVER_REQUESTED
+  HUMAN_TOOK_OVER
+  CALL_ENDED
+  AI_CONFIDENCE_LOW
+  ESCALATION_TRIGGERED
+}
+
+enum RiskLevel {
+  SAFE
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+  LIFE_THREATENING
+}
+
+enum ConversationStatus {
+  ACTIVE
+  GATHERING_INFO
+  CONFIRMING
+  JOB_CREATED
+  DISPATCHING
+  COMPLETED
+  ABANDONED
+  ESCALATED
+}
+
+// ─── Phase 8: Voice AI Models ─────────────────────────────────────────────────
+
+model VoiceCall {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  twilioCallSid   String?       @unique
+  customerId      String?       @db.Uuid
+  phoneNumber     String
+  direction       CallDirection
+  status          CallStatus    @default(INITIATED)
+  duration        Int?
+  recordingUrl    String?
+  transcript      String?       @db.Text
+  urgencyScore    Int?
+  aiConfidence    Float?
+  jobId           String?       @db.Uuid
+  assignedAgentId String?       @db.Uuid
+  startedAt       DateTime      @default(now())
+  answeredAt      DateTime?
+  endedAt         DateTime?
+  metadata        Json?
+
+  customer        User?         @relation("CustomerVoiceCalls", fields: [customerId], references: [id])
+  events          VoiceEvent[]
+  assessment      EmergencyAssessment?
+  conversation    AIConversation?
+
+  @@index([customerId])
+  @@index([status])
+  @@index([startedAt])
+  @@index([twilioCallSid])
+  @@map("voice_calls")
+}
+
+model VoiceEvent {
+  id          String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  callId      String         @db.Uuid
+  eventType   VoiceEventType
+  payload     Json?
+  confidence  Float?
+  createdAt   DateTime       @default(now())
+
+  call        VoiceCall      @relation(fields: [callId], references: [id])
+
+  @@index([callId])
+  @@index([eventType])
+  @@index([createdAt])
+  @@map("voice_events")
+}
+
+model EmergencyAssessment {
+  id                  String     @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId               String?    @db.Uuid @unique
+  callId              String?    @db.Uuid @unique
+  riskLevel           RiskLevel
+  emergencyScore      Int
+  detectedKeywords    String[]
+  tradeCategory       String?
+  recommendedAction   String     @db.Text
+  safetyInstructions  String[]
+  autoDispatch        Boolean    @default(false)
+  adminAlerted        Boolean    @default(false)
+  createdAt           DateTime   @default(now())
+  updatedAt           DateTime   @updatedAt
+
+  job                 Job?       @relation(fields: [jobId], references: [id])
+  call                VoiceCall? @relation(fields: [callId], references: [id])
+
+  @@index([riskLevel])
+  @@index([emergencyScore])
+  @@index([createdAt])
+  @@map("emergency_assessments")
+}
+
+model AIConversation {
+  id                String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId             String?            @db.Uuid @unique
+  callId            String?            @db.Uuid @unique
+  sessionId         String             @unique
+  status            ConversationStatus @default(ACTIVE)
+  messages          Json
+  extractedEntities Json?
+  aiSummary         String?            @db.Text
+  tradeCategory     String?
+  urgencyScore      Int?
+  isEmergency       Boolean            @default(false)
+  jobData           Json?
+  turnCount         Int                @default(0)
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  job               Job?               @relation(fields: [jobId], references: [id])
+  call              VoiceCall?         @relation(fields: [callId], references: [id])
+
+  @@index([sessionId])
+  @@index([status])
+  @@index([isEmergency])
+  @@map("ai_conversations")
 }
