@@ -1,0 +1,488 @@
+// Fixit247BM — Prisma Schema
+// Premium Australian emergency trade services platform
+
+generator client {
+  provider        = "prisma-client-js"
+  output          = "../src/generated/client"
+  previewFeatures = ["fullTextSearch", "postgresqlExtensions"]
+}
+
+datasource db {
+  provider          = "postgresql"
+  url               = env("DATABASE_URL")
+  directUrl         = env("DIRECT_URL")
+  extensions        = [postgis, uuid_ossp(map: "uuid-ossp"), pg_trgm]
+}
+
+// ─── Enums ────────────────────────────────────────────────────────────────────
+
+enum Role {
+  CUSTOMER
+  TRADIE
+  ADMIN
+  SUPER_ADMIN
+}
+
+enum JobStatus {
+  DRAFT
+  OPEN
+  ASSIGNED
+  IN_PROGRESS
+  PENDING_REVIEW
+  COMPLETED
+  CANCELLED
+  DISPUTED
+}
+
+enum JobPriority {
+  STANDARD
+  URGENT
+  EMERGENCY
+}
+
+enum TradeCategory {
+  PLUMBING
+  ELECTRICAL
+  HVAC
+  CARPENTRY
+  PAINTING
+  ROOFING
+  TILING
+  PEST_CONTROL
+  LOCKSMITH
+  GLAZING
+  PLASTERING
+  LANDSCAPING
+  CLEANING
+  APPLIANCE_REPAIR
+  GENERAL_MAINTENANCE
+  OTHER
+}
+
+enum PaymentStatus {
+  PENDING
+  PROCESSING
+  HELD_IN_ESCROW
+  RELEASED
+  REFUNDED
+  DISPUTED
+  FAILED
+}
+
+enum VerificationStatus {
+  UNVERIFIED
+  PENDING
+  VERIFIED
+  REJECTED
+  SUSPENDED
+}
+
+enum NotificationType {
+  JOB_CREATED
+  JOB_ASSIGNED
+  JOB_STARTED
+  JOB_COMPLETED
+  JOB_CANCELLED
+  MESSAGE_RECEIVED
+  QUOTE_RECEIVED
+  QUOTE_ACCEPTED
+  PAYMENT_RECEIVED
+  REVIEW_RECEIVED
+  DOCUMENT_VERIFIED
+  SYSTEM_ALERT
+}
+
+// ─── Core Models ──────────────────────────────────────────────────────────────
+
+model User {
+  id                String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email             String             @unique
+  emailVerified     DateTime?
+  phone             String?
+  phoneVerified     Boolean            @default(false)
+  role              Role               @default(CUSTOMER)
+  firstName         String
+  lastName          String
+  avatarUrl         String?
+  isActive          Boolean            @default(true)
+  lastLoginAt       DateTime?
+  createdAt         DateTime           @default(now())
+  updatedAt         DateTime           @updatedAt
+
+  // Relations
+  customerProfile   CustomerProfile?
+  tradieProfile     TradieProfile?
+  adminProfile      AdminProfile?
+  jobsAsCustomer    Job[]              @relation("CustomerJobs")
+  messages          Message[]
+  notifications     Notification[]
+  reviewsGiven      Review[]           @relation("ReviewsGiven")
+  reviewsReceived   Review[]           @relation("ReviewsReceived")
+  sessions          Session[]
+
+  @@index([email])
+  @@index([role])
+  @@index([createdAt])
+  @@map("users")
+}
+
+model Session {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String   @db.Uuid
+  token     String   @unique
+  expiresAt DateTime
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([token])
+  @@map("sessions")
+}
+
+// ─── Profile Models ───────────────────────────────────────────────────────────
+
+model CustomerProfile {
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId            String   @unique @db.Uuid
+  defaultAddressId  String?  @db.Uuid
+  preferredTradeIds String[] @db.Uuid
+  notifyBySms       Boolean  @default(true)
+  notifyByEmail     Boolean  @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  addresses Address[]
+
+  @@map("customer_profiles")
+}
+
+model TradieProfile {
+  id                   String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId               String             @unique @db.Uuid
+  businessName         String?
+  abn                  String?            @unique
+  bio                  String?            @db.Text
+  trades               TradeCategory[]
+  yearsExperience      Int?
+  hourlyRate           Decimal?           @db.Decimal(10, 2)
+  calloutFee           Decimal?           @db.Decimal(10, 2)
+  serviceRadiusKm      Int                @default(25)
+  isAvailable          Boolean            @default(true)
+  isEmergencyAvailable Boolean            @default(false)
+  verificationStatus   VerificationStatus @default(UNVERIFIED)
+  verifiedAt           DateTime?
+  stripeAccountId      String?            @unique
+  stripeOnboardingDone Boolean            @default(false)
+  avgRating            Decimal            @default(0) @db.Decimal(3, 2)
+  totalReviews         Int                @default(0)
+  totalJobsCompleted   Int                @default(0)
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  licences       Licence[]
+  insurances     Insurance[]
+  certifications Certification[]
+  availability   Availability[]
+  jobs           Job[]          @relation("TradieJobs")
+
+  @@index([trades])
+  @@index([verificationStatus])
+  @@index([isAvailable])
+  @@map("tradie_profiles")
+}
+
+model AdminProfile {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String   @unique @db.Uuid
+  department  String?
+  permissions String[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("admin_profiles")
+}
+
+// ─── Location & Address ───────────────────────────────────────────────────────
+
+model Address {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  customerProfileId String  @db.Uuid
+  label            String?
+  street           String
+  suburb           String
+  city             String
+  state            String
+  postcode         String
+  country          String   @default("AU")
+  latitude         Decimal? @db.Decimal(10, 7)
+  longitude        Decimal? @db.Decimal(10, 7)
+  isDefault        Boolean  @default(false)
+  createdAt        DateTime @default(now())
+
+  customerProfile CustomerProfile @relation(fields: [customerProfileId], references: [id], onDelete: Cascade)
+  jobs            Job[]
+
+  @@index([customerProfileId])
+  @@map("addresses")
+}
+
+// ─── Jobs ─────────────────────────────────────────────────────────────────────
+
+model Job {
+  id              String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  customerId      String        @db.Uuid
+  tradieId        String?       @db.Uuid
+  addressId       String?       @db.Uuid
+  title           String
+  description     String        @db.Text
+  category        TradeCategory
+  status          JobStatus     @default(OPEN)
+  priority        JobPriority   @default(STANDARD)
+  scheduledFor    DateTime?
+  estimatedHours  Decimal?      @db.Decimal(5, 2)
+  agreedPrice     Decimal?      @db.Decimal(10, 2)
+  finalPrice      Decimal?      @db.Decimal(10, 2)
+  platformFee     Decimal?      @db.Decimal(10, 2)
+  tradieEarnings  Decimal?      @db.Decimal(10, 2)
+  isEmergency     Boolean       @default(false)
+  completedAt     DateTime?
+  cancelledAt     DateTime?
+  cancelReason    String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+
+  customer  User           @relation("CustomerJobs", fields: [customerId], references: [id])
+  tradie    TradieProfile? @relation("TradieJobs", fields: [tradieId], references: [id])
+  address   Address?       @relation(fields: [addressId], references: [id])
+  quotes    Quote[]
+  messages  Message[]
+  media     JobMedia[]
+  payment   Payment?
+  review    Review?
+  timeline  JobTimeline[]
+
+  @@index([customerId])
+  @@index([tradieId])
+  @@index([status])
+  @@index([category])
+  @@index([priority])
+  @@index([createdAt])
+  @@map("jobs")
+}
+
+model JobTimeline {
+  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId       String    @db.Uuid
+  status      JobStatus
+  note        String?
+  performedBy String    @db.Uuid
+  createdAt   DateTime  @default(now())
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@map("job_timeline")
+}
+
+model JobMedia {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId     String   @db.Uuid
+  url       String
+  type      String
+  uploadedBy String  @db.Uuid
+  createdAt DateTime @default(now())
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@map("job_media")
+}
+
+// ─── Quotes ───────────────────────────────────────────────────────────────────
+
+model Quote {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId       String   @db.Uuid
+  tradieId    String   @db.Uuid
+  amount      Decimal  @db.Decimal(10, 2)
+  calloutFee  Decimal? @db.Decimal(10, 2)
+  notes       String?  @db.Text
+  estimatedHours Decimal? @db.Decimal(5, 2)
+  isAccepted  Boolean  @default(false)
+  expiresAt   DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  @@index([jobId])
+  @@index([tradieId])
+  @@map("quotes")
+}
+
+// ─── Payments ─────────────────────────────────────────────────────────────────
+
+model Payment {
+  id                    String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId                 String        @unique @db.Uuid
+  customerId            String        @db.Uuid
+  tradieId              String        @db.Uuid
+  amount                Decimal       @db.Decimal(10, 2)
+  platformFee           Decimal       @db.Decimal(10, 2)
+  tradieAmount          Decimal       @db.Decimal(10, 2)
+  currency              String        @default("AUD")
+  status                PaymentStatus @default(PENDING)
+  stripePaymentIntentId String?       @unique
+  stripeTransferId      String?
+  paidAt                DateTime?
+  releasedAt            DateTime?
+  refundedAt            DateTime?
+  refundAmount          Decimal?      @db.Decimal(10, 2)
+  createdAt             DateTime      @default(now())
+  updatedAt             DateTime      @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id])
+
+  @@index([customerId])
+  @@index([tradieId])
+  @@index([status])
+  @@map("payments")
+}
+
+// ─── Reviews ──────────────────────────────────────────────────────────────────
+
+model Review {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId       String   @unique @db.Uuid
+  reviewerId  String   @db.Uuid
+  revieweeId  String   @db.Uuid
+  rating      Int
+  title       String?
+  body        String?  @db.Text
+  isPublic    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  job      Job  @relation(fields: [jobId], references: [id])
+  reviewer User @relation("ReviewsGiven", fields: [reviewerId], references: [id])
+  reviewee User @relation("ReviewsReceived", fields: [revieweeId], references: [id])
+
+  @@index([revieweeId])
+  @@index([rating])
+  @@map("reviews")
+}
+
+// ─── Messaging ────────────────────────────────────────────────────────────────
+
+model Message {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId       String   @db.Uuid
+  senderId    String   @db.Uuid
+  body        String   @db.Text
+  attachments String[]
+  readAt      DateTime?
+  createdAt   DateTime @default(now())
+
+  job    Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  sender User @relation(fields: [senderId], references: [id])
+
+  @@index([jobId])
+  @@index([senderId])
+  @@map("messages")
+}
+
+// ─── Notifications ────────────────────────────────────────────────────────────
+
+model Notification {
+  id        String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId    String           @db.Uuid
+  type      NotificationType
+  title     String
+  body      String
+  data      Json?
+  readAt    DateTime?
+  createdAt DateTime         @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([readAt])
+  @@map("notifications")
+}
+
+// ─── Tradie Documents ─────────────────────────────────────────────────────────
+
+model Licence {
+  id           String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId     String             @db.Uuid
+  licenceType  String
+  licenceNumber String
+  state        String
+  expiresAt    DateTime?
+  documentUrl  String?
+  status       VerificationStatus @default(PENDING)
+  verifiedAt   DateTime?
+  createdAt    DateTime           @default(now())
+
+  tradie TradieProfile @relation(fields: [tradieId], references: [id], onDelete: Cascade)
+
+  @@index([tradieId])
+  @@map("licences")
+}
+
+model Insurance {
+  id          String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId    String             @db.Uuid
+  insurer     String
+  policyNumber String
+  coverType   String
+  coverAmount Decimal            @db.Decimal(12, 2)
+  expiresAt   DateTime
+  documentUrl String?
+  status      VerificationStatus @default(PENDING)
+  verifiedAt  DateTime?
+  createdAt   DateTime           @default(now())
+
+  tradie TradieProfile @relation(fields: [tradieId], references: [id], onDelete: Cascade)
+
+  @@index([tradieId])
+  @@map("insurances")
+}
+
+model Certification {
+  id          String             @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId    String             @db.Uuid
+  name        String
+  issuedBy    String
+  issuedAt    DateTime
+  expiresAt   DateTime?
+  documentUrl String?
+  status      VerificationStatus @default(PENDING)
+  createdAt   DateTime           @default(now())
+
+  tradie TradieProfile @relation(fields: [tradieId], references: [id], onDelete: Cascade)
+
+  @@index([tradieId])
+  @@map("certifications")
+}
+
+model Availability {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId    String   @db.Uuid
+  dayOfWeek   Int
+  startTime   String
+  endTime     String
+  isAvailable Boolean  @default(true)
+
+  tradie TradieProfile @relation(fields: [tradieId], references: [id], onDelete: Cascade)
+
+  @@unique([tradieId, dayOfWeek])
+  @@map("availability")
+}
