@@ -444,6 +444,22 @@ importers:
         specifier: ^5.4.5
         version: 5.9.3
 
+  packages/voice:
+    dependencies:
+      '@fixit247/database':
+        specifier: workspace:*
+        version: link:../database
+      openai:
+        specifier: ^4.47.0
+        version: 4.104.0(ws@8.18.3)(zod@3.25.76)
+      zod:
+        specifier: ^3.23.8
+        version: 3.25.76
+    devDependencies:
+      typescript:
+        specifier: ^5.4.5
+        version: 5.9.3
+
 packages:
 
   '@ai-sdk/provider-utils@1.0.22':
