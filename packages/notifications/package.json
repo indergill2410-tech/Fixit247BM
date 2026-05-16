@@ -1,0 +1,20 @@
+{
+  "name": "@fixit247/notifications",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "build": "tsc --noEmit",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@fixit247/database": "*",
+    "resend": "^3.2.0",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^20.14.0",
+    "typescript": "^5.4.5"
+  }
+}
