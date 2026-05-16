@@ -1,0 +1,15 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@fixit247/ui": ["../../packages/ui/src"],
+      "@fixit247/auth": ["../../packages/auth/src"],
+      "@fixit247/database": ["../../packages/database/src"],
+      "@fixit247/payments": ["../../packages/payments/src"],
+      "@fixit247/ai": ["../../packages/ai/src"]
+    }
+  },
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts"],
+  "exclude": ["node_modules"]
+}
