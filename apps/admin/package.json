@@ -12,9 +12,9 @@
     "clean": "rm -rf .next"
   },
   "dependencies": {
-    "@fixit247/auth": "*",
-    "@fixit247/database": "*",
-    "@fixit247/ui": "*",
+    "@fixit247/auth": "workspace:*",
+    "@fixit247/database": "workspace:*",
+    "@fixit247/ui": "workspace:*",
     "@supabase/ssr": "^0.5.0",
     "@supabase/supabase-js": "^2.43.4",
     "framer-motion": "^11.2.0",

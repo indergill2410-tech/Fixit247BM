@@ -8,6 +8,7 @@ import {
   DollarSign, BarChart3, Settings, Menu, X,
   ShieldCheck, AlertOctagon, Scale, Ban,
   Settings2, LifeBuoy, Bell,
+  Globe, Megaphone, TrendingUp,
 } from 'lucide-react';
 
 const NAV_MAIN = [
@@ -32,6 +33,9 @@ const NAV_PLATFORM = [
   { label: 'Marketplace', href: '/marketplace', icon: <Settings2 size={18} /> },
   { label: 'Support', href: '/support', icon: <LifeBuoy size={18} /> },
   { label: 'Alerts', href: '/alerts', icon: <Bell size={18} /> },
+  { label: 'Market Expansion', href: '/expansion', icon: <Globe size={18} /> },
+  { label: 'Campaigns', href: '/campaigns', icon: <Megaphone size={18} /> },
+  { label: 'Growth Analytics', href: '/growth', icon: <TrendingUp size={18} /> },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
