@@ -3,10 +3,20 @@ import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 
-const StatusUpdateSchema = z.object({
-  status: z.enum(['IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
-  note: z.string().max(500).optional(),
+const Schema = z.object({
+  status: z.enum(['EN_ROUTE', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
+  etaMinutes: z.number().int().positive().optional(),
+  metadata: z.record(z.unknown()).optional(),
 });
+
+// Valid transitions per role
+const TRADIE_TRANSITIONS: Record<string, string[]> = {
+  CLAIMED: ['EN_ROUTE', 'CANCELLED'],
+  EN_ROUTE: ['ARRIVED', 'CANCELLED'],
+  ARRIVED: ['IN_PROGRESS'],
+  IN_PROGRESS: ['COMPLETED'],
+};
+const ADMIN_TRANSITIONS = Object.keys(TRADIE_TRANSITIONS);
 
 export async function PATCH(
   req: NextRequest,
@@ -16,45 +26,46 @@ export async function PATCH(
     const session = await requireSession();
     const { id: jobId } = await params;
     const body = await req.json();
-    const { status, note } = StatusUpdateSchema.parse(body);
+    const { status: newStatus, etaMinutes, metadata } = Schema.parse(body);
 
-    const job = await db.job.findUnique({ where: { id: jobId } });
+    const job = await db.job.findUnique({
+      where: { id: jobId },
+      select: { status: true, tradieId: true, customerId: true },
+    });
     if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
 
-    const eventTypeMap: Record<string, string> = {
-      IN_PROGRESS: 'WORK_STARTED',
-      COMPLETED: 'WORK_COMPLETED',
-      CANCELLED: 'CANCELLED',
-    };
+    const isTradie = session.role === 'TRADIE' && job.tradieId === session.id;
+    const isAdmin = ['ADMIN', 'SUPER_ADMIN'].includes(session.role);
+
+    if (!isTradie && !isAdmin) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
+
+    // Validate transition
+    const allowedNext = isAdmin ? ADMIN_TRANSITIONS : (TRADIE_TRANSITIONS[job.status] ?? []);
+    if (!allowedNext.includes(newStatus)) {
+      return NextResponse.json({
+        error: `Cannot transition from ${job.status} to ${newStatus}`,
+      }, { status: 422 });
+    }
 
     const updatedJob = await db.$transaction(async (tx) => {
       const updated = await tx.job.update({
         where: { id: jobId },
         data: {
-          status: status as any,
-          startedAt: status === 'IN_PROGRESS' ? new Date() : undefined,
-          completedAt: status === 'COMPLETED' ? new Date() : undefined,
-          cancelledAt: status === 'CANCELLED' ? new Date() : undefined,
+          status: newStatus as never,
+          ...(newStatus === 'COMPLETED' ? { completedAt: new Date() } : {}),
         },
       });
 
+      // Record job event
       await tx.jobEvent.create({
         data: {
           jobId,
-          type: eventTypeMap[status] as any,
+          type: `JOB_${newStatus}` as never,
           actorId: session.id,
-          actorRole: session.role as any,
-          metadata: { note, previousStatus: job.status },
-        },
-      });
-
-      await tx.jobStatusHistory.create({
-        data: {
-          jobId,
-          fromStatus: job.status,
-          toStatus: status as any,
-          note,
-          changedBy: session.id,
+          actorRole: session.role as never,
+          metadata: { ...(metadata ?? {}), ...(etaMinutes ? { etaMinutes } : {}) } as never,
         },
       });
 
@@ -63,10 +74,8 @@ export async function PATCH(
 
     return NextResponse.json({ job: updatedJob });
   } catch (err) {
-    if (err instanceof z.ZodError) {
-      return NextResponse.json({ error: 'Invalid status', details: err.errors }, { status: 400 });
-    }
-    console.error('[PATCH /api/jobs/[id]/status]', err);
+    if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
+    console.error('[PATCH /api/jobs/:id/status]', err);
     return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
   }
 }

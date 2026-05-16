@@ -80,15 +80,22 @@ enum PaymentStatus {
 enum NotificationType {
   JOB_CREATED
   JOB_ASSIGNED
+  JOB_ACCEPTED
+  JOB_DECLINED
+  TRADIE_EN_ROUTE
+  TRADIE_ARRIVED
   JOB_STARTED
   JOB_COMPLETED
-  JOB_CANCELLED
-  MESSAGE_RECEIVED
-  QUOTE_RECEIVED
-  QUOTE_ACCEPTED
-  PAYMENT_RECEIVED
-  REVIEW_RECEIVED
-  DOCUMENT_VERIFIED
+  PAYMENT_HELD
+  PAYMENT_RELEASED
+  PAYMENT_FAILED
+  DISPUTE_OPENED
+  DISPUTE_RESOLVED
+  NEW_MESSAGE
+  CREDIT_LOW
+  SUBSCRIPTION_RENEWED
+  VERIFICATION_APPROVED
+  VERIFICATION_REJECTED
   SYSTEM_ALERT
 }
 
@@ -182,18 +189,15 @@ model User {
   updatedAt          DateTime  @updatedAt
 
   // Relations
-  customerProfile       CustomerProfile?
-  tradieProfile         TradieProfile?
-  sessions              Session[]
-  auditLogs             AuditLog[]
-  notifications         Notification[]
-  sentMessages          Message[]        @relation("MessageSender")
-  receivedNotifications Notification[]   @relation("NotificationRecipient")
-  reviewsGiven          Review[]         @relation("ReviewsGiven")
-  reviewsReceived       Review[]         @relation("ReviewsReceived")
-  addresses             Address[]
-  subscription          Subscription?
-  creditsWallet         CreditsWallet?
+  customerProfile CustomerProfile?
+  tradieProfile   TradieProfile?
+  sessions        Session[]
+  auditLogs       AuditLog[]
+  reviewsGiven    Review[]         @relation("ReviewsGiven")
+  reviewsReceived Review[]         @relation("ReviewsReceived")
+  addresses       Address[]
+  subscription    Subscription?
+  creditsWallet   CreditsWallet?
 
   @@index([email])
   @@index([role])
@@ -605,44 +609,51 @@ model Review {
 // ─── Messaging ────────────────────────────────────────────────────────────────
 
 model Message {
-  id          String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  jobId       String    @db.Uuid
-  senderId    String    @db.Uuid
-  receiverId  String    @db.Uuid
-  body        String    @db.Text
-  attachments String[]
+  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId       String        @db.Uuid
+  senderId    String        @db.Uuid
+  receiverId  String?       @db.Uuid
+  content     String        @db.Text
+  type        MessageType   @default(TEXT)
+  status      MessageStatus @default(SENT)
+  mediaUrl    String?
+  mediaType   String?
+  isSystem    Boolean       @default(false)
+  deletedAt   DateTime?
+  deliveredAt DateTime?
   readAt      DateTime?
-  isSystem    Boolean   @default(false)
-  createdAt   DateTime  @default(now())
-
-  job    Job  @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  sender User @relation("MessageSender", fields: [senderId], references: [id])
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
 
   @@index([jobId])
   @@index([senderId])
   @@index([receiverId])
-  @@index([readAt])
+  @@index([createdAt])
   @@map("messages")
 }
 
 // ─── Notifications ────────────────────────────────────────────────────────────
 
 model Notification {
-  id        String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  userId    String           @db.Uuid
-  type      NotificationType
-  title     String
-  body      String
-  data      Json?
-  readAt    DateTime?
-  actionUrl String?
-  createdAt DateTime         @default(now())
-
-  user      User @relation(fields: [userId], references: [id], onDelete: Cascade)
-  recipient User @relation("NotificationRecipient", fields: [userId], references: [id])
+  id         String           @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId     String           @db.Uuid
+  jobId      String?          @db.Uuid
+  type       NotificationType
+  title      String
+  body       String           @db.Text
+  data       Json?
+  status     NotifStatus      @default(PENDING)
+  channel    NotifChannel     @default(IN_APP)
+  readAt     DateTime?
+  sentAt     DateTime?
+  failedAt   DateTime?
+  retryCount Int              @default(0)
+  createdAt  DateTime         @default(now())
 
   @@index([userId])
-  @@index([readAt])
+  @@index([status])
+  @@index([type])
+  @@index([jobId])
   @@index([createdAt])
   @@map("notifications")
 }
@@ -1077,4 +1088,68 @@ model SurgePricingRule {
   @@index([isActive])
   @@index([factor])
   @@map("surge_pricing_rules")
+}
+
+// ─── Real-Time Communication Extension — Enums & New Models ──────────────────
+
+enum MessageType {
+  TEXT
+  IMAGE
+  FILE
+  SYSTEM
+  STATUS_UPDATE
+  VOICE
+}
+
+enum MessageStatus {
+  SENT
+  DELIVERED
+  READ
+  FAILED
+}
+
+enum NotifStatus {
+  PENDING
+  SENT
+  FAILED
+  READ
+}
+
+enum NotifChannel {
+  IN_APP
+  EMAIL
+  PUSH
+  SMS
+}
+
+model NotificationPreference {
+  id                String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId            String   @unique @db.Uuid
+  emailEnabled      Boolean  @default(true)
+  pushEnabled       Boolean  @default(true)
+  smsEnabled        Boolean  @default(false)
+  quietHoursEnabled Boolean  @default(false)
+  quietHoursStart   Int?
+  quietHoursEnd     Int?
+  disabledTypes     String[]
+  updatedAt         DateTime @updatedAt
+
+  @@map("notification_preferences")
+}
+
+model LocationTracking {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId  String   @db.Uuid
+  jobId     String?  @db.Uuid
+  latitude  Decimal  @db.Decimal(10, 7)
+  longitude Decimal  @db.Decimal(10, 7)
+  accuracy  Float?
+  heading   Float?
+  speed     Float?
+  createdAt DateTime @default(now())
+
+  @@index([tradieId])
+  @@index([jobId])
+  @@index([createdAt])
+  @@map("location_tracking")
 }
