@@ -6,9 +6,11 @@ import { DashboardLayout, Header, HeaderBrand, Sidebar, SidebarNavItem } from '@
 import {
   LayoutDashboard, Users, Wrench, Shield,
   DollarSign, BarChart3, Settings, Menu, X,
+  ShieldCheck, AlertOctagon, Scale, Ban,
+  Settings2, LifeBuoy, Bell,
 } from 'lucide-react';
 
-const NAV = [
+const NAV_MAIN = [
   { label: 'Dashboard', href: '/dashboard', icon: <LayoutDashboard size={18} /> },
   { label: 'Users', href: '/users', icon: <Users size={18} /> },
   { label: 'Jobs', href: '/jobs', icon: <Wrench size={18} /> },
@@ -16,6 +18,20 @@ const NAV = [
   { label: 'Payments', href: '/payments', icon: <DollarSign size={18} /> },
   { label: 'Reports', href: '/reports', icon: <BarChart3 size={18} /> },
   { label: 'Settings', href: '/settings', icon: <Settings size={18} /> },
+];
+
+const NAV_INTELLIGENCE = [
+  { label: 'Trust Engine', href: '/trust', icon: <ShieldCheck size={18} /> },
+  { label: 'Fraud Detection', href: '/fraud', icon: <AlertOctagon size={18} /> },
+  { label: 'Disputes', href: '/disputes', icon: <Scale size={18} /> },
+  { label: 'Moderation', href: '/moderation', icon: <Ban size={18} /> },
+];
+
+const NAV_PLATFORM = [
+  { label: 'Analytics', href: '/analytics', icon: <BarChart3 size={18} /> },
+  { label: 'Marketplace', href: '/marketplace', icon: <Settings2 size={18} /> },
+  { label: 'Support', href: '/support', icon: <LifeBuoy size={18} /> },
+  { label: 'Alerts', href: '/alerts', icon: <Bell size={18} /> },
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -36,18 +52,63 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
               {collapsed ? <Menu size={18} /> : <X size={18} />}
             </button>
           </div>
-          <nav className="flex-1 space-y-1 px-2 py-4">
-            {NAV.map((item) => (
-              <SidebarNavItem
-                key={item.href}
-                icon={item.icon}
-                label={item.label}
-                href={item.href}
-                active={pathname.startsWith(item.href)}
-                collapsed={collapsed}
-                badge={item.badge}
-              />
-            ))}
+          <nav className="flex-1 overflow-y-auto px-2 py-4">
+            {/* Core */}
+            <div className="space-y-1">
+              {NAV_MAIN.map((item) => (
+                <SidebarNavItem
+                  key={item.href}
+                  icon={item.icon}
+                  label={item.label}
+                  href={item.href}
+                  active={pathname.startsWith(item.href)}
+                  collapsed={collapsed}
+                  badge={item.badge}
+                />
+              ))}
+            </div>
+
+            {/* Intelligence section */}
+            <div className="mt-6">
+              {!collapsed && (
+                <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Intelligence
+                </p>
+              )}
+              <div className="space-y-1">
+                {NAV_INTELLIGENCE.map((item) => (
+                  <SidebarNavItem
+                    key={item.href}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    active={pathname.startsWith(item.href)}
+                    collapsed={collapsed}
+                  />
+                ))}
+              </div>
+            </div>
+
+            {/* Platform section */}
+            <div className="mt-6">
+              {!collapsed && (
+                <p className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest text-muted-foreground">
+                  Platform
+                </p>
+              )}
+              <div className="space-y-1">
+                {NAV_PLATFORM.map((item) => (
+                  <SidebarNavItem
+                    key={item.href}
+                    icon={item.icon}
+                    label={item.label}
+                    href={item.href}
+                    active={pathname.startsWith(item.href)}
+                    collapsed={collapsed}
+                  />
+                ))}
+              </div>
+            </div>
           </nav>
         </Sidebar>
       }

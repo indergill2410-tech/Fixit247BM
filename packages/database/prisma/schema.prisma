@@ -1153,3 +1153,280 @@ model LocationTracking {
   @@index([createdAt])
   @@map("location_tracking")
 }
+
+// ─── Admin Intelligence Extension ────────────────────────────────────────────
+
+enum FraudFlagType {
+  FAKE_JOB
+  DUPLICATE_ACCOUNT
+  PAYMENT_ABUSE
+  EXCESSIVE_REFUNDS
+  LOCATION_SPOOFING
+  FAKE_REVIEW
+  BOT_ACTIVITY
+  SUSPICIOUS_MESSAGING
+  TRADIE_COLLUSION
+  EXCESSIVE_CANCELLATIONS
+  MULTI_ACCOUNT
+  OTHER
+}
+
+enum FraudSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum FraudFlagStatus {
+  PENDING
+  UNDER_REVIEW
+  RESOLVED_SAFE
+  RESOLVED_FRAUD
+  ESCALATED
+  AUTO_SUSPENDED
+}
+
+enum DisputeReason {
+  INCOMPLETE_WORK
+  NO_SHOW
+  PAYMENT_DISAGREEMENT
+  DAMAGE_CLAIM
+  REFUND_REQUEST
+  EMERGENCY_COMPLAINT
+  QUALITY_ISSUE
+  OTHER
+}
+
+enum DisputeStatus {
+  OPEN
+  UNDER_REVIEW
+  AWAITING_EVIDENCE
+  MEDIATION
+  RESOLVED_CUSTOMER
+  RESOLVED_TRADIE
+  RESOLVED_SPLIT
+  CLOSED
+  ESCALATED
+}
+
+enum ModerationActionType {
+  WARNING
+  TEMPORARY_SUSPENSION
+  PERMANENT_SUSPENSION
+  ACCOUNT_REINSTATEMENT
+  PROFILE_FLAG
+  REVIEW_REMOVAL
+  PAYOUT_HOLD
+  PAYOUT_RELEASE
+  VERIFICATION_APPROVED
+  VERIFICATION_REJECTED
+  TRUST_SCORE_OVERRIDE
+  FRAUD_FLAG_DISMISSED
+  FRAUD_FLAG_CONFIRMED
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING_CUSTOMER
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  NORMAL
+  HIGH
+  URGENT
+}
+
+enum TicketCategory {
+  PAYMENT
+  JOB_ISSUE
+  ACCOUNT
+  TECHNICAL
+  FRAUD
+  OTHER
+}
+
+enum AlertType {
+  FRAUD_SPIKE
+  PAYMENT_FAILURE
+  DISPATCH_FAILURE
+  UNUSUAL_REFUNDS
+  SYSTEM_ERROR
+  REVENUE_DROP
+  HIGH_DISPUTE_RATE
+  TRADIE_SHORTAGE
+}
+
+enum AlertSeverity {
+  INFO
+  WARNING
+  CRITICAL
+}
+
+enum AlertStatus {
+  ACTIVE
+  DISMISSED
+  RESOLVED
+}
+
+model TrustScoreHistory {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId      String   @db.Uuid
+  score         Int
+  previousScore Int?
+  reason        String
+  jobId         String?  @db.Uuid
+  adminId       String?  @db.Uuid
+  metadata      Json?
+  createdAt     DateTime @default(now())
+
+  @@index([tradieId])
+  @@index([createdAt])
+  @@map("trust_score_history")
+}
+
+model FraudFlag {
+  id           String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId       String          @db.Uuid
+  type         FraudFlagType
+  severity     FraudSeverity
+  riskScore    Int
+  status       FraudFlagStatus @default(PENDING)
+  title        String
+  description  String          @db.Text
+  evidence     Json?
+  jobId        String?         @db.Uuid
+  reviewedBy   String?         @db.Uuid
+  reviewedAt   DateTime?
+  resolvedAt   DateTime?
+  autoDetected Boolean         @default(true)
+  createdAt    DateTime        @default(now())
+  updatedAt    DateTime        @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([type])
+  @@index([severity])
+  @@index([createdAt])
+  @@map("fraud_flags")
+}
+
+model Dispute {
+  id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId        String        @db.Uuid
+  customerId   String        @db.Uuid
+  tradieId     String        @db.Uuid
+  reason       DisputeReason
+  status       DisputeStatus @default(OPEN)
+  title        String
+  description  String        @db.Text
+  evidenceUrls String[]
+  adminNotes   String?       @db.Text
+  resolution   String?       @db.Text
+  refundAmount Decimal?      @db.Decimal(10, 2)
+  assignedTo   String?       @db.Uuid
+  resolvedBy   String?       @db.Uuid
+  resolvedAt   DateTime?
+  dueBy        DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@index([jobId])
+  @@index([customerId])
+  @@index([tradieId])
+  @@index([status])
+  @@index([createdAt])
+  @@map("disputes")
+}
+
+model ModerationAction {
+  id           String               @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  adminId      String               @db.Uuid
+  targetUserId String               @db.Uuid
+  actionType   ModerationActionType
+  reason       String
+  metadata     Json?
+  expiresAt    DateTime?
+  createdAt    DateTime             @default(now())
+
+  @@index([adminId])
+  @@index([targetUserId])
+  @@index([actionType])
+  @@index([createdAt])
+  @@map("moderation_actions")
+}
+
+model AdminAuditLog {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  adminId   String   @db.Uuid
+  action    String
+  entity    String
+  entityId  String?
+  metadata  Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  @@index([adminId])
+  @@index([entity])
+  @@index([createdAt])
+  @@map("admin_audit_log")
+}
+
+model SupportTicket {
+  id          String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  userId      String         @db.Uuid
+  jobId       String?        @db.Uuid
+  subject     String
+  description String         @db.Text
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(NORMAL)
+  category    TicketCategory
+  assignedTo  String?        @db.Uuid
+  resolvedAt  DateTime?
+  closedAt    DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([userId])
+  @@index([status])
+  @@index([priority])
+  @@index([assignedTo])
+  @@index([createdAt])
+  @@map("support_tickets")
+}
+
+model SupportMessage {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  ticketId  String   @db.Uuid
+  senderId  String   @db.Uuid
+  isAdmin   Boolean  @default(false)
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+
+  @@index([ticketId])
+  @@map("support_messages")
+}
+
+model PlatformAlert {
+  id          String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  type        AlertType
+  severity    AlertSeverity
+  title       String
+  message     String        @db.Text
+  data        Json?
+  status      AlertStatus   @default(ACTIVE)
+  dismissedBy String?       @db.Uuid
+  dismissedAt DateTime?
+  createdAt   DateTime      @default(now())
+
+  @@index([type])
+  @@index([severity])
+  @@index([status])
+  @@index([createdAt])
+  @@map("platform_alerts")
+}
