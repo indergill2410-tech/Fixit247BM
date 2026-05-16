@@ -6,7 +6,7 @@ services:
     region: singapore
     plan: starter
     rootDir: .
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @fixit247/web build
+    buildCommand: NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @fixit247/web build
     startCommand: pnpm --filter @fixit247/web start
     healthCheckPath: /api/health
     envVars:
@@ -46,7 +46,7 @@ services:
     region: singapore
     plan: starter
     rootDir: .
-    buildCommand: pnpm install --frozen-lockfile && pnpm --filter @fixit247/admin build
+    buildCommand: NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @fixit247/admin build
     startCommand: pnpm --filter @fixit247/admin start
     healthCheckPath: /api/health
     envVars:
