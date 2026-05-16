@@ -485,19 +485,32 @@ model Job {
   cancelledAt        DateTime?
   cancelReason       String?
   disputeId          String?       @db.Uuid
+  budgetMin          Decimal?      @db.Decimal(10, 2)
+  budgetMax          Decimal?      @db.Decimal(10, 2)
+  complexity         JobComplexity @default(MEDIUM)
+  mediaUrls          String[]
+  voiceNoteUrl       String?
+  preferredTime      String?
+  leadPrice          Decimal?      @db.Decimal(8, 2)
+  matchingBatchNo    Int           @default(0)
+  aiProcessedAt      DateTime?
+  offerExpiresAt     DateTime?
   createdAt          DateTime      @default(now())
   updatedAt          DateTime      @updatedAt
 
-  customer CustomerProfile  @relation("CustomerJobs", fields: [customerId], references: [id])
-  tradie   TradieProfile?   @relation("TradieJobs", fields: [tradieId], references: [id])
-  address  Address?         @relation(fields: [addressId], references: [id])
-  claims   JobClaim[]
-  messages Message[]
-  images   JobImage[]
-  timeline JobStatusHistory[]
-  payment  Payment?
-  review   Review?
-  dispute  Dispute?
+  customer      CustomerProfile  @relation("CustomerJobs", fields: [customerId], references: [id])
+  tradie        TradieProfile?   @relation("TradieJobs", fields: [tradieId], references: [id])
+  address       Address?         @relation(fields: [addressId], references: [id])
+  claims        JobClaim[]
+  messages      Message[]
+  images        JobImage[]
+  timeline      JobStatusHistory[]
+  payment       Payment?
+  review        Review?
+  dispute       Dispute?
+  matchingQueue JobMatchingQueue[]
+  events        JobEvent[]
+  aiInsight     AIJobInsight?
 
   @@index([customerId])
   @@index([tradieId])
@@ -810,4 +823,135 @@ model Certification {
   @@index([tradieId])
   @@index([status])
   @@map("certifications")
+}
+
+// ─── New Enums ────────────────────────────────────────────────────────────────
+
+enum MatchStatus {
+  PENDING
+  SENT
+  ACCEPTED
+  DECLINED
+  EXPIRED
+  FALLBACK
+}
+
+enum JobEventType {
+  CREATED
+  AI_PROCESSED
+  MATCHING_STARTED
+  OFFER_SENT
+  OFFER_ACCEPTED
+  OFFER_DECLINED
+  OFFER_EXPIRED
+  REASSIGNED
+  TRADIE_EN_ROUTE
+  TRADIE_ARRIVED
+  WORK_STARTED
+  WORK_COMPLETED
+  PAYMENT_REQUESTED
+  PAYMENT_RECEIVED
+  DISPUTED
+  CANCELLED
+}
+
+enum OnlineStatus {
+  ONLINE
+  OFFLINE
+  BUSY
+  EMERGENCY_ONLY
+  AWAY
+}
+
+enum JobComplexity {
+  SIMPLE
+  MEDIUM
+  COMPLEX
+}
+
+// ─── New Models ───────────────────────────────────────────────────────────────
+
+model JobMatchingQueue {
+  id            String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId         String      @db.Uuid
+  tradieId      String      @db.Uuid
+  batchNumber   Int         @default(1)
+  matchScore    Decimal     @db.Decimal(8, 4)
+  distanceKm    Decimal?    @db.Decimal(8, 2)
+  status        MatchStatus @default(PENDING)
+  sentAt        DateTime?
+  respondedAt   DateTime?
+  expiresAt     DateTime?
+  declineReason String?
+  createdAt     DateTime    @default(now())
+
+  @@index([jobId])
+  @@index([tradieId])
+  @@index([status])
+  @@index([batchNumber])
+  @@index([expiresAt])
+  @@map("job_matching_queue")
+}
+
+model JobEvent {
+  id        String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId     String       @db.Uuid
+  type      JobEventType
+  actorId   String?      @db.Uuid
+  actorRole Role?
+  metadata  Json?
+  createdAt DateTime     @default(now())
+
+  @@index([jobId])
+  @@index([type])
+  @@index([createdAt])
+  @@map("job_events")
+}
+
+model TradieRealtimeStatus {
+  id               String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId         String       @unique @db.Uuid
+  onlineStatus     OnlineStatus @default(OFFLINE)
+  lastHeartbeatAt  DateTime?
+  currentJobId     String?      @db.Uuid
+  activeJobCount   Int          @default(0)
+  travelRadiusKm   Int          @default(25)
+  currentLatitude  Decimal?     @db.Decimal(10, 7)
+  currentLongitude Decimal?     @db.Decimal(10, 7)
+  isAutoAccept     Boolean      @default(false)
+  updatedAt        DateTime     @updatedAt
+
+  @@index([onlineStatus])
+  @@index([lastHeartbeatAt])
+  @@map("tradie_realtime_status")
+}
+
+model AIJobInsight {
+  id                  String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  jobId               String        @unique @db.Uuid
+  rawInput            String        @db.Text
+  extractedCategory   TradeCategory
+  complexity          JobComplexity @default(MEDIUM)
+  urgencyScore        Int
+  confidenceScore     Int
+  isEmergencyDetected Boolean       @default(false)
+  emergencyIndicators String[]
+  suggestedTitle      String
+  professionalSummary String        @db.Text
+  suggestedMaterials  String[]
+  estimatedPriceMin   Decimal?      @db.Decimal(10, 2)
+  estimatedPriceMax   Decimal?      @db.Decimal(10, 2)
+  leadPrice           Decimal?      @db.Decimal(8, 2)
+  suggestedTrades     String[]
+  imageAnalysis       Json?
+  voiceTranscript     String?       @db.Text
+  modelUsed           String?
+  processingMs        Int?
+  createdAt           DateTime      @default(now())
+  updatedAt           DateTime      @updatedAt
+
+  @@index([jobId])
+  @@index([extractedCategory])
+  @@index([urgencyScore])
+  @@map("ai_job_insights")
 }

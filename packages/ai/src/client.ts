@@ -9,4 +9,5 @@ export const AI_MODELS = {
   fast: 'gpt-4o-mini',
   balanced: 'gpt-4o',
   advanced: 'gpt-4o',
+  smart: 'gpt-4o',
 } as const;
