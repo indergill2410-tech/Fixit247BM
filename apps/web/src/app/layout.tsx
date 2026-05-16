@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from 'next';
 import { Geist, Geist_Mono } from 'next/font/google';
 import { Toaster } from 'sonner';
 import { Providers } from './providers';
+import { AnalyticsScripts } from '@/components/analytics/analytics-scripts';
 import '@fixit247/ui/src/styles/globals.css';
 
 const geistSans = Geist({ variable: '--font-geist-sans', subsets: ['latin'] });
@@ -38,6 +39,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           {children}
           <Toaster richColors position="top-right" closeButton />
         </Providers>
+        <AnalyticsScripts />
       </body>
     </html>
   );
