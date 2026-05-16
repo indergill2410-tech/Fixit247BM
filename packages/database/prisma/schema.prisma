@@ -955,3 +955,126 @@ model AIJobInsight {
   @@index([urgencyScore])
   @@map("ai_job_insights")
 }
+
+// ─── Financial Extension ──────────────────────────────────────────────────────
+
+enum PayoutStatus {
+  PENDING
+  PROCESSING
+  PAID
+  FAILED
+  HELD
+  CANCELLED
+}
+
+enum SurgeFactor {
+  NONE
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum CreditTransactionType {
+  PURCHASE
+  JOB_DEDUCTION
+  BONUS
+  REFUND
+  ADMIN_ADJUSTMENT
+  REFERRAL
+  SUBSCRIPTION_CREDIT
+}
+
+model Payout {
+  id                String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId          String       @db.Uuid
+  jobId             String?      @db.Uuid
+  amount            Decimal      @db.Decimal(10, 2)
+  currency          String       @default("AUD")
+  status            PayoutStatus @default(PENDING)
+  stripeTransferId  String?      @unique
+  stripePayoutId    String?
+  scheduledFor      DateTime?
+  processedAt       DateTime?
+  failureReason     String?
+  isHeld            Boolean      @default(false)
+  heldReason        String?
+  heldBy            String?      @db.Uuid
+  metadata          Json?
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@index([tradieId])
+  @@index([status])
+  @@index([jobId])
+  @@index([createdAt])
+  @@map("payouts")
+}
+
+model CreditPackage {
+  id            String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name          String
+  credits       Int
+  priceAud      Decimal  @db.Decimal(8, 2)
+  bonusCredits  Int      @default(0)
+  stripePriceId String?
+  isActive      Boolean  @default(true)
+  isPopular     Boolean  @default(false)
+  displayOrder  Int      @default(0)
+  createdAt     DateTime @default(now())
+
+  @@index([isActive])
+  @@index([displayOrder])
+  @@map("credit_packages")
+}
+
+model CreditLedger {
+  id           String                @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  tradieId     String                @db.Uuid
+  type         CreditTransactionType
+  credits      Int
+  balanceAfter Int
+  jobId        String?               @db.Uuid
+  packageId    String?               @db.Uuid
+  referenceId  String?
+  description  String
+  metadata     Json?
+  createdAt    DateTime              @default(now())
+
+  @@index([tradieId])
+  @@index([type])
+  @@index([jobId])
+  @@index([createdAt])
+  @@map("credit_ledger")
+}
+
+model PlatformConfig {
+  id        String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  key       String   @unique
+  value     String
+  category  String   @default("general")
+  updatedBy String?  @db.Uuid
+  updatedAt DateTime @updatedAt
+
+  @@index([category])
+  @@map("platform_config")
+}
+
+model SurgePricingRule {
+  id              String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  name            String
+  factor          SurgeFactor
+  multiplier      Decimal     @db.Decimal(4, 2)
+  startHour       Int?        // 0-23, null = always
+  endHour         Int?        // 0-23, null = always
+  daysOfWeek      Int[]       // 0=Sun … 6=Sat, empty = all days
+  tradeCategories String[]    // empty = all trades
+  isActive        Boolean     @default(true)
+  priority        Int         @default(0)
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([isActive])
+  @@index([factor])
+  @@map("surge_pricing_rules")
+}
