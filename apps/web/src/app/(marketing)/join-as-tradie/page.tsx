@@ -55,14 +55,14 @@ function EarningsCalculator() {
   const netYearly = netWeekly * 52;
 
   return (
-    <div className="rounded-3xl border border-gray-200 bg-white p-8 shadow-lg">
-      <h3 className="mb-6 text-xl font-bold text-gray-900">Calculate Your Earnings</h3>
+    <div className="rounded-3xl border border-white/8 bg-white/4 p-8 shadow-lg">
+      <h3 className="mb-6 text-xl font-bold text-white">Calculate Your Earnings</h3>
 
       {/* Jobs per week slider */}
       <div className="mb-6">
         <div className="mb-2 flex items-center justify-between">
-          <label className="text-sm font-semibold text-gray-700">Jobs per week</label>
-          <span className="text-lg font-extrabold text-brand-600">{jobsPerWeek}</span>
+          <label className="text-sm font-semibold text-gray-400">Jobs per week</label>
+          <span className="text-lg font-extrabold text-brand-400">{jobsPerWeek}</span>
         </div>
         <input
           type="range"
@@ -70,9 +70,9 @@ function EarningsCalculator() {
           max={10}
           value={jobsPerWeek}
           onChange={(e) => setJobsPerWeek(Number(e.target.value))}
-          className="w-full accent-brand-600"
+          className="w-full accent-brand-500"
         />
-        <div className="mt-1 flex justify-between text-xs text-gray-400">
+        <div className="mt-1 flex justify-between text-xs text-gray-500">
           <span>1</span>
           <span>10</span>
         </div>
@@ -80,11 +80,11 @@ function EarningsCalculator() {
 
       {/* Trade selector */}
       <div className="mb-6">
-        <label className="mb-2 block text-sm font-semibold text-gray-700">Your trade</label>
+        <label className="mb-2 block text-sm font-semibold text-gray-400">Your trade</label>
         <select
           value={trade}
           onChange={(e) => setTrade(e.target.value)}
-          className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-sm font-medium text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
+          className="w-full rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm font-medium text-white placeholder:text-gray-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
         >
           {Object.entries(TRADE_LABELS).map(([key, label]) => (
             <option key={key} value={key}>{label}</option>
@@ -94,32 +94,32 @@ function EarningsCalculator() {
 
       {/* Earnings breakdown */}
       <div className="mb-4 grid grid-cols-3 gap-3 text-center">
-        <div className="rounded-xl bg-gray-50 p-3">
+        <div className="rounded-xl bg-white/4 border border-white/8 p-3">
           <p className="text-xs text-gray-500">Weekly</p>
-          <p className="text-lg font-extrabold text-gray-900">${grossWeekly.toLocaleString()}</p>
+          <p className="text-lg font-extrabold text-white">${grossWeekly.toLocaleString()}</p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
+        <div className="rounded-xl bg-white/4 border border-white/8 p-3">
           <p className="text-xs text-gray-500">Monthly</p>
-          <p className="text-lg font-extrabold text-gray-900">${Math.round(netMonthly / (1 - PLATFORM_FEE)).toLocaleString()}</p>
+          <p className="text-lg font-extrabold text-white">${Math.round(netMonthly / (1 - PLATFORM_FEE)).toLocaleString()}</p>
         </div>
-        <div className="rounded-xl bg-gray-50 p-3">
+        <div className="rounded-xl bg-white/4 border border-white/8 p-3">
           <p className="text-xs text-gray-500">Yearly</p>
-          <p className="text-lg font-extrabold text-gray-900">${Math.round(netYearly / (1 - PLATFORM_FEE)).toLocaleString()}</p>
+          <p className="text-lg font-extrabold text-white">${Math.round(netYearly / (1 - PLATFORM_FEE)).toLocaleString()}</p>
         </div>
       </div>
 
-      <p className="mb-4 text-center text-xs text-gray-400">Fixit takes only 15% platform fee — released when job is complete</p>
+      <p className="mb-4 text-center text-xs text-gray-500">Fixit takes only 15% platform fee — released when job is complete</p>
 
       {/* Net earnings highlight */}
-      <div className="mb-6 rounded-2xl bg-green-50 border border-green-200 p-5 text-center">
-        <p className="text-sm font-medium text-green-700">Your NET weekly take-home</p>
-        <p className="mt-1 text-4xl font-extrabold text-green-700">${Math.round(netWeekly).toLocaleString()}</p>
-        <p className="mt-1 text-xs text-green-600">= ${Math.round(netMonthly).toLocaleString()}/mo · ${Math.round(netYearly).toLocaleString()}/yr</p>
+      <div className="mb-6 rounded-2xl bg-green-500/10 border border-green-500/30 p-5 text-center">
+        <p className="text-sm font-medium text-green-400">Your NET weekly take-home</p>
+        <p className="mt-1 text-4xl font-extrabold text-green-400">${Math.round(netWeekly).toLocaleString()}</p>
+        <p className="mt-1 text-xs text-green-500">= ${Math.round(netMonthly).toLocaleString()}/mo · ${Math.round(netYearly).toLocaleString()}/yr</p>
       </div>
 
       <Link
         href={`/auth/register?role=TRADIE`}
-        className="block w-full rounded-xl bg-brand-600 py-3.5 text-center text-sm font-bold text-white hover:bg-brand-700 transition-colors"
+        className="block w-full rounded-xl bg-brand-500 py-3.5 text-center text-sm font-bold text-gray-900 hover:bg-brand-400 transition-colors"
       >
         Start earning ${Math.round(netWeekly).toLocaleString()}/week — Sign Up Free
       </Link>
@@ -291,7 +291,7 @@ function JoinAsTradiePageInner() {
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/auth/register?role=TRADIE"
-              className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-white hover:bg-brand-600 transition-colors shadow-lg shadow-brand-900/30"
+              className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-900/30"
             >
               Start Earning Today
             </Link>
@@ -320,23 +320,23 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 3. Earnings Calculator */}
-      <section className="bg-gray-50 py-20 px-4">
+      <section className="bg-[#111111] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
-              <span className="mb-3 inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+              <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
                 EARNINGS CALCULATOR
               </span>
-              <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">
+              <h2 className="text-3xl font-extrabold text-white sm:text-4xl">
                 See exactly what you could earn
               </h2>
-              <p className="mt-4 text-lg text-gray-600">
+              <p className="mt-4 text-lg text-gray-400">
                 Adjust the sliders to see your estimated earnings based on real job data from tradies on our platform.
               </p>
               <ul className="mt-6 space-y-3">
                 {['No lock-in contracts', 'Cancel anytime', '85% of every job goes to you', 'Direct bank deposits'].map((item) => (
-                  <li key={item} className="flex items-center gap-2 text-sm font-medium text-gray-700">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-100 text-green-600 text-xs">✓</span>
+                  <li key={item} className="flex items-center gap-2 text-sm font-medium text-gray-400">
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 text-green-400 text-xs">✓</span>
                     {item}
                   </li>
                 ))}
@@ -348,25 +348,25 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 4. How It Works */}
-      <section id="how-it-works" className="bg-white py-20 px-4">
+      <section id="how-it-works" className="bg-[#0f0f0f] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
               HOW IT WORKS
             </span>
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">From sign-up to paid in 4 steps</h2>
+            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">From sign-up to paid in 4 steps</h2>
           </div>
           <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {HOW_IT_WORKS_STEPS.map((step) => (
-              <div key={step.step} className="relative rounded-2xl border border-gray-100 bg-gray-50 p-6">
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-600 text-xl font-extrabold text-white">
+              <div key={step.step} className="relative rounded-2xl border border-white/8 bg-white/4 p-6">
+                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-brand-500 text-xl font-extrabold text-gray-900">
                   {step.step}
                 </div>
-                <span className="mb-2 inline-block rounded-full bg-brand-50 px-2 py-0.5 text-xs font-medium text-brand-600">
+                <span className="mb-2 inline-block rounded-full bg-brand-500/20 px-2 py-0.5 text-xs font-medium text-brand-400">
                   {step.time}
                 </span>
-                <h3 className="mb-2 text-base font-bold text-gray-900">{step.title}</h3>
-                <p className="text-sm text-gray-600 leading-relaxed">{step.desc}</p>
+                <h3 className="mb-2 text-base font-bold text-white">{step.title}</h3>
+                <p className="text-sm text-gray-400 leading-relaxed">{step.desc}</p>
               </div>
             ))}
           </div>
@@ -374,14 +374,14 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 5. Subscription Plans */}
-      <section className="bg-gray-50 py-20 px-4">
+      <section className="bg-[#111111] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
               PLANS & PRICING
             </span>
-            <h2 className="text-3xl font-extrabold text-gray-900 sm:text-4xl">Choose your plan</h2>
-            <p className="mx-auto mt-4 max-w-xl text-gray-600">Start free, upgrade when you&apos;re ready. No lock-in contracts.</p>
+            <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Choose your plan</h2>
+            <p className="mx-auto mt-4 max-w-xl text-gray-400">Start free, upgrade when you&apos;re ready. No lock-in contracts.</p>
           </div>
           <div className="grid gap-8 lg:grid-cols-3">
             {PLANS.map((plan) => (
@@ -389,26 +389,26 @@ function JoinAsTradiePageInner() {
                 key={plan.name}
                 className={`relative rounded-3xl border p-8 ${
                   plan.highlight
-                    ? 'border-brand-500 bg-white shadow-2xl shadow-brand-100 ring-2 ring-brand-500'
-                    : 'border-gray-200 bg-white'
+                    ? 'border-brand-500/50 bg-brand-500/10 ring-1 ring-brand-500/30'
+                    : 'border-white/8 bg-white/4'
                 }`}
               >
                 {plan.badge && (
                   <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-                    <span className="rounded-full bg-brand-600 px-4 py-1 text-xs font-bold text-white shadow">
+                    <span className="rounded-full bg-brand-500 px-4 py-1 text-xs font-bold text-gray-900 shadow">
                       {plan.badge}
                     </span>
                   </div>
                 )}
                 <h3 className="text-sm font-bold uppercase tracking-widest text-gray-500">{plan.name}</h3>
                 <div className="mt-3 flex items-end gap-1">
-                  <span className="text-4xl font-extrabold text-gray-900">{plan.price}</span>
+                  <span className="text-4xl font-extrabold text-white">{plan.price}</span>
                   <span className="mb-1 text-gray-500">{plan.period}</span>
                 </div>
                 <ul className="mt-6 space-y-3">
                   {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2 text-sm text-gray-700">
-                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-600 text-xs">✓</span>
+                    <li key={f} className="flex items-start gap-2 text-sm text-gray-400">
+                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-500/20 text-green-400 text-xs">✓</span>
                       {f}
                     </li>
                   ))}
@@ -417,8 +417,8 @@ function JoinAsTradiePageInner() {
                   href={plan.href}
                   className={`mt-8 block w-full rounded-xl py-3 text-center text-sm font-bold transition-colors ${
                     plan.highlight
-                      ? 'bg-brand-600 text-white hover:bg-brand-700'
-                      : 'bg-gray-100 text-gray-900 hover:bg-gray-200'
+                      ? 'bg-brand-500 text-gray-900 hover:bg-brand-400'
+                      : 'bg-white/8 text-white hover:bg-white/12'
                   }`}
                 >
                   {plan.cta}
@@ -430,13 +430,13 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 6. Trust badges */}
-      <section className="bg-white border-y border-gray-100 py-10 px-4">
+      <section className="bg-[#0f0f0f] border-y border-white/8 py-10 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {TRUST_BADGES.map((badge) => (
               <div key={badge.label} className="flex flex-col items-center gap-2 text-center">
                 <span className="text-3xl">{badge.icon}</span>
-                <p className="text-sm font-semibold text-gray-700">{badge.label}</p>
+                <p className="text-sm font-semibold text-gray-400">{badge.label}</p>
               </div>
             ))}
           </div>
@@ -444,25 +444,25 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 7. Testimonials */}
-      <section className="bg-gray-50 py-20 px-4">
+      <section className="bg-[#111111] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
               TESTIMONIALS
             </span>
-            <h2 className="text-3xl font-extrabold text-gray-900">What tradies are saying</h2>
+            <h2 className="text-3xl font-extrabold text-white">What tradies are saying</h2>
           </div>
           <div className="grid gap-8 lg:grid-cols-3">
             {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="rounded-2xl bg-white border border-gray-100 p-7 shadow-sm">
+              <div key={t.name} className="rounded-2xl bg-white/4 border border-white/8 p-7 shadow-sm">
                 <div className="mb-3 flex gap-0.5">
                   {Array.from({ length: t.rating }).map((_, i) => (
                     <span key={i} className="text-yellow-400">★</span>
                   ))}
                 </div>
-                <p className="text-sm leading-relaxed text-gray-700">&ldquo;{t.quote}&rdquo;</p>
+                <p className="text-sm leading-relaxed text-gray-400">&ldquo;{t.quote}&rdquo;</p>
                 <div className="mt-5">
-                  <p className="text-sm font-bold text-gray-900">{t.name}</p>
+                  <p className="text-sm font-bold text-white">{t.name}</p>
                   <p className="text-xs text-gray-500">{t.trade}</p>
                 </div>
               </div>
@@ -472,19 +472,19 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 8. FAQ */}
-      <section className="bg-white py-20 px-4">
+      <section className="bg-[#0f0f0f] py-20 px-4">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-100 px-3 py-1 text-xs font-semibold text-brand-700">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
               FAQ
             </span>
-            <h2 className="text-3xl font-extrabold text-gray-900">Common questions</h2>
+            <h2 className="text-3xl font-extrabold text-white">Common questions</h2>
           </div>
           <div className="space-y-6">
             {FAQS.map((faq) => (
-              <div key={faq.q} className="rounded-2xl border border-gray-100 bg-gray-50 p-6">
-                <h3 className="mb-2 text-base font-bold text-gray-900">{faq.q}</h3>
-                <p className="text-sm leading-relaxed text-gray-600">{faq.a}</p>
+              <div key={faq.q} className="rounded-2xl border border-white/8 bg-white/4 p-6">
+                <h3 className="mb-2 text-base font-bold text-white">{faq.q}</h3>
+                <p className="text-sm leading-relaxed text-gray-400">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -501,7 +501,7 @@ function JoinAsTradiePageInner() {
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/auth/register?role=TRADIE"
-              className="rounded-xl bg-white px-8 py-4 text-base font-bold text-brand-700 hover:bg-brand-50 transition-colors shadow-lg"
+              className="rounded-xl bg-brand-400 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-300 transition-colors shadow-lg"
             >
               Join Free Today
             </Link>

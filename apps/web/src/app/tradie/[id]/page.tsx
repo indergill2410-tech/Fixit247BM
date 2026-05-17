@@ -86,20 +86,20 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
 
-      <div className="min-h-screen bg-gray-50">
+      <div className="min-h-screen bg-[#111111] text-white">
         {/* Back link */}
         <div className="mx-auto max-w-4xl px-4 pt-6">
-          <Link href="/find-a-tradie" className="flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700 mb-6">
+          <Link href="/find-a-tradie" className="flex items-center gap-1 text-sm text-gray-400 hover:text-gray-200 mb-6">
             <ChevronLeft size={14} /> Find a Tradie
           </Link>
         </div>
 
         {/* Profile header */}
-        <div className="bg-white border-b">
+        <div className="bg-[#111111] border-b border-white/8">
           <div className="mx-auto max-w-4xl px-4 py-8">
             <div className="flex items-start gap-6">
               {/* Avatar */}
-              <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-brand-100 text-3xl font-bold text-brand-700">
+              <div className="flex h-24 w-24 shrink-0 items-center justify-center rounded-2xl bg-brand-500/20 text-3xl font-bold text-brand-400">
                 {tradie.user.avatarUrl
                   ? <img src={tradie.user.avatarUrl} alt={fullName} className="h-24 w-24 rounded-2xl object-cover" />
                   : fullName.charAt(0)
@@ -109,15 +109,15 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
               <div className="flex-1">
                 <div className="flex items-start justify-between">
                   <div>
-                    <h1 className="text-2xl font-extrabold text-gray-900">{fullName}</h1>
-                    <p className="text-gray-500">{trades.join(' · ')}</p>
-                    <div className="mt-1 flex items-center gap-1 text-sm text-gray-500">
+                    <h1 className="text-2xl font-extrabold text-white">{fullName}</h1>
+                    <p className="text-gray-400">{trades.join(' · ')}</p>
+                    <div className="mt-1 flex items-center gap-1 text-sm text-gray-400">
                       <MapPin size={13} />
                       <span>{suburb}</span>
                     </div>
                   </div>
                   {isVerified && (
-                    <div className="flex items-center gap-1 rounded-full bg-green-100 px-3 py-1 text-sm font-semibold text-green-700">
+                    <div className="flex items-center gap-1 rounded-full bg-green-500/20 px-3 py-1 text-sm font-semibold text-green-400">
                       <Shield size={14} />
                       Verified
                     </div>
@@ -129,20 +129,20 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
                   <div className="mt-3 flex items-center gap-2">
                     <div className="flex items-center gap-1">
                       {[1,2,3,4,5].map((s) => (
-                        <Star key={s} size={16} className={s <= Math.round(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'} />
+                        <Star key={s} size={16} className={s <= Math.round(rating) ? 'fill-yellow-400 text-yellow-400' : 'text-white/20'} />
                       ))}
                     </div>
-                    <span className="text-sm font-semibold text-gray-700">{rating.toFixed(1)}</span>
+                    <span className="text-sm font-semibold text-gray-300">{rating.toFixed(1)}</span>
                     <span className="text-sm text-gray-400">({tradie.totalReviews ?? 0} reviews)</span>
                   </div>
                 )}
 
                 {/* Trust badges */}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {isVerified && <span className="flex items-center gap-1 rounded-full bg-brand-500/15 px-2.5 py-1 text-xs font-medium text-brand-600"><CheckCircle size={11} />Licensed</span>}
-                  {tradie.isInsured && <span className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700"><Shield size={11} />Insured</span>}
-                  {tradie.responseTimeMinutes && <span className="flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700"><Clock size={11} />{tradie.responseTimeMinutes}min avg response</span>}
-                  <span className="flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700"><CheckCircle size={11} />Background Checked</span>
+                  {isVerified && <span className="flex items-center gap-1 rounded-full bg-brand-500/15 px-2.5 py-1 text-xs font-medium text-brand-400"><CheckCircle size={11} />Licensed</span>}
+                  {tradie.isInsured && <span className="flex items-center gap-1 rounded-full bg-green-500/15 px-2.5 py-1 text-xs font-medium text-green-400"><Shield size={11} />Insured</span>}
+                  {tradie.responseTimeMinutes && <span className="flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-medium text-orange-400"><Clock size={11} />{tradie.responseTimeMinutes}min avg response</span>}
+                  <span className="flex items-center gap-1 rounded-full bg-purple-500/15 px-2.5 py-1 text-xs font-medium text-purple-400"><CheckCircle size={11} />Background Checked</span>
                 </div>
               </div>
             </div>
@@ -158,7 +158,7 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
               </Link>
               <Link
                 href="/emergency"
-                className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 px-6 py-3 font-semibold text-red-700 hover:bg-red-100 transition-colors"
+                className="flex items-center gap-2 rounded-xl border border-white/8 bg-white/4 px-6 py-3 font-semibold text-brand-400 hover:bg-white/8 transition-colors"
               >
                 Emergency Job
               </Link>
@@ -172,31 +172,31 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
           <div className="lg:col-span-2 space-y-6">
             {/* Bio */}
             {tradie.bio && (
-              <div className="rounded-2xl bg-white p-6">
-                <h2 className="mb-3 font-semibold text-gray-900">About {tradie.user.firstName}</h2>
-                <p className="text-sm text-gray-700 leading-relaxed">{tradie.bio}</p>
+              <div className="rounded-2xl bg-white/4 border border-white/8 p-6">
+                <h2 className="mb-3 font-semibold text-white">About {tradie.user.firstName}</h2>
+                <p className="text-sm text-gray-400 leading-relaxed">{tradie.bio}</p>
               </div>
             )}
 
             {/* Reviews */}
             {tradie.reviews.length > 0 && (
-              <div className="rounded-2xl bg-white p-6">
-                <h2 className="mb-4 font-semibold text-gray-900">Customer Reviews</h2>
+              <div className="rounded-2xl bg-white/4 border border-white/8 p-6">
+                <h2 className="mb-4 font-semibold text-white">Customer Reviews</h2>
                 <div className="space-y-4">
                   {tradie.reviews.map((review) => (
-                    <div key={review.id} className="border-b border-gray-100 pb-4 last:border-0 last:pb-0">
+                    <div key={review.id} className="border-b border-white/8 pb-4 last:border-0 last:pb-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-xs font-bold">
+                        <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/8 text-xs font-bold text-gray-300">
                           {review.reviewer.firstName.charAt(0)}
                         </div>
-                        <span className="text-sm font-medium text-gray-900">{review.reviewer.firstName}</span>
+                        <span className="text-sm font-medium text-white">{review.reviewer.firstName}</span>
                         <div className="flex items-center gap-0.5 ml-auto">
                           {[1,2,3,4,5].map((s) => (
-                            <Star key={s} size={12} className={s <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-gray-200'} />
+                            <Star key={s} size={12} className={s <= review.rating ? 'fill-yellow-400 text-yellow-400' : 'text-white/20'} />
                           ))}
                         </div>
                       </div>
-                      {review.comment && <p className="text-sm text-gray-600">{review.comment}</p>}
+                      {review.comment && <p className="text-sm text-gray-400">{review.comment}</p>}
                     </div>
                   ))}
                 </div>
@@ -206,30 +206,30 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
 
           {/* Right sidebar */}
           <div className="space-y-4">
-            <div className="rounded-2xl bg-white p-5">
-              <h3 className="mb-3 font-semibold text-gray-900">Specialties</h3>
+            <div className="rounded-2xl bg-white/4 border border-white/8 p-5">
+              <h3 className="mb-3 font-semibold text-white">Specialties</h3>
               <div className="flex flex-wrap gap-2">
                 {trades.map((t) => (
-                  <span key={t} className="rounded-full bg-brand-50 px-3 py-1 text-xs font-medium text-brand-700">{t}</span>
+                  <span key={t} className="rounded-full bg-brand-500/15 px-3 py-1 text-xs font-medium text-brand-400">{t}</span>
                 ))}
               </div>
             </div>
 
             {tradie.servicedSuburbs && tradie.servicedSuburbs.length > 0 && (
-              <div className="rounded-2xl bg-white p-5">
-                <h3 className="mb-3 font-semibold text-gray-900">Service Areas</h3>
+              <div className="rounded-2xl bg-white/4 border border-white/8 p-5">
+                <h3 className="mb-3 font-semibold text-white">Service Areas</h3>
                 <div className="flex flex-wrap gap-1.5">
                   {tradie.servicedSuburbs.slice(0, 10).map((s) => (
-                    <span key={s} className="rounded-full bg-gray-100 px-2.5 py-1 text-xs text-gray-600">{s}</span>
+                    <span key={s} className="rounded-full bg-white/8 px-2.5 py-1 text-xs text-gray-400">{s}</span>
                   ))}
                 </div>
               </div>
             )}
 
-            <div className="rounded-2xl bg-gray-900 p-5 text-white text-center">
+            <div className="rounded-2xl bg-white/8 border border-white/8 p-5 text-white text-center">
               <p className="mb-2 font-semibold">Need {tradie.user.firstName} urgently?</p>
               <p className="mb-4 text-xs text-gray-400">Post an emergency job and they&apos;ll be notified immediately</p>
-              <Link href="/emergency" className="inline-block w-full rounded-xl bg-red-600 py-2.5 text-sm font-bold hover:bg-red-700 transition-colors">
+              <Link href="/emergency" className="inline-block w-full rounded-xl bg-brand-400 py-2.5 text-sm font-bold text-gray-900 hover:bg-brand-300 transition-colors">
                 Emergency Dispatch
               </Link>
             </div>

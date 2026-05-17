@@ -6,11 +6,30 @@ import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@fixit2
 import { TrustScoreMeter, TrustBadge } from '@fixit247/ui';
 import Link from 'next/link';
 import { CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { db } from '@fixit247/database';
 
 export const metadata: Metadata = { title: 'Tradie Dashboard' };
 
 export default async function TradieDashboardPage() {
   const session = await requireOnboarding();
+
+  const incomingJobs = await db.job.findMany({
+    where: { status: 'OPEN', tradieId: null },
+    orderBy: [{ isEmergency: 'desc' }, { createdAt: 'desc' }],
+    take: 10,
+    select: {
+      id: true,
+      title: true,
+      tradeCategory: true,
+      suburb: true,
+      state: true,
+      budgetMin: true,
+      budgetMax: true,
+      isEmergency: true,
+      createdAt: true,
+    },
+  });
+
   return (
     <DashboardShell role="TRADIE">
       <PageHeader
@@ -37,22 +56,22 @@ export default async function TradieDashboardPage() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <CardTitle>Incoming jobs</CardTitle>
-              <Badge variant="warning">4 new</Badge>
+              <Badge variant="warning">{incomingJobs.length} new</Badge>
             </CardHeader>
             <CardContent>
-              <div className="divide-y divide-gray-100">
-                {MOCK_INCOMING.map((job) => (
+              <div className="divide-y divide-white/8">
+                {incomingJobs.map((job) => (
                   <div key={job.id} className="flex items-start justify-between py-4">
                     <div className="flex-1">
                       <div className="flex items-center gap-2">
-                        <p className="font-medium text-gray-900">{job.title}</p>
+                        <p className="font-medium text-white">{job.title}</p>
                         {job.isEmergency && <Badge variant="emergency">EMERGENCY</Badge>}
                       </div>
-                      <p className="mt-0.5 text-sm text-gray-500">{job.suburb} · {job.category}</p>
-                      <p className="mt-1 text-xs text-gray-400">{job.postedAgo}</p>
+                      <p className="mt-0.5 text-sm text-gray-500">{`${job.suburb}, ${job.state}`} · {job.tradeCategory}</p>
+                      <p className="mt-1 text-xs text-gray-400">{new Date(job.createdAt).toLocaleString()}</p>
                     </div>
                     <div className="flex flex-col items-end gap-2 pl-4">
-                      <p className="font-semibold text-gray-900">${job.budget}</p>
+                      <p className="font-semibold text-white">{job.budgetMin ? `$${job.budgetMin}` : 'Quote required'}</p>
                       <Button size="sm" asChild>
                         <Link href={`/tradie/jobs/${job.id}`}>View job</Link>
                       </Button>
@@ -97,7 +116,7 @@ export default async function TradieDashboardPage() {
                   {item.done
                     ? <CheckCircle size={16} className="text-green-500 shrink-0" />
                     : <AlertTriangle size={16} className="text-amber-500 shrink-0" />}
-                  <span className="text-sm text-gray-700">{item.label}</span>
+                  <span className="text-sm text-gray-300">{item.label}</span>
                   {!item.done && <span className="ml-auto text-xs text-amber-600">Needed</span>}
                 </div>
               ))}
@@ -111,9 +130,3 @@ export default async function TradieDashboardPage() {
     </DashboardShell>
   );
 }
-
-const MOCK_INCOMING = [
-  { id: '1', title: 'Burst pipe under kitchen sink', category: 'Plumbing', suburb: 'Surry Hills, NSW', budget: '350', isEmergency: true, postedAgo: '2 min ago' },
-  { id: '2', title: 'RCD tripping in switchboard', category: 'Electrical', suburb: 'Newtown, NSW', budget: '180', isEmergency: false, postedAgo: '15 min ago' },
-  { id: '3', title: 'Hot water system not working', category: 'Plumbing', suburb: 'Glebe, NSW', budget: '600', isEmergency: false, postedAgo: '1 hr ago' },
-];

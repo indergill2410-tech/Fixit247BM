@@ -59,7 +59,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
           <div>
             {job.isEmergency && (
               <span className="mb-2 inline-flex items-center gap-1.5 rounded-full bg-red-500 px-3 py-1 text-xs font-bold uppercase tracking-wide">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white" />
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-brand-400" />
                 Emergency
               </span>
             )}
@@ -96,8 +96,8 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
 
       {/* Status timeline */}
       {!isSearching && (
-        <div className="mb-6 rounded-2xl border bg-white p-5">
-          <h2 className="mb-4 text-sm font-semibold text-gray-700">Job Progress</h2>
+        <div className="mb-6 rounded-2xl border border-white/8 bg-white/4 p-5">
+          <h2 className="mb-4 text-sm font-semibold text-white">Job Progress</h2>
           <div className="relative">
             {/* Progress line */}
             <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-gray-100" />
@@ -123,7 +123,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
                       {step.icon}
                     </div>
                     <div className="flex-1">
-                      <p className={`text-sm font-medium ${done ? 'text-gray-900' : 'text-gray-400'}`}>{step.label}</p>
+                      <p className={`text-sm font-medium ${done ? 'text-white' : 'text-gray-400'}`}>{step.label}</p>
                     </div>
                     {active && <span className="text-xs text-brand-500 font-medium">Now</span>}
                   </motion.div>
@@ -145,7 +145,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
                   key={tab.key}
                   onClick={() => setActiveTab(tab.key as typeof activeTab)}
                   className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors ${
-                    activeTab === tab.key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                    activeTab === tab.key ? 'bg-brand-500/15 text-brand-400' : 'text-gray-500 hover:text-white'
                   }`}
                 >
                   <Icon size={14} />
@@ -173,7 +173,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
               />
             )}
             {activeTab === 'status' && (
-              <div className="flex h-full items-center justify-center rounded-2xl bg-gray-50 text-sm text-gray-400">
+              <div className="flex h-full items-center justify-center rounded-2xl bg-white/4 text-sm text-gray-400">
                 Job timeline shown above
               </div>
             )}
