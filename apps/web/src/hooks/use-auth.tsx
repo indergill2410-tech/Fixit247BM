@@ -43,14 +43,18 @@ function mapUser(supabaseUser: User): AuthUser {
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = React.useState<AuthUser | null>(null);
   const [isLoading, setIsLoading] = React.useState(true);
-  const supabase = getSupabaseBrowserClient();
 
   const refreshUser = React.useCallback(async () => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) return;
     const { data: { user: supabaseUser } } = await supabase.auth.getUser();
     setUser(supabaseUser ? mapUser(supabaseUser) : null);
-  }, [supabase]);
+  }, []);
 
   React.useEffect(() => {
+    const supabase = getSupabaseBrowserClient();
+    if (!supabase) { setIsLoading(false); return; }
+
     void supabase.auth.getUser().then(({ data: { user: u } }) => {
       setUser(u ? mapUser(u) : null);
       setIsLoading(false);
@@ -62,12 +66,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, [supabase]);
+  }, []);
 
   const signOut = React.useCallback(async () => {
-    await supabase.auth.signOut();
+    const supabase = getSupabaseBrowserClient();
+    if (supabase) await supabase.auth.signOut();
     window.location.href = '/login';
-  }, [supabase]);
+  }, []);
 
   return (
     <AuthContext.Provider value={{ user, isLoading, isAuthenticated: !!user, signOut, refreshUser }}>

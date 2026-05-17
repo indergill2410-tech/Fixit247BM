@@ -120,9 +120,15 @@ importers:
       '@fixit247/payments':
         specifier: workspace:*
         version: link:../../packages/payments
+      '@fixit247/realtime':
+        specifier: workspace:*
+        version: link:../../packages/realtime
       '@fixit247/ui':
         specifier: workspace:*
         version: link:../../packages/ui
+      '@fixit247/voice':
+        specifier: workspace:*
+        version: link:../../packages/voice
       '@hookform/resolvers':
         specifier: ^3.9.0
         version: 3.10.0(react-hook-form@7.76.0(react@19.2.6))
