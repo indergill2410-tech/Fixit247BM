@@ -14,10 +14,10 @@ export default async function CustomerDashboardPage() {
   return (
     <DashboardShell role="CUSTOMER">
       {/* Emergency banner */}
-      <div className="mb-6 flex items-center justify-between rounded-2xl bg-gradient-to-r from-red-600 to-red-500 p-5 text-white shadow-lg">
+      <div className="mb-6 flex items-center justify-between rounded-2xl border border-brand-500/30 bg-brand-500/10 p-5">
         <div>
-          <p className="text-sm font-medium text-red-100">Need urgent help right now?</p>
-          <p className="mt-0.5 text-xl font-bold">Emergency tradie dispatch — available 24/7</p>
+          <p className="text-sm font-medium text-brand-300">Need urgent help right now?</p>
+          <p className="mt-0.5 text-xl font-bold text-white">Emergency tradie dispatch — available 24/7</p>
         </div>
         <Button asChild variant="emergency" size="lg" className="shrink-0">
           <Link href="/jobs/emergency">
@@ -44,9 +44,9 @@ export default async function CustomerDashboardPage() {
           <RecentJobsList />
         </div>
         <div className="space-y-4">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
-            <h3 className="font-semibold text-gray-900">Quick actions</h3>
-            <div className="mt-3 space-y-2">
+          <div className="rounded-2xl border border-white/8 bg-white/4 p-5">
+            <h3 className="font-semibold text-white">Quick actions</h3>
+            <div className="mt-3 space-y-1">
               {[
                 { label: '🔧 Post a new job', href: '/jobs/new' },
                 { label: '⚡ Emergency request', href: '/jobs/emergency' },
@@ -56,10 +56,10 @@ export default async function CustomerDashboardPage() {
                 <Link
                   key={action.href}
                   href={action.href}
-                  className="flex items-center justify-between rounded-xl p-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                  className="flex items-center justify-between rounded-xl p-3 text-sm font-medium text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
                 >
                   {action.label}
-                  <span className="text-gray-400">→</span>
+                  <span className="text-gray-600">→</span>
                 </Link>
               ))}
             </div>

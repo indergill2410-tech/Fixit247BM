@@ -29,9 +29,9 @@ const TRADE_CATEGORIES = [
 ];
 
 const URGENCY_OPTIONS = [
-  { id: 'EMERGENCY', label: 'Emergency', sublabel: 'Right now — within 1 hour', icon: '🚨', color: 'border-red-400 bg-red-50 text-red-700' },
-  { id: 'URGENT', label: 'Same-day', sublabel: 'Today — within a few hours', icon: '⚡', color: 'border-orange-400 bg-orange-50 text-orange-700' },
-  { id: 'STANDARD', label: 'Scheduled', sublabel: 'I can wait a day or two', icon: '📅', color: 'border-gray-300 bg-white text-gray-700' },
+  { id: 'EMERGENCY', label: 'Emergency', sublabel: 'Right now — within 1 hour', icon: '🚨', color: 'border-red-500/50 bg-red-500/10 text-red-400' },
+  { id: 'URGENT', label: 'Same-day', sublabel: 'Today — within a few hours', icon: '⚡', color: 'border-orange-500/50 bg-orange-500/10 text-orange-400' },
+  { id: 'STANDARD', label: 'Scheduled', sublabel: 'I can wait a day or two', icon: '📅', color: 'border-white/20 bg-white/6 text-gray-300' },
 ];
 
 interface FormData {
@@ -183,7 +183,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 1: Describe the problem */}
         {step === 1 && !showAiScope && (
           <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-gray-900">What do you need help with?</h2>
+            <h2 className="mb-1 text-xl font-bold text-white">What do you need help with?</h2>
             <p className="mb-6 text-sm text-gray-500">Describe the problem in your own words — our AI will handle the rest.</p>
 
             <div className="space-y-4">
@@ -192,7 +192,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                 onChange={(e) => updateForm({ description: e.target.value })}
                 placeholder="e.g. My kitchen sink is leaking badly under the cabinet and water is coming through..."
                 rows={4}
-                className="w-full resize-none rounded-2xl border border-gray-200 bg-white p-4 text-sm placeholder-gray-400 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-100"
+                className="w-full resize-none rounded-2xl border border-white/15 bg-white/6 p-4 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               />
 
               <MediaUpload
@@ -230,7 +230,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* AI scope review */}
         {showAiScope && aiResult && (
           <motion.div key="ai-scope" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}>
-            <h2 className="mb-1 text-xl font-bold text-gray-900">AI Scope Review</h2>
+            <h2 className="mb-1 text-xl font-bold text-white">AI Scope Review</h2>
             <p className="mb-6 text-sm text-gray-500">Review what our AI found. You can edit anything before posting.</p>
             <AIScopeDisplay
               result={aiResult}
@@ -243,13 +243,13 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 2: Category + urgency */}
         {step === 2 && !showAiScope && (
           <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-gray-900">Trade & urgency</h2>
+            <h2 className="mb-1 text-xl font-bold text-white">Trade & urgency</h2>
             <p className="mb-6 text-sm text-gray-500">Confirm the trade category and how urgently you need help.</p>
 
             <div className="space-y-6">
               {/* Category grid */}
               <div>
-                <p className="mb-3 text-sm font-medium text-gray-700">Trade category</p>
+                <p className="mb-3 text-sm font-medium text-gray-400">Trade category</p>
                 <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
                   {TRADE_CATEGORIES.map((cat) => (
                     <button
@@ -259,8 +259,8 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                       className={cn(
                         'flex items-center gap-2 rounded-xl border p-3 text-left text-sm transition-all',
                         formData.category === cat.id
-                          ? 'border-brand-500 bg-brand-50 text-brand-700 ring-2 ring-brand-200'
-                          : 'border-gray-200 bg-white text-gray-700 hover:border-brand-300 hover:bg-gray-50'
+                          ? 'border-brand-500 bg-brand-500/10 text-brand-400 ring-2 ring-brand-500/30'
+                          : 'border-white/10 bg-white/4 text-gray-400 hover:border-brand-500/40 hover:bg-white/6'
                       )}
                     >
                       <span className="text-base">{cat.icon}</span>
@@ -273,7 +273,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
 
               {/* Urgency */}
               <div>
-                <p className="mb-3 text-sm font-medium text-gray-700">How urgent is this?</p>
+                <p className="mb-3 text-sm font-medium text-gray-400">How urgent is this?</p>
                 <div className="space-y-2">
                   {URGENCY_OPTIONS.map((opt) => (
                     <button
@@ -282,7 +282,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                       onClick={() => updateForm({ priority: opt.id })}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all',
-                        formData.priority === opt.id ? opt.color + ' ring-2 ring-offset-1' : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300'
+                        formData.priority === opt.id ? opt.color + ' ring-2 ring-offset-1 ring-offset-[#111]' : 'border-white/10 bg-white/4 text-gray-400 hover:border-white/20'
                       )}
                     >
                       <span className="text-xl">{opt.icon}</span>
@@ -316,22 +316,22 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 3: Location + budget + confirm */}
         {step === 3 && !showAiScope && (
           <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-gray-900">Location & budget</h2>
+            <h2 className="mb-1 text-xl font-bold text-white">Location & budget</h2>
             <p className="mb-6 text-sm text-gray-500">Tell tradies where you are and your rough budget (optional).</p>
 
             <div className="space-y-5">
               {/* Location (from profile — just show suburb) */}
-              <div className="flex items-center gap-3 rounded-xl border border-gray-200 bg-gray-50 p-4">
-                <MapPin size={18} className="text-brand-600 shrink-0" />
+              <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/4 p-4">
+                <MapPin size={18} className="text-brand-400 shrink-0" />
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-gray-900">Your location</p>
+                  <p className="text-sm font-medium text-white">Your location</p>
                   <p className="text-xs text-gray-500">Using your saved address — change in profile</p>
                 </div>
               </div>
 
               {/* Budget */}
               <div>
-                <p className="mb-2 text-sm font-medium text-gray-700">Budget range (optional)</p>
+                <p className="mb-2 text-sm font-medium text-gray-400">Budget range (optional)</p>
                 <div className="flex items-center gap-3">
                   <div className="relative flex-1">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
@@ -340,7 +340,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                       placeholder="Min"
                       value={formData.budgetMin ?? ''}
                       onChange={(e) => updateForm({ budgetMin: e.target.value ? Number(e.target.value) : undefined })}
-                      className="w-full rounded-xl border border-gray-200 py-3 pl-7 pr-3 text-sm focus:border-brand-400 focus:outline-none"
+                      className="w-full rounded-xl border border-white/15 bg-white/6 py-3 pl-7 pr-3 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none"
                     />
                   </div>
                   <span className="text-gray-400">–</span>
@@ -351,7 +351,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                       placeholder="Max"
                       value={formData.budgetMax ?? ''}
                       onChange={(e) => updateForm({ budgetMax: e.target.value ? Number(e.target.value) : undefined })}
-                      className="w-full rounded-xl border border-gray-200 py-3 pl-7 pr-3 text-sm focus:border-brand-400 focus:outline-none"
+                      className="w-full rounded-xl border border-white/15 bg-white/6 py-3 pl-7 pr-3 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none"
                     />
                   </div>
                   <span className="text-xs text-gray-400">AUD</span>
@@ -359,13 +359,13 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
               </div>
 
               {/* Job summary */}
-              <div className="rounded-xl bg-gray-50 p-4 space-y-2">
-                <p className="text-sm font-semibold text-gray-900">Job summary</p>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+              <div className="rounded-xl border border-white/8 bg-white/4 p-4 space-y-2">
+                <p className="text-sm font-semibold text-white">Job summary</p>
+                <div className="flex items-center gap-2 text-sm text-gray-400">
                   <span className="text-base">{TRADE_CATEGORIES.find((c) => c.id === formData.category)?.icon}</span>
                   <span>{formData.category.replace(/_/g, ' ')}</span>
                 </div>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
+                <div className="flex items-center gap-2 text-sm text-gray-400">
                   {formData.priority === 'EMERGENCY' ? <Zap size={14} className="text-red-500" /> : <Clock size={14} className="text-gray-400" />}
                   <span>{URGENCY_OPTIONS.find((o) => o.id === formData.priority)?.label}</span>
                 </div>

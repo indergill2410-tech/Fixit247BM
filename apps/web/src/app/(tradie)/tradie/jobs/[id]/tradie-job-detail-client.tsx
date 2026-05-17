@@ -81,9 +81,9 @@ export function TradieJobDetailClient({ job, currentUser }: Props) {
 
       {/* Job description */}
       {job.description && (
-        <div className="mb-4 rounded-xl border bg-white p-4">
-          <p className="text-xs font-medium text-gray-400 mb-1">Job Details</p>
-          <p className="text-sm text-gray-700">{job.description}</p>
+        <div className="mb-4 rounded-xl border border-white/8 bg-white/4 p-4">
+          <p className="text-xs font-medium text-gray-500 mb-1">Job Details</p>
+          <p className="text-sm text-gray-400">{job.description}</p>
         </div>
       )}
 
@@ -108,7 +108,7 @@ export function TradieJobDetailClient({ job, currentUser }: Props) {
       )}
 
       {/* Tabs */}
-      <div className="mb-4 flex gap-2 rounded-xl bg-gray-100 p-1">
+      <div className="mb-4 flex gap-2 rounded-xl bg-white/6 p-1">
         {[
           { key: 'nav', label: 'Navigation', icon: Navigation },
           { key: 'chat', label: 'Chat', icon: MessageCircle },
@@ -117,7 +117,7 @@ export function TradieJobDetailClient({ job, currentUser }: Props) {
             key={key}
             onClick={() => setActiveTab(key as 'nav' | 'chat')}
             className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors ${
-              activeTab === key ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-500 hover:text-gray-700'
+              activeTab === key ? 'bg-brand-500/15 text-brand-400' : 'text-gray-500 hover:text-white'
             }`}
           >
             <Icon size={14} />

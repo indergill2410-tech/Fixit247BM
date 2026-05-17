@@ -100,7 +100,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
           <h2 className="mb-4 text-sm font-semibold text-white">Job Progress</h2>
           <div className="relative">
             {/* Progress line */}
-            <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-gray-100" />
+            <div className="absolute left-4 top-4 bottom-4 w-0.5 bg-white/10" />
             <div
               className="absolute left-4 top-4 w-0.5 bg-brand-500 transition-all duration-700"
               style={{ height: `${(currentStepIndex / (JOB_STATUS_STEPS.length - 1)) * 100}%` }}
@@ -118,7 +118,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
                     animate={{ opacity: done ? 1 : 0.4 }}
                   >
                     <div className={`relative flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-base z-10 ${
-                      active ? 'bg-brand-500 ring-4 ring-brand-100 scale-110' : done ? 'bg-brand-500' : 'bg-gray-100'
+                      active ? 'bg-brand-500 ring-4 ring-brand-500/30 scale-110' : done ? 'bg-brand-500' : 'bg-white/10'
                     }`}>
                       {step.icon}
                     </div>
@@ -137,7 +137,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
       {/* Tab bar (when tradie active) */}
       {(isActive || isCompleted) && (
         <>
-          <div className="mb-4 flex gap-2 rounded-xl bg-gray-100 p-1">
+          <div className="mb-4 flex gap-2 rounded-xl bg-white/6 p-1">
             {TABS.map((tab) => {
               const Icon = tab.icon;
               return (

@@ -46,13 +46,13 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   return (
     <DashboardShell role="CUSTOMER">
       <div className="mb-6">
-        <Link href="/jobs" className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/jobs" className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-white transition-colors">
           <ChevronLeft size={16} />
           All jobs
         </Link>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
+            <h1 className="text-2xl font-bold text-white">{job.title}</h1>
             <p className="mt-1 text-sm text-gray-500">{job.category.replace(/_/g, ' ')} · Posted {new Date(job.createdAt).toLocaleDateString('en-AU')}</p>
           </div>
           <Badge variant={PRIORITY_BADGE[job.priority] ?? 'default'}>{job.priority}</Badge>
@@ -76,9 +76,9 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
           {/* AI insights */}
           {job.aiInsight && (
-            <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
-              <p className="mb-2 text-sm font-semibold text-brand-700">AI Job Analysis</p>
-              <p className="text-sm text-gray-700">{job.aiInsight.professionalSummary}</p>
+            <div className="rounded-2xl border border-brand-500/25 bg-brand-500/8 p-5">
+              <p className="mb-2 text-sm font-semibold text-brand-400">AI Job Analysis</p>
+              <p className="text-sm text-gray-400">{job.aiInsight.professionalSummary}</p>
               <div className="mt-3 flex gap-4 text-xs text-gray-500">
                 <span>Urgency: <strong>{job.aiInsight.urgencyScore}/100</strong></span>
                 <span>Confidence: <strong>{job.aiInsight.confidenceScore}%</strong></span>
@@ -89,22 +89,22 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
         {/* Job details sidebar */}
         <div className="space-y-4">
-          <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h3 className="mb-3 font-semibold text-gray-900">Job details</h3>
-            <p className="text-sm text-gray-700 leading-relaxed">{job.description}</p>
+          <div className="rounded-2xl border border-white/8 bg-white/4 p-5">
+            <h3 className="mb-3 font-semibold text-white">Job details</h3>
+            <p className="text-sm text-gray-400 leading-relaxed">{job.description}</p>
             {job.budgetMin && (
-              <div className="mt-3 border-t pt-3">
+              <div className="mt-3 border-t border-white/8 pt-3">
                 <p className="text-xs text-gray-500">Budget</p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-white">
                   ${job.budgetMin.toLocaleString()}
                   {job.budgetMax && ` – $${Number(job.budgetMax).toLocaleString()}`} AUD
                 </p>
               </div>
             )}
             {job.address && (
-              <div className="mt-3 border-t pt-3">
+              <div className="mt-3 border-t border-white/8 pt-3">
                 <p className="text-xs text-gray-500">Location</p>
-                <p className="text-sm font-medium text-gray-900">
+                <p className="text-sm font-medium text-white">
                   {job.address.suburb}, {job.address.state}
                 </p>
               </div>

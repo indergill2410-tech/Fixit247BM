@@ -34,7 +34,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               For Tradies
             </Link>
             <Link
-              href="/how-it-works"
+              href="/about"
               className="rounded-xl px-4 py-2 text-sm font-medium text-gray-400 transition-colors hover:bg-white/6 hover:text-white"
             >
               About
