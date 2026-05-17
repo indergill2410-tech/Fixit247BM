@@ -121,12 +121,12 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }} />
 
-      <div className="min-h-screen bg-white">
-        {/* Hero — red emergency banner */}
-        <section className="bg-red-600 py-16 text-white">
+      <div className="min-h-screen bg-[#111111] text-white">
+        {/* Hero — dark emergency banner with brand accents */}
+        <section className="bg-[#0f0f0f] py-16 text-white">
           <div className="mx-auto max-w-5xl px-4">
             {/* Breadcrumb */}
-            <nav className="mb-6 flex items-center gap-1 text-sm text-red-200">
+            <nav className="mb-6 flex items-center gap-1 text-sm text-gray-400">
               <Link href="/" className="hover:text-white">Home</Link>
               <ChevronRight size={14} />
               <Link href="/emergency" className="hover:text-white">Emergency</Link>
@@ -140,8 +140,8 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
               <span className="text-5xl">{tradeInfo.emoji}</span>
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="flex h-2 w-2 animate-pulse rounded-full bg-red-300" />
-                  <span className="text-sm font-bold uppercase tracking-widest text-red-200">Available Now · 24/7</span>
+                  <span className="flex h-2 w-2 animate-pulse rounded-full bg-brand-400" />
+                  <span className="text-sm font-bold uppercase tracking-widest text-brand-400">Available Now · 24/7</span>
                 </div>
                 <h1 className="text-4xl font-extrabold leading-tight md:text-5xl">
                   Emergency {tradeInfo.singular}<br />in {suburbName}
@@ -149,7 +149,7 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
               </div>
             </div>
 
-            <p className="mt-4 max-w-2xl text-lg text-red-100">
+            <p className="mt-4 max-w-2xl text-lg text-gray-400">
               Verified, licensed {tradeInfo.singular.toLowerCase()}s dispatched within 60 minutes.
               Available 24/7 across {suburbName} and surrounds.
             </p>
@@ -157,14 +157,14 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
             <div className="mt-8 flex flex-wrap gap-4">
               <Link
                 href="/emergency"
-                className="inline-flex items-center gap-2 rounded-2xl bg-white px-8 py-4 text-lg font-bold text-red-600 shadow-lg hover:bg-red-50 transition-colors"
+                className="inline-flex items-center gap-2 rounded-2xl bg-brand-400 px-8 py-4 text-lg font-bold text-gray-900 shadow-lg hover:bg-brand-300 transition-colors"
               >
                 <Zap size={20} />
                 Get Emergency Help Now
               </Link>
               <a
                 href="tel:1800348498"
-                className="inline-flex items-center gap-2 rounded-2xl border-2 border-white px-8 py-4 text-lg font-bold text-white hover:bg-red-700 transition-colors"
+                className="inline-flex items-center gap-2 rounded-2xl border-2 border-white/20 px-8 py-4 text-lg font-bold text-white hover:border-white/40 transition-colors"
               >
                 <Phone size={20} />
                 Call Now
@@ -172,7 +172,7 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
             </div>
 
             {/* Trust signals */}
-            <div className="mt-8 flex flex-wrap gap-6 text-sm text-red-100">
+            <div className="mt-8 flex flex-wrap gap-6 text-sm text-gray-400">
               <span className="flex items-center gap-1.5"><Clock size={14} /> 60-min response</span>
               <span className="flex items-center gap-1.5"><Shield size={14} /> Licensed &amp; insured</span>
               <span className="flex items-center gap-1.5"><Star size={14} /> 4.9★ average rating</span>
@@ -182,9 +182,9 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
         </section>
 
         {/* How it works */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-[#111111]">
           <div className="mx-auto max-w-5xl px-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+            <h2 className="text-2xl font-bold text-white mb-8 text-center">
               How Emergency Dispatch Works in {suburbName}
             </h2>
             <div className="grid gap-6 md:grid-cols-3">
@@ -193,11 +193,11 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
                 { step: '2', title: 'Instant Matching', desc: 'We notify verified local tradies in real-time. The first available one accepts your job immediately.', icon: '⚡' },
                 { step: '3', title: 'Tradie En Route', desc: `Track your tradie live on the map. Average arrival time in ${suburbName}: under 60 minutes.`, icon: '🚗' },
               ].map((s) => (
-                <div key={s.step} className="rounded-2xl bg-white p-6 shadow-sm text-center">
+                <div key={s.step} className="rounded-2xl bg-white/4 border border-white/8 p-6 text-center">
                   <div className="mb-3 text-4xl">{s.icon}</div>
-                  <div className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-600">Step {s.step}</div>
-                  <h3 className="mb-2 text-lg font-semibold text-gray-900">{s.title}</h3>
-                  <p className="text-sm text-gray-500">{s.desc}</p>
+                  <div className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-400">Step {s.step}</div>
+                  <h3 className="mb-2 text-lg font-semibold text-white">{s.title}</h3>
+                  <p className="text-sm text-gray-400">{s.desc}</p>
                 </div>
               ))}
             </div>
@@ -208,25 +208,25 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
         {localTradies.length > 0 && (
           <section className="py-16">
             <div className="mx-auto max-w-5xl px-4">
-              <h2 className="text-2xl font-bold text-gray-900 mb-8">
+              <h2 className="text-2xl font-bold text-white mb-8">
                 Verified {tradeInfo.singular}s Near {suburbName}
               </h2>
               <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {localTradies.map((t) => (
-                  <div key={t.id} className="rounded-2xl border border-gray-200 bg-white p-5">
+                  <div key={t.id} className="rounded-2xl border border-white/8 bg-white/4 p-5">
                     <div className="flex items-center gap-3 mb-3">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-100 text-lg font-bold text-brand-700">
+                      <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-500/20 text-lg font-bold text-brand-400">
                         {t.user.firstName.charAt(0)}
                       </div>
                       <div>
-                        <p className="font-semibold text-gray-900">{t.user.firstName} {t.user.lastName}</p>
-                        <div className="flex items-center gap-1 text-sm text-yellow-600">
-                          <Star size={12} className="fill-yellow-500 text-yellow-500" />
+                        <p className="font-semibold text-white">{t.user.firstName} {t.user.lastName}</p>
+                        <div className="flex items-center gap-1 text-sm text-yellow-400">
+                          <Star size={12} className="fill-yellow-400 text-yellow-400" />
                           <span>{t.avgRating ? Number(t.avgRating).toFixed(1) : 'New'}</span>
                         </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1 text-xs text-green-600">
+                    <div className="flex items-center gap-1 text-xs text-green-400">
                       <Shield size={12} />
                       <span>Verified &amp; Licensed</span>
                     </div>
@@ -238,9 +238,9 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
         )}
 
         {/* FAQ */}
-        <section className="py-16 bg-gray-50">
+        <section className="py-16 bg-[#0f0f0f]">
           <div className="mx-auto max-w-3xl px-4">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8 text-center">
+            <h2 className="text-2xl font-bold text-white mb-8 text-center">
               Frequently Asked Questions — Emergency {tradeInfo.singular} {suburbName}
             </h2>
             <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify({
@@ -254,12 +254,12 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
             }) }} />
             <div className="space-y-4">
               {faqs.map(({ q, a }, i) => (
-                <details key={i} className="group rounded-2xl border border-gray-200 bg-white">
-                  <summary className="flex cursor-pointer items-center justify-between p-5 font-semibold text-gray-900 hover:text-brand-700">
+                <details key={i} className="group rounded-2xl border border-white/8 bg-white/4">
+                  <summary className="flex cursor-pointer items-center justify-between p-5 font-semibold text-white hover:text-brand-400">
                     {q}
                     <ChevronRight size={16} className="shrink-0 rotate-90 transition-transform group-open:rotate-[270deg]" />
                   </summary>
-                  <p className="px-5 pb-5 text-sm text-gray-600">{a}</p>
+                  <p className="px-5 pb-5 text-sm text-gray-400">{a}</p>
                 </details>
               ))}
             </div>
@@ -267,7 +267,7 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
         </section>
 
         {/* CTA footer */}
-        <section className="bg-gray-900 py-16 text-white">
+        <section className="bg-[#111111] py-16 text-white border-t border-white/8">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <h2 className="text-3xl font-extrabold mb-4">
               Need an Emergency {tradeInfo.singular} in {suburbName}?
@@ -277,7 +277,7 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
             </p>
             <Link
               href="/emergency"
-              className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-10 py-5 text-lg font-bold text-white shadow-lg hover:bg-red-700 transition-colors"
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand-400 px-10 py-5 text-lg font-bold text-gray-900 shadow-lg hover:bg-brand-300 transition-colors"
             >
               <Zap size={20} />
               Get Help Now — It&apos;s Free to Post

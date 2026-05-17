@@ -100,7 +100,7 @@ export function MediaUpload({ onImagesChange, onVoiceTranscript, maxImages = 4, 
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.8 }}
-                className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-gray-200"
+                className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-white/15"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt={`Upload ${idx + 1}`} className="h-full w-full object-cover" />
@@ -120,7 +120,7 @@ export function MediaUpload({ onImagesChange, onVoiceTranscript, maxImages = 4, 
               type="button"
               onClick={() => fileInputRef.current?.click()}
               disabled={uploadingImages}
-              className="flex h-20 w-20 flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 text-gray-400 hover:border-brand-400 hover:bg-brand-50 hover:text-brand-600 transition-colors"
+              className="flex h-20 w-20 flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/20 bg-white/4 text-gray-500 hover:border-brand-400 hover:bg-brand-500/10 hover:text-brand-400 transition-colors"
             >
               {uploadingImages ? <Loader2 size={20} className="animate-spin" /> : <ImagePlus size={20} />}
               <span className="mt-1 text-xs">Add photo</span>

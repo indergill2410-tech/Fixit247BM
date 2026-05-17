@@ -77,7 +77,7 @@ export default async function EarningsPage() {
       </StatsGrid>
 
       <div className="mt-8">
-        <h2 className="mb-4 text-lg font-semibold text-gray-900">Recent payouts</h2>
+        <h2 className="mb-4 text-lg font-semibold text-white">Recent payouts</h2>
         <PayoutHistory payouts={payoutsForDisplay} />
       </div>
     </DashboardShell>

@@ -19,17 +19,17 @@ const ARTICLES = [
 ];
 
 const CATEGORY_COLORS: Record<string, string> = {
-  Emergency: 'bg-red-100 text-red-700',
-  Safety: 'bg-orange-100 text-orange-700',
-  Guide: 'bg-brand-500/20 text-brand-600',
-  Maintenance: 'bg-green-100 text-green-700',
-  Pricing: 'bg-purple-100 text-purple-700',
+  Emergency: 'bg-red-900/40 text-brand-400',
+  Safety: 'bg-orange-900/40 text-orange-400',
+  Guide: 'bg-brand-500/20 text-brand-400',
+  Maintenance: 'bg-green-900/40 text-green-400',
+  Pricing: 'bg-purple-900/40 text-purple-400',
 };
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-white">
-      <div className="bg-gray-900 py-16 text-white">
+    <div className="min-h-screen bg-[#111111] text-white">
+      <div className="bg-[#111111] py-16 text-white">
         <div className="mx-auto max-w-5xl px-4">
           <h1 className="text-4xl font-extrabold">Home Services Blog</h1>
           <p className="mt-3 text-lg text-gray-400">Expert advice for Australian homeowners. Emergency tips, guides, and pricing.</p>
@@ -38,14 +38,14 @@ export default function BlogPage() {
       <div className="mx-auto max-w-5xl px-4 py-12">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {ARTICLES.map((article) => (
-            <Link key={article.slug} href={`/blog/${article.slug}`} className="group rounded-2xl border border-gray-200 bg-white p-6 hover:border-brand-300 hover:shadow-md transition-all">
+            <Link key={article.slug} href={`/blog/${article.slug}`} className="group rounded-2xl border border-white/8 bg-white/4 p-6 hover:border-brand-400/40 hover:shadow-md transition-all">
               <div className="mb-3 flex items-center gap-2">
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${CATEGORY_COLORS[article.category] ?? 'bg-gray-100 text-gray-600'}`}>{article.category}</span>
+                <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${CATEGORY_COLORS[article.category] ?? 'bg-white/8 text-gray-400'}`}>{article.category}</span>
                 <span className="flex items-center gap-1 text-xs text-gray-400"><Clock size={10} />{article.readTime}</span>
               </div>
-              <h2 className="mb-2 font-bold text-gray-900 group-hover:text-brand-700 transition-colors leading-snug">{article.title}</h2>
-              <p className="text-sm text-gray-500 leading-relaxed">{article.excerpt}</p>
-              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-brand-600">Read more <ChevronRight size={14} /></div>
+              <h2 className="mb-2 font-bold text-white group-hover:text-brand-400 transition-colors leading-snug">{article.title}</h2>
+              <p className="text-sm text-gray-400 leading-relaxed">{article.excerpt}</p>
+              <div className="mt-4 flex items-center gap-1 text-sm font-medium text-brand-400">Read more <ChevronRight size={14} /></div>
             </Link>
           ))}
         </div>

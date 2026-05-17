@@ -68,8 +68,8 @@ export function TradieJobCard({
       initial={{ opacity: 0, y: 8 }}
       animate={{ opacity: 1, y: 0 }}
       className={cn(
-        'rounded-2xl border bg-white shadow-sm transition-shadow hover:shadow-md',
-        job.isEmergency ? 'border-red-200 ring-1 ring-red-100' : 'border-gray-200'
+        'rounded-2xl border transition-colors',
+        job.isEmergency ? 'border-red-500/30 bg-red-500/5 ring-1 ring-red-500/20' : 'border-white/8 bg-white/4 hover:bg-white/6'
       )}
     >
       {/* Emergency banner */}
@@ -86,7 +86,7 @@ export function TradieJobCard({
           <div className="flex items-start gap-3 min-w-0 flex-1">
             <span className="mt-0.5 text-2xl shrink-0">{CATEGORY_ICONS[job.category] ?? '🔨'}</span>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold text-gray-900 leading-tight">{job.title}</p>
+              <p className="font-semibold text-white leading-tight">{job.title}</p>
               <p className="text-xs text-gray-500">{job.category.replace(/_/g, ' ')}</p>
             </div>
           </div>
@@ -95,13 +95,13 @@ export function TradieJobCard({
           {job.leadPrice && (
             <div className="shrink-0 text-right">
               <p className="text-xs text-gray-400">Lead price</p>
-              <p className="text-lg font-bold text-brand-700">${job.leadPrice}</p>
+              <p className="text-lg font-bold text-brand-400">${job.leadPrice}</p>
             </div>
           )}
         </div>
 
         {/* Description */}
-        <p className="mb-3 text-sm text-gray-600 line-clamp-2">{job.description}</p>
+        <p className="mb-3 text-sm text-gray-400 line-clamp-2">{job.description}</p>
 
         {/* Meta row */}
         <div className="mb-4 flex flex-wrap items-center gap-3 text-xs text-gray-500">
@@ -135,7 +135,7 @@ export function TradieJobCard({
               <span>Urgency</span>
               <span>{job.aiInsight.urgencyScore}/100</span>
             </div>
-            <div className="h-1.5 overflow-hidden rounded-full bg-gray-100">
+            <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
               <div
                 className={cn(
                   'h-full rounded-full',
@@ -150,9 +150,9 @@ export function TradieJobCard({
 
         {/* Match score */}
         {matchScore !== undefined && (
-          <div className="mb-4 flex items-center gap-2 rounded-xl bg-brand-50 px-3 py-2">
-            <span className="text-xs font-medium text-brand-700">Match score: {matchScore.toFixed(0)}/100</span>
-            {matchScore >= 80 && <span className="ml-auto text-xs text-brand-600">⭐ Great fit</span>}
+          <div className="mb-4 flex items-center gap-2 rounded-xl bg-brand-500/10 px-3 py-2">
+            <span className="text-xs font-medium text-brand-400">Match score: {matchScore.toFixed(0)}/100</span>
+            {matchScore >= 80 && <span className="ml-auto text-xs text-brand-400">⭐ Great fit</span>}
           </div>
         )}
 
@@ -162,7 +162,7 @@ export function TradieJobCard({
             <button
               onClick={() => onDecline(job.id)}
               disabled={isProcessing}
-              className="flex-1 rounded-xl border border-gray-300 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+              className="flex-1 rounded-xl border border-white/15 py-2.5 text-sm font-medium text-gray-400 hover:bg-white/6 hover:text-white disabled:opacity-50 transition-colors"
             >
               Decline
             </button>
@@ -181,7 +181,7 @@ export function TradieJobCard({
         ) : (
           <Link
             href={`/tradie/jobs/${job.id}`}
-            className="flex items-center justify-between rounded-xl border border-gray-200 px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-between rounded-xl border border-white/10 px-4 py-2.5 text-sm font-medium text-gray-400 hover:bg-white/6 hover:text-white transition-colors"
           >
             <span>View details</span>
             <ChevronRight size={16} className="text-gray-400" />

@@ -1,9 +1,21 @@
 import OpenAI from 'openai';
 
-const apiKey = process.env['OPENAI_API_KEY'];
-if (!apiKey) throw new Error('Missing OPENAI_API_KEY');
+let _openai: OpenAI | null = null;
 
-export const openai = new OpenAI({ apiKey });
+function getOpenAI(): OpenAI {
+  if (!_openai) {
+    const apiKey = process.env['OPENAI_API_KEY'];
+    if (!apiKey) throw new Error('Missing OPENAI_API_KEY');
+    _openai = new OpenAI({ apiKey });
+  }
+  return _openai;
+}
+
+export const openai = new Proxy({} as OpenAI, {
+  get(_target, prop) {
+    return (getOpenAI() as never)[prop as keyof OpenAI];
+  },
+});
 
 export const AI_MODELS = {
   fast: 'gpt-4o-mini',

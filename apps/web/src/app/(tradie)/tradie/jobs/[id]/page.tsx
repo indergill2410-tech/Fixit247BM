@@ -32,13 +32,13 @@ export default async function TradieJobDetailPage({ params }: { params: Promise<
   return (
     <DashboardShell role="TRADIE">
       <div className="mb-6">
-        <Link href="/tradie/jobs" className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-gray-700">
+        <Link href="/tradie/jobs" className="mb-4 flex items-center gap-1 text-sm text-gray-500 hover:text-white transition-colors">
           <ChevronLeft size={16} />
           Back to jobs
         </Link>
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">{job.title}</h1>
+            <h1 className="text-2xl font-bold text-white">{job.title}</h1>
             <p className="mt-1 text-sm text-gray-500">
               {job.category.replace(/_/g, ' ')} · Posted {new Date(job.createdAt).toLocaleDateString('en-AU')}
             </p>
@@ -54,27 +54,27 @@ export default async function TradieJobDetailPage({ params }: { params: Promise<
         {/* Main content */}
         <div className="lg:col-span-2 space-y-5">
           {/* Description */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5">
-            <h2 className="mb-3 font-semibold text-gray-900">Job description</h2>
-            <p className="text-sm text-gray-700 leading-relaxed">{job.description}</p>
+          <div className="rounded-2xl border border-white/8 bg-white/4 p-5">
+            <h2 className="mb-3 font-semibold text-white">Job description</h2>
+            <p className="text-sm text-gray-400 leading-relaxed">{job.description}</p>
           </div>
 
           {/* AI insights */}
           {job.aiInsight && (
-            <div className="rounded-2xl border border-brand-100 bg-brand-50 p-5">
-              <p className="mb-2 text-sm font-semibold text-brand-700">✨ AI Scope Analysis</p>
-              <p className="mb-3 text-sm text-gray-700">{job.aiInsight.professionalSummary}</p>
-              <div className="flex flex-wrap gap-4 text-xs text-gray-600">
-                <span>Urgency: <strong>{job.aiInsight.urgencyScore}/100</strong></span>
-                <span>Confidence: <strong>{job.aiInsight.confidenceScore}%</strong></span>
-                <span>Complexity: <strong>{job.aiInsight.complexity}</strong></span>
+            <div className="rounded-2xl border border-brand-500/25 bg-brand-500/8 p-5">
+              <p className="mb-2 text-sm font-semibold text-brand-400">✨ AI Scope Analysis</p>
+              <p className="mb-3 text-sm text-gray-400">{job.aiInsight.professionalSummary}</p>
+              <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                <span>Urgency: <strong className="text-white">{job.aiInsight.urgencyScore}/100</strong></span>
+                <span>Confidence: <strong className="text-white">{job.aiInsight.confidenceScore}%</strong></span>
+                <span>Complexity: <strong className="text-white">{job.aiInsight.complexity}</strong></span>
               </div>
               {job.aiInsight.suggestedMaterials.length > 0 && (
                 <div className="mt-3">
                   <p className="mb-1 text-xs text-gray-500">Suggested materials:</p>
                   <div className="flex flex-wrap gap-1">
                     {job.aiInsight.suggestedMaterials.map((m) => (
-                      <span key={m} className="rounded-full bg-white border border-brand-200 px-2 py-0.5 text-xs text-brand-700">{m}</span>
+                      <span key={m} className="rounded-full border border-brand-500/30 bg-brand-500/10 px-2 py-0.5 text-xs text-brand-400">{m}</span>
                     ))}
                   </div>
                 </div>
@@ -96,24 +96,24 @@ export default async function TradieJobDetailPage({ params }: { params: Promise<
         {/* Sidebar */}
         <div className="space-y-4">
           {/* Job meta */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 space-y-3">
-            <h3 className="font-semibold text-gray-900">Job details</h3>
+          <div className="rounded-2xl border border-white/8 bg-white/4 p-5 space-y-3">
+            <h3 className="font-semibold text-white">Job details</h3>
 
             {job.address && (
-              <div className="flex items-start gap-2 text-sm text-gray-700">
-                <MapPin size={16} className="mt-0.5 shrink-0 text-gray-400" />
+              <div className="flex items-start gap-2 text-sm text-gray-400">
+                <MapPin size={16} className="mt-0.5 shrink-0 text-gray-500" />
                 <span>{job.address.street}, {job.address.suburb} {job.address.state} {job.address.postcode}</span>
               </div>
             )}
 
-            <div className="flex items-center gap-2 text-sm text-gray-700">
-              <Clock size={16} className="shrink-0 text-gray-400" />
+            <div className="flex items-center gap-2 text-sm text-gray-400">
+              <Clock size={16} className="shrink-0 text-gray-500" />
               <span>{new Date(job.createdAt).toLocaleString('en-AU')}</span>
             </div>
 
             {(job.budgetMin || job.budgetMax) && (
-              <div className="flex items-center gap-2 text-sm text-gray-700">
-                <DollarSign size={16} className="shrink-0 text-gray-400" />
+              <div className="flex items-center gap-2 text-sm text-gray-400">
+                <DollarSign size={16} className="shrink-0 text-gray-500" />
                 <span>
                   {job.budgetMin && job.budgetMax
                     ? `$${Number(job.budgetMin).toLocaleString()} – $${Number(job.budgetMax).toLocaleString()} AUD`
@@ -125,9 +125,9 @@ export default async function TradieJobDetailPage({ params }: { params: Promise<
             )}
 
             {job.leadPrice && (
-              <div className="border-t pt-3">
+              <div className="border-t border-white/8 pt-3">
                 <p className="text-xs text-gray-500">Lead price (deducted from wallet)</p>
-                <p className="text-xl font-bold text-brand-700">${Number(job.leadPrice).toFixed(2)} AUD</p>
+                <p className="text-xl font-bold text-brand-400">${Number(job.leadPrice).toFixed(2)} AUD</p>
               </div>
             )}
           </div>

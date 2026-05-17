@@ -36,17 +36,17 @@ export function TradieJobActions({ jobId, status, isEmergency, budgetMax, budget
 
   if (status === 'OPEN' && !hasAccepted) {
     return (
-      <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <h3 className="mb-3 font-semibold text-gray-900">Submit your quote</h3>
+      <div className="rounded-2xl border border-white/8 bg-white/4 p-5">
+        <h3 className="mb-3 font-semibold text-white">Submit your quote</h3>
         <div className="mb-4">
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">Your quoted price (AUD)</label>
+          <label className="mb-1.5 block text-sm font-medium text-gray-400">Your quoted price (AUD)</label>
           <div className="relative">
-            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">$</span>
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">$</span>
             <input
               type="number"
               value={quotedPrice}
               onChange={(e) => setQuotedPrice(e.target.value)}
-              className="w-full rounded-xl border border-gray-200 py-3 pl-7 pr-3 text-sm focus:border-brand-400 focus:outline-none"
+              className="w-full rounded-xl border border-white/15 bg-white/6 py-3 pl-7 pr-3 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none"
               placeholder="0"
             />
           </div>
@@ -76,8 +76,8 @@ export function TradieJobActions({ jobId, status, isEmergency, budgetMax, budget
 
   if (status === 'CLAIMED') {
     return (
-      <div className="rounded-2xl border border-green-200 bg-green-50 p-5">
-        <p className="mb-3 font-semibold text-green-800">You've accepted this job!</p>
+      <div className="rounded-2xl border border-green-500/30 bg-green-500/8 p-5">
+        <p className="mb-3 font-semibold text-green-400">You've accepted this job!</p>
         <Button
           onClick={() => callApi(`/api/jobs/${jobId}/status`, 'PATCH', { status: 'IN_PROGRESS' })}
           disabled={loading}
@@ -92,8 +92,8 @@ export function TradieJobActions({ jobId, status, isEmergency, budgetMax, budget
 
   if (status === 'IN_PROGRESS') {
     return (
-      <div className="rounded-2xl border border-brand-200 bg-brand-50 p-5">
-        <p className="mb-3 font-semibold text-brand-800">Job in progress</p>
+      <div className="rounded-2xl border border-brand-500/30 bg-brand-500/8 p-5">
+        <p className="mb-3 font-semibold text-brand-400">Job in progress</p>
         <Button
           onClick={() => callApi(`/api/jobs/${jobId}/status`, 'PATCH', { status: 'COMPLETED' })}
           disabled={loading}
