@@ -23,7 +23,7 @@ const TYPE_CONFIG: Record<string, { icon: React.ElementType; color: string; labe
   PURCHASE:            { icon: TrendingUp,   color: 'text-green-600',  label: 'Purchase' },
   JOB_DEDUCTION:       { icon: TrendingDown, color: 'text-red-500',    label: 'Job Claimed' },
   BONUS:               { icon: Gift,          color: 'text-purple-600', label: 'Bonus' },
-  REFUND:              { icon: TrendingUp,    color: 'text-blue-600',   label: 'Refund' },
+  REFUND:              { icon: TrendingUp,    color: 'text-brand-400',  label: 'Refund' },
   ADMIN_ADJUSTMENT:    { icon: AlertCircle,   color: 'text-orange-600', label: 'Admin Adjustment' },
   REFERRAL:            { icon: Gift,          color: 'text-pink-600',   label: 'Referral' },
   SUBSCRIPTION_CREDIT: { icon: TrendingUp,   color: 'text-brand-600',  label: 'Subscription' },

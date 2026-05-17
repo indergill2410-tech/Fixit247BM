@@ -15,7 +15,7 @@ interface MessageBubbleProps {
 }
 
 function DeliveryIcon({ status }: { status?: string }) {
-  if (status === 'READ') return <CheckCheck size={12} className="text-blue-400" />;
+  if (status === 'READ') return <CheckCheck size={12} className="text-brand-400" />;
   if (status === 'DELIVERED') return <CheckCheck size={12} className="text-gray-400" />;
   return <Check size={12} className="text-gray-400" />;
 }

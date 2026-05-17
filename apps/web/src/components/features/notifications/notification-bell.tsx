@@ -16,8 +16,8 @@ function formatTimeAgo(iso: string): string {
 
 const TYPE_COLORS: Record<string, string> = {
   JOB_ACCEPTED: 'bg-green-100',
-  TRADIE_EN_ROUTE: 'bg-blue-100',
-  TRADIE_ARRIVED: 'bg-blue-200',
+  TRADIE_EN_ROUTE: 'bg-brand-500/20',
+  TRADIE_ARRIVED: 'bg-brand-500/30',
   JOB_COMPLETED: 'bg-purple-100',
   PAYMENT_RELEASED: 'bg-green-100',
   PAYMENT_FAILED: 'bg-red-100',

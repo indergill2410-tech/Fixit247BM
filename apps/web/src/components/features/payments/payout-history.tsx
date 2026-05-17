@@ -16,7 +16,7 @@ interface Payout {
 
 const STATUS_CONFIG: Record<string, { icon: React.ElementType; color: string; label: string }> = {
   PENDING:    { icon: Clock,         color: 'text-yellow-600', label: 'Pending' },
-  PROCESSING: { icon: Clock,         color: 'text-blue-600',   label: 'Processing' },
+  PROCESSING: { icon: Clock,         color: 'text-brand-400',  label: 'Processing' },
   PAID:       { icon: CheckCircle,   color: 'text-green-600',  label: 'Paid' },
   FAILED:     { icon: XCircle,       color: 'text-red-500',    label: 'Failed' },
   HELD:       { icon: AlertTriangle, color: 'text-orange-600', label: 'On Hold' },

@@ -1,14 +1,14 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Phone, Clock, Shield, Star, Zap, CheckCircle } from 'lucide-react';
+import { Phone, Clock, CheckCircle, Zap } from 'lucide-react';
 
 export const metadata: Metadata = {
-  title: 'Emergency Trades Australia | 24/7 Dispatch | Fixit 24/7',
+  title: 'Emergency Trades Australia | 24/7 Dispatch | Fixit247',
   description: 'Get emergency trade help now. Verified plumbers, electricians, locksmiths, HVAC technicians and roofers dispatched in under 60 minutes, 24/7 across Australia.',
   openGraph: {
-    title: 'Emergency Trades Australia | 24/7 Dispatch | Fixit 24/7',
+    title: 'Emergency Trades Australia | 24/7 Dispatch | Fixit247',
     description: 'Get emergency trade help now. Verified tradies dispatched in under 60 minutes, 24/7 across Australia.',
-    siteName: 'Fixit 24/7',
+    siteName: 'Fixit247',
     locale: 'en_AU',
     type: 'website',
   },
@@ -49,36 +49,39 @@ const TRUST_POINTS = [
 
 export default function EmergencyHubPage() {
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-[#0f0f0f] text-white">
       {/* Hero */}
-      <section className="bg-red-600 py-20 text-white">
-        <div className="mx-auto max-w-5xl px-4 text-center">
+      <section className="relative overflow-hidden py-24 text-center">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute left-1/2 top-0 h-[500px] w-[600px] -translate-x-1/2 rounded-full bg-brand-500/10 blur-3xl" />
+        </div>
+        <div className="relative z-10 mx-auto max-w-5xl px-4">
           <div className="mb-4 flex items-center justify-center gap-2">
-            <span className="flex h-3 w-3 animate-pulse rounded-full bg-red-300" />
-            <span className="text-sm font-bold uppercase tracking-widest text-red-200">Live · Tradies Available Now</span>
+            <span className="flex h-2.5 w-2.5 animate-pulse rounded-full bg-brand-400" />
+            <span className="text-sm font-bold uppercase tracking-widest text-brand-400">Live · Tradies Available Now</span>
           </div>
 
           <h1 className="text-5xl font-extrabold leading-tight md:text-6xl">
             Emergency Trade Help,<br />
-            <span className="text-red-200">Available Right Now</span>
+            <span className="text-brand-400">Available Right Now</span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-red-100">
+          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400">
             Verified, licensed tradies dispatched to your door in under 60 minutes.
             Available 24 hours a day, 7 days a week, across Australia.
           </p>
 
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
-              href="/post-job?emergency=true"
-              className="inline-flex items-center gap-2 rounded-2xl bg-white px-10 py-5 text-xl font-extrabold text-red-600 shadow-xl hover:bg-red-50 transition-colors"
+              href="/jobs/new?emergency=true"
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-10 py-5 text-xl font-extrabold text-gray-900 shadow-xl shadow-brand-500/20 hover:bg-brand-400 transition-colors"
             >
               <Zap size={24} />
               Get Emergency Help Now
             </Link>
             <a
               href="tel:1800348498"
-              className="inline-flex items-center gap-2 rounded-2xl border-2 border-white px-10 py-5 text-xl font-bold text-white hover:bg-red-700 transition-colors"
+              className="inline-flex items-center gap-2 rounded-2xl border-2 border-white/20 px-10 py-5 text-xl font-bold text-white hover:bg-white/8 transition-colors"
             >
               <Phone size={24} />
               Call 1800-FIXIT-247
@@ -88,9 +91,9 @@ export default function EmergencyHubPage() {
           {/* Stats */}
           <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
             {STATS.map((s) => (
-              <div key={s.label} className="rounded-2xl bg-red-700/50 p-4 backdrop-blur-sm">
-                <p className="text-2xl font-extrabold text-white">{s.value}</p>
-                <p className="mt-1 text-xs text-red-200">{s.label}</p>
+              <div key={s.label} className="rounded-2xl border border-white/8 bg-white/4 p-4 backdrop-blur-sm">
+                <p className="text-2xl font-extrabold text-brand-400">{s.value}</p>
+                <p className="mt-1 text-xs text-gray-500">{s.label}</p>
               </div>
             ))}
           </div>
@@ -98,9 +101,9 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Emergency trade links */}
-      <section className="py-16">
+      <section className="border-t border-white/8 py-16">
         <div className="mx-auto max-w-5xl px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+          <h2 className="text-2xl font-bold text-white mb-2 text-center">
             Select Your Emergency Trade
           </h2>
           <p className="text-center text-gray-500 mb-10">
@@ -111,16 +114,16 @@ export default function EmergencyHubPage() {
               <Link
                 key={t.slug}
                 href={`/emergency/${t.slug}/sydney-cbd`}
-                className="flex items-start gap-4 rounded-2xl border border-gray-200 bg-white p-5 hover:border-red-300 hover:bg-red-50 transition-colors group"
+                className="flex items-start gap-4 rounded-2xl border border-white/8 bg-white/4 p-5 hover:border-brand-500/40 hover:bg-brand-500/8 transition-colors group"
               >
                 <span className="text-3xl shrink-0">{t.emoji}</span>
                 <div className="flex-1">
-                  <p className="font-bold text-gray-900 group-hover:text-red-700">
+                  <p className="font-bold text-white group-hover:text-brand-300 transition-colors">
                     Emergency {t.singular} →
                   </p>
                   <p className="mt-0.5 text-sm text-gray-500">{t.examples}</p>
                 </div>
-                <div className="shrink-0 rounded-full bg-red-100 px-2 py-0.5 text-xs font-bold text-red-700">
+                <div className="shrink-0 rounded-full bg-brand-500/15 px-2.5 py-0.5 text-xs font-bold text-brand-400">
                   24/7
                 </div>
               </Link>
@@ -130,36 +133,21 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* How it works */}
-      <section className="py-16 bg-gray-50">
+      <section className="border-t border-white/8 bg-[#111111] py-16">
         <div className="mx-auto max-w-5xl px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">
+          <h2 className="text-2xl font-bold text-white mb-10 text-center">
             How Emergency Dispatch Works
           </h2>
           <div className="grid gap-6 md:grid-cols-3">
             {[
-              {
-                step: '1',
-                title: 'Describe Your Emergency',
-                desc: 'Tell us what\'s happening. Our AI triages the urgency and identifies the right trade for your situation.',
-                icon: '📋',
-              },
-              {
-                step: '2',
-                title: 'We Notify Local Tradies',
-                desc: 'Verified tradies in your area are alerted instantly. The first available professional accepts your job.',
-                icon: '📡',
-              },
-              {
-                step: '3',
-                title: 'Tradie En Route',
-                desc: 'Track your tradie in real-time. Average arrival time across Australian cities: under 60 minutes.',
-                icon: '🚗',
-              },
+              { step: '1', title: 'Describe Your Emergency', desc: 'Tell us what\'s happening. Our AI triages the urgency and identifies the right trade for your situation.', icon: '📋' },
+              { step: '2', title: 'We Notify Local Tradies', desc: 'Verified tradies in your area are alerted instantly. The first available professional accepts your job.', icon: '📡' },
+              { step: '3', title: 'Tradie En Route', desc: 'Track your tradie in real-time. Average arrival time across Australian cities: under 60 minutes.', icon: '🚗' },
             ].map((s) => (
-              <div key={s.step} className="rounded-2xl bg-white p-6 shadow-sm text-center">
+              <div key={s.step} className="rounded-2xl border border-white/8 bg-white/4 p-6 text-center">
                 <div className="mb-3 text-4xl">{s.icon}</div>
-                <div className="mb-1 text-xs font-bold uppercase tracking-widest text-red-600">Step {s.step}</div>
-                <h3 className="mb-2 text-lg font-semibold text-gray-900">{s.title}</h3>
+                <div className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-400">Step {s.step}</div>
+                <h3 className="mb-2 text-lg font-semibold text-white">{s.title}</h3>
                 <p className="text-sm text-gray-500">{s.desc}</p>
               </div>
             ))}
@@ -168,27 +156,27 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Trust signals */}
-      <section className="py-16">
+      <section className="border-t border-white/8 py-16">
         <div className="mx-auto max-w-5xl px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-10 text-center">
+          <h2 className="text-2xl font-bold text-white mb-10 text-center">
             Every Tradie is Verified
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {TRUST_POINTS.map((p) => (
-              <div key={p.title} className="rounded-2xl border border-gray-100 bg-gray-50 p-5 text-center">
+              <div key={p.title} className="rounded-2xl border border-white/8 bg-white/4 p-5 text-center">
                 <div className="mb-3 text-3xl">{p.icon}</div>
-                <h3 className="mb-2 font-semibold text-gray-900">{p.title}</h3>
+                <h3 className="mb-2 font-semibold text-white">{p.title}</h3>
                 <p className="text-sm text-gray-500">{p.desc}</p>
               </div>
             ))}
           </div>
 
-          <div className="mt-8 rounded-2xl bg-green-50 border border-green-200 p-5">
+          <div className="mt-8 rounded-2xl border border-brand-500/30 bg-brand-500/8 p-5">
             <div className="flex items-start gap-3">
-              <CheckCircle size={20} className="text-green-600 shrink-0 mt-0.5" />
+              <CheckCircle size={20} className="text-brand-400 shrink-0 mt-0.5" />
               <div>
-                <p className="font-semibold text-green-900">Satisfaction Guarantee</p>
-                <p className="mt-1 text-sm text-green-700">
+                <p className="font-semibold text-white">Satisfaction Guarantee</p>
+                <p className="mt-1 text-sm text-gray-400">
                   Your payment is held securely in escrow and only released when you confirm the work is complete and you are satisfied. If something goes wrong, our support team steps in.
                 </p>
               </div>
@@ -198,9 +186,9 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Recent suburbs */}
-      <section className="py-16 bg-gray-50">
+      <section className="border-t border-white/8 bg-[#111111] py-16">
         <div className="mx-auto max-w-5xl px-4">
-          <h2 className="text-2xl font-bold text-gray-900 mb-2 text-center">
+          <h2 className="text-2xl font-bold text-white mb-2 text-center">
             Recently Served Suburbs
           </h2>
           <p className="text-center text-gray-500 mb-8">Emergency jobs completed in the last 24 hours</p>
@@ -208,9 +196,9 @@ export default function EmergencyHubPage() {
             {RECENT_SUBURBS.map((s) => (
               <span
                 key={s}
-                className="flex items-center gap-1.5 rounded-full bg-white border border-gray-200 px-4 py-2 text-sm text-gray-700"
+                className="flex items-center gap-1.5 rounded-full border border-white/8 bg-white/4 px-4 py-2 text-sm text-gray-400"
               >
-                <span className="h-2 w-2 rounded-full bg-green-500" />
+                <span className="h-2 w-2 rounded-full bg-brand-400" />
                 {s}
               </span>
             ))}
@@ -219,11 +207,11 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="bg-gray-900 py-16 text-white">
-        <div className="mx-auto max-w-2xl px-4 text-center">
+      <section className="border-t border-white/8 px-4 py-20 text-center">
+        <div className="mx-auto max-w-2xl">
           <div className="mb-4 flex items-center justify-center gap-2">
-            <Clock size={18} className="text-red-400" />
-            <span className="text-sm font-bold uppercase tracking-widest text-red-400">Don&apos;t Wait</span>
+            <Clock size={18} className="text-brand-400" />
+            <span className="text-sm font-bold uppercase tracking-widest text-brand-400">Don&apos;t Wait</span>
           </div>
           <h2 className="text-3xl font-extrabold mb-4">
             Get Emergency Help in Minutes
@@ -233,15 +221,15 @@ export default function EmergencyHubPage() {
           </p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
-              href="/post-job?emergency=true"
-              className="inline-flex items-center gap-2 rounded-2xl bg-red-600 px-10 py-5 text-lg font-bold text-white shadow-lg hover:bg-red-700 transition-colors"
+              href="/jobs/new?emergency=true"
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-10 py-5 text-lg font-bold text-gray-900 shadow-lg shadow-brand-500/20 hover:bg-brand-400 transition-colors"
             >
               <Zap size={20} />
               Get Help Now — It&apos;s Free to Post
             </Link>
             <a
               href="tel:1800348498"
-              className="inline-flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+              className="inline-flex items-center gap-2 text-gray-500 hover:text-white transition-colors"
             >
               <Phone size={18} />
               <span>or call 1800-FIXIT-247</span>

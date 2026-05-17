@@ -15,7 +15,7 @@ const ACTIVITIES = [
 
 const STATUS_LABELS: Record<string, { label: string; color: string }> = {
   COMPLETED: { label: 'Completed', color: 'text-green-600' },
-  EN_ROUTE: { label: 'Tradie en route', color: 'text-blue-600' },
+  EN_ROUTE: { label: 'Tradie en route', color: 'text-brand-400' },
   CLAIMED: { label: 'Tradie assigned', color: 'text-brand-600' },
   IN_PROGRESS: { label: 'In progress', color: 'text-orange-600' },
 };

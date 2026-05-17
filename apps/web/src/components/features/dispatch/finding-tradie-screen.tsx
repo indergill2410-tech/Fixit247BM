@@ -19,8 +19,8 @@ const PHASE_CONFIG = {
   },
   BATCH_SENT: {
     icon: Users,
-    color: 'text-blue-500',
-    bg: 'bg-blue-50',
+    color: 'text-brand-400',
+    bg: 'bg-brand-500/10',
     label: 'Notifying nearby tradies',
     pulse: true,
   },
