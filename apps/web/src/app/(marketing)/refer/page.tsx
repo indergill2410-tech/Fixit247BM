@@ -108,7 +108,7 @@ export default function ReferPage() {
               <button onClick={shareWhatsApp} className="flex flex-col items-center gap-1.5 rounded-2xl bg-green-600 py-4 text-sm font-semibold hover:bg-green-700 transition-colors">
                 <span className="text-2xl">💬</span> WhatsApp
               </button>
-              <button onClick={shareSMS} className="flex flex-col items-center gap-1.5 rounded-2xl bg-blue-600 py-4 text-sm font-semibold hover:bg-blue-700 transition-colors">
+              <button onClick={shareSMS} className="flex flex-col items-center gap-1.5 rounded-2xl bg-brand-500 py-4 text-sm font-semibold hover:bg-brand-600 transition-colors">
                 <span className="text-2xl">📱</span> SMS
               </button>
               <button onClick={nativeShare} className="flex flex-col items-center gap-1.5 rounded-2xl bg-white/10 py-4 text-sm font-semibold hover:bg-white/20 transition-colors">

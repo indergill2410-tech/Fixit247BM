@@ -21,7 +21,7 @@ interface Props {
 }
 
 const STATUS_ACTIONS: Record<string, { label: string; next: string; color: string } | null> = {
-  CLAIMED:     { label: "I'm On My Way", next: 'EN_ROUTE', color: 'bg-blue-600 hover:bg-blue-700' },
+  CLAIMED:     { label: "I'm On My Way", next: 'EN_ROUTE', color: 'bg-brand-500 hover:bg-brand-400' },
   EN_ROUTE:    { label: "I've Arrived", next: 'ARRIVED', color: 'bg-green-600 hover:bg-green-700' },
   ARRIVED:     { label: 'Start Job', next: 'IN_PROGRESS', color: 'bg-brand-600 hover:bg-brand-700' },
   IN_PROGRESS: { label: 'Mark Job Complete', next: 'COMPLETED', color: 'bg-green-600 hover:bg-green-700' },

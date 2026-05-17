@@ -139,7 +139,7 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
 
                 {/* Trust badges */}
                 <div className="mt-3 flex flex-wrap gap-2">
-                  {isVerified && <span className="flex items-center gap-1 rounded-full bg-blue-50 px-2.5 py-1 text-xs font-medium text-blue-700"><CheckCircle size={11} />Licensed</span>}
+                  {isVerified && <span className="flex items-center gap-1 rounded-full bg-brand-500/15 px-2.5 py-1 text-xs font-medium text-brand-600"><CheckCircle size={11} />Licensed</span>}
                   {tradie.isInsured && <span className="flex items-center gap-1 rounded-full bg-green-50 px-2.5 py-1 text-xs font-medium text-green-700"><Shield size={11} />Insured</span>}
                   {tradie.responseTimeMinutes && <span className="flex items-center gap-1 rounded-full bg-orange-50 px-2.5 py-1 text-xs font-medium text-orange-700"><Clock size={11} />{tradie.responseTimeMinutes}min avg response</span>}
                   <span className="flex items-center gap-1 rounded-full bg-purple-50 px-2.5 py-1 text-xs font-medium text-purple-700"><CheckCircle size={11} />Background Checked</span>

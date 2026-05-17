@@ -21,7 +21,7 @@ const ARTICLES = [
 const CATEGORY_COLORS: Record<string, string> = {
   Emergency: 'bg-red-100 text-red-700',
   Safety: 'bg-orange-100 text-orange-700',
-  Guide: 'bg-blue-100 text-blue-700',
+  Guide: 'bg-brand-500/20 text-brand-600',
   Maintenance: 'bg-green-100 text-green-700',
   Pricing: 'bg-purple-100 text-purple-700',
 };
