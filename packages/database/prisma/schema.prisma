@@ -136,14 +136,6 @@ enum AuditAction {
   ACCOUNT_REINSTATED
 }
 
-enum DisputeStatus {
-  OPEN
-  UNDER_REVIEW
-  RESOLVED
-  ESCALATED
-  CLOSED
-}
-
 enum SubscriptionTier {
   FREE
   BASIC
@@ -491,7 +483,6 @@ model Job {
   completedAt        DateTime?
   cancelledAt        DateTime?
   cancelReason       String?
-  disputeId          String?       @db.Uuid
   budgetMin          Decimal?      @db.Decimal(10, 2)
   budgetMax          Decimal?      @db.Decimal(10, 2)
   complexity         JobComplexity @default(MEDIUM)
@@ -695,33 +686,6 @@ model Payment {
   @@index([status])
   @@index([createdAt])
   @@map("payments")
-}
-
-// ─── Disputes ─────────────────────────────────────────────────────────────────
-
-model Dispute {
-  id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  jobId        String        @unique @db.Uuid
-  raisedBy     String        @db.Uuid
-  respondentId String        @db.Uuid
-  reason       String
-  description  String        @db.Text
-  status       DisputeStatus @default(OPEN)
-  resolution   String?       @db.Text
-  resolvedBy   String?       @db.Uuid
-  resolvedAt   DateTime?
-  refundAmount Decimal?      @db.Decimal(10, 2)
-  evidence     Json?
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
-
-  job Job @relation(fields: [jobId], references: [id])
-
-  @@index([raisedBy])
-  @@index([respondentId])
-  @@index([status])
-  @@index([createdAt])
-  @@map("disputes")
 }
 
 // ─── Subscriptions ────────────────────────────────────────────────────────────
@@ -1323,7 +1287,7 @@ model FraudFlag {
 
 model Dispute {
   id           String        @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  jobId        String        @db.Uuid
+  jobId        String        @unique @db.Uuid
   customerId   String        @db.Uuid
   tradieId     String        @db.Uuid
   reason       DisputeReason
@@ -1341,7 +1305,8 @@ model Dispute {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  @@index([jobId])
+  job Job @relation(fields: [jobId], references: [id])
+
   @@index([customerId])
   @@index([tradieId])
   @@index([status])
