@@ -622,6 +622,8 @@ model Message {
   createdAt   DateTime      @default(now())
   updatedAt   DateTime      @updatedAt
 
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
   @@index([jobId])
   @@index([senderId])
   @@index([receiverId])
@@ -866,6 +868,8 @@ model JobMatchingQueue {
   declineReason String?
   createdAt     DateTime    @default(now())
 
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
   @@index([jobId])
   @@index([tradieId])
   @@index([status])
@@ -882,6 +886,8 @@ model JobEvent {
   actorRole Role?
   metadata  Json?
   createdAt DateTime     @default(now())
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([jobId])
   @@index([type])
@@ -930,6 +936,8 @@ model AIJobInsight {
   processingMs        Int?
   createdAt           DateTime      @default(now())
   updatedAt           DateTime      @updatedAt
+
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([jobId])
   @@index([extractedCategory])
@@ -1606,7 +1614,7 @@ model MarketingCampaign {
 
 model ReviewRequest {
   id             String              @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  jobId          String              @db.Uuid
+  jobId          String              @unique @db.Uuid
   customerId     String              @db.Uuid
   tradieId       String              @db.Uuid
   status         ReviewRequestStatus @default(PENDING)
