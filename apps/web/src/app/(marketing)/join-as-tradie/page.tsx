@@ -43,7 +43,7 @@ const TRADE_LABELS: Record<string, string> = {
 
 const PLATFORM_FEE = 0.15;
 
-export function EarningsCalculator() {
+function EarningsCalculator() {
   const [jobsPerWeek, setJobsPerWeek] = useState(3);
   const [trade, setTrade] = useState('PLUMBING');
 
