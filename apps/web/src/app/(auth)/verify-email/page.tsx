@@ -5,7 +5,7 @@ import { Button } from '@fixit247/ui';
 
 export const metadata: Metadata = { title: 'Verify Email' };
 
-export default function VerifyEmailPage({ searchParams }: { searchParams: Promise<{ email?: string }> }) {
+export default function VerifyEmailPage() {
   return (
     <div className="text-center">
       <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-brand-500/20">

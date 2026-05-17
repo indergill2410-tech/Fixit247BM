@@ -43,7 +43,7 @@ const TRADE_LABELS: Record<string, string> = {
 
 const PLATFORM_FEE = 0.15;
 
-export function EarningsCalculator() {
+function EarningsCalculator() {
   const [jobsPerWeek, setJobsPerWeek] = useState(3);
   const [trade, setTrade] = useState('PLUMBING');
 
@@ -130,7 +130,7 @@ export function EarningsCalculator() {
 // ─── Page (also client since it embeds EarningsCalculator) ──────────────────
 
 const STATS = [
-  { value: '$2.8M', label: 'paid to tradies this month' },
+  { value: '$111/mo', label: 'free credits for your first 6 months' },
   { value: '4.9★', label: 'average tradie rating' },
   { value: '< 60s', label: 'to receive a lead' },
   { value: '5,000+', label: 'active tradies' },
@@ -170,10 +170,10 @@ const PLANS = [
     period: '/mo',
     highlight: false,
     features: [
-      '5 leads per month',
+      '$111/month free credits for 6 months',
+      '5 leads per month after bonus period',
       'Standard dispatch priority',
       'Basic profile listing',
-      'Email support',
     ],
     cta: 'Start Free',
     href: '/auth/register?role=TRADIE&plan=FREE',
@@ -275,6 +275,9 @@ function JoinAsTradiePageInner() {
       <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-brand-900 px-4 py-24 text-center text-white">
         <div className="absolute inset-0 bg-grid-white/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
         <div className="relative z-10 mx-auto max-w-4xl">
+          <span className="mb-2 inline-flex items-center rounded-full bg-green-500/20 border border-green-400/30 px-4 py-1.5 text-sm font-bold text-green-300 backdrop-blur-sm">
+            🎁 Sign up bonus: $111/month in free credits for your first 6 months
+          </span>
           <span className="mb-4 inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
             🇦🇺 Join 5,000+ Australian tradies already earning on Fixit 24/7
           </span>
