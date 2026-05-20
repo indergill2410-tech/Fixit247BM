@@ -9,7 +9,7 @@ services:
     buildCommand: >
       NODE_ENV=development pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
-      pnpm --filter @fixit247/database run db:migrate:prod &&
+      pnpm --filter @fixit247/database run db:push &&
       pnpm --filter @fixit247/web build
     startCommand: pnpm --filter @fixit247/web start
     healthCheckPath: /api/health
