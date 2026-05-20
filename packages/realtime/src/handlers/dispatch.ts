@@ -13,7 +13,7 @@ type IoServer = Server<ClientToServerEvents, ServerToClientEvents, InterServerEv
 // Called by the matching engine / API routes to push dispatch status to customer
 export function emitDispatchUpdate(io: IoServer, customerId: string, update: DispatchUpdate): void {
   io.to(ROOMS.user(customerId)).emit('dispatch:update', update);
-  io.to(ROOMS.adminLive()).emit('admin:job_feed', { type: 'dispatch_update', data: update });
+  io.to(ROOMS.adminLive()).emit('admin:job_feed', { type: 'dispatch_update', data: update as unknown as Record<string, unknown> });
 }
 
 export function emitJobOffer(
@@ -25,7 +25,7 @@ export function emitJobOffer(
     io.to(ROOMS.tradie(tradieId)).emit('job:new_offer', offer);
     io.to(ROOMS.user(tradieId)).emit('job:new_offer', offer);
   }
-  io.to(ROOMS.adminLive()).emit('admin:job_feed', { type: 'job_offer_sent', data: offer });
+  io.to(ROOMS.adminLive()).emit('admin:job_feed', { type: 'job_offer_sent', data: offer as unknown as Record<string, unknown> });
 }
 
 export function emitJobStatusChange(
@@ -34,7 +34,7 @@ export function emitJobStatusChange(
   update: Parameters<ServerToClientEvents['job:status_changed']>[0]
 ): void {
   io.to(ROOMS.job(jobId)).emit('job:status_changed', update);
-  io.to(ROOMS.adminLive()).emit('admin:job_feed', { type: 'status_change', data: update });
+  io.to(ROOMS.adminLive()).emit('admin:job_feed', { type: 'status_change', data: update as unknown as Record<string, unknown> });
 }
 
 export function emitNotification(

@@ -125,7 +125,7 @@ export default function AnalyticsPage() {
             <StatCard
               title="MRR"
               value={data ? fmt$(data.revenue.mrr) : '—'}
-              delta={data ? `ARR ${fmt$(data.revenue.arr)}` : undefined}
+              {...(data ? { delta: `ARR ${fmt$(data.revenue.arr)}` } : {})}
               icon="📈"
             />
           </>

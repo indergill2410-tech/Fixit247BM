@@ -65,7 +65,8 @@ Rules:
     max_tokens: 1200,
   });
 
-  return JSON.parse(response.choices[0].message.content!) as GeneratedSEOContent;
+  const content = response.choices[0]?.message.content ?? '{}';
+  return JSON.parse(content) as GeneratedSEOContent;
 }
 
 export async function generateBlogArticle(topic: string, suburb?: string): Promise<{ title: string; content: string; metaDescription: string }> {
@@ -89,5 +90,6 @@ Return JSON with:
     max_tokens: 2000,
   });
 
-  return JSON.parse(response.choices[0].message.content!);
+  const blogContent = response.choices[0]?.message.content ?? '{}';
+  return JSON.parse(blogContent);
 }

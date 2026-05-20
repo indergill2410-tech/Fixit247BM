@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { AdminShell } from '@/components/shared/admin-shell';
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@fixit247/ui';
+import { Card, CardContent, Badge, Button } from '@fixit247/ui';
 import Link from 'next/link';
 
 export const metadata: Metadata = { title: 'Tradie Verifications' };

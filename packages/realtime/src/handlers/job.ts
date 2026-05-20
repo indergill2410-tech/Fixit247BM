@@ -11,7 +11,7 @@ type IoServer = Server<ClientToServerEvents, ServerToClientEvents, InterServerEv
 type IoSocket = Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>;
 
 export function registerJobHandlers(io: IoServer, socket: IoSocket): void {
-  const { userId, role } = socket.data;
+  const { role } = socket.data;
 
   // Subscribe to real-time updates for a specific job
   socket.on('job:subscribe', ({ jobId }) => {
@@ -30,15 +30,14 @@ export function registerJobHandlers(io: IoServer, socket: IoSocket): void {
   }
 
   socket.on('tradie:heartbeat', ({ tradieId, lat, lng }) => {
-    // Update tradie room
-    socket.join(ROOMS.tradie(tradieId));
+    void socket.join(ROOMS.tradie(tradieId));
     if (lat !== undefined && lng !== undefined) {
       io.to(ROOMS.adminLive()).emit('availability:changed', { tradieId, status: 'ONLINE' });
     }
   });
 
   socket.on('tradie:go_online', ({ tradieId, status }) => {
-    socket.join(ROOMS.tradie(tradieId));
+    void socket.join(ROOMS.tradie(tradieId));
     io.to(ROOMS.adminLive()).emit('availability:changed', { tradieId, status });
   });
 }

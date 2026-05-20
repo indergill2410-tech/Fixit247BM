@@ -31,10 +31,10 @@ export function registerTrackingHandlers(io: IoServer, socket: IoSocket): void {
       jobId,
       lat,
       lng,
-      heading,
-      speed,
-      accuracy,
       timestamp: new Date().toISOString(),
+      ...(heading !== undefined && { heading }),
+      ...(speed !== undefined && { speed }),
+      ...(accuracy !== undefined && { accuracy }),
     };
 
     // Broadcast to job room (customer + admin see it)

@@ -10,7 +10,7 @@ export async function transcribeVoiceNote(
   audioBuffer: Buffer,
   filename: string = 'voice-note.webm'
 ): Promise<TranscriptionResult> {
-  const file = new File([audioBuffer], filename, {
+  const file = new File([audioBuffer.buffer as ArrayBuffer], filename, {
     type: filename.endsWith('.mp3') ? 'audio/mpeg' : 'audio/webm',
   });
 

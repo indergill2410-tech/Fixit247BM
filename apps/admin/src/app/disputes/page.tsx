@@ -135,7 +135,7 @@ export default function DisputesPage() {
 
       {/* KPI row */}
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard title="Open Disputes" value={data?.stats.open ?? '—'} icon="⚖️" delta={data?.stats.open ? 'Needs attention' : undefined} />
+        <StatCard title="Open Disputes" value={data?.stats.open ?? '—'} icon="⚖️" {...(data?.stats.open ? { delta: 'Needs attention' } : {})} />
         <StatCard title="In Review" value={data?.stats.inReview ?? '—'} icon="🔍" />
         <StatCard title="Resolved" value={data?.stats.resolved ?? '—'} icon="✅" />
         <StatCard title="Avg Resolution (days)" value={data ? data.stats.avgResolutionDays.toFixed(1) : '—'} icon="📅" />

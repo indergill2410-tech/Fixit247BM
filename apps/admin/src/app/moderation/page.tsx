@@ -174,7 +174,7 @@ export default function ModerationPage() {
       {/* KPI row */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard title="Total Actions" value={data?.stats.total ?? '—'} icon="🛡️" />
-        <StatCard title="Active Suspensions" value={data?.stats.activeSuspensions ?? '—'} icon="🔒" delta={data?.stats.activeSuspensions ? 'Currently enforced' : undefined} />
+        <StatCard title="Active Suspensions" value={data?.stats.activeSuspensions ?? '—'} icon="🔒" {...(data?.stats.activeSuspensions ? { delta: 'Currently enforced' } : {})} />
         <StatCard title="Pending Verifications" value={data?.stats.pendingVerifications ?? '—'} icon="⏳" />
       </div>
 

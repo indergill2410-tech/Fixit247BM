@@ -3,9 +3,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { StatCard } from '@/components/shared/stat-card';
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@fixit247/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button } from '@fixit247/ui';
 import {
-  DollarSign, TrendingUp, Clock, AlertTriangle,
+  DollarSign, TrendingUp, AlertTriangle,
   RefreshCw, Download, ChevronDown, ChevronUp,
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -52,10 +52,6 @@ const TIER_COLORS: Record<string, string> = {
   PROFESSIONAL: 'bg-slate-100 text-slate-700',
   ELITE: 'bg-yellow-100 text-yellow-700',
 };
-
-function fmt(cents: number) {
-  return `$${(cents / 100).toFixed(2)}`;
-}
 
 function fmtAud(aud: number) {
   return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 }).format(aud);

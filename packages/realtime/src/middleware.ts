@@ -1,8 +1,8 @@
 import type { Socket } from 'socket.io';
-import type { SocketData } from './events';
+import type { ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData } from './events';
 
 export function socketAuthMiddleware(
-  socket: Socket<unknown, unknown, unknown, SocketData>,
+  socket: Socket<ClientToServerEvents, ServerToClientEvents, InterServerEvents, SocketData>,
   next: (err?: Error) => void
 ): void {
   const auth = socket.handshake.auth as { userId?: string; role?: string; token?: string };
