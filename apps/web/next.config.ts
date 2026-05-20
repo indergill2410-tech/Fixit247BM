@@ -13,6 +13,14 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
+  async redirects() {
+    return [
+      { source: '/find-a-tradie', destination: '/emergency', permanent: true },
+      { source: '/find-a-tradie/:path*', destination: '/emergency/:path*', permanent: true },
+      { source: '/auth/login', destination: '/login', permanent: true },
+      { source: '/auth/register', destination: '/register', permanent: true },
+    ];
+  },
   async headers() {
     return [
       {

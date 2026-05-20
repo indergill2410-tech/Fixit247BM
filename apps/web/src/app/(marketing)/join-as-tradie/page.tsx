@@ -176,7 +176,7 @@ const PLANS = [
       'Basic profile listing',
     ],
     cta: 'Start Free',
-    href: '/auth/register?role=TRADIE&plan=FREE',
+    href: '/register?role=TRADIE&plan=FREE',
   },
   {
     name: 'PROFESSIONAL',
@@ -192,7 +192,7 @@ const PLANS = [
       'Priority support',
     ],
     cta: 'Start 14-day Trial',
-    href: '/auth/register?role=TRADIE&plan=PROFESSIONAL',
+    href: '/register?role=TRADIE&plan=PROFESSIONAL',
   },
   {
     name: 'ELITE',
@@ -209,7 +209,7 @@ const PLANS = [
       'Emergency boost alerts',
     ],
     cta: 'Go Elite',
-    href: '/auth/register?role=TRADIE&plan=ELITE',
+    href: '/register?role=TRADIE&plan=ELITE',
   },
 ];
 
@@ -290,7 +290,7 @@ function JoinAsTradiePageInner() {
           </p>
           <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
-              href="/auth/register?role=TRADIE"
+              href="/register?role=TRADIE"
               className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-900/30"
             >
               Start Earning Today
@@ -500,7 +500,7 @@ function JoinAsTradiePageInner() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
-              href="/auth/register?role=TRADIE"
+              href="/register?role=TRADIE"
               className="rounded-xl bg-brand-400 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-300 transition-colors shadow-lg"
             >
               Join Free Today

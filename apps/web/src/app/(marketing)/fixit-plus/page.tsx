@@ -24,7 +24,7 @@ const PLANS = [
       'Annual safety inspection included',
     ],
     cta: 'Start Home Cover',
-    href: '/auth/register?plan=fixit-plus-home',
+    href: '/register?plan=fixit-plus-home',
   },
   {
     name: 'Fixit Plus Total',
@@ -43,7 +43,7 @@ const PLANS = [
       'Dedicated support concierge',
     ],
     cta: 'Start Total Cover',
-    href: '/auth/register?plan=fixit-plus-total',
+    href: '/register?plan=fixit-plus-total',
   },
 ];
 
@@ -118,7 +118,7 @@ export default function FixitPlusPage() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
-              href="/auth/register?plan=fixit-plus-total"
+              href="/register?plan=fixit-plus-total"
               className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-500/20"
             >
               Get Total Cover — $49/mo →
@@ -271,7 +271,7 @@ export default function FixitPlusPage() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
-              href="/auth/register?plan=fixit-plus-total"
+              href="/register?plan=fixit-plus-total"
               className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-500/20"
             >
               Try free for 14 days →

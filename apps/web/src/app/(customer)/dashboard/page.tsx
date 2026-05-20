@@ -50,8 +50,8 @@ export default async function CustomerDashboardPage() {
               {[
                 { label: '🔧 Post a new job', href: '/jobs/new' },
                 { label: '⚡ Emergency request', href: '/jobs/emergency' },
-                { label: '❤️ Browse saved tradies', href: '/saved-tradies' },
-                { label: '💳 View invoices', href: '/invoices' },
+                { label: '❤️ Saved tradies', href: '/saved-tradies' },
+                { label: '💳 Invoices', href: '/invoices' },
               ].map((action) => (
                 <Link
                   key={action.href}
