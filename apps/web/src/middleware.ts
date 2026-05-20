@@ -26,6 +26,7 @@ const PUBLIC_EXACT: readonly string[] = [
   '/blog',
   '/emergency',
   '/voice',
+  '/api/health', // Render health checks + public status endpoint
 ];
 
 // Prefix-match public routes (handles dynamic segments)
