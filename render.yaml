@@ -21,20 +21,18 @@ services:
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
 
-      # ── Database ──
+      # ── Database (Supabase — set these manually in Render dashboard) ──
       - key: DATABASE_URL
-        fromDatabase:
-          name: fixit247-db
-          property: connectionString
+        sync: false
       - key: DIRECT_URL
-        fromDatabase:
-          name: fixit247-db
-          property: connectionString
+        sync: false
 
       # ── Supabase ──
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
@@ -116,20 +114,18 @@ services:
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
 
-      # ── Database ──
+      # ── Database (Supabase — set these manually in Render dashboard) ──
       - key: DATABASE_URL
-        fromDatabase:
-          name: fixit247-db
-          property: connectionString
+        sync: false
       - key: DIRECT_URL
-        fromDatabase:
-          name: fixit247-db
-          property: connectionString
+        sync: false
 
       # ── Supabase ──
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
@@ -181,11 +177,3 @@ services:
         sync: false
       - key: NEXT_PUBLIC_SENTRY_DSN
         sync: false
-
-# ── PostgreSQL database ────────────────────────────────────────────────────────
-databases:
-  - name: fixit247-db
-    plan: starter
-    databaseName: fixit247bm
-    region: singapore
-    postgresMajorVersion: 16
