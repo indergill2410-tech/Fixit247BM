@@ -3,6 +3,7 @@ import { db } from '@fixit247/database';
 import { generateJobSummary } from '@fixit247/voice';
 import type { ConversationContext } from '@fixit247/voice';
 import { z } from 'zod';
+import { toLocalFormat } from '@/lib/utils/phone';
 
 export const runtime = 'nodejs';
 
@@ -33,8 +34,10 @@ export async function POST(req: Request) {
   // Find or create a system user for voice-created jobs
   let customerId = call.customerId;
   if (!customerId) {
-    // Try to find by phone number
-    const user = await db.user.findFirst({ where: { phone: call.phoneNumber } });
+    // Try to find by phone — match either E.164 (+61XXXXXXXXX) or local (0XXXXXXXXX)
+    // since older records may have been stored before E.164 normalisation was enforced.
+    const phoneVariants = [call.phoneNumber, toLocalFormat(call.phoneNumber)].filter(Boolean);
+    const user = await db.user.findFirst({ where: { phone: { in: phoneVariants } } });
     customerId = user?.id ?? null;
   }
 

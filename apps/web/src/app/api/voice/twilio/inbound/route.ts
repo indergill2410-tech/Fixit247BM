@@ -10,7 +10,10 @@ function validateTwilioSignature(req: Request, body: string): boolean {
   const authToken = process.env.TWILIO_AUTH_TOKEN;
   if (!authToken || !twilioSignature) return process.env.NODE_ENV !== 'production';
 
-  const url = process.env.NEXT_PUBLIC_APP_URL + '/api/voice/twilio/inbound';
+  // Use the canonical app URL without trailing slash + the fixed path.
+  // This must exactly match the webhook URL configured in the Twilio console.
+  const base = (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '');
+  const url = `${base}/api/voice/twilio/inbound`;
   const params = Object.fromEntries(new URLSearchParams(body));
   const sortedKeys = Object.keys(params).sort();
   const data = url + sortedKeys.map((k) => k + params[k]).join('');
