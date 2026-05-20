@@ -1,14 +1,18 @@
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { z } from 'zod';
+import { rateLimit, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 });
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const rl = rateLimit(request, LIMITS.auth);
+  if (!rl.success) return rateLimitResponse(rl);
+
   const body = await request.json() as unknown;
   const parsed = loginSchema.safeParse(body);
 

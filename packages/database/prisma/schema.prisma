@@ -323,6 +323,9 @@ model TradieProfile {
   @@index([isFeatured])
   @@index([rankScore])
   @@index([avgRating])
+  // Composite for matching engine: find available verified tradies
+  @@index([isAvailable, verificationStatus])
+  @@index([isEmergencyAvailable, verificationStatus])
   @@map("tradie_profiles")
 }
 
@@ -521,6 +524,11 @@ model Job {
   @@index([isEmergency])
   @@index([scheduledFor])
   @@index([createdAt])
+  // Composite indexes for common filtered queries
+  @@index([status, category])
+  @@index([status, isEmergency])
+  @@index([tradieId, status])
+  @@index([customerId, status])
   @@map("jobs")
 }
 
@@ -654,6 +662,9 @@ model Notification {
   @@index([type])
   @@index([jobId])
   @@index([createdAt])
+  // Composite for "unread notifications for user" — most common notification query
+  @@index([userId, readAt])
+  @@index([userId, createdAt])
   @@map("notifications")
 }
 

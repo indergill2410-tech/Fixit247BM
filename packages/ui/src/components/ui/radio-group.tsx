@@ -76,9 +76,9 @@ function RadioCardGroup({
 
   return (
     <RadioGroupPrimitive.Root
-      value={value}
-      onValueChange={onValueChange}
-      name={name}
+      {...(value !== undefined && { value })}
+      {...(onValueChange !== undefined && { onValueChange })}
+      {...(name !== undefined && { name })}
       className={cn('grid gap-3', colClass[columns], className)}
     >
       {options.map((option) => (

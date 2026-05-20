@@ -54,7 +54,7 @@ Welcome to Fixit 24/7! Your profile is being reviewed and you'll receive your fi
 3. Turn on emergency availability to get priority leads
 
 **Your earning potential in {{suburb}}:**
-• Average tradie earns ${{estimatedWeekly}}/week on Fixit 24/7
+• Average tradie earns \${{estimatedWeekly}}/week on Fixit 24/7
 • Emergency jobs pay 2-3x standard rates
 • Get paid within 24 hours of job completion
 
@@ -156,6 +156,9 @@ function interpolate(template: string, data: NotifData): string {
 export function renderTemplate(type: string, data: NotifData): { title: string; subject?: string; body: string } {
   const tpl = TEMPLATES[type] ?? TEMPLATES['SYSTEM_ALERT']!;
   const title = tpl.title ? interpolate(tpl.title, data) : (tpl.subject ? interpolate(tpl.subject, data) : type);
-  const subject = tpl.subject ? interpolate(tpl.subject, data) : undefined;
-  return { title, subject, body: interpolate(tpl.body, data) };
+  const body = interpolate(tpl.body, data);
+  if (tpl.subject) {
+    return { title, subject: interpolate(tpl.subject, data), body };
+  }
+  return { title, body };
 }

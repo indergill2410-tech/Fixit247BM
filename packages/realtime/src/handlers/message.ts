@@ -29,9 +29,9 @@ export function registerMessageHandlers(io: IoServer, socket: IoSocket): void {
       senderRole: role,
       content,
       type,
-      mediaUrl,
       isSystem: false,
       createdAt: new Date().toISOString(),
+      ...(mediaUrl !== undefined && { mediaUrl }),
     });
   });
 

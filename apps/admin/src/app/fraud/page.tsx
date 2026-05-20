@@ -132,7 +132,7 @@ export default function FraudPage() {
       {/* KPI row */}
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard title="Pending Flags" value={data?.stats.pendingCount ?? '—'} icon="🚩" />
-        <StatCard title="Critical" value={data?.stats.bySeverity.CRITICAL ?? '—'} icon="🔴" delta={data?.stats.bySeverity.CRITICAL ? 'Immediate action' : undefined} />
+        <StatCard title="Critical" value={data?.stats.bySeverity.CRITICAL ?? '—'} icon="🔴" {...(data?.stats.bySeverity.CRITICAL ? { delta: 'Immediate action' } : {})} />
         <StatCard title="High Risk" value={data?.stats.bySeverity.HIGH ?? '—'} icon="🟠" />
         <StatCard title="Auto-Suspended" value={loading ? '—' : autoSuspendedCount} icon="🔒" />
       </div>

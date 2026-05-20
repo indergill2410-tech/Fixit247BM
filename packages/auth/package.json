@@ -10,6 +10,7 @@
     "type-check": "tsc --noEmit"
   },
   "dependencies": {
+    "@fixit247/database": "workspace:*",
     "@supabase/supabase-js": "^2.43.4",
     "@supabase/ssr": "^0.5.0",
     "zod": "^3.23.8"

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { StatCard } from '@/components/shared/stat-card';
-import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@fixit247/ui';
+import { Card, CardContent, CardHeader, CardTitle, Button } from '@fixit247/ui';
 import { RefreshCw, Radio, Globe } from 'lucide-react';
 import { toast } from 'sonner';
 

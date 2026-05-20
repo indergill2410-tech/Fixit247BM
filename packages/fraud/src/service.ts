@@ -76,7 +76,7 @@ export async function resolveFraudFlag(
         reviewedBy: adminId,
         reviewedAt: new Date(),
         resolvedAt: resolution !== 'ESCALATED' ? new Date() : null,
-        description: notes ? `${notes}` : undefined,
+        ...(notes !== undefined && { description: notes }),
       },
     }),
     db.adminAuditLog.create({
@@ -96,8 +96,5 @@ export async function getFraudQueue(limit = 50) {
     where: { status: { in: ['PENDING', 'UNDER_REVIEW'] } },
     orderBy: [{ severity: 'desc' }, { createdAt: 'asc' }],
     take: limit,
-    include: {
-      user: { select: { id: true, name: true, email: true, role: true } },
-    },
   });
 }
