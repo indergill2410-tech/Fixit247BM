@@ -3,9 +3,9 @@ import type { MetadataRoute } from 'next';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://fixit247.com.au';
 
 const TRADE_CATEGORIES = [
-  'plumbing','electrical','hvac','carpentry','painting','roofing',
-  'tiling','pest-control','locksmith','glazing','plastering','landscaping',
-  'cleaning','appliance-repair','general-maintenance',
+  'plumbing', 'electrical', 'hvac', 'carpentry', 'painting', 'roofing',
+  'tiling', 'pest-control', 'locksmith', 'glazing', 'plastering', 'landscaping',
+  'cleaning', 'appliance-repair', 'general-maintenance',
 ];
 
 const MAJOR_SUBURBS = [
@@ -21,16 +21,34 @@ const MAJOR_SUBURBS = [
   { suburb: 'fremantle', state: 'wa' }, { suburb: 'glenelg', state: 'sa' },
 ];
 
+const BLOG_SLUGS = [
+  'burst-pipe-emergency', 'electrical-safety', 'how-to-choose-a-tradie',
+  'lockout-guide', 'hvac-maintenance', 'roof-leak-emergency',
+  'tradie-pricing-guide', 'before-tradie-arrives',
+];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${SITE_URL}/emergency`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
-    { url: `${SITE_URL}/find-a-tradie`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
     { url: `${SITE_URL}/join-as-tradie`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
-    { url: `${SITE_URL}/how-it-works`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${SITE_URL}/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.7 },
-    { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.6 },
+    { url: `${SITE_URL}/fixit-plus`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
+    { url: `${SITE_URL}/how-it-works`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
+    { url: `${SITE_URL}/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
+    { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.65 },
+    { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.65 },
+    { url: `${SITE_URL}/refer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${SITE_URL}/voice`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
+    { url: `${SITE_URL}/privacy`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
+    { url: `${SITE_URL}/terms`, lastModified: new Date(), changeFrequency: 'yearly', priority: 0.3 },
   ];
+
+  const blogPages: MetadataRoute.Sitemap = BLOG_SLUGS.map((slug) => ({
+    url: `${SITE_URL}/blog/${slug}`,
+    lastModified: new Date(),
+    changeFrequency: 'monthly' as const,
+    priority: 0.6,
+  }));
 
   // Emergency pages: /emergency/[trade]/[suburb]
   const emergencyPages: MetadataRoute.Sitemap = TRADE_CATEGORIES.flatMap((trade) =>
@@ -60,5 +78,5 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }));
 
-  return [...staticPages, ...emergencyPages, ...tradePages, ...suburbPages];
+  return [...staticPages, ...blogPages, ...emergencyPages, ...tradePages, ...suburbPages];
 }

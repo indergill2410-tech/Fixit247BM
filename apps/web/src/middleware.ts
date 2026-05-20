@@ -4,7 +4,8 @@ import type { Role } from '@fixit247/auth';
 
 // ─── Route Configuration ──────────────────────────────────────────────────────
 
-const PUBLIC_ROUTES = [
+// Exact-match public routes
+const PUBLIC_EXACT: readonly string[] = [
   '/',
   '/login',
   '/register',
@@ -16,13 +17,49 @@ const PUBLIC_ROUTES = [
   '/pricing',
   '/contact',
   '/unauthorized',
+  '/how-it-works',
+  '/fixit-plus',
+  '/join-as-tradie',
+  '/refer',
+  '/terms',
+  '/privacy',
+  '/blog',
+  '/emergency',
+  '/voice',
+];
+
+// Prefix-match public routes (handles dynamic segments)
+const PUBLIC_PREFIXES: readonly string[] = [
+  '/blog/',
+  '/emergency/',
+  '/suburb/',
+  '/trade/',
+  '/tradie/',   // public tradie profiles (/tradie/[id])
+  '/api/auth',
+  '/_next',
+  '/favicon',
 ];
 
 const ROUTE_ROLES: { pattern: RegExp; roles: Role[] }[] = [
   { pattern: /^\/admin/, roles: ['ADMIN', 'SUPER_ADMIN'] },
-  { pattern: /^\/tradie/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/dashboard/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/jobs/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/messages/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/profile/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/earnings/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/wallet/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/subscription/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/availability/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/documents/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/onboarding/, roles: ['TRADIE'] },
   { pattern: /^\/dashboard/, roles: ['CUSTOMER'] },
   { pattern: /^\/jobs/, roles: ['CUSTOMER'] },
+  { pattern: /^\/messages/, roles: ['CUSTOMER'] },
+  { pattern: /^\/profile/, roles: ['CUSTOMER'] },
+  { pattern: /^\/reviews/, roles: ['CUSTOMER'] },
+  { pattern: /^\/book/, roles: ['CUSTOMER'] },
+  { pattern: /^\/saved-tradies/, roles: ['CUSTOMER'] },
+  { pattern: /^\/invoices/, roles: ['CUSTOMER'] },
   { pattern: /^\/onboarding/, roles: ['CUSTOMER'] },
 ];
 
@@ -35,10 +72,9 @@ const ONBOARDING_EXEMPT = [
 ];
 
 function isPublicRoute(pathname: string): boolean {
-  return PUBLIC_ROUTES.some((p) => pathname === p) ||
-    pathname.startsWith('/api/auth') ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon');
+  if (PUBLIC_EXACT.includes(pathname)) return true;
+  if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return true;
+  return false;
 }
 
 function getRequiredRoles(pathname: string): Role[] | null {

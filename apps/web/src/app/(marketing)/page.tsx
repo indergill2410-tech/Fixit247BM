@@ -193,7 +193,7 @@ export default function HomePage() {
                   <Link href="/fixit-plus" className="rounded-xl bg-brand-500 px-5 py-2.5 text-sm font-bold text-gray-900 hover:bg-brand-400 transition-colors">
                     Learn more →
                   </Link>
-                  <Link href="/auth/register?plan=fixit-plus-total" className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-bold text-white hover:bg-white/8 transition-colors">
+                  <Link href="/register?plan=fixit-plus-total" className="rounded-xl border border-white/15 px-5 py-2.5 text-sm font-bold text-white hover:bg-white/8 transition-colors">
                     Start free trial
                   </Link>
                 </div>

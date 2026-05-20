@@ -20,7 +20,7 @@ const TRADIE_PLANS = [
       support: 'Email',
     },
     cta: 'Start Free',
-    href: '/auth/register?role=TRADIE&plan=FREE',
+    href: '/register?role=TRADIE&plan=FREE',
   },
   {
     name: 'PROFESSIONAL',
@@ -36,7 +36,7 @@ const TRADIE_PLANS = [
       support: 'Priority email',
     },
     cta: 'Start 14-day Trial',
-    href: '/auth/register?role=TRADIE&plan=PROFESSIONAL',
+    href: '/register?role=TRADIE&plan=PROFESSIONAL',
   },
   {
     name: 'ELITE',
@@ -51,7 +51,7 @@ const TRADIE_PLANS = [
       support: 'Dedicated manager',
     },
     cta: 'Go Elite',
-    href: '/auth/register?role=TRADIE&plan=ELITE',
+    href: '/register?role=TRADIE&plan=ELITE',
   },
 ];
 
@@ -353,7 +353,7 @@ export default function PricingPage() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
-              href="/auth/register?role=TRADIE"
+              href="/register?role=TRADIE"
               className="rounded-xl bg-brand-400 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-300 transition-colors shadow-lg"
             >
               Join as a Tradie — Free

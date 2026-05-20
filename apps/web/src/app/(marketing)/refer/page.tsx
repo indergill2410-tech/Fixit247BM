@@ -70,7 +70,7 @@ export default function ReferPage() {
         ) : notAuthed ? (
           <div className="rounded-2xl bg-white/10 p-8 text-center">
             <p className="mb-4 text-gray-300">Sign in to get your personal referral link</p>
-            <Link href="/auth/login" className="inline-block rounded-xl bg-brand-600 px-6 py-3 font-bold hover:bg-brand-700 transition-colors">
+            <Link href="/login" className="inline-block rounded-xl bg-brand-600 px-6 py-3 font-bold hover:bg-brand-700 transition-colors">
               Sign In
             </Link>
           </div>
