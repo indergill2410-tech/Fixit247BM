@@ -29,7 +29,7 @@ const TEAM = [
 
 export default function AboutPage() {
   return (
-    <div className="bg-[#111111] text-white">
+    <div className="bg-[#0a0a0a] text-white">
       {/* Hero */}
       <section className="relative overflow-hidden px-4 py-24 text-center">
         <div className="pointer-events-none absolute inset-0">

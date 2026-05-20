@@ -109,7 +109,7 @@ export default function PricingPage() {
   return (
     <>
       {/* 1. Hero */}
-      <section className="relative bg-gradient-to-br from-gray-900 to-gray-800 px-4 py-20 text-center text-white">
+      <section className="relative bg-gradient-to-br from-[#0a0a0a] to-[#111111] px-4 py-20 text-center text-white">
         <div className="relative z-10 mx-auto max-w-3xl">
           <span className="mb-4 inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
             💰 No hidden fees, ever
@@ -124,7 +124,7 @@ export default function PricingPage() {
       </section>
 
       {/* 2. Customer Pricing */}
-      <section className="bg-[#111111] py-20 px-4">
+      <section className="bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="mb-10 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
@@ -251,7 +251,7 @@ export default function PricingPage() {
       </section>
 
       {/* 4. Lead Pricing Breakdown */}
-      <section className="bg-[#111111] py-20 px-4">
+      <section className="bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
@@ -325,7 +325,7 @@ export default function PricingPage() {
       </section>
 
       {/* 6. FAQ */}
-      <section className="bg-[#111111] py-20 px-4">
+      <section className="bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
