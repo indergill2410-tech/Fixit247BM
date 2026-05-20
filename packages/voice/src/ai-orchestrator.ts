@@ -4,10 +4,16 @@ import { detectEmergency } from './emergency-detector';
 
 let _openai: OpenAI | null = null;
 function getOpenAI(): OpenAI {
-  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  if (!_openai) {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) throw new Error('OPENAI_API_KEY is not set');
+    _openai = new OpenAI({ apiKey });
+  }
   return _openai;
 }
-const openai = new Proxy({} as OpenAI, { get(_t, p) { return (getOpenAI() as never)[p as keyof OpenAI]; } });
+
+const AI_TIMEOUT_MS = 12_000;
+const FALLBACK_MESSAGE = "Sorry, I'm having a moment. Could you repeat that for me?";
 
 export interface AIResponse {
   message: string;
@@ -19,48 +25,78 @@ export interface AIResponse {
   safetyInstructions?: string[];
 }
 
+async function withTimeout<T>(promise: Promise<T>, ms: number, label: string): Promise<T> {
+  let timer: ReturnType<typeof setTimeout>;
+  const timeout = new Promise<never>((_, reject) => {
+    timer = setTimeout(() => reject(new Error(`${label} timed out after ${ms}ms`)), ms);
+  });
+  try {
+    return await Promise.race([promise, timeout]);
+  } finally {
+    clearTimeout(timer!);
+  }
+}
+
 export async function processConversationTurn(
   userMessage: string,
   context: ConversationContext,
 ): Promise<AIResponse> {
-  // Run emergency detection on user message
   const emergency = detectEmergency(userMessage);
 
-  // Build messages array
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: 'system', content: SYSTEM_PROMPT },
     ...context.messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
     { role: 'user', content: userMessage },
   ];
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    messages,
-    max_tokens: 300,
-    temperature: 0.7,
-  });
+  let rawResponse: string;
+  try {
+    const completion = await withTimeout(
+      getOpenAI().chat.completions.create({
+        model: 'gpt-4o',
+        messages,
+        max_tokens: 300,
+        temperature: 0.7,
+      }),
+      AI_TIMEOUT_MS,
+      'OpenAI chat completion',
+    );
+    rawResponse = completion.choices[0]?.message?.content ?? FALLBACK_MESSAGE;
+  } catch (err) {
+    console.error(JSON.stringify({
+      ts: new Date().toISOString(),
+      ctx: 'ai-orchestrator',
+      msg: 'OpenAI call failed',
+      err: err instanceof Error ? err.message : String(err),
+    }));
+    return {
+      message: FALLBACK_MESSAGE,
+      isJobReady: false,
+      emergencyDetected: emergency.isEmergency,
+      emergencyScore: emergency.emergencyScore,
+      requiresHumanTakeover: false,
+      safetyInstructions: emergency.safetyInstructions.length > 0 ? emergency.safetyInstructions : undefined,
+    };
+  }
 
-  const rawResponse = response.choices[0].message.content ?? '';
-
-  // Parse job_ready block if present
+  // Parse job_ready block
   let isJobReady = false;
   let extractedJobData: Partial<ExtractedJobData> | undefined;
   const jobReadyMatch = rawResponse.match(/```job_ready\n([\s\S]+?)\n```/);
   if (jobReadyMatch) {
     try {
-      extractedJobData = JSON.parse(jobReadyMatch[1]);
+      extractedJobData = JSON.parse(jobReadyMatch[1]) as Partial<ExtractedJobData>;
       isJobReady = true;
-    } catch { /* ignore parse errors */ }
+    } catch {
+      console.warn(JSON.stringify({ ts: new Date().toISOString(), ctx: 'ai-orchestrator', msg: 'Failed to parse job_ready JSON' }));
+    }
   }
 
-  // Clean response (remove JSON block from display)
   const cleanMessage = rawResponse.replace(/```job_ready[\s\S]+?```/g, '').trim();
-
-  // Determine if human takeover needed (low AI confidence on complex situations)
   const requiresHumanTakeover = emergency.riskLevel === 'LIFE_THREATENING' && context.turnCount > 3;
 
   return {
-    message: cleanMessage,
+    message: cleanMessage || FALLBACK_MESSAGE,
     isJobReady,
     extractedJobData: isJobReady ? extractedJobData : undefined,
     emergencyDetected: emergency.isEmergency,
@@ -71,28 +107,42 @@ export async function processConversationTurn(
 }
 
 export async function generateJobSummary(context: ConversationContext): Promise<string> {
-  const transcript = context.messages.filter(m => m.role !== 'system').map(m => `${m.role}: ${m.content}`).join('\n');
+  const transcript = context.messages
+    .filter((m) => m.role !== 'system')
+    .map((m) => `${m.role}: ${m.content}`)
+    .join('\n');
 
-  const response = await openai.chat.completions.create({
-    model: 'gpt-4o',
-    messages: [{
-      role: 'user',
-      content: `Based on this conversation, write a concise job description for a tradie (2-3 sentences, professional tone):\n\n${transcript}`,
-    }],
-    max_tokens: 150,
-    temperature: 0.5,
-  });
-
-  return response.choices[0].message.content ?? 'Emergency service required.';
+  try {
+    const completion = await withTimeout(
+      getOpenAI().chat.completions.create({
+        model: 'gpt-4o',
+        messages: [{
+          role: 'user',
+          content: `Based on this conversation, write a concise job description for a tradie (2-3 sentences, professional tone):\n\n${transcript}`,
+        }],
+        max_tokens: 150,
+        temperature: 0.5,
+      }),
+      AI_TIMEOUT_MS,
+      'generateJobSummary',
+    );
+    return completion.choices[0]?.message?.content ?? 'Emergency service required.';
+  } catch {
+    return 'Emergency home service required — details gathered via voice booking.';
+  }
 }
 
 export async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
   const file = new File([audioBuffer], 'audio.webm', { type: 'audio/webm' });
-  const response = await openai.audio.transcriptions.create({
-    file,
-    model: 'whisper-1',
-    language: 'en',
-    prompt: 'Australian emergency home services. Trade terms: plumber, electrician, locksmith, HVAC.',
-  });
+  const response = await withTimeout(
+    getOpenAI().audio.transcriptions.create({
+      file,
+      model: 'whisper-1',
+      language: 'en',
+      prompt: 'Australian emergency home services. Trade terms: plumber, electrician, locksmith, HVAC.',
+    }),
+    30_000,
+    'transcribeAudio',
+  );
   return response.text;
 }

@@ -7,9 +7,8 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      NODE_ENV=development pnpm install --frozen-lockfile &&
+      NODE_ENV=development pnpm install --no-frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
-      pnpm --filter @fixit247/database run db:push &&
       pnpm --filter @fixit247/web build
     startCommand: pnpm --filter @fixit247/web start
     healthCheckPath: /api/health
@@ -101,7 +100,7 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      NODE_ENV=development pnpm install --frozen-lockfile &&
+      NODE_ENV=development pnpm install --no-frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/admin build
     startCommand: pnpm --filter @fixit247/admin start
