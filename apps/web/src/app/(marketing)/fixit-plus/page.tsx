@@ -135,7 +135,7 @@ export default function FixitPlusPage() {
       </section>
 
       {/* Trust Stats */}
-      <section className="border-y border-white/8 bg-[#111111] py-8">
+      <section className="border-y border-white/8 bg-[#0a0a0a] py-8">
         <div className="mx-auto max-w-4xl px-4">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {TRUST_STATS.map((s) => (
@@ -176,7 +176,7 @@ export default function FixitPlusPage() {
       </section>
 
       {/* Plans */}
-      <section id="plans" className="bg-[#111111] px-4 py-20">
+      <section id="plans" className="bg-[#0a0a0a] px-4 py-20">
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold">Choose your cover</h2>
@@ -257,7 +257,7 @@ export default function FixitPlusPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="border-t border-white/8 bg-[#111111] px-4 py-20 text-center">
+      <section className="border-t border-white/8 bg-[#0a0a0a] px-4 py-20 text-center">
         <div className="mx-auto max-w-2xl">
           <div className="mb-3 flex items-center justify-center gap-2 text-brand-400">
             <Zap size={18} />

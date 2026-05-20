@@ -3,13 +3,13 @@ import { MarketingNav } from '@/components/layout/marketing-nav';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-[#111111]">
+    <div className="min-h-screen bg-[#0a0a0a]">
       <MarketingNav />
 
       <main>{children}</main>
 
       {/* ── Footer ── */}
-      <footer className="border-t border-white/8 bg-[#0d0d0d] py-12">
+      <footer className="border-t border-white/[0.07] bg-[#080808] py-14">
         <div className="mx-auto max-w-7xl px-4">
           <div className="grid gap-8 md:grid-cols-4">
             <div>

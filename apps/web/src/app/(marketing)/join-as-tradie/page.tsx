@@ -118,7 +118,7 @@ function EarningsCalculator() {
       </div>
 
       <Link
-        href={`/auth/register?role=TRADIE`}
+        href={`/register?role=TRADIE`}
         className="block w-full rounded-xl bg-brand-500 py-3.5 text-center text-sm font-bold text-gray-900 hover:bg-brand-400 transition-colors"
       >
         Start earning ${Math.round(netWeekly).toLocaleString()}/week — Sign Up Free
@@ -272,41 +272,39 @@ function JoinAsTradiePageInner() {
   return (
     <>
       {/* 1. Hero */}
-      <section className="relative bg-gradient-to-br from-gray-900 via-gray-800 to-brand-900 px-4 py-24 text-center text-white">
-        <div className="absolute inset-0 bg-grid-white/5 [mask-image:radial-gradient(ellipse_at_center,transparent_20%,black)]" />
+      <section className="relative overflow-hidden bg-[#0a0a0a] px-4 py-24 text-center text-white">
+        <div className="pointer-events-none absolute inset-0 grid-pattern" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-brand-500/8 blur-[100px]" />
         <div className="relative z-10 mx-auto max-w-4xl">
-          <span className="mb-2 inline-flex items-center rounded-full bg-green-500/20 border border-green-400/30 px-4 py-1.5 text-sm font-bold text-green-300 backdrop-blur-sm">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-2 text-sm font-bold text-emerald-400">
             🎁 Sign up bonus: $111/month in free credits for your first 6 months
-          </span>
-          <span className="mb-4 inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
-            🇦🇺 Join 5,000+ Australian tradies already earning on Fixit 24/7
-          </span>
-          <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Earn More. Work Less.<br />
-            <span className="text-brand-300">Grow Your Trade Business.</span>
+          </div>
+          <h1 className="text-[2.75rem] font-black leading-[1.06] tracking-tighter text-white sm:text-5xl lg:text-[4rem]">
+            Earn more.<br />
+            <span className="text-gradient-brand">Grow your trade business.</span>
           </h1>
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-300 sm:text-xl">
-            Join 5,000+ Australian tradies earning extra income on Fixit 24/7. Get matched with quality local jobs, get paid instantly, grow your reputation.
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-gray-400 sm:text-lg">
+            Join 5,000+ Australian tradies earning consistent income on Fixit 24/7. Quality leads, secure payments, zero invoice chasing.
           </p>
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/register?role=TRADIE"
-              className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-900/30"
+              className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 shadow-brand transition-all hover:bg-brand-400 hover:shadow-[0_0_50px_rgba(245,158,11,0.3)]"
             >
-              Start Earning Today
+              Start earning today — free
             </Link>
             <a
               href="#how-it-works"
-              className="rounded-xl border border-white/30 px-8 py-4 text-base font-bold text-white hover:bg-white/10 transition-colors"
+              className="inline-flex items-center gap-2 rounded-2xl border border-white/12 px-8 py-4 text-base font-semibold text-white transition-all hover:bg-white/[0.05]"
             >
-              See How It Works
+              See how it works
             </a>
           </div>
         </div>
       </section>
 
       {/* 2. Stats bar */}
-      <section className="bg-brand-600 py-6">
+      <section className="bg-brand-600/90 py-6">
         <div className="mx-auto max-w-6xl px-4">
           <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
             {STATS.map((stat) => (
@@ -320,7 +318,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 3. Earnings Calculator */}
-      <section className="bg-[#111111] py-20 px-4">
+      <section className="bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
@@ -348,7 +346,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 4. How It Works */}
-      <section id="how-it-works" className="bg-[#0f0f0f] py-20 px-4">
+      <section id="how-it-works" className="bg-[#0d0d0d] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
@@ -374,7 +372,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 5. Subscription Plans */}
-      <section className="bg-[#111111] py-20 px-4">
+      <section className="bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
@@ -430,7 +428,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 6. Trust badges */}
-      <section className="bg-[#0f0f0f] border-y border-white/8 py-10 px-4">
+      <section className="bg-[#0d0d0d] border-y border-white/8 py-10 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {TRUST_BADGES.map((badge) => (
@@ -444,7 +442,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 7. Testimonials */}
-      <section className="bg-[#111111] py-20 px-4">
+      <section className="bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
@@ -472,7 +470,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 8. FAQ */}
-      <section className="bg-[#0f0f0f] py-20 px-4">
+      <section className="bg-[#0d0d0d] py-20 px-4">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
@@ -492,10 +490,10 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 9. Bottom CTA */}
-      <section className="bg-gradient-to-br from-brand-600 to-brand-800 py-20 px-4 text-center text-white">
+      <section className="bg-[#0d0d0d] border-t border-brand-500/20 py-20 px-4 text-center text-white">
         <div className="mx-auto max-w-2xl">
           <h2 className="text-3xl font-extrabold sm:text-4xl">Ready to grow your trade business?</h2>
-          <p className="mx-auto mt-4 max-w-lg text-brand-100">
+          <p className="mx-auto mt-4 max-w-lg text-gray-400">
             Join 5,000+ Australian tradies already earning on Fixit 24/7. Free to start, no credit card required.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

@@ -291,7 +291,7 @@ export default async function SuburbLandingPage({ params }: { params: Promise<{ 
         </section>
 
         {/* CTA footer */}
-        <section className="bg-gray-900 py-16 text-white">
+        <section className="bg-[#0a0a0a] py-16 text-white">
           <div className="mx-auto max-w-2xl px-4 text-center">
             <h2 className="text-3xl font-extrabold mb-4">
               Ready to Find a Tradie in {suburbName}?

@@ -54,7 +54,7 @@ export default function ReferPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Hero */}
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <div className="mb-6 text-6xl">🎁</div>

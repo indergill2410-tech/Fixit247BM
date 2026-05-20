@@ -9,11 +9,12 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-gradient-to-br from-brand-950 via-brand-900 to-brand-800">
-      {/* Ambient background */}
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#080808]">
+      {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute -left-1/4 -top-1/4 h-1/2 w-1/2 rounded-full bg-brand-500/10 blur-3xl" />
-        <div className="absolute -bottom-1/4 -right-1/4 h-1/2 w-1/2 rounded-full bg-brand-400/10 blur-3xl" />
+        <div className="absolute left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/[0.07] blur-[120px]" />
+        <div className="absolute -left-24 -top-24 h-64 w-64 rounded-full bg-brand-600/[0.06] blur-[80px]" />
+        <div className="absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-brand-500/[0.05] blur-[60px]" />
       </div>
 
       {/* Header */}
@@ -32,10 +33,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 text-center text-xs text-brand-300/70">
+      <footer className="relative z-10 py-6 text-center text-xs text-gray-700">
         © {new Date().getFullYear()} Fixit247 Pty Ltd · ABN 00 000 000 000 ·{' '}
-        <Link href="/privacy" className="hover:text-white">Privacy</Link>{' '}·{' '}
-        <Link href="/terms" className="hover:text-white">Terms</Link>
+        <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>{' '}·{' '}
+        <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
       </footer>
     </div>
   );

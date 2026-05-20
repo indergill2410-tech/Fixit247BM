@@ -49,50 +49,53 @@ const TRUST_POINTS = [
 
 export default function EmergencyHubPage() {
   return (
-    <div className="min-h-screen bg-[#0f0f0f] text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Hero */}
-      <section className="relative overflow-hidden py-24 text-center">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-0 h-[500px] w-[600px] -translate-x-1/2 rounded-full bg-brand-500/10 blur-3xl" />
-        </div>
+      <section className="relative overflow-hidden py-20 text-center md:py-28">
+        <div className="pointer-events-none absolute inset-0 grid-pattern opacity-60" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[700px] -translate-x-1/2 -translate-y-1/4 rounded-full bg-red-500/6 blur-[100px]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[400px] w-[500px] -translate-x-1/2 rounded-full bg-brand-500/8 blur-[80px]" />
         <div className="relative z-10 mx-auto max-w-5xl px-4">
-          <div className="mb-4 flex items-center justify-center gap-2">
-            <span className="flex h-2.5 w-2.5 animate-pulse rounded-full bg-brand-400" />
-            <span className="text-sm font-bold uppercase tracking-widest text-brand-400">Live · Tradies Available Now</span>
+          <div className="mb-5 flex items-center justify-center gap-2.5">
+            <span className="relative flex h-2.5 w-2.5">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
+            </span>
+            <span className="text-sm font-bold uppercase tracking-widest text-emerald-400">Live · Tradies available right now</span>
           </div>
 
-          <h1 className="text-5xl font-extrabold leading-tight md:text-6xl">
-            Emergency Trade Help,<br />
-            <span className="text-brand-400">Available Right Now</span>
+          <h1 className="text-[2.75rem] font-black leading-[1.06] tracking-tighter md:text-[4rem] lg:text-[5rem]">
+            Emergency trade help,<br />
+            <span className="text-gradient-brand">dispatched in minutes.</span>
           </h1>
 
-          <p className="mx-auto mt-6 max-w-2xl text-lg text-gray-400">
+          <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-gray-400 sm:text-lg">
             Verified, licensed tradies dispatched to your door in under 60 minutes.
             Available 24 hours a day, 7 days a week, across Australia.
           </p>
 
-          <div className="mt-10 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+          <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
               href="/jobs/new?emergency=true"
-              className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-10 py-5 text-xl font-extrabold text-gray-900 shadow-xl shadow-brand-500/20 hover:bg-brand-400 transition-colors"
+              className="group inline-flex items-center gap-2.5 rounded-2xl bg-brand-500 px-9 py-4.5 text-base font-extrabold text-gray-900 shadow-brand transition-all hover:bg-brand-400 hover:shadow-[0_0_50px_rgba(245,158,11,0.3)] active:scale-[0.98]"
             >
-              <Zap size={24} />
-              Get Emergency Help Now
+              <Zap size={18} />
+              Get emergency help now
             </Link>
             <a
               href="tel:1800348498"
-              className="inline-flex items-center gap-2 rounded-2xl border-2 border-white/20 px-10 py-5 text-xl font-bold text-white hover:bg-white/8 transition-colors"
+              className="inline-flex items-center gap-2.5 rounded-2xl border border-white/15 px-9 py-4.5 text-base font-bold text-white transition-all hover:border-white/25 hover:bg-white/[0.05] active:scale-[0.98]"
             >
-              <Phone size={24} />
-              Call 1800-FIXIT-247
+              <Phone size={18} />
+              1800-FIXIT-247
             </a>
           </div>
 
           {/* Stats */}
-          <div className="mt-12 grid grid-cols-2 gap-4 sm:grid-cols-4">
+          <div className="mt-12 grid grid-cols-2 gap-3 sm:grid-cols-4">
             {STATS.map((s) => (
-              <div key={s.label} className="rounded-2xl border border-white/8 bg-white/4 p-4 backdrop-blur-sm">
-                <p className="text-2xl font-extrabold text-brand-400">{s.value}</p>
+              <div key={s.label} className="rounded-2xl border border-white/[0.07] bg-white/[0.03] p-4 backdrop-blur-sm">
+                <p className="text-2xl font-black text-brand-400">{s.value}</p>
                 <p className="mt-1 text-xs text-gray-500">{s.label}</p>
               </div>
             ))}
@@ -101,7 +104,7 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Emergency trade links */}
-      <section className="border-t border-white/8 py-16">
+      <section className="border-t border-white/[0.07] py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="text-2xl font-bold text-white mb-2 text-center">
             Select Your Emergency Trade
@@ -114,7 +117,7 @@ export default function EmergencyHubPage() {
               <Link
                 key={t.slug}
                 href={`/emergency/${t.slug}/sydney-cbd`}
-                className="flex items-start gap-4 rounded-2xl border border-white/8 bg-white/4 p-5 hover:border-brand-500/40 hover:bg-brand-500/8 transition-colors group"
+                className="flex items-start gap-4 rounded-2xl border border-white/[0.07] bg-white/[0.03] p-5 hover:border-brand-500/40 hover:bg-brand-500/8 transition-colors group"
               >
                 <span className="text-3xl shrink-0">{t.emoji}</span>
                 <div className="flex-1">
@@ -133,7 +136,7 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* How it works */}
-      <section className="border-t border-white/8 bg-[#111111] py-16">
+      <section className="border-t border-white/[0.07] bg-[#0d0d0d] py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="text-2xl font-bold text-white mb-10 text-center">
             How Emergency Dispatch Works
@@ -144,7 +147,7 @@ export default function EmergencyHubPage() {
               { step: '2', title: 'We Notify Local Tradies', desc: 'Verified tradies in your area are alerted instantly. The first available professional accepts your job.', icon: '📡' },
               { step: '3', title: 'Tradie En Route', desc: 'Track your tradie in real-time. Average arrival time across Australian cities: under 60 minutes.', icon: '🚗' },
             ].map((s) => (
-              <div key={s.step} className="rounded-2xl border border-white/8 bg-white/4 p-6 text-center">
+              <div key={s.step} className="rounded-2xl border border-white/[0.07] bg-white/[0.03] p-6 text-center">
                 <div className="mb-3 text-4xl">{s.icon}</div>
                 <div className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-400">Step {s.step}</div>
                 <h3 className="mb-2 text-lg font-semibold text-white">{s.title}</h3>
@@ -156,14 +159,14 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Trust signals */}
-      <section className="border-t border-white/8 py-16">
+      <section className="border-t border-white/[0.07] py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="text-2xl font-bold text-white mb-10 text-center">
             Every Tradie is Verified
           </h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {TRUST_POINTS.map((p) => (
-              <div key={p.title} className="rounded-2xl border border-white/8 bg-white/4 p-5 text-center">
+              <div key={p.title} className="rounded-2xl border border-white/[0.07] bg-white/[0.03] p-5 text-center">
                 <div className="mb-3 text-3xl">{p.icon}</div>
                 <h3 className="mb-2 font-semibold text-white">{p.title}</h3>
                 <p className="text-sm text-gray-500">{p.desc}</p>
@@ -186,7 +189,7 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Recent suburbs */}
-      <section className="border-t border-white/8 bg-[#111111] py-16">
+      <section className="border-t border-white/[0.07] bg-[#0d0d0d] py-16">
         <div className="mx-auto max-w-5xl px-4">
           <h2 className="text-2xl font-bold text-white mb-2 text-center">
             Recently Served Suburbs
@@ -196,7 +199,7 @@ export default function EmergencyHubPage() {
             {RECENT_SUBURBS.map((s) => (
               <span
                 key={s}
-                className="flex items-center gap-1.5 rounded-full border border-white/8 bg-white/4 px-4 py-2 text-sm text-gray-400"
+                className="flex items-center gap-1.5 rounded-full border border-white/[0.07] bg-white/[0.03] px-4 py-2 text-sm text-gray-400"
               >
                 <span className="h-2 w-2 rounded-full bg-brand-400" />
                 {s}
@@ -207,7 +210,7 @@ export default function EmergencyHubPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="border-t border-white/8 px-4 py-20 text-center">
+      <section className="border-t border-white/[0.07] px-4 py-20 text-center">
         <div className="mx-auto max-w-2xl">
           <div className="mb-4 flex items-center justify-center gap-2">
             <Clock size={18} className="text-brand-400" />
