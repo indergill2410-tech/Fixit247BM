@@ -70,16 +70,20 @@ export function detectEmergency(text: string): EmergencyDetectionResult {
 
   // Take highest score + diminishing returns for additional signals
   const sorted = [...detected].sort((a, b) => b.baseScore - a.baseScore);
-  let score = sorted[0].baseScore;
+  const topSignal = sorted[0];
+  if (!topSignal) {
+    return { isEmergency: false, riskLevel: 'SAFE', emergencyScore: 0, detectedSignals: [], tradeCategory: null, recommendedAction: 'Proceed with standard booking flow', safetyInstructions: [], autoDispatch: false, requiresAdminAlert: false };
+  }
+  let score = topSignal.baseScore;
   for (let i = 1; i < sorted.length; i++) {
-    score = Math.min(100, score + sorted[i].baseScore * 0.2);
+    score = Math.min(100, score + (sorted[i]?.baseScore ?? 0) * 0.2);
   }
   score = Math.round(score);
 
-  const tradeCategory = sorted[0].category;
+  const tradeCategory = topSignal.category;
 
-  const riskOrder = ['SAFE', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'LIFE_THREATENING'];
-  const riskLevel = riskOrder[Math.max(...sorted.map((s) => riskOrder.indexOf(s.riskLevel)))] as EmergencyDetectionResult['riskLevel'];
+  const riskOrder: EmergencyDetectionResult['riskLevel'][] = ['SAFE', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL', 'LIFE_THREATENING'];
+  const riskLevel = riskOrder[Math.max(...sorted.map((s) => riskOrder.indexOf(s.riskLevel)))] ?? 'SAFE';
 
   const allInstructions = [...new Set(sorted.flatMap((s) => s.safetyInstructions))].slice(0, 5);
 
