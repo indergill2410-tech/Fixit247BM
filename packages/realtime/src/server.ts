@@ -23,7 +23,7 @@ export function createSocketServer(httpServer: import('http').Server): Server<Cl
   io.use(socketAuthMiddleware);
 
   io.on('connection', (socket) => {
-    const { userId, role } = socket.data;
+    const { userId } = socket.data;
 
     // Auto-join user's personal room for notifications
     socket.join(ROOMS.user(userId));

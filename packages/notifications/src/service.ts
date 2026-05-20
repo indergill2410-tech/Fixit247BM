@@ -23,11 +23,14 @@ export async function notify(opts: NotifyOptions): Promise<void> {
   const resolvedBody = opts.body ?? body;
 
   const notif = await db.notification.create({
-    data: { userId, jobId, type: type as never, title: resolvedTitle, body: resolvedBody, data: data as never, status: 'PENDING', channel: 'IN_APP' },
+    data: { userId, jobId: jobId ?? null, type: type as never, title: resolvedTitle, body: resolvedBody, data: data as never, status: 'PENDING', channel: 'IN_APP' },
   });
 
   if (io) {
-    const { ROOMS } = await import('@fixit247/realtime');
+    // Dynamic import so the realtime package is only needed at runtime
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-require-imports
+    const { ROOMS } = require('@fixit247/realtime') as { ROOMS: { user: (id: string) => string } };
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access
     io.to(ROOMS.user(userId)).emit('notification:new', {
       id: notif.id, type, title: resolvedTitle, body: resolvedBody, jobId, data, createdAt: notif.createdAt.toISOString(),
     });

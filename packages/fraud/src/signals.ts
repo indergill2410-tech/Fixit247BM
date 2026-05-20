@@ -76,11 +76,11 @@ export async function checkMultiAccount(userId: string): Promise<FraudSignal | n
 // Check for suspicious review patterns (many 5-star reviews in short window)
 export async function checkFakeReviews(tradieId: string): Promise<FraudSignal | null> {
   const sevenDaysAgo = new Date(Date.now() - 7 * 86_400_000);
-  const recentHighRatings = await db.job.count({
+  const recentHighRatings = await db.review.count({
     where: {
-      tradieId,
+      job: { tradieId },
       rating: { gte: 5 },
-      ratedAt: { gte: sevenDaysAgo },
+      createdAt: { gte: sevenDaysAgo },
     },
   });
   if (recentHighRatings < 8) return null;

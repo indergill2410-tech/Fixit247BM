@@ -1,10 +1,10 @@
 import OpenAI from 'openai';
-import { SYSTEM_PROMPT, ConversationTurn, ExtractedJobData, ConversationContext } from './conversation';
+import { SYSTEM_PROMPT, ExtractedJobData, ConversationContext } from './conversation';
 import { detectEmergency } from './emergency-detector';
 
 let _openai: OpenAI | null = null;
 function getOpenAI(): OpenAI {
-  if (!_openai) _openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+  if (!_openai) _openai = new OpenAI({ apiKey: process.env['OPENAI_API_KEY'] });
   return _openai;
 }
 const openai = new Proxy({} as OpenAI, { get(_t, p) { return (getOpenAI() as never)[p as keyof OpenAI]; } });
@@ -23,10 +23,8 @@ export async function processConversationTurn(
   userMessage: string,
   context: ConversationContext,
 ): Promise<AIResponse> {
-  // Run emergency detection on user message
   const emergency = detectEmergency(userMessage);
 
-  // Build messages array
   const messages: OpenAI.Chat.ChatCompletionMessageParam[] = [
     { role: 'system', content: SYSTEM_PROMPT },
     ...context.messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
@@ -40,38 +38,39 @@ export async function processConversationTurn(
     temperature: 0.7,
   });
 
-  const rawResponse = response.choices[0].message.content ?? '';
+  const rawResponse = response.choices[0]?.message.content ?? '';
 
-  // Parse job_ready block if present
   let isJobReady = false;
   let extractedJobData: Partial<ExtractedJobData> | undefined;
   const jobReadyMatch = rawResponse.match(/```job_ready\n([\s\S]+?)\n```/);
-  if (jobReadyMatch) {
+  if (jobReadyMatch?.[1]) {
     try {
-      extractedJobData = JSON.parse(jobReadyMatch[1]);
+      extractedJobData = JSON.parse(jobReadyMatch[1]) as Partial<ExtractedJobData>;
       isJobReady = true;
     } catch { /* ignore parse errors */ }
   }
 
-  // Clean response (remove JSON block from display)
   const cleanMessage = rawResponse.replace(/```job_ready[\s\S]+?```/g, '').trim();
 
-  // Determine if human takeover needed (low AI confidence on complex situations)
   const requiresHumanTakeover = emergency.riskLevel === 'LIFE_THREATENING' && context.turnCount > 3;
 
-  return {
+  const result: AIResponse = {
     message: cleanMessage,
     isJobReady,
-    extractedJobData: isJobReady ? extractedJobData : undefined,
     emergencyDetected: emergency.isEmergency,
     emergencyScore: emergency.emergencyScore,
     requiresHumanTakeover,
-    safetyInstructions: emergency.safetyInstructions.length > 0 ? emergency.safetyInstructions : undefined,
+    ...(isJobReady && extractedJobData !== undefined && { extractedJobData }),
+    ...(emergency.safetyInstructions.length > 0 && { safetyInstructions: emergency.safetyInstructions }),
   };
+  return result;
 }
 
 export async function generateJobSummary(context: ConversationContext): Promise<string> {
-  const transcript = context.messages.filter(m => m.role !== 'system').map(m => `${m.role}: ${m.content}`).join('\n');
+  const transcript = context.messages
+    .filter((m) => m.role !== 'system')
+    .map((m) => `${m.role}: ${m.content}`)
+    .join('\n');
 
   const response = await openai.chat.completions.create({
     model: 'gpt-4o',
@@ -83,11 +82,11 @@ export async function generateJobSummary(context: ConversationContext): Promise<
     temperature: 0.5,
   });
 
-  return response.choices[0].message.content ?? 'Emergency service required.';
+  return response.choices[0]?.message.content ?? 'Emergency service required.';
 }
 
 export async function transcribeAudio(audioBuffer: Buffer): Promise<string> {
-  const file = new File([audioBuffer], 'audio.webm', { type: 'audio/webm' });
+  const file = new File([new Uint8Array(audioBuffer)], 'audio.webm', { type: 'audio/webm' });
   const response = await openai.audio.transcriptions.create({
     file,
     model: 'whisper-1',

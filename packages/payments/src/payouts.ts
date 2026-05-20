@@ -1,5 +1,6 @@
 import { stripe } from './stripe';
 import { db } from '@fixit247/database';
+import type { Prisma } from '@fixit247/database';
 
 export async function releaseJobPayment(jobId: string): Promise<{ payoutId: string }> {
   const payment = await db.payment.findUnique({ where: { jobId } });
@@ -10,7 +11,7 @@ export async function releaseJobPayment(jobId: string): Promise<{ payoutId: stri
   // Capture the held payment intent (releases funds)
   await stripe.paymentIntents.capture(payment.stripePaymentIntentId);
 
-  const payout = await db.$transaction(async (tx) => {
+  const payout = await db.$transaction(async (tx: Prisma.TransactionClient) => {
     await tx.payment.update({
       where: { jobId },
       data: { status: 'RELEASED', releasedAt: new Date() },

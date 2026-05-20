@@ -1,5 +1,3 @@
-import { db } from '@fixit247/database';
-
 export interface TrustInputs {
   tradieId: string;
   avgRating: number;           // 0-5

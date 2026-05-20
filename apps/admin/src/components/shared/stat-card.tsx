@@ -5,6 +5,8 @@ interface StatCardProps {
   value: string | number;
   delta?: string;
   icon?: string;
+  trend?: 'up' | 'down' | 'neutral';
+  highlight?: boolean;
 }
 
 export function StatCard({ title, value, delta, icon }: StatCardProps) {

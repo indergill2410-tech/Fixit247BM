@@ -14,6 +14,10 @@ const AnalyzeSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const { rateLimit, rateLimitResponse, LIMITS } = await import('@/lib/api/rate-limit');
+    const rl = rateLimit(req, LIMITS.ai);
+    if (!rl.success) return rateLimitResponse(rl);
+
     await requireSession();
     const body = await req.json();
     const data = AnalyzeSchema.parse(body);

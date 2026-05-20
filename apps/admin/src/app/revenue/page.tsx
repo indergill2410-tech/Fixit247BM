@@ -66,16 +66,16 @@ export default function AdminRevenuePage() {
   );
 
   const subscriptionMRR = ['BASIC', 'PROFESSIONAL', 'ELITE'].reduce(
-    (sum, tier) => sum + (subscriptionMap[tier] ?? 0) * TIER_MONTHLY[tier],
+    (sum, tier) => sum + (subscriptionMap[tier] ?? 0) * (TIER_MONTHLY[tier] ?? 0),
     0
   );
 
   // Simulated monthly trend (replace with real query in production)
   const now = new Date();
-  const last6Months = Array.from({ length: 6 }, (_, i) => {
+  const last6Months: string[] = Array.from({ length: 6 }, (_, i) => {
     const d = new Date(now);
     d.setMonth(d.getMonth() - (5 - i));
-    return MONTHS[d.getMonth()];
+    return MONTHS[d.getMonth()] ?? '';
   });
   const mockMonthlyRevenue = [4200, 5800, 7100, 6500, 9200, revenue?.monthRevenuePlatform ?? 0];
 
@@ -157,7 +157,7 @@ export default function AdminRevenuePage() {
             ) : (
               ['BASIC', 'PROFESSIONAL', 'ELITE'].map((tier) => {
                 const count = subscriptionMap[tier] ?? 0;
-                const revenue = count * TIER_MONTHLY[tier];
+                const revenue = count * (TIER_MONTHLY[tier] ?? 0);
                 const pct = subscriptionMRR > 0 ? (revenue / subscriptionMRR) * 100 : 0;
                 return (
                   <div key={tier}>

@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, X, FileText, Image, AlertCircle, CheckCircle2 } from 'lucide-react';
+import { Upload, X, FileText, AlertCircle, CheckCircle2 } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { Progress } from './progress';
 
@@ -55,8 +55,8 @@ export function FileUpload({
           file,
           id: `${file.name}-${Date.now()}-${Math.random()}`,
           status: tooBig ? 'error' : 'pending',
-          error: tooBig ? `File exceeds ${formatBytes(maxSize)} limit` : undefined,
           progress: 0,
+          ...(tooBig && { error: `File exceeds ${formatBytes(maxSize)} limit` }),
         };
         if (isImage(file) && !tooBig) {
           entry.preview = URL.createObjectURL(file);

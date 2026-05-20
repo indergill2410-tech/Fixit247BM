@@ -1,4 +1,5 @@
 import { db } from '@fixit247/database';
+import type { Prisma } from '@fixit247/database';
 import type { JobComplexity, JobPriority } from './pricing';
 import { calculateCreditCost } from './pricing';
 
@@ -28,7 +29,7 @@ export async function deductCreditsForJob(opts: {
 }): Promise<{ success: boolean; creditsDeducted: number; balanceAfter: number; error?: string }> {
   const creditCost = calculateCreditCost(opts.complexity, opts.priority, opts.subscriptionTier);
 
-  return db.$transaction(async (tx) => {
+  return db.$transaction(async (tx: Prisma.TransactionClient) => {
     const wallet = await tx.creditsWallet.findUnique({ where: { userId: opts.userId } });
     const currentBalance = Number(wallet?.balance ?? 0);
 
@@ -70,7 +71,7 @@ export async function addCredits(opts: {
   referenceId?: string;
   packageId?: string;
 }): Promise<{ balanceAfter: number }> {
-  return db.$transaction(async (tx) => {
+  return db.$transaction(async (tx: Prisma.TransactionClient) => {
     const wallet = await tx.creditsWallet.upsert({
       where: { userId: opts.userId },
       create: {
@@ -90,12 +91,12 @@ export async function addCredits(opts: {
     await tx.creditLedger.create({
       data: {
         tradieId: opts.tradieProfileId,
-        type: opts.type as any,
+        type: opts.type as never,
         credits: opts.credits,
         balanceAfter,
-        referenceId: opts.referenceId,
-        packageId: opts.packageId,
         description: opts.description,
+        ...(opts.referenceId !== undefined && { referenceId: opts.referenceId }),
+        ...(opts.packageId !== undefined && { packageId: opts.packageId }),
       },
     });
 

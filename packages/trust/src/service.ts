@@ -7,24 +7,18 @@ export async function recalculateTrustScore(
   jobId?: string,
   adminId?: string
 ): Promise<TrustScoreResult> {
-  const [profile, stats, disputes, refunds] = await Promise.all([
+  const [profile, disputes, refunds] = await Promise.all([
     db.tradieProfile.findUnique({
       where: { id: tradieId },
       select: {
-        rating: true,
-        totalJobs: true,
-        completedJobs: true,
-        cancelledJobs: true,
-        responseTimeAvg: true,
-        isVerified: true,
-        verificationLevel: true,
+        avgRating: true,
+        totalJobsCompleted: true,
+        completionRate: true,
+        cancellationRate: true,
+        responseTimeMinutes: true,
+        verificationStatus: true,
         trustScore: true,
       },
-    }),
-    db.job.groupBy({
-      by: ['status'],
-      where: { tradieId },
-      _count: { id: true },
     }),
     db.dispute.count({ where: { tradieId, status: { in: ['OPEN', 'UNDER_REVIEW', 'RESOLVED_CUSTOMER'] } } }),
     db.payout.count({ where: { tradieId, status: 'FAILED' } }),
@@ -32,9 +26,7 @@ export async function recalculateTrustScore(
 
   if (!profile) throw new Error(`Tradie profile not found: ${tradieId}`);
 
-  const totalJobs = profile.totalJobs ?? 0;
-  const completedJobs = profile.completedJobs ?? 0;
-  const cancelledJobs = profile.cancelledJobs ?? 0;
+  const totalJobs = profile.totalJobsCompleted ?? 0;
 
   const lastJob = await db.job.findFirst({
     where: { tradieId, status: 'COMPLETED' },
@@ -55,18 +47,25 @@ export async function recalculateTrustScore(
     ? Math.floor((Date.now() - lastJob.completedAt.getTime()) / 86_400_000)
     : 365;
 
+  const completedJobs = Math.round(totalJobs * Number(profile.completionRate ?? 100) / 100);
+
+  const verificationLevel: TrustInputs['verificationLevel'] =
+    profile.verificationStatus === 'VERIFIED' ? 'VERIFIED'
+    : profile.verificationStatus === 'PENDING' ? 'BASIC'
+    : 'NONE';
+
   const inputs: TrustInputs = {
     tradieId,
-    avgRating: profile.rating ? Number(profile.rating) : 0,
-    completionRate: totalJobs > 0 ? completedJobs / totalJobs : 0,
-    cancellationRate: totalJobs > 0 ? cancelledJobs / totalJobs : 0,
-    avgResponseTimeMinutes: profile.responseTimeAvg ? Number(profile.responseTimeAvg) : 30,
+    avgRating: Number(profile.avgRating ?? 0),
+    completionRate: Number(profile.completionRate ?? 100) / 100,
+    cancellationRate: Number(profile.cancellationRate ?? 0) / 100,
+    avgResponseTimeMinutes: profile.responseTimeMinutes ?? 30,
     totalJobs,
     repeatCustomerRate: completedJobs > 0 ? repeatCustomers.length / completedJobs : 0,
     emergencyCompletionRate: emergencyJobs > 0 ? emergencyCompleted / emergencyJobs : 0,
     disputeRate: totalJobs > 0 ? disputes / totalJobs : 0,
     refundRate: totalJobs > 0 ? refunds / totalJobs : 0,
-    verificationLevel: (profile.verificationLevel as TrustInputs['verificationLevel']) ?? 'NONE',
+    verificationLevel,
     daysSinceLastJob,
   };
 
@@ -82,7 +81,7 @@ export async function recalculateTrustScore(
       data: {
         tradieId,
         score: result.score,
-        previousScore: profile.trustScore ?? null,
+        previousScore: profile.trustScore ? Number(profile.trustScore) : null,
         reason,
         jobId: jobId ?? null,
         adminId: adminId ?? null,
@@ -108,7 +107,7 @@ export async function adminOverrideTrustScore(
       data: {
         tradieId,
         score: newScore,
-        previousScore: profile?.trustScore ?? null,
+        previousScore: profile?.trustScore ? Number(profile.trustScore) : null,
         reason: `Admin override: ${reason}`,
         adminId,
       },

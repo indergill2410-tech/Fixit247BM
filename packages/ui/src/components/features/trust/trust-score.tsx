@@ -59,7 +59,6 @@ export function TrustScoreMeter({
   const circumference = 2 * Math.PI * r;
   const arcLength = (sweepDeg / 360) * circumference;
   const filledLength = (clamped / 100) * arcLength;
-  const gap = circumference - arcLength;
 
   // Animated count-up
   const displayScore = useMotionValue(0);
