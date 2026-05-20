@@ -10,12 +10,35 @@ export async function POST(req: Request) {
   const params = Object.fromEntries(new URLSearchParams(body));
   const callSid = params.CallSid;
   const speechResult = params.SpeechResult ?? '';
-  const webhookBase = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247.com.au';
+  const from = params.From ?? 'unknown';
 
-  // Load or create conversation
-  const call = await db.voiceCall.findUnique({ where: { twilioCallSid: callSid } });
+  const proto = req.headers.get('x-forwarded-proto') ?? 'https';
+  const host = req.headers.get('x-forwarded-host') ?? req.headers.get('host') ?? '';
+  const webhookBase = host
+    ? `${proto}://${host}`
+    : (process.env.NEXT_PUBLIC_APP_URL ?? '').replace(/\/$/, '');
+
+  // Upsert the VoiceCall — recover gracefully if the inbound handler's DB write failed.
+  let call = await db.voiceCall.findUnique({ where: { twilioCallSid: callSid } });
   if (!call) {
-    return new NextResponse(buildResponseTwiML("Sorry, I've lost track of our call. Please call back.", webhookBase, false), {
+    console.warn('[gather] VoiceCall not found for sid %s — creating now', callSid);
+    call = await db.voiceCall.create({
+      data: {
+        twilioCallSid: callSid,
+        phoneNumber: from,
+        direction: 'INBOUND',
+        status: 'AI_HANDLING',
+        answeredAt: new Date(),
+      },
+    }).catch((err: unknown) => {
+      console.error('[gather] voiceCall.create failed:', err);
+      return null;
+    });
+  }
+
+  if (!call) {
+    console.error('[gather] cannot create VoiceCall — giving up');
+    return new NextResponse(buildResponseTwiML("Sorry, there's a technical issue. Please call back in a moment.", webhookBase, false), {
       headers: { 'Content-Type': 'text/xml' },
     });
   }
