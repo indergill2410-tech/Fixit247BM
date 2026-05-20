@@ -1,13 +1,20 @@
 import { z } from 'zod';
+import { normalizeAustralianPhone } from '@/lib/utils/phone';
+
+// Strips common formatting characters, validates as an Australian number,
+// and normalises the stored value to E.164 (+61XXXXXXXXX).
+const auPhoneSchema = z
+  .string()
+  .transform((val) => val.replace(/[\s\-().]/g, ''))
+  .pipe(z.string().regex(/^(\+?61|0)[2-9]\d{8}$/, 'Enter a valid Australian phone number'))
+  .transform((val) => normalizeAustralianPhone(val) ?? val);
 
 // ─── Customer ────────────────────────────────────────────────────────────────
 
 export const customerOnboardingSchema = z.object({
   firstName: z.string().min(2).max(50),
   lastName: z.string().min(2).max(50),
-  phone: z
-    .string()
-    .regex(/^(\+?61|0)[2-9]\d{8}$/, 'Enter a valid Australian phone number'),
+  phone: auPhoneSchema,
   suburb: z.string().min(2, 'Enter your suburb'),
   postcode: z.string().regex(/^\d{4}$/, 'Enter a valid 4-digit postcode'),
   state: z.enum(['NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT']),
@@ -15,7 +22,14 @@ export const customerOnboardingSchema = z.object({
   notifyBySms: z.boolean().default(true),
   notifyByEmail: z.boolean().default(true),
   emergencyContactName: z.string().optional(),
-  emergencyContactPhone: z.string().optional(),
+  emergencyContactPhone: z
+    .string()
+    .optional()
+    .refine(
+      (val) => !val || val.trim() === '' || normalizeAustralianPhone(val) !== null,
+      'Enter a valid Australian phone number',
+    )
+    .transform((val) => (val && val.trim() !== '' ? (normalizeAustralianPhone(val) ?? val) : val)),
 });
 
 export type CustomerOnboardingValues = z.infer<typeof customerOnboardingSchema>;
@@ -29,7 +43,7 @@ export const tradieBusinessSchema = z.object({
     .regex(/^\d{11}$/, 'ABN must be 11 digits (no spaces)')
     .optional()
     .or(z.literal('')),
-  phone: z.string().regex(/^(\+?61|0)[2-9]\d{8}$/, 'Enter a valid Australian phone number'),
+  phone: auPhoneSchema,
   trades: z.array(z.string()).min(1, 'Select at least one trade'),
   serviceSuburbs: z.array(z.string()).min(1, 'Add at least one service suburb'),
   serviceRadiusKm: z.number().min(5).max(200).default(25),
