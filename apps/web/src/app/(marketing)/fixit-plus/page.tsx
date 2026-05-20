@@ -24,7 +24,7 @@ const PLANS = [
       'Annual safety inspection included',
     ],
     cta: 'Start Home Cover',
-    href: '/auth/register?plan=fixit-plus-home',
+    href: '/register?plan=fixit-plus-home',
   },
   {
     name: 'Fixit Plus Total',
@@ -43,7 +43,7 @@ const PLANS = [
       'Dedicated support concierge',
     ],
     cta: 'Start Total Cover',
-    href: '/auth/register?plan=fixit-plus-total',
+    href: '/register?plan=fixit-plus-total',
   },
 ];
 
@@ -118,7 +118,7 @@ export default function FixitPlusPage() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
-              href="/auth/register?plan=fixit-plus-total"
+              href="/register?plan=fixit-plus-total"
               className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-500/20"
             >
               Get Total Cover — $49/mo →
@@ -135,7 +135,7 @@ export default function FixitPlusPage() {
       </section>
 
       {/* Trust Stats */}
-      <section className="border-y border-white/8 bg-[#111111] py-8">
+      <section className="border-y border-white/8 bg-[#0a0a0a] py-8">
         <div className="mx-auto max-w-4xl px-4">
           <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
             {TRUST_STATS.map((s) => (
@@ -176,7 +176,7 @@ export default function FixitPlusPage() {
       </section>
 
       {/* Plans */}
-      <section id="plans" className="bg-[#111111] px-4 py-20">
+      <section id="plans" className="bg-[#0a0a0a] px-4 py-20">
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">
             <h2 className="text-3xl font-bold">Choose your cover</h2>
@@ -257,7 +257,7 @@ export default function FixitPlusPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="border-t border-white/8 bg-[#111111] px-4 py-20 text-center">
+      <section className="border-t border-white/8 bg-[#0a0a0a] px-4 py-20 text-center">
         <div className="mx-auto max-w-2xl">
           <div className="mb-3 flex items-center justify-center gap-2 text-brand-400">
             <Zap size={18} />
@@ -271,7 +271,7 @@ export default function FixitPlusPage() {
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
-              href="/auth/register?plan=fixit-plus-total"
+              href="/register?plan=fixit-plus-total"
               className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-500/20"
             >
               Try free for 14 days →

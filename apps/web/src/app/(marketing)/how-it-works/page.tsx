@@ -93,7 +93,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* 3-Step Process */}
-      <section className="border-t border-white/8 bg-[#111111] py-20 px-4">
+      <section className="border-t border-white/8 bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-16 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/15 px-3 py-1 text-xs font-semibold text-brand-400">
@@ -180,7 +180,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* For Standard Jobs */}
-      <section className="border-t border-white/8 bg-[#111111] py-20 px-4">
+      <section className="border-t border-white/8 bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div className="rounded-3xl border border-brand-500/30 bg-brand-500/10 p-8 order-last lg:order-first">
@@ -245,7 +245,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Transparent Pricing */}
-      <section className="border-t border-white/8 bg-[#111111] py-20 px-4">
+      <section className="border-t border-white/8 bg-[#0a0a0a] py-20 px-4">
         <div className="mx-auto max-w-3xl text-center">
           <span className="mb-3 inline-block rounded-full bg-brand-500/15 px-3 py-1 text-xs font-semibold text-brand-400">
             TRANSPARENT PRICING
@@ -304,7 +304,7 @@ export default function HowItWorksPage() {
       </section>
 
       {/* Final CTA */}
-      <section className="border-t border-white/8 bg-[#111111] py-20 px-4 text-center">
+      <section className="border-t border-white/8 bg-[#0a0a0a] py-20 px-4 text-center">
         <div className="mx-auto max-w-2xl">
           <h2 className="text-3xl font-extrabold sm:text-4xl">Post Your First Job Free</h2>
           <p className="mx-auto mt-4 max-w-lg text-gray-400">

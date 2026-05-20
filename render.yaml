@@ -1,12 +1,16 @@
 services:
-  # Web app (customer + tradie facing)
+  # ── Web app (customer + tradie facing) ──────────────────────────────────────
   - type: web
     name: fixit247-web
     runtime: node
     region: singapore
     plan: starter
     rootDir: .
-    buildCommand: NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @fixit247/database run db:generate && pnpm --filter @fixit247/web build
+    buildCommand: >
+      NODE_ENV=development pnpm install --frozen-lockfile &&
+      pnpm --filter @fixit247/database run db:generate &&
+      pnpm --filter @fixit247/database run db:migrate:prod &&
+      pnpm --filter @fixit247/web build
     startCommand: pnpm --filter @fixit247/web start
     healthCheckPath: /api/health
     envVars:
@@ -16,37 +20,90 @@ services:
         value: production
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
+
+      # ── Database ──
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: fixit247-db
+          property: connectionString
       - key: DIRECT_URL
-        sync: false
+        fromDatabase:
+          name: fixit247-db
+          property: connectionString
+
+      # ── Supabase ──
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
-      - key: OPENAI_API_KEY
+      - key: SUPABASE_JWT_SECRET
         sync: false
+
+      # ── App URLs ──
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+      - key: NEXT_PUBLIC_ADMIN_URL
+        sync: false
+
+      # ── Stripe ──
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_WEBHOOK_SECRET
         sync: false
       - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
         sync: false
-      - key: RESEND_API_KEY
-        sync: false
-      - key: NEXT_PUBLIC_SITE_URL
+      - key: STRIPE_PLATFORM_FEE_PERCENT
+        value: "15"
+
+      # ── OpenAI ──
+      - key: OPENAI_API_KEY
         sync: false
 
-  # Admin app
+      # ── Email (Resend) ──
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: noreply@fixit247.com.au
+
+      # ── Twilio (voice features) ──
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+
+      # ── Google Maps ──
+      - key: NEXT_PUBLIC_GOOGLE_MAPS_KEY
+        sync: false
+
+      # ── Redis (rate limiting / queues) ──
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+
+      # ── Sentry ──
+      - key: SENTRY_DSN
+        sync: false
+      - key: NEXT_PUBLIC_SENTRY_DSN
+        sync: false
+
+  # ── Admin app ───────────────────────────────────────────────────────────────
   - type: web
     name: fixit247-admin
     runtime: node
     region: singapore
     plan: starter
     rootDir: .
-    buildCommand: NODE_ENV=development pnpm install --frozen-lockfile && pnpm --filter @fixit247/database run db:generate && pnpm --filter @fixit247/admin build
+    buildCommand: >
+      NODE_ENV=development pnpm install --frozen-lockfile &&
+      pnpm --filter @fixit247/database run db:generate &&
+      pnpm --filter @fixit247/admin build
     startCommand: pnpm --filter @fixit247/admin start
     healthCheckPath: /api/health
     envVars:
@@ -56,13 +113,77 @@ services:
         value: production
       - key: NEXT_TELEMETRY_DISABLED
         value: "1"
+
+      # ── Database ──
       - key: DATABASE_URL
-        sync: false
+        fromDatabase:
+          name: fixit247-db
+          property: connectionString
       - key: DIRECT_URL
-        sync: false
+        fromDatabase:
+          name: fixit247-db
+          property: connectionString
+
+      # ── Supabase ──
       - key: NEXT_PUBLIC_SUPABASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
         sync: false
       - key: SUPABASE_SERVICE_ROLE_KEY
         sync: false
+      - key: SUPABASE_JWT_SECRET
+        sync: false
+
+      # ── App URLs ──
+      - key: NEXT_PUBLIC_SITE_URL
+        sync: false
+      - key: NEXT_PUBLIC_APP_URL
+        sync: false
+
+      # ── Stripe ──
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_PLATFORM_FEE_PERCENT
+        value: "15"
+
+      # ── OpenAI ──
+      - key: OPENAI_API_KEY
+        sync: false
+
+      # ── Email ──
+      - key: RESEND_API_KEY
+        sync: false
+      - key: EMAIL_FROM
+        value: noreply@fixit247.com.au
+
+      # ── Twilio ──
+      - key: TWILIO_ACCOUNT_SID
+        sync: false
+      - key: TWILIO_AUTH_TOKEN
+        sync: false
+      - key: TWILIO_PHONE_NUMBER
+        sync: false
+
+      # ── Redis ──
+      - key: UPSTASH_REDIS_REST_URL
+        sync: false
+      - key: UPSTASH_REDIS_REST_TOKEN
+        sync: false
+
+      # ── Sentry ──
+      - key: SENTRY_DSN
+        sync: false
+      - key: NEXT_PUBLIC_SENTRY_DSN
+        sync: false
+
+# ── PostgreSQL database ────────────────────────────────────────────────────────
+databases:
+  - name: fixit247-db
+    plan: starter
+    databaseName: fixit247bm
+    region: singapore
+    postgresMajorVersion: 16

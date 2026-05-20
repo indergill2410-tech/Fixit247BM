@@ -54,7 +54,7 @@ export default function ReferPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
       {/* Hero */}
       <div className="mx-auto max-w-2xl px-4 py-20 text-center">
         <div className="mb-6 text-6xl">🎁</div>
@@ -70,7 +70,7 @@ export default function ReferPage() {
         ) : notAuthed ? (
           <div className="rounded-2xl bg-white/10 p-8 text-center">
             <p className="mb-4 text-gray-300">Sign in to get your personal referral link</p>
-            <Link href="/auth/login" className="inline-block rounded-xl bg-brand-600 px-6 py-3 font-bold hover:bg-brand-700 transition-colors">
+            <Link href="/login" className="inline-block rounded-xl bg-brand-600 px-6 py-3 font-bold hover:bg-brand-700 transition-colors">
               Sign In
             </Link>
           </div>

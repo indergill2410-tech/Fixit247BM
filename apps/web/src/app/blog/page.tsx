@@ -28,8 +28,8 @@ const CATEGORY_COLORS: Record<string, string> = {
 
 export default function BlogPage() {
   return (
-    <div className="min-h-screen bg-[#111111] text-white">
-      <div className="bg-[#111111] py-16 text-white">
+    <div className="min-h-screen bg-[#0a0a0a] text-white">
+      <div className="bg-[#0a0a0a] py-16 text-white">
         <div className="mx-auto max-w-5xl px-4">
           <h1 className="text-4xl font-extrabold">Home Services Blog</h1>
           <p className="mt-3 text-lg text-gray-400">Expert advice for Australian homeowners. Emergency tips, guides, and pricing.</p>
