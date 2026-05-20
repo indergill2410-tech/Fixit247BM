@@ -26,6 +26,7 @@ const PUBLIC_EXACT: readonly string[] = [
   '/blog',
   '/emergency',
   '/voice',
+  '/api/health', // Render health checks + public status endpoint
 ];
 
 // Prefix-match public routes (handles dynamic segments)
@@ -36,6 +37,7 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/trade/',
   '/tradie/',   // public tradie profiles (/tradie/[id])
   '/api/auth',
+  '/api/voice/twilio', // Twilio webhooks — must be publicly reachable, no session
   '/_next',
   '/favicon',
 ];
