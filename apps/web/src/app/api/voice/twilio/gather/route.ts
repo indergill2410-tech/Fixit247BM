@@ -32,7 +32,7 @@ function validateTwilioSignature(req: Request, body: string): boolean {
   // Derive URL from actual request so signature validates for any configured path
   const reqUrl = new URL(req.url);
   const base = (process.env['NEXT_PUBLIC_APP_URL'] ?? `${reqUrl.protocol}//${reqUrl.host}`).replace(/\/$/, '');
-  const url = `${base}${reqUrl.pathname}`;
+  const url = `${base}${reqUrl.pathname}${reqUrl.search}`;
   const params = Object.fromEntries(new URLSearchParams(body));
   const sortedKeys = Object.keys(params).sort();
   const data = url + sortedKeys.map((k) => `${k}${params[k] ?? ''}`).join('');
