@@ -34,12 +34,8 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
     ],
   },
-  output: 'standalone',
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
-    // Next.js 15.3+ validates Host header for all requests.
-    // Set to 'all' so Render's reverse proxy can forward without rejection.
-    allowedHosts: 'all',
     serverActions: {
       allowedOrigins: ['fixit247bm.onrender.com', '*.onrender.com'],
     },
