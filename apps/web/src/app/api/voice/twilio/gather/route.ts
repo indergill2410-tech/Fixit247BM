@@ -557,7 +557,7 @@ export async function POST(req: Request) {
       ? "We're treating this as urgent — they'll be with you as fast as possible."
       : "No worries — you're all sorted.";
     const confirmMsg = jobId
-      ? `Perfect${name}! I've booked a ${category} for ${suburb}. You'll get a text confirmation shortly and the tradie will call you soon. ${urgencySuffix}`
+      ? `Perfect${name}! I've booked a tradie for your ${category === 'tradie' ? 'request' : category} in ${suburb}. They'll call you soon. ${urgencySuffix}`
       : `${aiResponse.message} Your request is logged and our team will call you back shortly. Sorry for any inconvenience.`;
 
     return new NextResponse(buildResponseTwiML(confirmMsg, webhookBase, true), {
