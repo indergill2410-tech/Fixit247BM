@@ -87,8 +87,8 @@ export async function POST(req: Request) {
   logger.info('[inbound] POST received', { url: req.url, bodyLength: body.length });
 
   if (!validateTwilioSignature(req, body)) {
-    logger.error('[inbound] Signature invalid — returning 403');
-    return new NextResponse('Forbidden', { status: 403 });
+    logger.error('[inbound] Signature invalid — returning TwiML rejection so caller hears voice');
+    return new NextResponse(errorTwiml(), { headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
   }
 
   const params = Object.fromEntries(new URLSearchParams(body));

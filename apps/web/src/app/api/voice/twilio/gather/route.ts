@@ -194,8 +194,11 @@ export async function POST(req: Request) {
   logger.info('[gather] POST received', { url: req.url, bodyLength: body.length });
 
   if (!validateTwilioSignature(req, body)) {
-    logger.error('[gather] Signature invalid — returning 403');
-    return new NextResponse('Forbidden', { status: 403 });
+    logger.error('[gather] Signature invalid — returning TwiML rejection so caller hears voice');
+    return new NextResponse(
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Nicole" language="en-AU">Sorry, we couldn't verify this call. Please try again.</Say><Hangup/></Response>`,
+      { headers: { 'Content-Type': 'text/xml; charset=utf-8' } },
+    );
   }
 
   const params = Object.fromEntries(new URLSearchParams(body));
