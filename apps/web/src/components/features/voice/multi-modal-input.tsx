@@ -40,7 +40,7 @@ export function MultiModalInput({ onComplete }: Props) {
       chunksRef.current = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
       recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
+        stream.getTracks().forEach((t) => { t.stop(); });
         setTranscribing(true);
         try {
           const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
@@ -87,7 +87,7 @@ export function MultiModalInput({ onComplete }: Props) {
         <div className="relative">
           <textarea
             value={description}
-            onChange={(e) => setDescription(e.target.value)}
+            onChange={(e) => { setDescription(e.target.value); }}
             placeholder="E.g. My toilet is overflowing and water is coming through the floor..."
             rows={3}
             className="w-full rounded-xl border border-gray-200 px-4 py-3 pr-12 text-sm outline-none focus:border-red-300 resize-none"
@@ -109,7 +109,7 @@ export function MultiModalInput({ onComplete }: Props) {
           {imagePreviews.map((src, i) => (
             <div key={i} className="relative h-20 w-20">
               <img src={src} alt="" className="h-20 w-20 rounded-xl object-cover border border-gray-200" />
-              <button onClick={() => removeImage(i)} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white">
+              <button onClick={() => { removeImage(i); }} className="absolute -right-1.5 -top-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-red-600 text-white">
                 <X size={10} />
               </button>
             </div>

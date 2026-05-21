@@ -54,7 +54,7 @@ export function LiveDispatchPanel() {
           .filter((o) => o.secondsRemaining > 0)
       );
     }, 1000);
-    return () => clearInterval(interval);
+    return () => { clearInterval(interval); };
   }, []);
 
   const handleAccept = async (jobId: string) => {
@@ -112,7 +112,7 @@ export function LiveDispatchPanel() {
                 {Math.floor(offer.secondsRemaining / 60)}:{String(offer.secondsRemaining % 60).padStart(2, '0')}
               </div>
               <button
-                onClick={() => setOffers((prev) => prev.filter((o) => o.jobId !== offer.jobId))}
+                onClick={() => { setOffers((prev) => prev.filter((o) => o.jobId !== offer.jobId)); }}
                 className="rounded-lg p-0.5 text-white/70 hover:text-white"
               >
                 <X size={14} />

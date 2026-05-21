@@ -7,7 +7,7 @@ import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 
-const APP_BASE = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
 
 // Simple in-memory rate limiter: max 5 calls per phone per 10 minutes
 const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
@@ -54,7 +54,7 @@ function extractPathname(url: string): string {
 
 function validateTwilioSignature(req: Request, body: string): boolean {
   const twilioSignature = req.headers.get('x-twilio-signature');
-  const authToken = process.env['TWILIO_AUTH_TOKEN'];
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
 
   if (!authToken) {
     logger.warn('[inbound] TWILIO_AUTH_TOKEN not set — skipping signature validation');
@@ -62,7 +62,7 @@ function validateTwilioSignature(req: Request, body: string): boolean {
   }
 
   if (!twilioSignature) {
-    if (process.env['NODE_ENV'] === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       logger.warn('[inbound] No x-twilio-signature — likely not a Twilio request');
       return false;
     }
@@ -83,18 +83,18 @@ function validateTwilioSignature(req: Request, body: string): boolean {
 }
 
 // GET: quick liveness check — curl https://fixit247bm.onrender.com/api/voice/twilio/inbound
-export async function GET() {
+export function GET() {
   checkEnvOnce();
   return NextResponse.json({
     status: 'ok',
     route: 'twilio-inbound',
     webhookBase: APP_BASE,
     env: {
-      TWILIO_ACCOUNT_SID: process.env['TWILIO_ACCOUNT_SID'] ? 'set' : 'MISSING',
-      TWILIO_AUTH_TOKEN: process.env['TWILIO_AUTH_TOKEN'] ? 'set' : 'MISSING',
-      TWILIO_PHONE_NUMBER: process.env['TWILIO_PHONE_NUMBER'] ?? 'MISSING',
-      OPENAI_API_KEY: process.env['OPENAI_API_KEY'] ? 'set' : 'MISSING',
-      DATABASE_URL: process.env['DATABASE_URL'] ? 'set' : 'MISSING',
+      TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID ? 'set' : 'MISSING',
+      TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN ? 'set' : 'MISSING',
+      TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER ?? 'MISSING',
+      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'set' : 'MISSING',
+      DATABASE_URL: process.env.DATABASE_URL ? 'set' : 'MISSING',
     },
   });
 }
@@ -118,9 +118,9 @@ export async function POST(req: Request) {
   }
 
   const params = Object.fromEntries(new URLSearchParams(body));
-  const callSid = params['CallSid'];
-  const from = params['From'] ?? 'unknown';
-  const to = params['To'] ?? 'unknown';
+  const callSid = params.CallSid;
+  const from = params.From ?? 'unknown';
+  const to = params.To ?? 'unknown';
 
   logger.info('[inbound] Call received', { callSid, from, to });
 

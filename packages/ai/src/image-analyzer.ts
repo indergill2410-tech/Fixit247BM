@@ -54,14 +54,14 @@ export async function analyzeMultipleImages(imageUrls: string[]): Promise<{
 
   const overallSeverity = analyses.reduce<ImageAnalysis['severity']>(
     (max: ImageAnalysis['severity'], a: ImageAnalysis): ImageAnalysis['severity'] => {
-      const aRank = severityRank[a.severity] ?? 0;
-      const maxRank = severityRank[max] ?? 0;
+      const aRank = severityRank[a.severity];
+      const maxRank = severityRank[max];
       return aRank > maxRank ? a.severity : max;
     },
     'MINOR'
   );
 
-  const combined = analyses.map((a: ImageAnalysis, i: number) => `Image ${i + 1}: ${a.description}`).join('. ');
+  const combined = analyses.map((a: ImageAnalysis, i: number) => `Image ${String(i + 1)}: ${a.description}`).join('. ');
 
   return { combined, analyses, overallSeverity };
 }

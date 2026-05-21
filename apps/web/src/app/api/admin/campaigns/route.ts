@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
 
 export async function GET() {
@@ -32,8 +33,8 @@ export async function POST(req: Request) {
     data: {
       name: body.name,
       type: body.type,
-      targetAudience: body.targetAudience ?? {},
-      content: body.content ?? {},
+      targetAudience: (body.targetAudience ?? {}) as Prisma.InputJsonValue,
+      content: (body.content ?? {}) as Prisma.InputJsonValue,
       scheduledAt: body.scheduledAt ? new Date(body.scheduledAt) : null,
       status: 'DRAFT',
     },

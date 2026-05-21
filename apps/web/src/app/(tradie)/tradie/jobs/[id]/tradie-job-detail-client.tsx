@@ -56,7 +56,7 @@ export function TradieJobDetailClient({ job, currentUser }: Props) {
   }
 
   return (
-    <DashboardShell>
+    <DashboardShell role="TRADIE">
       {/* Header */}
       <div className={`mb-6 rounded-2xl p-6 ${job.isEmergency ? 'bg-red-900 text-white' : 'bg-gray-900 text-white'}`}>
         {job.isEmergency && (
@@ -115,7 +115,7 @@ export function TradieJobDetailClient({ job, currentUser }: Props) {
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}
-            onClick={() => setActiveTab(key as 'nav' | 'chat')}
+            onClick={() => { setActiveTab(key as 'nav' | 'chat'); }}
             className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors ${
               activeTab === key ? 'bg-brand-500/15 text-brand-400' : 'text-gray-500 hover:text-white'
             }`}

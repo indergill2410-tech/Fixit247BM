@@ -52,7 +52,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
   ] as const;
 
   return (
-    <DashboardShell>
+    <DashboardShell role="CUSTOMER">
       {/* Job header */}
       <div className={`mb-6 rounded-2xl p-6 ${job.isEmergency ? 'bg-red-900 text-white' : 'bg-gray-900 text-white'}`}>
         <div className="flex items-start justify-between">
@@ -143,7 +143,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
               return (
                 <button
                   key={tab.key}
-                  onClick={() => setActiveTab(tab.key as typeof activeTab)}
+                  onClick={() => { setActiveTab(tab.key as typeof activeTab); }}
                   className={`flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-sm font-medium transition-colors ${
                     activeTab === tab.key ? 'bg-brand-500/15 text-brand-400' : 'text-gray-500 hover:text-white'
                   }`}
@@ -186,7 +186,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
         <div className="mt-6">
           <Button
             className="w-full gap-2 bg-green-600 hover:bg-green-700"
-            onClick={() => setShowPaymentConfirm(true)}
+            onClick={() => { setShowPaymentConfirm(true); }}
           >
             Job Complete — Release Payment
             <ChevronRight size={16} />
@@ -201,7 +201,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
             tradieName={job.tradieName}
             jobTitle={job.title}
             amount={0}
-            onConfirmed={() => setShowPaymentConfirm(false)}
+            onConfirmed={() => { setShowPaymentConfirm(false); }}
           />
         </div>
       )}

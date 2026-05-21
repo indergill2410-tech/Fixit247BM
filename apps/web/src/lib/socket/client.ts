@@ -1,6 +1,7 @@
 'use client';
 
-import { io, Socket } from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
+import { io } from 'socket.io-client';
 
 let socket: Socket | null = null;
 
@@ -29,7 +30,7 @@ export function disconnectSocket(): void {
 }
 
 // Typed socket events
-export type ServerToClientEvents = {
+export interface ServerToClientEvents {
   'job:new_offer': (payload: { jobId: string; job: Record<string, unknown>; expiresAt: string }) => void;
   'job:offer_expired': (payload: { jobId: string }) => void;
   'job:status_changed': (payload: { jobId: string; status: string; tradie?: Record<string, unknown> }) => void;
@@ -37,11 +38,11 @@ export type ServerToClientEvents = {
   'job:tradie_arrived': (payload: { jobId: string }) => void;
   'availability:updated': (payload: { tradieId: string; status: string }) => void;
   'notification:new': (payload: { id: string; type: string; title: string; body: string }) => void;
-};
+}
 
-export type ClientToServerEvents = {
+export interface ClientToServerEvents {
   'tradie:heartbeat': (payload: { tradieId: string; lat?: number; lng?: number }) => void;
   'tradie:go_online': (payload: { tradieId: string; status: string }) => void;
   'job:subscribe': (payload: { jobId: string }) => void;
   'job:unsubscribe': (payload: { jobId: string }) => void;
-};
+}

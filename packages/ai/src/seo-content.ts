@@ -91,5 +91,5 @@ Return JSON with:
   });
 
   const blogContent = response.choices[0]?.message.content ?? '{}';
-  return JSON.parse(blogContent);
+  return JSON.parse(blogContent) as { title: string; content: string; metaDescription: string };
 }

@@ -49,9 +49,11 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: 'avatars.githubusercontent.com' },
     ],
   },
-  output: 'standalone',
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
+    serverActions: {
+      allowedOrigins: ['fixit247bm.onrender.com', '*.onrender.com'],
+    },
   },
   async redirects() {
     return [

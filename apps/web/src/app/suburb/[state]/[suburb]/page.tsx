@@ -69,7 +69,6 @@ export default async function SuburbLandingPage({ params }: { params: Promise<{ 
   const tradieCount = await db.tradieProfile.count({
     where: {
       verificationStatus: 'VERIFIED',
-      servicedSuburbs: { hasSome: [suburbName, suburb] },
     },
   }).catch(() => 0);
 

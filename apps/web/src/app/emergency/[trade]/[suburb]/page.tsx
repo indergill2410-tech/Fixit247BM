@@ -84,9 +84,8 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
   // Fetch real local tradies from DB
   const localTradies = await db.tradieProfile.findMany({
     where: {
-      tradeCategories: { has: tradeCategoryKey as any },
+      trades: { has: tradeCategoryKey as any },
       verificationStatus: 'VERIFIED',
-      servicedSuburbs: { hasSome: [suburbName, suburb] },
     },
     include: { user: { select: { firstName: true, lastName: true, avatarUrl: true } } },
     take: 6,

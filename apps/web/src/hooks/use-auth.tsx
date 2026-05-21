@@ -31,11 +31,11 @@ function mapUser(supabaseUser: User): AuthUser {
   return {
     id: supabaseUser.id,
     email: supabaseUser.email ?? '',
-    role: (meta['role'] as Role | undefined) ?? 'CUSTOMER',
-    firstName: (meta['firstName'] as string | undefined) ?? '',
-    lastName: (meta['lastName'] as string | undefined) ?? '',
-    avatarUrl: (meta['avatarUrl'] as string | null | undefined) ?? null,
-    onboardingComplete: (meta['onboardingComplete'] as boolean | undefined) ?? false,
+    role: (meta.role as Role | undefined) ?? 'CUSTOMER',
+    firstName: (meta.firstName as string | undefined) ?? '',
+    lastName: (meta.lastName as string | undefined) ?? '',
+    avatarUrl: (meta.avatarUrl as string | null | undefined) ?? null,
+    onboardingComplete: (meta.onboardingComplete as boolean | undefined) ?? false,
     emailVerified: !!supabaseUser.email_confirmed_at,
   };
 }
@@ -65,7 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
     });
 
-    return () => subscription.unsubscribe();
+    return () => { subscription.unsubscribe(); };
   }, []);
 
   const signOut = React.useCallback(async () => {

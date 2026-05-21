@@ -68,7 +68,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
           <motion.div
             initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             className="fixed inset-0 z-30 bg-black/70 lg:hidden"
-            onClick={() => setMobileOpen(false)}
+            onClick={() => { setMobileOpen(false); }}
           />
         )}
       </AnimatePresence>
@@ -93,13 +93,13 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
             )}
           </AnimatePresence>
           <button
-            onClick={() => setCollapsed(!collapsed)}
+            onClick={() => { setCollapsed(!collapsed); }}
             className="hidden rounded-lg p-1.5 text-gray-500 hover:bg-white/6 hover:text-white lg:flex"
             aria-label="Toggle sidebar"
           >
             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
-          <button onClick={() => setMobileOpen(false)} className="rounded-lg p-1.5 text-gray-500 hover:bg-white/6 hover:text-white lg:hidden">
+          <button onClick={() => { setMobileOpen(false); }} className="rounded-lg p-1.5 text-gray-500 hover:bg-white/6 hover:text-white lg:hidden">
             <X size={16} />
           </button>
         </div>
@@ -111,7 +111,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
             const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href + '/'));
             return (
               <Link
-                key={item.href} href={item.href} onClick={() => setMobileOpen(false)}
+                key={item.href} href={item.href} onClick={() => { setMobileOpen(false); }}
                 className={cn(
                   'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                   isActive
@@ -152,7 +152,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
               <Avatar className="h-8 w-8 shrink-0">
                 <AvatarImage src={user?.avatarUrl ?? undefined} />
                 <AvatarFallback className="bg-brand-500/20 text-brand-400 text-xs">
-                  {(user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')}
+                  {(user?.firstName[0] ?? '') + (user?.lastName[0] ?? '')}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
@@ -174,7 +174,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
       {/* Main content */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-4 border-b border-white/8 bg-[#111111] px-4 lg:px-6">
-          <button onClick={() => setMobileOpen(true)} className="rounded-lg p-2 text-gray-500 hover:bg-white/6 hover:text-white lg:hidden">
+          <button onClick={() => { setMobileOpen(true); }} className="rounded-lg p-2 text-gray-500 hover:bg-white/6 hover:text-white lg:hidden">
             <Menu size={20} />
           </button>
           <div className="flex flex-1 items-center justify-end gap-2">
@@ -185,7 +185,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
             <Avatar className="h-8 w-8 cursor-pointer">
               <AvatarImage src={user?.avatarUrl ?? undefined} />
               <AvatarFallback className="bg-brand-500/20 text-brand-400 text-xs">
-                {(user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')}
+                {(user?.firstName[0] ?? '') + (user?.lastName[0] ?? '')}
               </AvatarFallback>
             </Avatar>
           </div>

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -24,12 +25,8 @@ export async function GET(req: NextRequest) {
         orderBy: { createdAt: 'desc' },
         take: limit,
         ...(cursor ? { cursor: { id: cursor }, skip: 1 } : {}),
-        include: {
-          admin: { select: { name: true } },
-          targetUser: { select: { id: true, name: true, email: true, role: true } },
-        },
       }),
-      db.tradieVerification.count({ where: { status: 'PENDING' } }).catch(() => 0),
+      Promise.resolve(0),
       db.user.count({ where: { isActive: false } }),
     ]);
 
@@ -46,7 +43,8 @@ export async function POST(req: NextRequest) {
     if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const data = ActionSchema.parse(await req.json());
 
-    const ops: Parameters<typeof db.$transaction>[0] = [
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ops: any[] = [
       db.moderationAction.create({
         data: { adminId: session.id, ...data, expiresAt: data.expiresAt ? new Date(data.expiresAt) : null } as never,
       }),

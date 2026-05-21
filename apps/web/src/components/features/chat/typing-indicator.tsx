@@ -10,7 +10,7 @@ export function TypingIndicator({ users }: TypingIndicatorProps) {
   if (users.length === 0) return null;
 
   const label = users.length === 1
-    ? `${users[0]!.userName || 'Someone'} is typing`
+    ? `${users[0].userName || 'Someone'} is typing`
     : `${users.length} people are typing`;
 
   return (

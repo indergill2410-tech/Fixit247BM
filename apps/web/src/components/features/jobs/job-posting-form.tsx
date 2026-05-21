@@ -80,7 +80,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
     complexity: 'MEDIUM',
   });
 
-  const updateForm = (updates: Partial<FormData>) => setFormData((prev) => ({ ...prev, ...updates }));
+  const updateForm = (updates: Partial<FormData>) => { setFormData((prev) => ({ ...prev, ...updates })); };
 
   const analyzeWithAI = async () => {
     if (!formData.description && formData.mediaUrls.length === 0) return;
@@ -189,19 +189,19 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
             <div className="space-y-4">
               <textarea
                 value={formData.description}
-                onChange={(e) => updateForm({ description: e.target.value })}
+                onChange={(e) => { updateForm({ description: e.target.value }); }}
                 placeholder="e.g. My kitchen sink is leaking badly under the cabinet and water is coming through..."
                 rows={4}
                 className="w-full resize-none rounded-2xl border border-white/15 bg-white/6 p-4 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none focus:ring-2 focus:ring-brand-500/20"
               />
 
               <MediaUpload
-                onImagesChange={(urls) => updateForm({ mediaUrls: urls })}
-                onVoiceTranscript={(text) => updateForm({ description: formData.description ? `${formData.description}\n\n[Voice note]: ${text}` : text })}
+                onImagesChange={(urls) => { updateForm({ mediaUrls: urls }); }}
+                onVoiceTranscript={(text) => { updateForm({ description: formData.description ? `${formData.description}\n\n[Voice note]: ${text}` : text }); }}
               />
 
               <Button
-                onClick={formData.description || formData.mediaUrls.length > 0 ? analyzeWithAI : () => setStep(2)}
+                onClick={formData.description || formData.mediaUrls.length > 0 ? analyzeWithAI : () => { setStep(2); }}
                 disabled={isAnalyzing}
                 className="w-full"
                 size="lg"
@@ -235,7 +235,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
             <AIScopeDisplay
               result={aiResult}
               onAccept={handleAcceptAiScope}
-              onEdit={() => setShowAiScope(false)}
+              onEdit={() => { setShowAiScope(false); }}
             />
           </motion.div>
         )}
@@ -255,7 +255,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                     <button
                       key={cat.id}
                       type="button"
-                      onClick={() => updateForm({ category: cat.id })}
+                      onClick={() => { updateForm({ category: cat.id }); }}
                       className={cn(
                         'flex items-center gap-2 rounded-xl border p-3 text-left text-sm transition-all',
                         formData.category === cat.id
@@ -279,7 +279,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                     <button
                       key={opt.id}
                       type="button"
-                      onClick={() => updateForm({ priority: opt.id })}
+                      onClick={() => { updateForm({ priority: opt.id }); }}
                       className={cn(
                         'flex w-full items-center gap-3 rounded-xl border-2 p-4 text-left transition-all',
                         formData.priority === opt.id ? opt.color + ' ring-2 ring-offset-1 ring-offset-[#111]' : 'border-white/10 bg-white/4 text-gray-400 hover:border-white/20'
@@ -296,12 +296,12 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(1)} className="flex-1 gap-2">
+                <Button variant="outline" onClick={() => { setStep(1); }} className="flex-1 gap-2">
                   <ChevronLeft size={16} />
                   Back
                 </Button>
                 <Button
-                  onClick={() => setStep(3)}
+                  onClick={() => { setStep(3); }}
                   disabled={!formData.category || !formData.priority}
                   className="flex-1 gap-2"
                 >
@@ -339,7 +339,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                       type="number"
                       placeholder="Min"
                       value={formData.budgetMin ?? ''}
-                      onChange={(e) => updateForm({ budgetMin: e.target.value ? Number(e.target.value) : undefined })}
+                      onChange={(e) => { updateForm({ budgetMin: e.target.value ? Number(e.target.value) : undefined }); }}
                       className="w-full rounded-xl border border-white/15 bg-white/6 py-3 pl-7 pr-3 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none"
                     />
                   </div>
@@ -350,7 +350,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                       type="number"
                       placeholder="Max"
                       value={formData.budgetMax ?? ''}
-                      onChange={(e) => updateForm({ budgetMax: e.target.value ? Number(e.target.value) : undefined })}
+                      onChange={(e) => { updateForm({ budgetMax: e.target.value ? Number(e.target.value) : undefined }); }}
                       className="w-full rounded-xl border border-white/15 bg-white/6 py-3 pl-7 pr-3 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none"
                     />
                   </div>
@@ -375,7 +375,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
               </div>
 
               <div className="flex gap-3">
-                <Button variant="outline" onClick={() => setStep(2)} className="flex-1 gap-2">
+                <Button variant="outline" onClick={() => { setStep(2); }} className="flex-1 gap-2">
                   <ChevronLeft size={16} />
                   Back
                 </Button>

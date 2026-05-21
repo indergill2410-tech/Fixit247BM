@@ -2,4 +2,5 @@
 // The gather action URL in TwiML must match whichever path Twilio calls.
 // Since buildGreetingTwiML hardcodes /api/voice/twilio/gather, this file
 // is only active if Twilio uses the short path for gather too.
-export { POST, runtime } from '@/app/api/voice/twilio/gather/route';
+export const runtime = 'nodejs';
+export { POST } from '@/app/api/voice/twilio/gather/route';

@@ -29,7 +29,7 @@ const TIER_LABELS: Record<string, string> = {
 };
 
 export function WalletCard({ balance, lifetimeEarned, lifetimeSpent, subscriptionTier = 'FREE', onPurchaseClick, className }: WalletCardProps) {
-  const gradient = TIER_COLORS[subscriptionTier] ?? TIER_COLORS.FREE!;
+  const gradient = TIER_COLORS[subscriptionTier] ?? TIER_COLORS.FREE;
   const tierLabel = TIER_LABELS[subscriptionTier] ?? 'Free';
 
   return (
