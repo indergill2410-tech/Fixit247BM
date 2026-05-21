@@ -50,7 +50,7 @@ export function AIScopeDisplay({ result, onAccept, onEdit, className }: AIScopeD
 
   const urgencyConfig = URGENCY_COLORS.find(
     (c) => result.urgencyScore >= c.min && result.urgencyScore < c.max
-  ) ?? URGENCY_COLORS[0]!;
+  ) ?? URGENCY_COLORS[0];
 
   return (
     <motion.div
@@ -69,7 +69,7 @@ export function AIScopeDisplay({ result, onAccept, onEdit, className }: AIScopeD
         </div>
         <div className="ml-auto">
           <Badge variant={result.isEmergency ? 'emergency' : 'default'}>
-            {result.isEmergency ? '🚨 EMERGENCY' : `${urgencyConfig.label}`}
+            {result.isEmergency ? '🚨 EMERGENCY' : urgencyConfig.label}
           </Badge>
         </div>
       </div>
@@ -130,7 +130,7 @@ export function AIScopeDisplay({ result, onAccept, onEdit, className }: AIScopeD
       {/* Expandable details */}
       <button
         type="button"
-        onClick={() => setShowDetails(!showDetails)}
+        onClick={() => { setShowDetails(!showDetails); }}
         className="mb-4 flex w-full items-center justify-between text-xs text-gray-500 hover:text-gray-700"
       >
         <span>More details</span>
@@ -182,7 +182,7 @@ export function AIScopeDisplay({ result, onAccept, onEdit, className }: AIScopeD
         </button>
         <button
           type="button"
-          onClick={() => onAccept(result)}
+          onClick={() => { onAccept(result); }}
           className="flex-1 rounded-xl bg-brand-600 py-2.5 text-sm font-semibold text-white hover:bg-brand-700 transition-colors"
         >
           <CheckCircle size={14} className="mr-1.5 inline" />

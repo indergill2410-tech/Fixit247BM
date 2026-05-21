@@ -9,9 +9,9 @@ export async function POST(req: Request) {
   const body = await req.text();
   const params = Object.fromEntries(new URLSearchParams(body));
 
-  const callSid = params['CallSid'];
-  const errorCode = params['ErrorCode'];
-  const errorUrl = params['ErrorUrl'];
+  const callSid = params.CallSid;
+  const errorCode = params.ErrorCode;
+  const errorUrl = params.ErrorUrl;
 
   logger.error('Twilio fallback triggered — primary webhook failed', {
     callSid,

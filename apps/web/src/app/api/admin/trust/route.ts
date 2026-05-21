@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
@@ -19,8 +20,8 @@ export async function GET(req: NextRequest) {
       orderBy: { trustScore: 'desc' },
       take: limit,
       select: {
-        id: true, trustScore: true, rating: true, totalJobs: true, isVerified: true,
-        user: { select: { id: true, name: true, email: true } },
+        id: true, trustScore: true, avgRating: true, totalJobsCompleted: true, verificationStatus: true,
+        user: { select: { id: true, firstName: true, lastName: true, email: true } },
       },
     });
 

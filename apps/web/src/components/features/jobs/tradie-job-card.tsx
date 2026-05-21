@@ -160,7 +160,7 @@ export function TradieJobCard({
         {mode === 'offer' && onAccept && onDecline ? (
           <div className="flex gap-2">
             <button
-              onClick={() => onDecline(job.id)}
+              onClick={() => { onDecline(job.id); }}
               disabled={isProcessing}
               className="flex-1 rounded-xl border border-white/15 py-2.5 text-sm font-medium text-gray-400 hover:bg-white/6 hover:text-white disabled:opacity-50 transition-colors"
             >
@@ -168,7 +168,7 @@ export function TradieJobCard({
             </button>
             <motion.button
               whileTap={{ scale: 0.97 }}
-              onClick={() => onAccept(job.id)}
+              onClick={() => { onAccept(job.id); }}
               disabled={isProcessing}
               className={cn(
                 'flex-1 rounded-xl py-2.5 text-sm font-semibold text-white transition-colors disabled:opacity-50',

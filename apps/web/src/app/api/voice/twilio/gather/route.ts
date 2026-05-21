@@ -17,7 +17,7 @@ import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 
-const APP_BASE = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
 
 function extractPathname(url: string): string {
   try {
@@ -29,14 +29,14 @@ function extractPathname(url: string): string {
 
 function validateTwilioSignature(req: Request, body: string): boolean {
   const twilioSignature = req.headers.get('x-twilio-signature');
-  const authToken = process.env['TWILIO_AUTH_TOKEN'];
+  const authToken = process.env.TWILIO_AUTH_TOKEN;
 
   if (!authToken) {
     logger.warn('[gather] TWILIO_AUTH_TOKEN not set — skipping signature validation');
     return true;
   }
   if (!twilioSignature) {
-    if (process.env['NODE_ENV'] === 'production') {
+    if (process.env.NODE_ENV === 'production') {
       logger.warn('[gather] No x-twilio-signature in production — rejecting');
       return false;
     }
@@ -251,7 +251,7 @@ async function createJobFromCallData(
 
       // Alert admin for critical emergencies
       if (urgency >= 85) {
-        const adminPhone = process.env['TWILIO_FALLBACK_NUMBER'];
+        const adminPhone = process.env.TWILIO_FALLBACK_NUMBER;
         if (adminPhone) {
           sendEmergencyAdminAlertSms(adminPhone, {
             callerPhone: call.phoneNumber,
@@ -334,8 +334,8 @@ export async function POST(req: Request) {
   }
 
   const params = Object.fromEntries(new URLSearchParams(body));
-  const callSid = params['CallSid'];
-  const speechResult = (params['SpeechResult'] ?? '').trim();
+  const callSid = params.CallSid;
+  const speechResult = (params.SpeechResult ?? '').trim();
   const webhookBase = APP_BASE;
 
   logger.info('[gather] Speech received', {
@@ -381,7 +381,7 @@ export async function POST(req: Request) {
       call = await db.voiceCall.create({
         data: {
           twilioCallSid: callSid,
-          phoneNumber: params['From'] ?? 'unknown',
+          phoneNumber: params.From ?? 'unknown',
           direction: 'INBOUND',
           status: 'AI_HANDLING',
           answeredAt: new Date(),
@@ -511,7 +511,7 @@ export async function POST(req: Request) {
         })
         .catch(() => null);
     }
-    const agentNumber = process.env['TWILIO_FALLBACK_NUMBER'] ?? '';
+    const agentNumber = process.env.TWILIO_FALLBACK_NUMBER ?? '';
     if (agentNumber) {
       return new NextResponse(buildTransferTwiML(agentNumber), {
         headers: { 'Content-Type': 'text/xml; charset=utf-8' },

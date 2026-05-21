@@ -113,7 +113,7 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
       mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
       mediaRecorder.onstop = async () => {
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
-        stream.getTracks().forEach((t) => t.stop());
+        stream.getTracks().forEach((t) => { t.stop(); });
         await transcribeAndSend(blob);
       };
 
@@ -238,7 +238,7 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
           </button>
           <input
             value={input}
-            onChange={(e) => setInput(e.target.value)}
+            onChange={(e) => { setInput(e.target.value); }}
             onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
             placeholder={emergencyDetected ? 'Describe the situation...' : "What's happening?"}
             className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-red-300 focus:ring-1 focus:ring-red-100"

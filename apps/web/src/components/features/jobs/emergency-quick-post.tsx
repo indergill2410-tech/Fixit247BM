@@ -75,7 +75,7 @@ export function EmergencyQuickPost() {
             <motion.button
               key={trade.id}
               whileTap={{ scale: 0.98 }}
-              onClick={() => setSelected(trade.id)}
+              onClick={() => { setSelected(trade.id); }}
               className={cn(
                 'flex items-start gap-3 rounded-2xl border-2 p-4 text-left transition-all',
                 selected === trade.id
@@ -100,7 +100,7 @@ export function EmergencyQuickPost() {
         <p className="mb-2 text-sm font-medium text-gray-700">Any extra details? (optional)</p>
         <textarea
           value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          onChange={(e) => { setDescription(e.target.value); }}
           placeholder="e.g. Water is spraying from under the sink, kitchen flooding..."
           rows={2}
           className="w-full resize-none rounded-2xl border border-gray-200 p-4 text-sm placeholder-gray-400 focus:border-red-400 focus:outline-none"

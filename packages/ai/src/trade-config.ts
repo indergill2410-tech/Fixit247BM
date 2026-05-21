@@ -247,7 +247,8 @@ export function calculateLeadPrice(
   complexity: JobComplexity,
   isEmergency: boolean
 ): LeadPriceResult {
-  const fallback = TRADE_PRICING.OTHER as TradePricingConfig;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const fallback = TRADE_PRICING.OTHER!;
   const config = TRADE_PRICING[category] ?? fallback;
   const basePrice = config.leadPriceBase;
   const complexityMult = config.complexityMultipliers[complexity];
@@ -267,7 +268,8 @@ export function calculateLeadPrice(
 }
 
 export function getTradeConfig(category: string): TradePricingConfig {
-  return TRADE_PRICING[category] ?? (TRADE_PRICING.OTHER as TradePricingConfig);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  return TRADE_PRICING[category] ?? TRADE_PRICING.OTHER!;
 }
 
 export function getAllEmergencyTrades(): string[] {

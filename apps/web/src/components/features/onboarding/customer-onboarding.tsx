@@ -63,7 +63,7 @@ export function CustomerOnboarding() {
     await refreshUser();
 
     setIsComplete(true);
-    setTimeout(() => router.push('/dashboard'), 2000);
+    setTimeout(() => { router.push('/dashboard'); }, 2000);
   }
 
   if (isComplete) {
@@ -231,7 +231,7 @@ export function CustomerOnboarding() {
 
             <div className="mt-8 flex gap-3">
               {step > 1 && (
-                <Button type="button" variant="outline" className="border-white/20 text-white hover:bg-white/10" onClick={() => setStep(step - 1)}>
+                <Button type="button" variant="outline" className="border-white/20 text-white hover:bg-white/10" onClick={() => { setStep(step - 1); }}>
                   Back
                 </Button>
               )}

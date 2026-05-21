@@ -102,16 +102,16 @@ export async function getAuditLogs(
   }
 
   return (data ?? []).map((row: Record<string, unknown>) => ({
-    id: String(row['id']),
-    userId: row['user_id'] ? String(row['user_id']) : null,
-    action: row['action'] as AuditAction,
-    resource: row['resource'] ? String(row['resource']) : null,
-    resourceId: row['resource_id'] ? String(row['resource_id']) : null,
-    ipAddress: row['ip_address'] ? String(row['ip_address']) : null,
-    userAgent: row['user_agent'] ? String(row['user_agent']) : null,
-    metadata: row['metadata']
-      ? (row['metadata'] as Record<string, unknown>)
+    id: String(row.id),
+    userId: row.user_id ? String(row.user_id) : null,
+    action: row.action as AuditAction,
+    resource: row.resource ? String(row.resource) : null,
+    resourceId: row.resource_id ? String(row.resource_id) : null,
+    ipAddress: row.ip_address ? String(row.ip_address) : null,
+    userAgent: row.user_agent ? String(row.user_agent) : null,
+    metadata: row.metadata
+      ? (row.metadata as Record<string, unknown>)
       : null,
-    createdAt: String(row['created_at']),
+    createdAt: String(row.created_at),
   }));
 }

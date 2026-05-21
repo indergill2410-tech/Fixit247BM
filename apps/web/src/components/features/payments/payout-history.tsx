@@ -46,7 +46,7 @@ export function PayoutHistory({ payouts, isLoading }: { payouts: Payout[]; isLoa
   return (
     <div className="divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-200 bg-white">
       {payouts.map((payout) => {
-        const config = STATUS_CONFIG[payout.status] ?? STATUS_CONFIG.PENDING!;
+        const config = STATUS_CONFIG[payout.status] ?? STATUS_CONFIG.PENDING;
         const Icon = config.icon;
 
         return (

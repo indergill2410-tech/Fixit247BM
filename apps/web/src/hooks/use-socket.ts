@@ -13,8 +13,8 @@ export function useSocket() {
 
     const socket = connectSocket(user.id, user.role ?? 'CUSTOMER');
 
-    socket.on('connect', () => setConnected(true));
-    socket.on('disconnect', () => setConnected(false));
+    socket.on('connect', () => { setConnected(true); });
+    socket.on('disconnect', () => { setConnected(false); });
 
     return () => {
       socket.off('connect');

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -19,12 +20,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const dispute = await db.dispute.findUnique({
       where: { id },
       include: {
-        customer: { select: { id: true, name: true, email: true } },
-        tradie: { select: { id: true, name: true, email: true } },
         job: {
           select: {
             id: true, title: true, status: true, description: true, createdAt: true, completedAt: true,
-            payments: { select: { id: true, amount: true, status: true, stripePaymentIntentId: true }, take: 1 },
+            payment: { select: { id: true, amount: true, status: true, stripePaymentIntentId: true } },
           },
         },
       },

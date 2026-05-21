@@ -63,8 +63,8 @@ export async function refundPayment(paymentIntentId: string, amount?: number) {
   });
 }
 
-export async function constructWebhookEvent(payload: string | Buffer, sig: string) {
-  const secret = process.env['STRIPE_WEBHOOK_SECRET'];
+export function constructWebhookEvent(payload: string | Buffer, sig: string) {
+  const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) throw new Error('Missing STRIPE_WEBHOOK_SECRET');
   return stripe.webhooks.constructEvent(payload, sig, secret);
 }

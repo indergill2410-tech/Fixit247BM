@@ -24,8 +24,8 @@ export default function ReferPage() {
         return r.json();
       })
       .then((d) => d && setData(d))
-      .catch(() => setNotAuthed(true))
-      .finally(() => setLoading(false));
+      .catch(() => { setNotAuthed(true); })
+      .finally(() => { setLoading(false); });
   }, []);
 
   function copyLink() {
@@ -33,7 +33,7 @@ export default function ReferPage() {
     navigator.clipboard.writeText(data.link);
     setCopied(true);
     toast.success('Referral link copied!');
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => { setCopied(false); }, 2000);
   }
 
   function shareWhatsApp() {

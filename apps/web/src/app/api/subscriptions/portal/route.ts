@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { createBillingPortalSession, cancelSubscription } from '@fixit247/payments';
@@ -31,7 +32,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No billing account found' }, { status: 404 });
     }
 
-    const returnUrl = `${process.env['NEXT_PUBLIC_APP_URL']}/tradie/subscription`;
+    const returnUrl = `${process.env.NEXT_PUBLIC_APP_URL}/tradie/subscription`;
     const url = await createBillingPortalSession(stripeCustomerId, returnUrl);
 
     return NextResponse.json({ url });

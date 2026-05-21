@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -18,9 +19,9 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tra
       db.tradieProfile.findUnique({
         where: { id: tradieId },
         select: {
-          id: true, trustScore: true, rating: true, totalJobs: true, completedJobs: true,
-          cancelledJobs: true, isVerified: true, verificationLevel: true, responseTimeAvg: true,
-          user: { select: { id: true, name: true, email: true } },
+          id: true, trustScore: true, avgRating: true, totalJobsCompleted: true,
+          verificationStatus: true, responseTimeMinutes: true,
+          user: { select: { id: true, firstName: true, lastName: true, email: true } },
         },
       }),
       db.trustScoreHistory.findMany({
@@ -51,7 +52,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ tr
     await db.$transaction([
       db.tradieProfile.update({ where: { id: tradieId }, data: { trustScore: score } }),
       db.trustScoreHistory.create({
-        data: { tradieId, score, previousScore: profile.trustScore, reason: `Admin override: ${reason}`, adminId: session.id },
+        data: { tradieId, score, previousScore: profile.trustScore ? Math.round(Number(profile.trustScore)) : undefined, reason: `Admin override: ${reason}`, adminId: session.id },
       }),
       db.adminAuditLog.create({
         data: { adminId: session.id, action: 'TRUST_SCORE_OVERRIDE', entity: 'TradieProfile', entityId: tradieId, metadata: { score, reason } as never },

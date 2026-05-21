@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -41,9 +42,6 @@ export async function GET(
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
-      include: {
-        sender: { select: { id: true, name: true, role: true, avatarUrl: true } },
-      },
     });
 
     // Mark unread messages as delivered for the current user
@@ -110,9 +108,6 @@ export async function POST(
         status: 'SENT',
         mediaUrl,
         mediaType: type !== 'TEXT' ? type.toLowerCase() : undefined,
-      },
-      include: {
-        sender: { select: { id: true, name: true, role: true, avatarUrl: true } },
       },
     });
 

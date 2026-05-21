@@ -35,7 +35,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   if (!job) notFound();
 
   const acceptedClaim = job.claims[0];
-  const tradieUser = acceptedClaim?.tradie.user;
+  const tradieUser = acceptedClaim.tradie.user;
 
   const PRIORITY_BADGE: Record<string, 'emergency' | 'warning' | 'default'> = {
     EMERGENCY: 'emergency',
@@ -70,7 +70,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               lastName: tradieUser.lastName,
               avatarUrl: tradieUser.avatarUrl ?? undefined,
               phone: tradieUser.phone ?? undefined,
-              avgRating: acceptedClaim?.tradie.avgRating ? Number(acceptedClaim.tradie.avgRating) : undefined,
+              avgRating: acceptedClaim.tradie.avgRating ? Number(acceptedClaim.tradie.avgRating) : undefined,
             } : null}
           />
 

@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -26,11 +27,10 @@ export async function GET(req: NextRequest) {
       where: {
         ...(status && status !== 'ALL' ? { status: status as never } : { status: { not: 'CLOSED' } }),
         ...(priority ? { priority: priority as never } : {}),
-        ...(search ? { OR: [{ subject: { contains: search, mode: 'insensitive' } }, { user: { name: { contains: search, mode: 'insensitive' } } }] } : {}),
+        ...(search ? { subject: { contains: search, mode: 'insensitive' } } : {}),
       },
       orderBy: [{ priority: 'desc' }, { createdAt: 'asc' }],
       take: limit,
-      include: { user: { select: { id: true, name: true, email: true, role: true } } },
     });
 
     const counts = await db.supportTicket.groupBy({ by: ['status'], _count: { id: true }, where: { status: { not: 'CLOSED' } } });

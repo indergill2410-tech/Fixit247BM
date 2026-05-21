@@ -52,7 +52,7 @@ export function TransactionHistory({ entries, isLoading, className }: Transactio
   return (
     <div className={cn('divide-y divide-gray-100 overflow-hidden rounded-2xl border border-gray-200 bg-white', className)}>
       {entries.map((entry) => {
-        const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.PURCHASE!;
+        const config = TYPE_CONFIG[entry.type] ?? TYPE_CONFIG.PURCHASE;
         const Icon = config.icon;
         const isPositive = entry.credits > 0;
 

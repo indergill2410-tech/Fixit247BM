@@ -20,9 +20,7 @@ export default async function TradieDashboardPage() {
     select: {
       id: true,
       title: true,
-      tradeCategory: true,
-      suburb: true,
-      state: true,
+      category: true,
       budgetMin: true,
       budgetMax: true,
       isEmergency: true,
@@ -67,7 +65,7 @@ export default async function TradieDashboardPage() {
                         <p className="font-medium text-white">{job.title}</p>
                         {job.isEmergency && <Badge variant="emergency">EMERGENCY</Badge>}
                       </div>
-                      <p className="mt-0.5 text-sm text-gray-500">{`${job.suburb}, ${job.state}`} · {job.tradeCategory}</p>
+                      <p className="mt-0.5 text-sm text-gray-500">{job.category.replace(/_/g, ' ')}</p>
                       <p className="mt-1 text-xs text-gray-400">{new Date(job.createdAt).toLocaleString()}</p>
                     </div>
                     <div className="flex flex-col items-end gap-2 pl-4">
@@ -94,8 +92,8 @@ export default async function TradieDashboardPage() {
               <div className="flex flex-col items-center gap-3">
                 <TrustScoreMeter score={87} size="lg" />
                 <div className="flex gap-2">
-                  <TrustBadge badge="VERIFIED" />
-                  <TrustBadge badge="PREMIUM" />
+                  <TrustBadge variant="VERIFIED" />
+                  <TrustBadge variant="PREMIUM" />
                 </div>
                 <p className="text-xs text-gray-500 text-center">Complete your profile to reach Elite status</p>
               </div>

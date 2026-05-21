@@ -43,9 +43,9 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
     setLoadingServer(true);
     fetch('/api/notifications?limit=20')
       .then((r) => r.json())
-      .then((data) => setServerNotifs(data.notifications ?? []))
+      .then((data) => { setServerNotifs(data.notifications ?? []); })
       .catch(() => {})
-      .finally(() => setLoadingServer(false));
+      .finally(() => { setLoadingServer(false); });
   }, [open]);
 
   // Close on outside click
@@ -54,7 +54,7 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
       if (panelRef.current && !panelRef.current.contains(e.target as Node)) setOpen(false);
     }
     if (open) document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    return () => { document.removeEventListener('mousedown', handler); };
   }, [open]);
 
   async function handleMarkAllRead() {
@@ -77,7 +77,7 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
   return (
     <div className="relative" ref={panelRef}>
       <button
-        onClick={() => setOpen((v) => !v)}
+        onClick={() => { setOpen((v) => !v); }}
         className="relative flex h-10 w-10 items-center justify-center rounded-full hover:bg-gray-100 transition-colors"
       >
         <Bell size={20} className="text-gray-600" />

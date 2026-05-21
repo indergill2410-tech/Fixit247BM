@@ -6,7 +6,8 @@ import { useRealTimeTracking } from '@/lib/socket/hooks';
 
 declare global {
   interface Window {
-    google: typeof google;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    google: any;
     initGoogleMaps?: () => void;
   }
 }
@@ -20,9 +21,12 @@ interface LiveTrackingMapProps {
 
 export function LiveTrackingMap({ jobId, jobLatitude, jobLongitude, jobAddress }: LiveTrackingMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
-  const mapInstanceRef = useRef<google.maps.Map | null>(null);
-  const tradieMarkerRef = useRef<google.maps.Marker | null>(null);
-  const jobMarkerRef = useRef<google.maps.Marker | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const mapInstanceRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const tradieMarkerRef = useRef<any>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const jobMarkerRef = useRef<any>(null);
   const [mapsReady, setMapsReady] = useState(false);
   const [mapsError, setMapsError] = useState(false);
   const { location, etaMinutes } = useRealTimeTracking(jobId);
@@ -37,8 +41,8 @@ export function LiveTrackingMap({ jobId, jobLatitude, jobLongitude, jobAddress }
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=geometry`;
     script.async = true;
-    script.onload = () => setMapsReady(true);
-    script.onerror = () => setMapsError(true);
+    script.onload = () => { setMapsReady(true); };
+    script.onerror = () => { setMapsError(true); };
     document.head.appendChild(script);
   }, []);
 

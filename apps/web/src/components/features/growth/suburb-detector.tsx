@@ -25,7 +25,7 @@ export function SuburbDetector({ onDetected, className }: Props) {
 
     try {
       const position = await new Promise<GeolocationPosition>((resolve, reject) =>
-        navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 })
+        { navigator.geolocation.getCurrentPosition(resolve, reject, { timeout: 8000 }); }
       );
 
       const { latitude, longitude } = position.coords;

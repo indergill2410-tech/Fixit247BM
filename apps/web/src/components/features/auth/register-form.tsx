@@ -48,7 +48,7 @@ export function RegisterForm() {
     if (error) {
       if (error.message.includes('already registered')) {
         toast.error('An account with this email already exists', {
-          action: { label: 'Log in', onClick: () => router.push('/login') },
+          action: { label: 'Log in', onClick: () => { router.push('/login'); } },
         });
       } else {
         toast.error(error.message);
@@ -77,7 +77,7 @@ export function RegisterForm() {
               <button
                 key={value}
                 type="button"
-                onClick={() => handleRoleSelect(value as RoleOption)}
+                onClick={() => { handleRoleSelect(value as RoleOption); }}
                 className={`flex flex-col items-center gap-2 rounded-xl border p-4 text-center transition-all ${
                   selectedRole === value
                     ? 'border-white/60 bg-white/15 text-white'
@@ -155,7 +155,7 @@ export function RegisterForm() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => { setShowPassword(!showPassword); }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80"
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
