@@ -7,7 +7,8 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      NODE_ENV=development pnpm install --frozen-lockfile &&
+      corepack enable &&
+      pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/database run db:push &&
       pnpm --filter @fixit247/web build
@@ -101,7 +102,8 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      NODE_ENV=development pnpm install --frozen-lockfile &&
+      corepack enable &&
+      pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/admin build
     startCommand: pnpm --filter @fixit247/admin start
