@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
@@ -18,7 +19,7 @@ export async function GET(req: NextRequest) {
       },
       orderBy: [{ severity: 'desc' }, { createdAt: 'asc' }],
       take: limit,
-      include: { user: { select: { id: true, name: true, email: true, role: true } } },
+      select: { id: true, userId: true, type: true, severity: true, riskScore: true, status: true, title: true, description: true, evidence: true, jobId: true, autoDetected: true, createdAt: true, updatedAt: true },
     });
 
     const counts = await db.fraudFlag.groupBy({

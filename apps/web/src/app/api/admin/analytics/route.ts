@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
@@ -41,7 +42,7 @@ export async function GET(req: NextRequest) {
       }),
 
       // Tradie retention (completed 2+ jobs)
-      db.tradieProfile.count({ where: { completedJobs: { gte: 2 } } }),
+      db.tradieProfile.count({ where: { totalJobsCompleted: { gte: 2 } } }),
 
       // Active subscriptions by tier
       db.subscription.groupBy({ by: ['tier'], _count: { id: true }, where: { status: 'ACTIVE' } }),

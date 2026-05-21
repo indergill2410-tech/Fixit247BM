@@ -98,8 +98,8 @@ export function PaymentConfirmation({ jobId, tradieName, jobTitle, amount, onCon
               <button
                 key={s}
                 onClick={() => { setRating(s); setShowWarning(false); }}
-                onMouseEnter={() => setHovered(s)}
-                onMouseLeave={() => setHovered(0)}
+                onMouseEnter={() => { setHovered(s); }}
+                onMouseLeave={() => { setHovered(0); }}
                 className="text-3xl transition-transform hover:scale-110 active:scale-95"
               >
                 <Star

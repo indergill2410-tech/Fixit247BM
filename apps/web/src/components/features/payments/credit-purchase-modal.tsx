@@ -79,7 +79,7 @@ export function CreditPurchaseModal({ open, onClose, packages }: CreditPurchaseM
                       return (
                         <button
                           key={pkg.id}
-                          onClick={() => setSelected(pkg.id)}
+                          onClick={() => { setSelected(pkg.id); }}
                           className={cn(
                             'relative w-full rounded-2xl border-2 p-4 text-left transition-all',
                             isSelected ? 'border-brand-500 bg-brand-50' : 'border-gray-200 bg-white hover:border-brand-300'
@@ -149,7 +149,7 @@ export function CreditPurchaseModal({ open, onClose, packages }: CreditPurchaseM
 
                   <div className="flex gap-3">
                     <button
-                      onClick={() => setStep('select')}
+                      onClick={() => { setStep('select'); }}
                       className="flex-1 rounded-2xl border border-gray-200 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
                     >
                       Back

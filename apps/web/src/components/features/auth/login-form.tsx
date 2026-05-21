@@ -43,7 +43,7 @@ export function LoginForm() {
       return;
     }
 
-    const role = (data.user?.user_metadata as Record<string, unknown>)['role'];
+    const role = (data.user.user_metadata as Record<string, unknown>).role;
     const dest =
       redirectTo !== '/dashboard'
         ? redirectTo
@@ -126,7 +126,7 @@ export function LoginForm() {
                 />
                 <button
                   type="button"
-                  onClick={() => setShowPassword(!showPassword)}
+                  onClick={() => { setShowPassword(!showPassword); }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >

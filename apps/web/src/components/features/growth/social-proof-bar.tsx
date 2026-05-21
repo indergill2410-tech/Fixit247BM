@@ -26,7 +26,7 @@ export function SocialProofBar() {
         setVisible(true);
       }, 300);
     }, 4000);
-    return () => clearInterval(interval);
+    return () => { clearInterval(interval); };
   }, []);
 
   const item = PROOF_ITEMS[currentIndex];

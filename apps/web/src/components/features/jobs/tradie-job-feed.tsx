@@ -74,7 +74,7 @@ export function TradieJobFeed() {
             <input
               type="checkbox"
               checked={emergencyOnly}
-              onChange={(e) => setEmergencyOnly(e.target.checked)}
+              onChange={(e) => { setEmergencyOnly(e.target.checked); }}
               className="rounded border-gray-300 text-red-600 focus:ring-red-500"
             />
             <span className="text-sm font-medium text-gray-700">Emergency only</span>
@@ -89,7 +89,7 @@ export function TradieJobFeed() {
           {CATEGORY_FILTERS.map((cat) => (
             <button
               key={cat}
-              onClick={() => setCategoryFilter(cat)}
+              onClick={() => { setCategoryFilter(cat); }}
               className={cn(
                 'shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-all',
                 categoryFilter === cat

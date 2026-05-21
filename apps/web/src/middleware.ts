@@ -38,6 +38,7 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/tradie/',   // public tradie profiles (/tradie/[id])
   '/api/auth',
   '/api/voice/twilio', // Twilio webhooks — must be publicly reachable, no session
+  '/api/twilio',       // Compatibility path (Twilio console may use either prefix)
   '/_next',
   '/favicon',
 ];
@@ -102,18 +103,18 @@ export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
   let response = NextResponse.next({ request });
 
-  const supabaseUrl = process.env['NEXT_PUBLIC_SUPABASE_URL'];
-  const supabaseKey = process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY'];
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseKey) return response;
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
       getAll() { return request.cookies.getAll(); },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: { name: string; value: string; options: Record<string, unknown> }[]) {
         cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) =>
-          response.cookies.set(name, value, options),
+          response.cookies.set(name, value, options as never),
         );
       },
     },
@@ -124,7 +125,7 @@ export async function middleware(request: NextRequest) {
   if (isPublicRoute(pathname)) {
     if (user && (pathname === '/login' || pathname === '/register')) {
       const meta = user.user_metadata as Record<string, unknown>;
-      const role = (meta['role'] as Role | undefined) ?? 'CUSTOMER';
+      const role = (meta.role as Role | undefined) ?? 'CUSTOMER';
       return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
     }
     return response;
@@ -137,8 +138,8 @@ export async function middleware(request: NextRequest) {
   }
 
   const meta = user.user_metadata as Record<string, unknown>;
-  const role = (meta['role'] as Role | undefined) ?? 'CUSTOMER';
-  const onboardingComplete = (meta['onboardingComplete'] as boolean | undefined) ?? false;
+  const role = (meta.role as Role | undefined) ?? 'CUSTOMER';
+  const onboardingComplete = (meta.onboardingComplete as boolean | undefined) ?? false;
 
   const requiredRoles = getRequiredRoles(pathname);
   if (requiredRoles && !requiredRoles.includes(role)) {

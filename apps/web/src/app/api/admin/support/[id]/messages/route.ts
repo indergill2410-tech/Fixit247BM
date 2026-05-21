@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -10,7 +11,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params;
 
     const [ticket, messages] = await Promise.all([
-      db.supportTicket.findUnique({ where: { id }, include: { user: { select: { id: true, name: true, email: true, role: true } } } }),
+      db.supportTicket.findUnique({ where: { id } }),
       db.supportMessage.findMany({ where: { ticketId: id }, orderBy: { createdAt: 'asc' } }),
     ]);
 

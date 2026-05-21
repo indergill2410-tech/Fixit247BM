@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
         packageId,
         credits: String(pkg.credits + pkg.bonusCredits),
       },
-      return_url: `${process.env['NEXT_PUBLIC_APP_URL']}/tradie/wallet`,
+      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/tradie/wallet`,
     });
 
     if (paymentIntent.status !== 'succeeded') {

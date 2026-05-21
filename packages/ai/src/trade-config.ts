@@ -247,7 +247,9 @@ export function calculateLeadPrice(
   complexity: JobComplexity,
   isEmergency: boolean
 ): LeadPriceResult {
-  const config = TRADE_PRICING[category] ?? TRADE_PRICING.OTHER!;
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  const fallback = TRADE_PRICING.OTHER!;
+  const config = TRADE_PRICING[category] ?? fallback;
   const basePrice = config.leadPriceBase;
   const complexityMult = config.complexityMultipliers[complexity];
   const afterComplexity = basePrice * complexityMult;
@@ -261,11 +263,12 @@ export function calculateLeadPrice(
     complexityAdjustment: Math.ceil(afterComplexity - basePrice),
     platformFeePercent: config.platformFeePercent,
     currency: 'AUD',
-    breakdown: `Base $${basePrice} × ${complexityMult} complexity${isEmergency ? ` + $${Math.ceil(emergencyPremium)} emergency` : ''} = $${finalPrice} AUD`,
+    breakdown: `Base $${String(basePrice)} × ${String(complexityMult)} complexity${isEmergency ? ` + $${String(Math.ceil(emergencyPremium))} emergency` : ''} = $${String(finalPrice)} AUD`,
   };
 }
 
 export function getTradeConfig(category: string): TradePricingConfig {
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return TRADE_PRICING[category] ?? TRADE_PRICING.OTHER!;
 }
 

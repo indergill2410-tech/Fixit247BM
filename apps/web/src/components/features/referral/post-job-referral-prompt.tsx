@@ -17,7 +17,7 @@ export function PostJobReferralPrompt({ referralCode, referralLink, onDismiss }:
     navigator.clipboard.writeText(referralLink);
     setCopied(true);
     toast.success('Link copied!');
-    setTimeout(() => setCopied(false), 2000);
+    setTimeout(() => { setCopied(false); }, 2000);
   }
 
   function shareWhatsApp() {

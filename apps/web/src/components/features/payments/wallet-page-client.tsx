@@ -7,7 +7,7 @@ import { TransactionHistory } from './transaction-history';
 
 interface WalletData {
   balance: { balance: number; lifetimeEarned: number; lifetimeSpent: number };
-  packages: Array<{ id: string; name: string; credits: number; priceAud: string | number; bonusCredits: number; isPopular: boolean }>;
+  packages: { id: string; name: string; credits: number; priceAud: string | number; bonusCredits: number; isPopular: boolean }[];
   subscription?: { tier: string; status: string; currentPeriodEnd?: string } | null;
 }
 
@@ -58,7 +58,7 @@ export function WalletPageClient({ userId }: { userId: string }) {
           lifetimeEarned={walletData.balance.lifetimeEarned}
           lifetimeSpent={walletData.balance.lifetimeSpent}
           subscriptionTier={walletData.subscription?.tier}
-          onPurchaseClick={() => setShowPurchase(true)}
+          onPurchaseClick={() => { setShowPurchase(true); }}
         />
       )}
 
@@ -70,7 +70,7 @@ export function WalletPageClient({ userId }: { userId: string }) {
       {walletData && (
         <CreditPurchaseModal
           open={showPurchase}
-          onClose={() => setShowPurchase(false)}
+          onClose={() => { setShowPurchase(false); }}
           packages={walletData.packages}
         />
       )}

@@ -16,7 +16,7 @@ export function useSocketEvent<K extends keyof ServerToClientEvents>(
   useEffect(() => {
     const socket = getSocket();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const listener = (...args: any[]) => (handlerRef.current as (...a: any[]) => void)(...args);
+    const listener = (...args: any[]) => { (handlerRef.current as (...a: any[]) => void)(...args); };
     socket.on(event as string, listener as never);
     return () => { socket.off(event as string, listener as never); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -181,7 +181,7 @@ export function useLocationBroadcast(jobId: string | undefined, enabled: boolean
           speed: pos.coords.speed ?? undefined,
         });
       },
-      (err) => console.warn('[location]', err.message),
+      (err) => { console.warn('[location]', err.message); },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
     );
 

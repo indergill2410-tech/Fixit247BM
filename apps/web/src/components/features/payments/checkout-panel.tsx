@@ -79,7 +79,7 @@ export function CheckoutPanel({
       // Simulating success for the UI scaffold
       await new Promise((r) => setTimeout(r, 1500));
       setStep('success');
-      setTimeout(() => onSuccess(clientSecret ?? ''), 800);
+      setTimeout(() => { onSuccess(clientSecret ?? ''); }, 800);
     } catch {
       toast.error('Payment confirmation failed');
       setStep('payment');
@@ -217,7 +217,7 @@ export function CheckoutPanel({
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" onClick={() => setStep('review')} className="flex-1">
+              <Button variant="outline" onClick={() => { setStep('review'); }} className="flex-1">
                 Back
               </Button>
               <Button onClick={confirmPayment} className="flex-1 gap-2 bg-green-600 hover:bg-green-700">

@@ -31,7 +31,7 @@ export function AvailabilityToggle() {
     }
   };
 
-  const currentOption = STATUS_OPTIONS.find((o) => o.id === status) ?? STATUS_OPTIONS[0]!;
+  const currentOption = STATUS_OPTIONS.find((o) => o.id === status) ?? STATUS_OPTIONS[0];
 
   return (
     <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3 shadow-sm">

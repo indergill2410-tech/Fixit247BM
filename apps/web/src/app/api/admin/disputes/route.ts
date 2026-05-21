@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -26,8 +27,6 @@ export async function GET(req: NextRequest) {
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
       take: limit,
       include: {
-        customer: { select: { id: true, name: true, email: true } },
-        tradie: { select: { id: true, name: true, email: true } },
         job: { select: { id: true, title: true, status: true } },
       },
     });

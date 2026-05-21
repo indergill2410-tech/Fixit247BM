@@ -55,7 +55,7 @@ const TRADIE_PLANS = [
   },
 ];
 
-const PLAN_FEATURE_ROWS: Array<{ key: keyof typeof TRADIE_PLANS[0]['features']; label: string }> = [
+const PLAN_FEATURE_ROWS: { key: keyof typeof TRADIE_PLANS[0]['features']; label: string }[] = [
   { key: 'leads', label: 'Leads per month' },
   { key: 'emergency', label: 'Emergency dispatch' },
   { key: 'analytics', label: 'Analytics dashboard' },

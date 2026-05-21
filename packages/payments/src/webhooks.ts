@@ -4,7 +4,7 @@ import { SUBSCRIPTION_PLANS } from './subscriptions';
 import type Stripe from 'stripe';
 
 export async function handlePaymentIntentSucceeded(event: Stripe.PaymentIntent): Promise<void> {
-  const jobId = event.metadata?.['jobId'];
+  const jobId = event.metadata.jobId;
   if (!jobId) return;
 
   await db.payment.updateMany({
@@ -22,7 +22,7 @@ export async function handlePaymentIntentSucceeded(event: Stripe.PaymentIntent):
 }
 
 export async function handlePaymentIntentFailed(event: Stripe.PaymentIntent): Promise<void> {
-  const jobId = event.metadata?.['jobId'];
+  const jobId = event.metadata.jobId;
   if (!jobId) return;
 
   await db.payment.updateMany({
@@ -32,8 +32,8 @@ export async function handlePaymentIntentFailed(event: Stripe.PaymentIntent): Pr
 }
 
 export async function handleSubscriptionUpdated(event: Stripe.Subscription): Promise<void> {
-  const userId = event.metadata?.['userId'];
-  const tier = (event.metadata?.['tier'] as string | undefined) ?? 'FREE';
+  const userId = event.metadata.userId;
+  const tier = (event.metadata.tier) ?? 'FREE';
   if (!userId) return;
 
   const isActive = event.status === 'active' || event.status === 'trialing';
@@ -67,10 +67,10 @@ export async function handleSubscriptionUpdated(event: Stripe.Subscription): Pro
 }
 
 export async function handleTransferCreated(event: Stripe.Transfer): Promise<void> {
-  if (!event.metadata?.['payoutId']) return;
+  if (!event.metadata.payoutId) return;
 
   await db.payout.updateMany({
-    where: { id: event.metadata['payoutId'] },
+    where: { id: event.metadata.payoutId },
     data: {
       stripeTransferId: event.id,
       status: 'PAID',

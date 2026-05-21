@@ -37,7 +37,7 @@ function mapSupabaseUser(raw: {
   created_at: string;
   updated_at?: string;
 }): AuthUser {
-  const meta = (raw.user_metadata ?? {}) as Record<string, unknown>;
+  const meta = (raw.user_metadata ?? {});
 
   return {
     id: raw.id,
@@ -46,21 +46,21 @@ function mapSupabaseUser(raw: {
       ? new Date(raw.email_confirmed_at)
       : null,
     phone: raw.phone ?? null,
-    phoneVerified: Boolean(meta['phone_verified'] ?? false),
-    role: (meta['role'] as Role) ?? 'CUSTOMER',
-    firstName: String(meta['first_name'] ?? ''),
-    lastName: String(meta['last_name'] ?? ''),
-    avatarUrl: meta['avatar_url'] ? String(meta['avatar_url']) : null,
-    isActive: Boolean(meta['is_active'] ?? true),
-    onboardingComplete: Boolean(meta['onboarding_complete'] ?? false),
-    lastLoginAt: meta['last_login_at']
-      ? new Date(String(meta['last_login_at']))
+    phoneVerified: Boolean(meta.phone_verified ?? false),
+    role: (meta.role as Role) ?? 'CUSTOMER',
+    firstName: String(meta.first_name ?? ''),
+    lastName: String(meta.last_name ?? ''),
+    avatarUrl: meta.avatar_url ? String(meta.avatar_url) : null,
+    isActive: Boolean(meta.is_active ?? true),
+    onboardingComplete: Boolean(meta.onboarding_complete ?? false),
+    lastLoginAt: meta.last_login_at
+      ? new Date(String(meta.last_login_at))
       : null,
-    loginCount: Number(meta['login_count'] ?? 0),
-    lastIpAddress: meta['last_ip_address']
-      ? String(meta['last_ip_address'])
+    loginCount: Number(meta.login_count ?? 0),
+    lastIpAddress: meta.last_ip_address
+      ? String(meta.last_ip_address)
       : null,
-    deletedAt: meta['deleted_at'] ? new Date(String(meta['deleted_at'])) : null,
+    deletedAt: meta.deleted_at ? new Date(String(meta.deleted_at)) : null,
     createdAt: new Date(raw.created_at),
     updatedAt: raw.updated_at ? new Date(raw.updated_at) : new Date(raw.created_at),
   };

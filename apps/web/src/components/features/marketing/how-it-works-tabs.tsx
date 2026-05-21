@@ -74,7 +74,7 @@ export function HowItWorksTabs() {
       <div className="mb-10 flex justify-center">
         <div className="flex rounded-2xl border border-white/10 bg-white/4 p-1">
           <button
-            onClick={() => setTab('homeowner')}
+            onClick={() => { setTab('homeowner'); }}
             className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
               tab === 'homeowner'
                 ? 'bg-brand-400 text-gray-900 shadow-sm'
@@ -85,7 +85,7 @@ export function HowItWorksTabs() {
             Homeowners
           </button>
           <button
-            onClick={() => setTab('tradie')}
+            onClick={() => { setTab('tradie'); }}
             className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
               tab === 'tradie'
                 ? 'bg-brand-400 text-gray-900 shadow-sm'

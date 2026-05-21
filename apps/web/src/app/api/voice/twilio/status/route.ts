@@ -10,9 +10,9 @@ export async function POST(req: Request) {
   const body = await req.text();
   const params = Object.fromEntries(new URLSearchParams(body));
 
-  const callSid = params['CallSid'];
-  const callStatus = params['CallStatus']; // completed, busy, no-answer, failed, canceled
-  const callDuration = params['CallDuration']; // seconds as string
+  const callSid = params.CallSid;
+  const callStatus = params.CallStatus; // completed, busy, no-answer, failed, canceled
+  const callDuration = params.CallDuration; // seconds as string
 
   logger.info('Twilio status callback', { callSid, callStatus, callDuration });
 
@@ -20,12 +20,13 @@ export async function POST(req: Request) {
     return new NextResponse('OK', { status: 200 });
   }
 
+  // Prisma CallStatus enum has no MISSED — map unanswered calls to ABANDONED
   const statusMap: Record<string, string> = {
     completed: 'COMPLETED',
-    busy: 'MISSED',
-    'no-answer': 'MISSED',
+    busy: 'ABANDONED',
+    'no-answer': 'ABANDONED',
     failed: 'FAILED',
-    canceled: 'MISSED',
+    canceled: 'ABANDONED',
   };
   const dbStatus = statusMap[callStatus ?? ''];
 
