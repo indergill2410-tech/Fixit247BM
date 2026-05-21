@@ -53,6 +53,10 @@ export async function matchAndDispatch(job: JobForMatching): Promise<void> {
   }
 
   // 2. Build JobRequirements for the matching engine
+  const budgetMin = job.budgetMin ? Number(job.budgetMin) : undefined;
+  const budgetMax = job.budgetMax ? Number(job.budgetMax) : undefined;
+  const scheduledFor = job.scheduledFor ?? undefined;
+
   const jobRequirements: JobRequirements = {
     jobId: job.id,
     category: job.category,
@@ -61,9 +65,9 @@ export async function matchAndDispatch(job: JobForMatching): Promise<void> {
     location: { latitude, longitude },
     suburb,
     state,
-    budgetMin: job.budgetMin ? Number(job.budgetMin) : undefined,
-    budgetMax: job.budgetMax ? Number(job.budgetMax) : undefined,
-    scheduledFor: job.scheduledFor ?? undefined,
+    ...(budgetMin !== undefined ? { budgetMin } : {}),
+    ...(budgetMax !== undefined ? { budgetMax } : {}),
+    ...(scheduledFor !== undefined ? { scheduledFor } : {}),
     customerId: job.customerId,
   };
 
