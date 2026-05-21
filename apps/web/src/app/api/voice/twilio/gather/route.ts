@@ -196,7 +196,7 @@ export async function POST(req: Request) {
   if (!validateTwilioSignature(req, body)) {
     logger.error('[gather] Signature invalid — returning TwiML rejection so caller hears voice');
     return new NextResponse(
-      gatherErrorTwiml("Sorry, we couldn't verify this call. Please try again."),
+      `<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="Polly.Nicole" language="en-AU">Sorry, we couldn't verify this call. Please try again.</Say><Hangup/></Response>`,
       { headers: { 'Content-Type': 'text/xml; charset=utf-8' } },
     );
   }
