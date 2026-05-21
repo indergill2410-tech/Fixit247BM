@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -85,7 +86,7 @@ export async function GET(req: NextRequest) {
       disputeRate: jobTotal > 0 ? disputeRate / jobTotal : 0,
     });
   } catch (err) {
-    console.error('[GET /api/admin/analytics]', err);
+    logger.error('[GET /api/admin/analytics]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

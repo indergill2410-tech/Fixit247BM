@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const UpdateSchema = z.object({
   status: z.enum(['UNDER_REVIEW', 'AWAITING_EVIDENCE', 'MEDIATION', 'RESOLVED_CUSTOMER', 'RESOLVED_TRADIE', 'RESOLVED_SPLIT', 'CLOSED', 'ESCALATED']).optional(),
@@ -39,7 +40,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
     return NextResponse.json({ dispute, chatMessages });
   } catch (err) {
-    console.error('[GET /api/admin/disputes/:id]', err);
+    logger.error('[GET /api/admin/disputes/:id]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -70,7 +71,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ id
     return NextResponse.json({ dispute });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/admin/disputes/:id]', err);
+    logger.error('[PATCH /api/admin/disputes/:id]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

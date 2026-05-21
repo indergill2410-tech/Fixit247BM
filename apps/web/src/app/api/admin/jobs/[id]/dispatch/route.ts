@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   reason: z.string().optional(),
@@ -54,7 +55,7 @@ export async function POST(
     return NextResponse.json({ success: true, newBatch, message: `Re-dispatched as batch #${newBatch}` });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/admin/jobs/:id/dispatch]', err);
+    logger.error('[POST /api/admin/jobs/:id/dispatch]', err);
     return NextResponse.json({ error: 'Failed to re-dispatch' }, { status: 500 });
   }
 }

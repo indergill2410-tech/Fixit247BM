@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 const CreateJobSchema = z.object({
   title: z.string().min(5).max(120),
@@ -86,7 +87,7 @@ export async function POST(req: NextRequest) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid job data', details: err.errors }, { status: 400 });
     }
-    console.error('[POST /api/jobs]', err);
+    logger.error('[POST /api/jobs]', err);
     return NextResponse.json({ error: 'Failed to create job' }, { status: 500 });
   }
 }
@@ -134,7 +135,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ jobs, total, limit, offset });
   } catch (err) {
-    console.error('[GET /api/jobs]', err);
+    logger.error('[GET /api/jobs]', err);
     return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 });
   }
 }

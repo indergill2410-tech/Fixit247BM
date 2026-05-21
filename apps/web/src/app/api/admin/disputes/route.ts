@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const CreateSchema = z.object({
   jobId: z.string().uuid(),
@@ -34,7 +35,7 @@ export async function GET(req: NextRequest) {
     const counts = await db.dispute.groupBy({ by: ['status'], _count: { id: true } });
     return NextResponse.json({ disputes, counts });
   } catch (err) {
-    console.error('[GET /api/admin/disputes]', err);
+    logger.error('[GET /api/admin/disputes]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -60,7 +61,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ dispute }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/admin/disputes]', err);
+    logger.error('[POST /api/admin/disputes]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

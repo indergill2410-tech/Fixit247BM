@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function GET(
   _req: NextRequest,
@@ -54,7 +55,7 @@ export async function GET(
         : null,
     });
   } catch (err) {
-    console.error('[GET /api/tracking/:jobId]', err);
+    logger.error('[GET /api/tracking/:jobId]', err);
     return NextResponse.json({ error: 'Failed to fetch location' }, { status: 500 });
   }
 }

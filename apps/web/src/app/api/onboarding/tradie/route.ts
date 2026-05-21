@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 import { db } from '@fixit247/database';
 import type { TradeCategory } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const tradieOnboardingPayload = z.object({
   business: z.object({
@@ -125,7 +126,7 @@ export async function POST(request: Request) {
     await supabase.auth.updateUser({ data: { onboardingComplete: true } });
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Tradie onboarding error:', err);
+    logger.error('Tradie onboarding error:', err);
     return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
   }
 }

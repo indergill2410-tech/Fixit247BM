@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const AcceptSchema = z.object({
   quotedPrice: z.number().positive(),
@@ -87,7 +88,7 @@ export async function POST(
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid data', details: err.errors }, { status: 400 });
     }
-    console.error('[POST /api/jobs/[id]/accept]', err);
+    logger.error('[POST /api/jobs/[id]/accept]', err);
     return NextResponse.json({ error: 'Failed to accept job' }, { status: 500 });
   }
 }

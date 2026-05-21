@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { db } from '@fixit247/database';
 import { customerOnboardingSchema } from '@/lib/validators/onboarding';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -54,7 +55,7 @@ export async function POST(request: Request) {
     await supabase.auth.updateUser({ data: { firstName, lastName, onboardingComplete: true } });
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('Customer onboarding error:', err);
+    logger.error('Customer onboarding error:', err);
     return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
   }
 }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -43,7 +44,7 @@ export async function GET() {
       timestamp: new Date().toISOString(),
     });
   } catch (err) {
-    console.error('[GET /api/admin/live]', err);
+    logger.error('[GET /api/admin/live]', err);
     return NextResponse.json({ error: 'Failed to fetch live data' }, { status: 500 });
   }
 }
