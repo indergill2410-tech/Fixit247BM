@@ -31,7 +31,7 @@ export function RecentActivityFeed() {
   const [, tick] = useState(0);
 
   useEffect(() => {
-    const tickInterval = setInterval(() => tick((n) => n + 1), 30000);
+    const tickInterval = setInterval(() => { tick((n) => n + 1); }, 30000);
     const addInterval = setInterval(() => {
       const base = ACTIVITIES[Math.floor(Math.random() * ACTIVITIES.length)];
       setItems((prev) => [{ ...base, addedAt: Date.now() }, ...prev.slice(0, 6)]);

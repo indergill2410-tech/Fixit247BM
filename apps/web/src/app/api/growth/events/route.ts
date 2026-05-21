@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { db } from '@fixit247/database';
+import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
 import crypto from 'crypto';
 
@@ -26,7 +27,7 @@ export async function POST(req: Request) {
         referrer: data.referrer,
         suburb: data.suburb,
         sessionId: data.sessionId,
-        metadata: (data.metadata ?? {}) as import('@fixit247/database').Prisma.InputJsonValue,
+        metadata: (data.metadata ?? {}) as Prisma.InputJsonValue,
         ipHash,
       },
     });

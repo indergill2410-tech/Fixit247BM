@@ -53,7 +53,7 @@ export async function GET() {
     {
       status: overall,
       timestamp: new Date().toISOString(),
-      version: process.env['npm_package_version'] ?? '0.1.0',
+      version: process.env.npm_package_version ?? '0.1.0',
       services: { database: db_status, env: env_status },
     },
     { status: httpStatus },

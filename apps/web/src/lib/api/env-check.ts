@@ -24,8 +24,8 @@ export function checkEnvOnce(): void {
 
   if (!hasMissing) {
     logger.info('Env validation passed', {
-      NEXT_PUBLIC_APP_URL: process.env['NEXT_PUBLIC_APP_URL'],
-      TWILIO_PHONE_NUMBER: process.env['TWILIO_PHONE_NUMBER'],
+      NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
+      TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER,
     });
   }
 }

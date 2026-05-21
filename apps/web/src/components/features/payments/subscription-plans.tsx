@@ -43,7 +43,7 @@ export function SubscriptionPlans({ plans, currentTier = 'FREE', onSelect }: Sub
   return (
     <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
       {plans.map((plan, idx) => {
-        const styles = PLAN_STYLES[plan.tier] ?? PLAN_STYLES.FREE!;
+        const styles = PLAN_STYLES[plan.tier] ?? PLAN_STYLES.FREE;
         const isCurrent = plan.tier === currentTier;
         const isElite = plan.tier === 'ELITE';
 

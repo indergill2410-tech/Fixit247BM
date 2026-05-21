@@ -37,7 +37,7 @@ export const EMERGENCY_DISPATCH_FEE_AUD = 15;
 export function calculateCreditCost(
   complexity: JobComplexity,
   priority: JobPriority,
-  subscriptionTier: string = 'FREE'
+  subscriptionTier = 'FREE'
 ): number {
   const base = CREDIT_COSTS[complexity][priority];
   const discount = SUBSCRIPTION_CREDIT_DISCOUNTS[subscriptionTier] ?? 0;

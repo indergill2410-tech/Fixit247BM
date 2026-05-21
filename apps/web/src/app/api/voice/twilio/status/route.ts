@@ -10,9 +10,9 @@ export async function POST(req: Request) {
   const body = await req.text();
   const params = Object.fromEntries(new URLSearchParams(body));
 
-  const callSid = params['CallSid'];
-  const callStatus = params['CallStatus']; // completed, busy, no-answer, failed, canceled
-  const callDuration = params['CallDuration']; // seconds as string
+  const callSid = params.CallSid;
+  const callStatus = params.CallStatus; // completed, busy, no-answer, failed, canceled
+  const callDuration = params.CallDuration; // seconds as string
 
   logger.info('Twilio status callback', { callSid, callStatus, callDuration });
 

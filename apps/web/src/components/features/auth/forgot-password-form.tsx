@@ -54,7 +54,7 @@ export function ForgotPasswordForm() {
             </p>
             <p className="mt-2 text-sm text-brand-300">
               Didn&apos;t receive it? Check your spam folder or{' '}
-              <button onClick={() => setSubmitted(false)} className="text-white underline">
+              <button onClick={() => { setSubmitted(false); }} className="text-white underline">
                 try again
               </button>
             </p>

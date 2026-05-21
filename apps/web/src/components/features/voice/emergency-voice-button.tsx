@@ -17,7 +17,7 @@ export function EmergencyVoiceButton({ phoneNumber = '1800348498' }: Props) {
         <div className="w-full max-w-md">
           <div className="mb-3 flex items-center justify-between">
             <p className="text-sm font-semibold text-white">AI Emergency Assistant</p>
-            <button onClick={() => setShowChat(false)} className="rounded-full bg-white/20 p-1.5 text-white hover:bg-white/30">
+            <button onClick={() => { setShowChat(false); }} className="rounded-full bg-white/20 p-1.5 text-white hover:bg-white/30">
               <X size={16} />
             </button>
           </div>
@@ -37,7 +37,7 @@ export function EmergencyVoiceButton({ phoneNumber = '1800348498' }: Props) {
         Call Now — 24/7
       </a>
       <button
-        onClick={() => setShowChat(true)}
+        onClick={() => { setShowChat(true); }}
         className="flex items-center justify-center gap-2 rounded-2xl border-2 border-white px-8 py-4 text-lg font-bold text-white hover:bg-red-700 transition-colors"
       >
         <Mic size={22} />

@@ -26,7 +26,7 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionTier, {
   BASIC: {
     name: 'Bronze',
     priceMonthlyAud: 49,
-    stripePriceId: process.env['STRIPE_PRICE_BASIC'] ?? null,
+    stripePriceId: process.env.STRIPE_PRICE_BASIC ?? null,
     features: ['10% credit discount', '5 bonus credits/month', 'Priority email support', 'Basic analytics'],
     monthlyBonusCredits: 5,
     jobAlertPriority: 1,
@@ -36,7 +36,7 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionTier, {
   PROFESSIONAL: {
     name: 'Silver',
     priceMonthlyAud: 99,
-    stripePriceId: process.env['STRIPE_PRICE_PROFESSIONAL'] ?? null,
+    stripePriceId: process.env.STRIPE_PRICE_PROFESSIONAL ?? null,
     features: ['20% credit discount', '15 bonus credits/month', 'Priority job alerts', 'Full analytics', 'Dedicated support'],
     monthlyBonusCredits: 15,
     jobAlertPriority: 2,
@@ -46,7 +46,7 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionTier, {
   ELITE: {
     name: 'Gold',
     priceMonthlyAud: 199,
-    stripePriceId: process.env['STRIPE_PRICE_ELITE'] ?? null,
+    stripePriceId: process.env.STRIPE_PRICE_ELITE ?? null,
     features: ['35% credit discount', '40 bonus credits/month', 'Highest dispatch priority', 'Exclusive premium jobs', 'White-glove support', 'Featured listing'],
     monthlyBonusCredits: 40,
     jobAlertPriority: 3,

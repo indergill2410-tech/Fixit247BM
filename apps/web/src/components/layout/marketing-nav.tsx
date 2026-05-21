@@ -20,10 +20,10 @@ export function MarketingNav() {
   const drawerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 12);
+    const handleScroll = () => { setScrolled(window.scrollY > 12); };
     handleScroll();
     window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
+    return () => { window.removeEventListener('scroll', handleScroll); };
   }, []);
 
   // Close on route change
@@ -44,7 +44,7 @@ export function MarketingNav() {
           <Link
             href="/"
             className="flex items-center gap-2 text-[15px] font-extrabold text-white transition-opacity hover:opacity-80"
-            onClick={() => setOpen(false)}
+            onClick={() => { setOpen(false); }}
           >
             <span className="text-brand-400">🔑</span>
             Fixit <span className="text-brand-400">24/7</span>
@@ -93,7 +93,7 @@ export function MarketingNav() {
               Get started
             </Link>
             <button
-              onClick={() => setOpen((v) => !v)}
+              onClick={() => { setOpen((v) => !v); }}
               className="ml-1 rounded-xl p-2 text-gray-400 transition-colors hover:bg-white/[0.06] hover:text-white md:hidden"
               aria-label="Toggle menu"
             >
@@ -107,7 +107,7 @@ export function MarketingNav() {
       {open && (
         <div
           className="fixed inset-0 z-40 md:hidden"
-          onClick={() => setOpen(false)}
+          onClick={() => { setOpen(false); }}
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
@@ -116,20 +116,20 @@ export function MarketingNav() {
           <div
             ref={drawerRef}
             className="absolute right-0 top-0 flex h-full w-[min(320px,90vw)] flex-col border-l border-white/[0.07] bg-[#0d0d0d] p-6 shadow-2xl"
-            onClick={(e) => e.stopPropagation()}
+            onClick={(e) => { e.stopPropagation(); }}
           >
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <Link
                 href="/"
                 className="flex items-center gap-2 text-[15px] font-extrabold text-white"
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); }}
               >
                 <span className="text-brand-400">🔑</span>
                 Fixit <span className="text-brand-400">24/7</span>
               </Link>
               <button
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); }}
                 className="rounded-xl p-1.5 text-gray-500 hover:text-white transition-colors"
               >
                 <X size={20} />
@@ -142,7 +142,7 @@ export function MarketingNav() {
                 <Link
                   key={href}
                   href={href}
-                  onClick={() => setOpen(false)}
+                  onClick={() => { setOpen(false); }}
                   className={`rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                     pathname === href
                       ? 'bg-white/[0.07] text-white'
@@ -158,14 +158,14 @@ export function MarketingNav() {
             <div className="mt-6 flex flex-col gap-2.5 border-t border-white/[0.07] pt-6">
               <Link
                 href="/login"
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); }}
                 className="w-full rounded-xl border border-white/12 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-white/[0.06]"
               >
                 Sign in
               </Link>
               <Link
                 href="/register"
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); }}
                 className="w-full rounded-xl bg-brand-500 py-3 text-center text-sm font-bold text-gray-900 transition-colors hover:bg-brand-400"
               >
                 Create account
@@ -184,7 +184,7 @@ export function MarketingNav() {
               <p className="mb-3 text-xs text-gray-600">Tradies available right now</p>
               <Link
                 href="/emergency"
-                onClick={() => setOpen(false)}
+                onClick={() => { setOpen(false); }}
                 className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 py-3 text-center text-sm font-bold text-white transition-all hover:bg-red-400 active:scale-[0.98]"
               >
                 <Phone size={14} />

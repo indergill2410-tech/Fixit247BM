@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest} from 'next/server';
+import { NextResponse } from 'next/server';
 import { constructWebhookEvent } from '@fixit247/payments';
 import {
   handlePaymentIntentSucceeded,
@@ -19,7 +20,7 @@ export async function POST(req: NextRequest) {
 
   let event: Stripe.Event;
   try {
-    event = await constructWebhookEvent(payload, sig);
+    event = constructWebhookEvent(payload, sig);
   } catch (err) {
     console.error('[Webhook] Signature verification failed:', err);
     return NextResponse.json({ error: 'Invalid signature' }, { status: 400 });
@@ -28,20 +29,20 @@ export async function POST(req: NextRequest) {
   try {
     switch (event.type) {
       case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
+        await handlePaymentIntentSucceeded(event.data.object);
         break;
       case 'payment_intent.payment_failed':
-        await handlePaymentIntentFailed(event.data.object as Stripe.PaymentIntent);
+        await handlePaymentIntentFailed(event.data.object);
         break;
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
-        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+        await handleSubscriptionUpdated(event.data.object);
         break;
       case 'transfer.created':
-        await handleTransferCreated(event.data.object as Stripe.Transfer);
+        await handleTransferCreated(event.data.object);
         break;
       case 'account.updated':
-        await handleConnectedAccountUpdated(event.data.object as Stripe.Account);
+        await handleConnectedAccountUpdated(event.data.object);
         break;
       default:
         // Unhandled event — acknowledged but not processed

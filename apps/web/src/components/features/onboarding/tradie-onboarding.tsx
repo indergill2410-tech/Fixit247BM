@@ -98,7 +98,7 @@ export function TradieOnboarding() {
     await supabase.auth.updateUser({ data: { onboardingComplete: true } });
     await refreshUser();
     setIsComplete(true);
-    setTimeout(() => router.push('/tradie/dashboard'), 2000);
+    setTimeout(() => { router.push('/tradie/dashboard'); }, 2000);
   }
 
   if (isComplete) {
@@ -156,11 +156,11 @@ export function TradieOnboarding() {
       </div>
 
       <AnimatePresence mode="wait">
-        {step === 1 && <Step1Business key="s1" onNext={(d) => handleStepComplete(d, 'business')} />}
-        {step === 2 && <Step2Verification key="s2" onBack={() => setStep(1)} onNext={(d) => handleStepComplete(d, 'verification')} />}
-        {step === 3 && <Step3Profile key="s3" onBack={() => setStep(2)} onNext={(d) => handleStepComplete(d, 'profile')} />}
-        {step === 4 && <Step4Availability key="s4" onBack={() => setStep(3)} onNext={(d) => handleStepComplete(d, 'availability')} />}
-        {step === 5 && <Step5Payments key="s5" onBack={() => setStep(4)} onNext={handleFinalStep} />}
+        {step === 1 && <Step1Business key="s1" onNext={(d) => { handleStepComplete(d, 'business'); }} />}
+        {step === 2 && <Step2Verification key="s2" onBack={() => { setStep(1); }} onNext={(d) => { handleStepComplete(d, 'verification'); }} />}
+        {step === 3 && <Step3Profile key="s3" onBack={() => { setStep(2); }} onNext={(d) => { handleStepComplete(d, 'profile'); }} />}
+        {step === 4 && <Step4Availability key="s4" onBack={() => { setStep(3); }} onNext={(d) => { handleStepComplete(d, 'availability'); }} />}
+        {step === 5 && <Step5Payments key="s5" onBack={() => { setStep(4); }} onNext={handleFinalStep} />}
       </AnimatePresence>
     </div>
   );
@@ -211,7 +211,7 @@ function Step1Business({ onNext }: { onNext: (d: TradieBusinessValues) => void }
                   <button
                     key={t}
                     type="button"
-                    onClick={() => toggleTrade(t)}
+                    onClick={() => { toggleTrade(t); }}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       selectedTrades.includes(t)
                         ? 'bg-white text-brand-700'

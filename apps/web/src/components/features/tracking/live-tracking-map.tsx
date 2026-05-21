@@ -41,8 +41,8 @@ export function LiveTrackingMap({ jobId, jobLatitude, jobLongitude, jobAddress }
     const script = document.createElement('script');
     script.src = `https://maps.googleapis.com/maps/api/js?key=${key}&libraries=geometry`;
     script.async = true;
-    script.onload = () => setMapsReady(true);
-    script.onerror = () => setMapsError(true);
+    script.onload = () => { setMapsReady(true); };
+    script.onerror = () => { setMapsError(true); };
     document.head.appendChild(script);
   }, []);
 

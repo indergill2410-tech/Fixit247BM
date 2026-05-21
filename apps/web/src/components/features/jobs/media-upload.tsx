@@ -24,7 +24,7 @@ export function MediaUpload({ onImagesChange, onVoiceTranscript, maxImages = 4, 
   const timerRef = React.useRef<ReturnType<typeof setInterval> | null>(null);
   const fileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []).slice(0, maxImages - images.length);
     if (files.length === 0) return;
     setUploadingImages(true);
@@ -50,7 +50,7 @@ export function MediaUpload({ onImagesChange, onVoiceTranscript, maxImages = 4, 
       chunksRef.current = [];
       recorder.ondataavailable = (e) => { if (e.data.size > 0) chunksRef.current.push(e.data); };
       recorder.onstop = async () => {
-        stream.getTracks().forEach((t) => t.stop());
+        stream.getTracks().forEach((t) => { t.stop(); });
         const blob = new Blob(chunksRef.current, { type: 'audio/webm' });
         await transcribeAudio(blob);
       };
@@ -58,7 +58,7 @@ export function MediaUpload({ onImagesChange, onVoiceTranscript, maxImages = 4, 
       recorder.start();
       setIsRecording(true);
       setRecordingSeconds(0);
-      timerRef.current = setInterval(() => setRecordingSeconds((s) => s + 1), 1000);
+      timerRef.current = setInterval(() => { setRecordingSeconds((s) => s + 1); }, 1000);
     } catch {
       alert('Microphone access denied. Please allow microphone access.');
     }
@@ -102,11 +102,10 @@ export function MediaUpload({ onImagesChange, onVoiceTranscript, maxImages = 4, 
                 exit={{ opacity: 0, scale: 0.8 }}
                 className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-white/15"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img src={url} alt={`Upload ${idx + 1}`} className="h-full w-full object-cover" />
                 <button
                   type="button"
-                  onClick={() => removeImage(idx)}
+                  onClick={() => { removeImage(idx); }}
                   className="absolute right-1 top-1 rounded-full bg-black/60 p-0.5 text-white hover:bg-black/80"
                 >
                   <X size={10} />

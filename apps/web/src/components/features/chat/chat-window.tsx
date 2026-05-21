@@ -34,7 +34,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
         setMessages(data.messages ?? []);
       })
       .catch(() => toast.error('Could not load messages'))
-      .finally(() => setLoading(false));
+      .finally(() => { setLoading(false); });
   }, [jobId, setMessages]);
 
   // Auto-scroll on new messages
@@ -143,7 +143,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
         <div className="flex-1">
           <textarea
             value={input}
-            onChange={(e) => handleInputChange(e.target.value)}
+            onChange={(e) => { handleInputChange(e.target.value); }}
             onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); void sendMessage(e); } }}
             placeholder={`Message ${participantName}…`}
             rows={1}

@@ -34,6 +34,6 @@ export async function GET() {
   return NextResponse.json({
     code: referral.code,
     link: `${siteUrl}/auth/register?ref=${referral.code}`,
-    stats: { sent: sentCount, rewarded, totalEarned: Number(totalEarned._sum?.credits ?? 0) },
+    stats: { sent: sentCount, rewarded, totalEarned: Number(totalEarned._sum.credits ?? 0) },
   });
 }

@@ -45,7 +45,7 @@ export function TradieJobActions({ jobId, status, isEmergency, budgetMax, budget
             <input
               type="number"
               value={quotedPrice}
-              onChange={(e) => setQuotedPrice(e.target.value)}
+              onChange={(e) => { setQuotedPrice(e.target.value); }}
               className="w-full rounded-xl border border-white/15 bg-white/6 py-3 pl-7 pr-3 text-sm text-white placeholder-gray-600 focus:border-brand-400 focus:outline-none"
               placeholder="0"
             />

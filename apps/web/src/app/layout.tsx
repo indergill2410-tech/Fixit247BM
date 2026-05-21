@@ -11,7 +11,7 @@ export const metadata: Metadata = {
   description: 'Australia\'s trusted platform for emergency trade services — plumbing, electrical, HVAC and more. Available 24/7.',
   keywords: ['emergency trades', 'plumber', 'electrician', 'HVAC', 'Australia', '24/7'],
   authors: [{ name: 'Fixit247' }],
-  metadataBase: new URL(process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247.com.au'),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247.com.au'),
   openGraph: {
     type: 'website',
     locale: 'en_AU',

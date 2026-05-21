@@ -69,7 +69,7 @@ function EarningsCalculator() {
           min={1}
           max={10}
           value={jobsPerWeek}
-          onChange={(e) => setJobsPerWeek(Number(e.target.value))}
+          onChange={(e) => { setJobsPerWeek(Number(e.target.value)); }}
           className="w-full accent-brand-500"
         />
         <div className="mt-1 flex justify-between text-xs text-gray-500">
@@ -83,7 +83,7 @@ function EarningsCalculator() {
         <label className="mb-2 block text-sm font-semibold text-gray-400">Your trade</label>
         <select
           value={trade}
-          onChange={(e) => setTrade(e.target.value)}
+          onChange={(e) => { setTrade(e.target.value); }}
           className="w-full rounded-xl border border-white/10 bg-white/6 px-4 py-3 text-sm font-medium text-white placeholder:text-gray-500 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
         >
           {Object.entries(TRADE_LABELS).map(([key, label]) => (
