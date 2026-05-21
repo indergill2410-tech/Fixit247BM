@@ -75,10 +75,11 @@ export async function buildJobScope(input: ScopeBuilderInput): Promise<AIScopeRe
   const content = response.choices[0]?.message.content;
   if (!content) throw new Error('Empty AI response from scope builder');
 
-  const parsed = JSON.parse(content);
+  const parsed: unknown = JSON.parse(content);
   const result = AIScopeResultSchema.parse(parsed);
 
-  console.log(`[AI Scope] Processed in ${Date.now() - startMs}ms — category: ${result.category}, urgency: ${result.urgencyScore}`);
+  // eslint-disable-next-line no-console
+  console.log(`[AI Scope] Processed in ${String(Date.now() - startMs)}ms — category: ${result.category}, urgency: ${String(result.urgencyScore)}`);
 
   return result;
 }
@@ -104,7 +105,7 @@ function buildUserContent(input: ScopeBuilderInput): string {
 
   if (input.customerContext) {
     if (input.customerContext.previousJobs) {
-      parts.push(`Customer has ${input.customerContext.previousJobs} previous jobs on the platform`);
+      parts.push(`Customer has ${String(input.customerContext.previousJobs)} previous jobs on the platform`);
     }
   }
 
