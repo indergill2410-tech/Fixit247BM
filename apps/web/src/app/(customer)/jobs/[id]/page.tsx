@@ -70,7 +70,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               lastName: tradieUser.lastName,
               avatarUrl: tradieUser.avatarUrl ?? undefined,
               phone: tradieUser.phone ?? undefined,
-              avgRating: acceptedClaim.tradie.avgRating ? Number(acceptedClaim.tradie.avgRating) : undefined,
+              avgRating: acceptedClaim?.tradie.avgRating ? Number(acceptedClaim.tradie.avgRating) : undefined,
             } : null}
           />
 
