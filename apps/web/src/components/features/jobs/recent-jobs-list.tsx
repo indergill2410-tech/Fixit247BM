@@ -22,10 +22,10 @@ export async function RecentJobsList() {
         select: {
           id: true,
           title: true,
-          tradeCategory: true,
+          category: true,
           status: true,
           createdAt: true,
-          tradie: { select: { firstName: true, lastName: true } },
+          tradie: { select: { user: { select: { firstName: true, lastName: true } } } },
         },
       })
     : [];
@@ -48,14 +48,14 @@ export async function RecentJobsList() {
       ) : (
         <div className="divide-y divide-white/6">
           {jobs.map((job) => {
-            const tradieName = job.tradie ? `${job.tradie.firstName} ${job.tradie.lastName[0]}.` : null;
+            const tradieName = job.tradie ? `${job.tradie.user.firstName} ${job.tradie.user.lastName[0]}.` : null;
             const date = new Date(job.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' });
             return (
               <Link key={job.id} href={`/jobs/${job.id}`} className="flex items-center justify-between py-3.5 hover:opacity-80 transition-opacity">
                 <div>
                   <p className="text-sm font-medium text-white">{job.title}</p>
                   <p className="mt-0.5 text-xs text-gray-500">
-                    {job.tradeCategory} · {tradieName ?? 'Finding tradie…'}
+                    {job.category.replace(/_/g, ' ')} · {tradieName ?? 'Finding tradie…'}
                   </p>
                 </div>
                 <div className="flex items-center gap-3 shrink-0">

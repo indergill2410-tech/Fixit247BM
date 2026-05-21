@@ -52,7 +52,7 @@ export function CustomerJobDetailClient({ job, currentUser, initialEvents: _ }: 
   ] as const;
 
   return (
-    <DashboardShell>
+    <DashboardShell role="CUSTOMER">
       {/* Job header */}
       <div className={`mb-6 rounded-2xl p-6 ${job.isEmergency ? 'bg-red-900 text-white' : 'bg-gray-900 text-white'}`}>
         <div className="flex items-start justify-between">

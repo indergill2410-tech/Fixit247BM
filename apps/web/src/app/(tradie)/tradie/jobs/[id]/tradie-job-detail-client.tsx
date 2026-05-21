@@ -56,7 +56,7 @@ export function TradieJobDetailClient({ job, currentUser }: Props) {
   }
 
   return (
-    <DashboardShell>
+    <DashboardShell role="TRADIE">
       {/* Header */}
       <div className={`mb-6 rounded-2xl p-6 ${job.isEmergency ? 'bg-red-900 text-white' : 'bg-gray-900 text-white'}`}>
         {job.isEmergency && (

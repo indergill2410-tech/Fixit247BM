@@ -19,12 +19,10 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const dispute = await db.dispute.findUnique({
       where: { id },
       include: {
-        customer: { select: { id: true, name: true, email: true } },
-        tradie: { select: { id: true, name: true, email: true } },
         job: {
           select: {
             id: true, title: true, status: true, description: true, createdAt: true, completedAt: true,
-            payments: { select: { id: true, amount: true, status: true, stripePaymentIntentId: true }, take: 1 },
+            payment: { select: { id: true, amount: true, status: true, stripePaymentIntentId: true } },
           },
         },
       },

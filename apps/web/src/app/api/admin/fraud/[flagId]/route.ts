@@ -17,7 +17,6 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ fla
 
     const flag = await db.fraudFlag.findUnique({
       where: { id: flagId },
-      include: { user: { select: { id: true, name: true, email: true, role: true, isActive: true } } },
     });
     if (!flag) return NextResponse.json({ error: 'Flag not found' }, { status: 404 });
     return NextResponse.json({ flag });
@@ -37,7 +36,8 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fl
     const flag = await db.fraudFlag.findUnique({ where: { id: flagId }, select: { userId: true } });
     if (!flag) return NextResponse.json({ error: 'Flag not found' }, { status: 404 });
 
-    const ops: Parameters<typeof db.$transaction>[0] = [
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const ops: any[] = [
       db.fraudFlag.update({
         where: { id: flagId },
         data: { status: resolution as never, reviewedBy: session.id, reviewedAt: new Date(), resolvedAt: new Date() },

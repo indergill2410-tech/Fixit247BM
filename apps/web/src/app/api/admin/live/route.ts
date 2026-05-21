@@ -11,12 +11,12 @@ export async function GET() {
 
     const [activeJobs, onlineTradies, recentEvents, pendingDispatch] = await Promise.all([
       db.job.findMany({
-        where: { status: { in: ['OPEN', 'MATCHING', 'CLAIMED', 'EN_ROUTE', 'ARRIVED', 'IN_PROGRESS'] } },
+        where: { status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] as const } },
         orderBy: [{ isEmergency: 'desc' }, { createdAt: 'desc' }],
         take: 50,
         select: {
           id: true, title: true, status: true, priority: true, isEmergency: true,
-          suburb: true, createdAt: true, tradieId: true, customerId: true,
+          createdAt: true, tradieId: true, customerId: true,
         },
       }),
       db.tradieRealtimeStatus.findMany({
@@ -31,7 +31,7 @@ export async function GET() {
         orderBy: { createdAt: 'desc' },
         take: 30,
       }),
-      db.job.count({ where: { status: 'MATCHING' } }),
+      db.job.count({ where: { status: 'OPEN' } }),
     ]);
 
     return NextResponse.json({

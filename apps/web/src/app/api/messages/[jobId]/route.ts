@@ -41,9 +41,6 @@ export async function GET(
       },
       orderBy: { createdAt: 'desc' },
       take: limit,
-      include: {
-        sender: { select: { id: true, name: true, role: true, avatarUrl: true } },
-      },
     });
 
     // Mark unread messages as delivered for the current user
@@ -110,9 +107,6 @@ export async function POST(
         status: 'SENT',
         mediaUrl,
         mediaType: type !== 'TEXT' ? type.toLowerCase() : undefined,
-      },
-      include: {
-        sender: { select: { id: true, name: true, role: true, avatarUrl: true } },
       },
     });
 

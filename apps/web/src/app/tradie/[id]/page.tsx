@@ -13,8 +13,8 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   if (!tradie) return {};
 
   const name = `${tradie.user.firstName} ${tradie.user.lastName}`;
-  const trade = tradie.tradeCategories[0]?.replace(/_/g, ' ') ?? 'Tradie';
-  const suburb = tradie.suburb ?? 'Australia';
+  const trade = tradie.trades[0]?.replace(/_/g, ' ') ?? 'Tradie';
+  const suburb = 'Australia';
   const rating = tradie.avgRating ? `${Number(tradie.avgRating).toFixed(1)}★ ` : '';
 
   const title = `${name} — ${rating}Verified ${trade} in ${suburb} | Fixit 24/7`;
@@ -46,20 +46,22 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
     where: { id },
     include: {
       user: { select: { firstName: true, lastName: true, avatarUrl: true, createdAt: true } },
-      reviews: {
-        include: { reviewer: { select: { firstName: true, avatarUrl: true } } },
-        orderBy: { createdAt: 'desc' },
-        take: 5,
-      },
     },
   }).catch(() => null);
 
   if (!tradie) notFound();
 
+  const reviews = await db.review.findMany({
+    where: { revieweeId: tradie.userId },
+    include: { reviewer: { select: { firstName: true, avatarUrl: true } } },
+    orderBy: { createdAt: 'desc' },
+    take: 5,
+  });
+
   const fullName = `${tradie.user.firstName} ${tradie.user.lastName}`;
-  const trades = tradie.tradeCategories.map((t) => TRADE_MAP[t] ?? t.replace(/_/g, ' '));
+  const trades = tradie.trades.map((t) => TRADE_MAP[t] ?? t.replace(/_/g, ' '));
   const primaryTrade = trades[0] ?? 'Tradie';
-  const suburb = tradie.suburb ?? 'Australia';
+  const suburb = 'Australia';
   const rating = tradie.avgRating ? Number(tradie.avgRating) : null;
   const isVerified = tradie.verificationStatus === 'VERIFIED';
 
@@ -140,7 +142,6 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
                 {/* Trust badges */}
                 <div className="mt-3 flex flex-wrap gap-2">
                   {isVerified && <span className="flex items-center gap-1 rounded-full bg-brand-500/15 px-2.5 py-1 text-xs font-medium text-brand-400"><CheckCircle size={11} />Licensed</span>}
-                  {tradie.isInsured && <span className="flex items-center gap-1 rounded-full bg-green-500/15 px-2.5 py-1 text-xs font-medium text-green-400"><Shield size={11} />Insured</span>}
                   {tradie.responseTimeMinutes && <span className="flex items-center gap-1 rounded-full bg-orange-500/15 px-2.5 py-1 text-xs font-medium text-orange-400"><Clock size={11} />{tradie.responseTimeMinutes}min avg response</span>}
                   <span className="flex items-center gap-1 rounded-full bg-purple-500/15 px-2.5 py-1 text-xs font-medium text-purple-400"><CheckCircle size={11} />Background Checked</span>
                 </div>
@@ -179,11 +180,11 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
             )}
 
             {/* Reviews */}
-            {tradie.reviews.length > 0 && (
+            {reviews.length > 0 && (
               <div className="rounded-2xl bg-white/4 border border-white/8 p-6">
                 <h2 className="mb-4 font-semibold text-white">Customer Reviews</h2>
                 <div className="space-y-4">
-                  {tradie.reviews.map((review) => (
+                  {reviews.map((review) => (
                     <div key={review.id} className="border-b border-white/8 pb-4 last:border-0 last:pb-0">
                       <div className="flex items-center gap-2 mb-1">
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-white/8 text-xs font-bold text-gray-300">
@@ -196,7 +197,7 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
                           ))}
                         </div>
                       </div>
-                      {review.comment && <p className="text-sm text-gray-400">{review.comment}</p>}
+                      {review.body && <p className="text-sm text-gray-400">{review.body}</p>}
                     </div>
                   ))}
                 </div>
@@ -214,17 +215,6 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
                 ))}
               </div>
             </div>
-
-            {tradie.servicedSuburbs && tradie.servicedSuburbs.length > 0 && (
-              <div className="rounded-2xl bg-white/4 border border-white/8 p-5">
-                <h3 className="mb-3 font-semibold text-white">Service Areas</h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {tradie.servicedSuburbs.slice(0, 10).map((s) => (
-                    <span key={s} className="rounded-full bg-white/8 px-2.5 py-1 text-xs text-gray-400">{s}</span>
-                  ))}
-                </div>
-              </div>
-            )}
 
             <div className="rounded-2xl bg-white/8 border border-white/8 p-5 text-white text-center">
               <p className="mb-2 font-semibold">Need {tradie.user.firstName} urgently?</p>

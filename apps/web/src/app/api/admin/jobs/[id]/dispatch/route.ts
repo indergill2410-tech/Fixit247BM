@@ -28,7 +28,7 @@ export async function POST(
     });
     if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
 
-    if (!['OPEN', 'MATCHING'].includes(job.status)) {
+    if (!['OPEN'].includes(job.status)) {
       return NextResponse.json({ error: `Job is ${job.status} — cannot re-dispatch` }, { status: 422 });
     }
 
@@ -40,7 +40,7 @@ export async function POST(
     const newBatch = (job.matchingBatchNo ?? 0) + 1;
 
     await db.$transaction([
-      db.job.update({ where: { id: jobId }, data: { status: 'MATCHING', matchingBatchNo: newBatch } }),
+      db.job.update({ where: { id: jobId }, data: { status: 'OPEN' as const, matchingBatchNo: newBatch } }),
       db.jobEvent.create({
         data: {
           jobId, type: 'JOB_REDISPATCHED' as never,

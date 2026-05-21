@@ -26,7 +26,7 @@ export async function POST(req: Request) {
         referrer: data.referrer,
         suburb: data.suburb,
         sessionId: data.sessionId,
-        metadata: data.metadata ?? {},
+        metadata: (data.metadata ?? {}) as import('@fixit247/database').Prisma.InputJsonValue,
         ipHash,
       },
     });

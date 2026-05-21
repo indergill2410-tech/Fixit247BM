@@ -35,7 +35,7 @@ export async function POST(request: Request) {
   const supabase = createServerClient(
     process.env['NEXT_PUBLIC_SUPABASE_URL']!,
     process.env['NEXT_PUBLIC_SUPABASE_ANON_KEY']!,
-    { cookies: { getAll() { return cookieStore.getAll(); }, setAll(c) { c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); } } },
+    { cookies: { getAll() { return cookieStore.getAll(); }, setAll(c: { name: string; value: string; options: Record<string, unknown> }[]) { c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); } } },
   );
 
   const { data: { user } } = await supabase.auth.getUser();
@@ -71,23 +71,23 @@ export async function POST(request: Request) {
           businessName: business?.businessName,
           abn: business?.abn ?? null,
           bio: business?.bio,
-          trades: (business?.trades ?? []) as import('@prisma/client').$Enums.TradeCategory[],
+          trades: (business?.trades ?? []) as import('@fixit247/database').TradeCategory[],
           serviceRadiusKm: business?.serviceRadiusKm ?? 25,
           yearsExperience: profile?.yearsExperience,
           hourlyRate: profile?.hourlyRate,
           calloutFee: profile?.calloutFee,
-          onboardingStatus: 'PENDING',
+          onboardingStatus: 'PENDING_REVIEW',
           onboardingStep: 4,
           verificationStatus: 'PENDING',
         },
         update: {
           businessName: business?.businessName,
           bio: business?.bio,
-          trades: (business?.trades ?? []) as import('@prisma/client').$Enums.TradeCategory[],
+          trades: (business?.trades ?? []) as import('@fixit247/database').TradeCategory[],
           yearsExperience: profile?.yearsExperience,
           hourlyRate: profile?.hourlyRate,
           calloutFee: profile?.calloutFee,
-          onboardingStatus: 'PENDING',
+          onboardingStatus: 'PENDING_REVIEW',
           verificationStatus: 'PENDING',
         },
       });

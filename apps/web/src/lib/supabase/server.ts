@@ -15,9 +15,9 @@ export function createServerClientFromCookies(cookieStore: ReadonlyRequestCookie
   return createServerClient(url, key, {
     cookies: {
       getAll() { return cookieStore.getAll(); },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: { name: string; value: string; options: Record<string, unknown> }[]) {
         cookiesToSet.forEach(({ name, value, options }) => {
-          try { cookieStore.set(name, value, options); } catch { /* read-only context */ }
+          try { cookieStore.set(name, value, options as never); } catch { /* read-only context */ }
         });
       },
     },

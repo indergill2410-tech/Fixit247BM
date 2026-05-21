@@ -26,8 +26,6 @@ export async function GET(req: NextRequest) {
       orderBy: [{ status: 'asc' }, { createdAt: 'desc' }],
       take: limit,
       include: {
-        customer: { select: { id: true, name: true, email: true } },
-        tradie: { select: { id: true, name: true, email: true } },
         job: { select: { id: true, title: true, status: true } },
       },
     });

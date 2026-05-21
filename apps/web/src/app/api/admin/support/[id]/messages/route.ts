@@ -10,7 +10,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     const { id } = await params;
 
     const [ticket, messages] = await Promise.all([
-      db.supportTicket.findUnique({ where: { id }, include: { user: { select: { id: true, name: true, email: true, role: true } } } }),
+      db.supportTicket.findUnique({ where: { id } }),
       db.supportMessage.findMany({ where: { ticketId: id }, orderBy: { createdAt: 'asc' } }),
     ]);
 
