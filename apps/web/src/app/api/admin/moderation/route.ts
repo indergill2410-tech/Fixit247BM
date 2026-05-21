@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
 
 const ActionSchema = z.object({
@@ -43,8 +44,7 @@ export async function POST(req: NextRequest) {
     if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     const data = ActionSchema.parse(await req.json());
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const ops: any[] = [
+    const ops: Prisma.PrismaPromise<unknown>[] = [
       db.moderationAction.create({
         data: { adminId: session.id, ...data, expiresAt: data.expiresAt ? new Date(data.expiresAt) : null } as never,
       }),
