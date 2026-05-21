@@ -25,6 +25,8 @@ const CreateJobSchema = z.object({
   aiConfidenceScore: z.number().int().min(0).max(100).optional(),
   complexity: z.enum(['SIMPLE', 'MEDIUM', 'COMPLEX']).default('MEDIUM'),
   leadPrice: z.number().positive().optional(),
+  // Optional promo/coupon code applied at booking time
+  promoCode: z.string().min(1).max(50).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -49,6 +51,22 @@ export async function POST(req: NextRequest) {
 
     if (!customerProfile) {
       return NextResponse.json({ error: 'Customer profile not found' }, { status: 404 });
+    }
+
+    // Validate optional promo code (static lookup — no DB round-trip)
+    const PROMO_CODES: Record<string, { discountPercent: number; description: string }> = {
+      'FIRST20':     { discountPercent: 20, description: '20% off your first job' },
+      'WELCOME10':   { discountPercent: 10, description: '10% off for new customers' },
+      'EMERGENCY15': { discountPercent: 15, description: '15% off emergency callouts' },
+    };
+
+    let promoDiscount: { discountPercent: number; description: string } | null = null;
+    if (data.promoCode) {
+      const normalised = data.promoCode.trim().toUpperCase();
+      promoDiscount = PROMO_CODES[normalised] ?? null;
+      if (!promoDiscount) {
+        return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 400 });
+      }
     }
 
     const job = await db.$transaction(async (tx) => {
@@ -99,7 +117,15 @@ export async function POST(req: NextRequest) {
       logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
     });
 
-    return NextResponse.json({ job }, { status: 201 });
+    return NextResponse.json({
+      job,
+      ...(promoDiscount && {
+        promoApplied: {
+          discountPercent: promoDiscount.discountPercent,
+          description: promoDiscount.description,
+        },
+      }),
+    }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid job data', details: err.errors }, { status: 400 });

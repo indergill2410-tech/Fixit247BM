@@ -123,8 +123,15 @@ export async function POST(request: Request) {
       }
     });
 
+    // Award 10 free credits to the tradie on first onboarding completion
+    await db.creditsWallet.upsert({
+      where: { userId: user.id },
+      create: { userId: user.id, balance: 10, lifetimeEarned: 10, lifetimeSpent: 0 },
+      update: {}, // do not overwrite an existing wallet balance
+    });
+
     await supabase.auth.updateUser({ data: { onboardingComplete: true } });
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, freeCreditsAwarded: 10 });
   } catch (err) {
     logger.error('Tradie onboarding error:', err);
     return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
