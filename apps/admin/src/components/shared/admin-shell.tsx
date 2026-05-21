@@ -53,7 +53,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <div className="flex h-16 items-center justify-between px-4">
             <HeaderBrand name="Fixit247 Admin" />
             <button
-              onClick={() => setCollapsed(!collapsed)}
+              onClick={() => { setCollapsed(!collapsed); }}
               className="rounded-lg p-1 hover:bg-muted"
               aria-label="Toggle sidebar"
             >
@@ -71,7 +71,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   active={pathname.startsWith(item.href)}
                   collapsed={collapsed}
-                  {...('badge' in item && item.badge !== undefined ? { badge: item.badge } : {})}
+                  {...('badge' in item ? { badge: item.badge } : {})}
                 />
               ))}
             </div>
