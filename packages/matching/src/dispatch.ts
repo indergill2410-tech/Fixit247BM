@@ -87,21 +87,38 @@ export async function matchAndDispatch(job: JobForMatching): Promise<void> {
       cancellationRate: true,
       responseTimeMinutes: true,
       trustScore: true,
-      realtimeStatus: {
-        select: {
-          onlineStatus: true,
-          currentLatitude: true,
-          currentLongitude: true,
-          activeJobCount: true,
-        },
-      },
     },
   });
+
+  if (tradieCandidates.length === 0) {
+    await db.jobEvent.create({
+      data: {
+        jobId: job.id,
+        type: 'MATCHING_STARTED',
+        metadata: { totalCandidates: 0, matched: 0, searchRadiusKm: job.isEmergency ? 50 : 30 },
+      },
+    });
+    return;
+  }
+
+  // Fetch realtime status for those tradies in a single query
+  const tradieIds = tradieCandidates.map((t) => t.id);
+  const realtimeStatuses = await db.tradieRealtimeStatus.findMany({
+    where: { tradieId: { in: tradieIds } },
+    select: {
+      tradieId: true,
+      onlineStatus: true,
+      currentLatitude: true,
+      currentLongitude: true,
+      activeJobCount: true,
+    },
+  });
+  const rtMap = new Map(realtimeStatuses.map((rt) => [rt.tradieId, rt]));
 
   // 4. Map DB records to TradieCandidate shape
   const candidates: TradieCandidate[] = tradieCandidates
     .map((t) => {
-      const rt = t.realtimeStatus;
+      const rt = rtMap.get(t.id);
       const lat = rt?.currentLatitude ? Number(rt.currentLatitude) : null;
       const lon = rt?.currentLongitude ? Number(rt.currentLongitude) : null;
       // Skip tradies without a known location
