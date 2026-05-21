@@ -45,7 +45,7 @@ export async function GET() {
     JSON.stringify({
       status: 'ok',
       route: 'twilio-inbound',
-      webhookBase: (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, ''),
+      webhookBase: (process.env['NEXT_PUBLIC_APP_URL'] ?? '').replace(/\/$/, ''),
       twilio: {
         accountSid: process.env['TWILIO_ACCOUNT_SID'] ? 'set' : 'MISSING',
         authToken: process.env['TWILIO_AUTH_TOKEN'] ? 'set' : 'MISSING',
