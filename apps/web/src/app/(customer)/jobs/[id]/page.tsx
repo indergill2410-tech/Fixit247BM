@@ -35,7 +35,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
   if (!job) notFound();
 
   const acceptedClaim = job.claims[0];
-  const tradieUser = acceptedClaim.tradie.user;
+  const tradieUser = acceptedClaim?.tradie.user;
 
   const PRIORITY_BADGE: Record<string, 'emergency' | 'warning' | 'default'> = {
     EMERGENCY: 'emergency',
