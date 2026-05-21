@@ -186,7 +186,7 @@ export async function middleware(request: NextRequest) {
     const { data: dbUser } = await supabase
       .from('users')
       .select('role, onboarding_complete')
-      .eq('email', user.email ?? '')
+      .eq('id', user.id)
       .single();
 
     if (dbUser) {
