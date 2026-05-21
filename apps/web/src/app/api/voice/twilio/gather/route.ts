@@ -13,32 +13,41 @@ import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 
+const APP_BASE = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
+
+function extractPathname(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    return url.split('?')[0] ?? '/api/voice/twilio/gather';
+  }
+}
+
 function validateTwilioSignature(req: Request, body: string): boolean {
   const twilioSignature = req.headers.get('x-twilio-signature');
   const authToken = process.env['TWILIO_AUTH_TOKEN'];
 
   if (!authToken) {
-    logger.warn('TWILIO_AUTH_TOKEN not set — skipping signature validation');
+    logger.warn('[gather] TWILIO_AUTH_TOKEN not set — skipping signature validation');
     return true;
   }
   if (!twilioSignature) {
     if (process.env['NODE_ENV'] === 'production') {
-      logger.warn('Gather: missing x-twilio-signature in production — rejecting');
+      logger.warn('[gather] No x-twilio-signature in production — rejecting');
       return false;
     }
     return true;
   }
 
-  // Derive URL from actual request so signature validates for any configured path
-  const reqUrl = new URL(req.url);
-  const base = (process.env['NEXT_PUBLIC_APP_URL'] ?? `${reqUrl.protocol}//${reqUrl.host}`).replace(/\/$/, '');
-  const url = `${base}${reqUrl.pathname}${reqUrl.search}`;
+  const pathname = extractPathname(req.url);
+  const url = `${APP_BASE}${pathname}`;
+
   const params = Object.fromEntries(new URLSearchParams(body));
   const sortedKeys = Object.keys(params).sort();
   const data = url + sortedKeys.map((k) => `${k}${params[k] ?? ''}`).join('');
   const expected = crypto.createHmac('sha1', authToken).update(data).digest('base64');
   const valid = expected === twilioSignature;
-  if (!valid) logger.warn('Twilio gather: signature mismatch', { url });
+  logger.info('[gather] Signature check', { url, valid });
   return valid;
 }
 
@@ -158,20 +167,43 @@ async function createJobFromCallData(
   }
 }
 
+function gatherErrorTwiml(message: string): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Gather input="speech" action="${APP_BASE}/api/voice/twilio/gather" method="POST"
+    speechTimeout="auto" language="en-AU">
+    <Say voice="Polly.Nicole" language="en-AU">${message}</Say>
+  </Gather>
+  <Say voice="Polly.Nicole" language="en-AU">Sorry, I didn't catch that. Please call back if the issue persists.</Say>
+  <Hangup/>
+</Response>`;
+}
+
 export async function POST(req: Request) {
-  logger.info('[twilio/gather] POST received', { url: req.url });
-  const body = await req.text();
+  let body = '';
+  try {
+    body = await req.text();
+  } catch (err) {
+    logger.error('[gather] Failed to read request body', { error: String(err) });
+    return new NextResponse(
+      gatherErrorTwiml("Sorry, something went wrong. Please try again."),
+      { headers: { 'Content-Type': 'text/xml; charset=utf-8' } },
+    );
+  }
+
+  logger.info('[gather] POST received', { url: req.url, bodyLength: body.length });
 
   if (!validateTwilioSignature(req, body)) {
+    logger.error('[gather] Signature invalid — returning 403');
     return new NextResponse('Forbidden', { status: 403 });
   }
 
   const params = Object.fromEntries(new URLSearchParams(body));
   const callSid = params['CallSid'];
   const speechResult = (params['SpeechResult'] ?? '').trim();
-  const webhookBase = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
+  const webhookBase = APP_BASE;
 
-  logger.info('Gather received', { callSid, speechLength: speechResult.length });
+  logger.info('[gather] Speech received', { callSid, speechLength: speechResult.length, speech: speechResult.slice(0, 60) });
 
   if (!callSid) {
     logger.error('Gather: missing CallSid');

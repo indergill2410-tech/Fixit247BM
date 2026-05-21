@@ -7,63 +7,87 @@ import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 
+const APP_BASE = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
+
+function errorTwiml(): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Nicole" language="en-AU">Sorry, we experienced a technical issue. Please call back in a moment. Fixit 24/7 apologises for the inconvenience.</Say>
+  <Hangup/>
+</Response>`;
+}
+
+function extractPathname(url: string): string {
+  try {
+    return new URL(url).pathname;
+  } catch {
+    // req.url is relative (e.g. "/api/voice/twilio/inbound") — split off query string
+    return url.split('?')[0] ?? '/api/voice/twilio/inbound';
+  }
+}
+
 function validateTwilioSignature(req: Request, body: string): boolean {
   const twilioSignature = req.headers.get('x-twilio-signature');
   const authToken = process.env['TWILIO_AUTH_TOKEN'];
 
   if (!authToken) {
-    logger.warn('TWILIO_AUTH_TOKEN not set — skipping signature validation');
+    logger.warn('[inbound] TWILIO_AUTH_TOKEN not set — skipping signature validation');
     return true;
   }
+
   if (!twilioSignature) {
-    // Allow in dev, reject in prod
     if (process.env['NODE_ENV'] === 'production') {
-      logger.warn('Missing x-twilio-signature header in production — rejecting');
+      logger.warn('[inbound] No x-twilio-signature — likely not a Twilio request');
       return false;
     }
     return true;
   }
 
-  // Use the actual request URL so signature validates correctly for any configured path
-  const reqUrl = new URL(req.url);
-  const base = (process.env['NEXT_PUBLIC_APP_URL'] ?? `${reqUrl.protocol}//${reqUrl.host}`).replace(/\/$/, '');
-  const url = `${base}${reqUrl.pathname}${reqUrl.search}`;
+  const pathname = extractPathname(req.url);
+  const url = `${APP_BASE}${pathname}`;
+
   const params = Object.fromEntries(new URLSearchParams(body));
   const sortedKeys = Object.keys(params).sort();
   const data = url + sortedKeys.map((k) => `${k}${params[k] ?? ''}`).join('');
   const expected = crypto.createHmac('sha1', authToken).update(data).digest('base64');
   const valid = expected === twilioSignature;
-  if (!valid) logger.warn('Twilio signature mismatch', { url, expected: '[hidden]', received: '[hidden]' });
+
+  logger.info('[inbound] Signature check', { url, valid });
   return valid;
 }
 
-// GET: quick liveness check — lets you verify the route is reachable before
-// setting it in the Twilio console. Returns 200 with JSON summary.
+// GET: quick liveness check — curl https://fixit247bm.onrender.com/api/voice/twilio/inbound
 export async function GET() {
   checkEnvOnce();
-  return new NextResponse(
-    JSON.stringify({
-      status: 'ok',
-      route: 'twilio-inbound',
-      webhookBase: (process.env['NEXT_PUBLIC_APP_URL'] ?? '').replace(/\/$/, ''),
-      twilio: {
-        accountSid: process.env['TWILIO_ACCOUNT_SID'] ? 'set' : 'MISSING',
-        authToken: process.env['TWILIO_AUTH_TOKEN'] ? 'set' : 'MISSING',
-        phoneNumber: process.env['TWILIO_PHONE_NUMBER'] ?? 'MISSING',
-      },
-      db: process.env['DATABASE_URL'] ? 'configured' : 'MISSING',
-      openai: process.env['OPENAI_API_KEY'] ? 'configured' : 'MISSING',
-    }),
-    { headers: { 'Content-Type': 'application/json' } },
-  );
+  return NextResponse.json({
+    status: 'ok',
+    route: 'twilio-inbound',
+    webhookBase: APP_BASE,
+    env: {
+      TWILIO_ACCOUNT_SID: process.env['TWILIO_ACCOUNT_SID'] ? 'set' : 'MISSING',
+      TWILIO_AUTH_TOKEN: process.env['TWILIO_AUTH_TOKEN'] ? 'set' : 'MISSING',
+      TWILIO_PHONE_NUMBER: process.env['TWILIO_PHONE_NUMBER'] ?? 'MISSING',
+      OPENAI_API_KEY: process.env['OPENAI_API_KEY'] ? 'set' : 'MISSING',
+      DATABASE_URL: process.env['DATABASE_URL'] ? 'set' : 'MISSING',
+    },
+  });
 }
 
 export async function POST(req: Request) {
   checkEnvOnce();
-  logger.info('[twilio/inbound] POST received', { url: req.url });
-  const body = await req.text();
+
+  let body = '';
+  try {
+    body = await req.text();
+  } catch (err) {
+    logger.error('[inbound] Failed to read request body', { error: String(err) });
+    return new NextResponse(errorTwiml(), { headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
+  }
+
+  logger.info('[inbound] POST received', { url: req.url, bodyLength: body.length });
 
   if (!validateTwilioSignature(req, body)) {
+    logger.error('[inbound] Signature invalid — returning 403');
     return new NextResponse('Forbidden', { status: 403 });
   }
 
@@ -72,13 +96,14 @@ export async function POST(req: Request) {
   const from = params['From'] ?? 'unknown';
   const to = params['To'] ?? 'unknown';
 
-  logger.info('Inbound call', { callSid, from, to });
+  logger.info('[inbound] Call received', { callSid, from, to });
 
   if (!callSid) {
-    logger.error('Inbound: missing CallSid');
-    return new NextResponse('Bad Request', { status: 400 });
+    logger.error('[inbound] Missing CallSid — returning error TwiML');
+    return new NextResponse(errorTwiml(), { headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
   }
 
+  // Persist call record — errors are non-fatal, caller must hear a response regardless
   try {
     await db.voiceCall.create({
       data: {
@@ -89,21 +114,20 @@ export async function POST(req: Request) {
         answeredAt: new Date(),
       },
     });
-    logger.info('VoiceCall created', { callSid });
+    logger.info('[inbound] VoiceCall persisted', { callSid });
   } catch (err) {
-    // Log but don't drop the call — caller must still hear a response
-    logger.error('Failed to persist VoiceCall', {
+    logger.error('[inbound] DB write failed — continuing without persistence', {
       callSid,
       error: err instanceof Error ? err.message : String(err),
     });
   }
 
-  const webhookBase = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
-  const twiml = buildGreetingTwiML(webhookBase);
-
-  logger.info('Returning greeting TwiML', { callSid });
-
-  return new NextResponse(twiml, {
-    headers: { 'Content-Type': 'text/xml; charset=utf-8' },
-  });
+  try {
+    const twiml = buildGreetingTwiML(APP_BASE);
+    logger.info('[inbound] Returning greeting TwiML', { callSid, twimlLength: twiml.length });
+    return new NextResponse(twiml, { headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
+  } catch (err) {
+    logger.error('[inbound] buildGreetingTwiML failed', { callSid, error: String(err) });
+    return new NextResponse(errorTwiml(), { headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
+  }
 }
