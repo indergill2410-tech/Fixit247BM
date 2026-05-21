@@ -3,6 +3,8 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { rateLimit, rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
+import { matchAndDispatch } from '@fixit247/matching';
 import { logger } from '@/lib/logger';
 
 const CreateJobSchema = z.object({
@@ -27,7 +29,16 @@ const CreateJobSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    // IP-level guard first (before auth) to stop unauthenticated flood
+    const ipRl = rateLimit(req, LIMITS.api);
+    if (!ipRl.success) return rateLimitResponse(ipRl);
+
     const session = await requireSession();
+
+    // Per-user rate limit: 10 job creations per hour
+    const userRl = rateLimitByUser(session.id, LIMITS.jobsCreate);
+    if (!userRl.success) return rateLimitResponse(userRl);
+
     const body = await req.json();
     const data = CreateJobSchema.parse(body);
 
@@ -80,6 +91,12 @@ export async function POST(req: NextRequest) {
       });
 
       return newJob;
+    });
+
+    // Fire-and-forget: trigger matching engine asynchronously
+    // We do not await this — job creation response is not blocked by matching
+    void matchAndDispatch(job).catch((err: unknown) => {
+      logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
     });
 
     return NextResponse.json({ job }, { status: 201 });

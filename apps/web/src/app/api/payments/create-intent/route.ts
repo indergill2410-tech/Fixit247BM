@@ -5,6 +5,7 @@ import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { stripe, calculateJobPricing } from '@fixit247/payments';
 import { logger } from '@/lib/logger';
+import { rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
 
 const Schema = z.object({
   jobId: z.string().uuid(),
@@ -17,6 +18,10 @@ export async function POST(req: NextRequest) {
     if (session.role !== 'CUSTOMER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
+
+    // Per-user rate limit: 5 payment intents per hour
+    const userRl = rateLimitByUser(session.id, LIMITS.paymentIntent);
+    if (!userRl.success) return rateLimitResponse(userRl);
 
     const body = await req.json();
     const { jobId, agreedPrice } = Schema.parse(body);

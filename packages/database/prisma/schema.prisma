@@ -526,6 +526,7 @@ model Job {
   @@index([createdAt])
   // Composite indexes for common filtered queries
   @@index([status, category])
+  @@index([status, category, createdAt])
   @@index([status, isEmergency])
   @@index([tradieId, status])
   @@index([customerId, status])
@@ -665,6 +666,7 @@ model Notification {
   // Composite for "unread notifications for user" — most common notification query
   @@index([userId, readAt])
   @@index([userId, createdAt])
+  @@index([userId, readAt, createdAt])
   @@map("notifications")
 }
 
@@ -886,6 +888,7 @@ model JobMatchingQueue {
   @@index([status])
   @@index([batchNumber])
   @@index([expiresAt])
+  @@index([jobId, status])
   @@map("job_matching_queue")
 }
 
@@ -1745,6 +1748,7 @@ model VoiceCall {
   @@index([customerId])
   @@index([status])
   @@index([startedAt])
+  @@index([status, startedAt])
   @@index([twilioCallSid])
   @@map("voice_calls")
 }
