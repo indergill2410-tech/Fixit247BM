@@ -9,6 +9,32 @@ export const runtime = 'nodejs';
 
 const APP_BASE = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
 
+// Simple in-memory rate limiter: max 5 calls per phone per 10 minutes
+const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
+const RATE_WINDOW_MS = 10 * 60 * 1000;
+const RATE_MAX_CALLS = 5;
+
+function isRateLimited(phoneNumber: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(phoneNumber);
+  if (!entry || now - entry.windowStart > RATE_WINDOW_MS) {
+    rateLimitMap.set(phoneNumber, { count: 1, windowStart: now });
+    // Prune old entries to avoid unbounded growth
+    if (rateLimitMap.size > 10_000) {
+      for (const [k, v] of rateLimitMap) {
+        if (now - v.windowStart > RATE_WINDOW_MS) rateLimitMap.delete(k);
+      }
+    }
+    return false;
+  }
+  entry.count += 1;
+  if (entry.count > RATE_MAX_CALLS) {
+    logger.warn('[inbound] Rate limit exceeded', { phoneNumber, count: entry.count });
+    return true;
+  }
+  return false;
+}
+
 function errorTwiml(): string {
   return `<?xml version="1.0" encoding="UTF-8"?>
 <Response>
@@ -101,6 +127,18 @@ export async function POST(req: Request) {
   if (!callSid) {
     logger.error('[inbound] Missing CallSid — returning error TwiML');
     return new NextResponse(errorTwiml(), { headers: { 'Content-Type': 'text/xml; charset=utf-8' } });
+  }
+
+  // Rate limit: politely reject spam callers
+  if (from !== 'unknown' && isRateLimited(from)) {
+    return new NextResponse(
+      `<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Say voice="Polly.Nicole" language="en-AU">You've reached the call limit for this period. Please try again in 10 minutes or visit fixit247.com.au to book online.</Say>
+  <Hangup/>
+</Response>`,
+      { headers: { 'Content-Type': 'text/xml; charset=utf-8' } },
+    );
   }
 
   // Persist call record — errors are non-fatal, caller must hear a response regardless
