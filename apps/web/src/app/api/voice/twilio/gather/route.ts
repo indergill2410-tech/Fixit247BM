@@ -13,7 +13,7 @@ import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 
-function validateTwilioSignature(req: Request, body: string, urlPath: string): boolean {
+function validateTwilioSignature(req: Request, body: string): boolean {
   const twilioSignature = req.headers.get('x-twilio-signature');
   const authToken = process.env['TWILIO_AUTH_TOKEN'];
 
@@ -22,11 +22,17 @@ function validateTwilioSignature(req: Request, body: string, urlPath: string): b
     return true;
   }
   if (!twilioSignature) {
-    return process.env['NODE_ENV'] !== 'production';
+    if (process.env['NODE_ENV'] === 'production') {
+      logger.warn('Gather: missing x-twilio-signature in production — rejecting');
+      return false;
+    }
+    return true;
   }
 
-  const base = (process.env['NEXT_PUBLIC_APP_URL'] ?? '').replace(/\/$/, '');
-  const url = `${base}${urlPath}`;
+  // Derive URL from actual request so signature validates for any configured path
+  const reqUrl = new URL(req.url);
+  const base = (process.env['NEXT_PUBLIC_APP_URL'] ?? `${reqUrl.protocol}//${reqUrl.host}`).replace(/\/$/, '');
+  const url = `${base}${reqUrl.pathname}${reqUrl.search}`;
   const params = Object.fromEntries(new URLSearchParams(body));
   const sortedKeys = Object.keys(params).sort();
   const data = url + sortedKeys.map((k) => `${k}${params[k] ?? ''}`).join('');
@@ -153,9 +159,10 @@ async function createJobFromCallData(
 }
 
 export async function POST(req: Request) {
+  logger.info('[twilio/gather] POST received', { url: req.url });
   const body = await req.text();
 
-  if (!validateTwilioSignature(req, body, '/api/voice/twilio/gather')) {
+  if (!validateTwilioSignature(req, body)) {
     return new NextResponse('Forbidden', { status: 403 });
   }
 

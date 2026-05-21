@@ -20,12 +20,13 @@ export async function POST(req: Request) {
     return new NextResponse('OK', { status: 200 });
   }
 
+  // Prisma CallStatus enum has no MISSED — map unanswered calls to ABANDONED
   const statusMap: Record<string, string> = {
     completed: 'COMPLETED',
-    busy: 'MISSED',
-    'no-answer': 'MISSED',
+    busy: 'ABANDONED',
+    'no-answer': 'ABANDONED',
     failed: 'FAILED',
-    canceled: 'MISSED',
+    canceled: 'ABANDONED',
   };
   const dbStatus = statusMap[callStatus ?? ''];
 

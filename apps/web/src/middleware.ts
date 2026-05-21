@@ -38,6 +38,7 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/tradie/',   // public tradie profiles (/tradie/[id])
   '/api/auth',
   '/api/voice/twilio', // Twilio webhooks — must be publicly reachable, no session
+  '/api/twilio',       // Compatibility path (Twilio console may use either prefix)
   '/_next',
   '/favicon',
 ];

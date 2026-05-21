@@ -27,7 +27,22 @@ const csp = [
 const nextConfig: NextConfig = {
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
-  transpilePackages: ['@fixit247/ui', '@fixit247/auth', '@fixit247/database', '@fixit247/payments', '@fixit247/ai'],
+  transpilePackages: [
+    '@fixit247/ui',
+    '@fixit247/auth',
+    '@fixit247/database',
+    '@fixit247/payments',
+    '@fixit247/ai',
+    '@fixit247/voice',      // ← was missing: used in /api/voice/twilio/* routes
+    '@fixit247/matching',
+    '@fixit247/realtime',
+    '@fixit247/notifications',
+    '@fixit247/fraud',
+    '@fixit247/seo',
+    '@fixit247/trust',
+    '@fixit247/referral',
+    '@fixit247/growth',
+  ],
   images: {
     remotePatterns: [
       { protocol: 'https', hostname: '*.supabase.co' },
