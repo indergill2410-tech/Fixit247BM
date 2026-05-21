@@ -71,7 +71,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
                   href={item.href}
                   active={pathname.startsWith(item.href)}
                   collapsed={collapsed}
-                  {...('badge' in item ? { badge: (item as typeof item & { badge: number }).badge } : {})}
+                  {...('badge' in item ? { badge: item.badge } : {})}
                 />
               ))}
             </div>
