@@ -7,6 +7,7 @@ import {
   handleSubscriptionUpdated,
   handleTransferCreated,
   handleConnectedAccountUpdated,
+  handleInvoicePaymentFailed,
 } from '@fixit247/payments';
 import { db } from '@fixit247/database';
 import { notify } from '@fixit247/notifications';
@@ -78,6 +79,15 @@ export async function POST(req: NextRequest) {
       case 'customer.subscription.deleted':
         await handleSubscriptionUpdated(event.data.object);
         break;
+      case 'invoice.payment_failed': {
+        await handleInvoicePaymentFailed(event.data.object);
+        const userId = (event.data.object as { subscription_details?: { metadata?: { userId?: string } } })
+          .subscription_details?.metadata?.userId;
+        if (userId) {
+          void notify({ userId, type: 'SYSTEM_ALERT', data: { title: 'Subscription payment failed', body: 'Your subscription payment failed. Please update your payment method to keep your account active.' } });
+        }
+        break;
+      }
       case 'transfer.created':
         await handleTransferCreated(event.data.object);
         break;

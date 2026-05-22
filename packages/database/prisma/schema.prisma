@@ -148,6 +148,7 @@ enum SubscriptionStatus {
   CANCELLED
   PAUSED
   EXPIRED
+  PAST_DUE
 }
 
 enum TransactionType {

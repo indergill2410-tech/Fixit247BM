@@ -19,3 +19,6 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS "disputes_status_createdAt_idx" ON "disp
 -- CHECK constraint to prevent negative credit balances (belt + suspenders alongside SELECT FOR UPDATE)
 ALTER TABLE "credits_wallets" ADD CONSTRAINT "credits_wallets_balance_non_negative"
   CHECK (balance >= 0);
+
+-- Add PAST_DUE to SubscriptionStatus enum for invoice.payment_failed webhook
+ALTER TYPE "SubscriptionStatus" ADD VALUE IF NOT EXISTS 'PAST_DUE';
