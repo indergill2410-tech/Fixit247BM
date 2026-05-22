@@ -1,6 +1,5 @@
 import { stripe } from './stripe';
 import { db } from '@fixit247/database';
-import type { Prisma } from '@fixit247/database';
 
 export async function releaseJobPayment(jobId: string): Promise<{ payoutId: string }> {
   const payment = await db.payment.findUnique({ where: { jobId } });

@@ -31,7 +31,7 @@ export async function deductCreditsForJob(opts: {
   return db.$transaction(async (tx) => {
     // SELECT FOR UPDATE locks the row so concurrent transactions queue behind this one,
     // preventing the TOCTOU race where two requests both see sufficient balance.
-    const rows = await tx.$queryRaw<Array<{ balance: number }>>`
+    const rows = await tx.$queryRaw<{ balance: number }[]>`
       SELECT balance FROM credits_wallets WHERE "userId" = ${opts.userId}::uuid FOR UPDATE
     `;
     const currentBalance = Number(rows[0]?.balance ?? 0);
