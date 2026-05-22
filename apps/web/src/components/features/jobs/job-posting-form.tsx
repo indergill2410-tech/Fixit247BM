@@ -34,6 +34,15 @@ const URGENCY_OPTIONS = [
   { id: 'STANDARD', label: 'Scheduled', sublabel: 'I can wait a day or two', icon: '📅', color: 'border-white/20 bg-white/6 text-gray-300' },
 ];
 
+interface SavedAddress {
+  id: string;
+  street: string;
+  suburb: string;
+  state: string;
+  postcode: string;
+  isDefault: boolean;
+}
+
 interface FormData {
   category: string;
   description: string;
@@ -44,6 +53,7 @@ interface FormData {
   voiceNoteUrl?: string;
   preferredTime?: string;
   complexity: 'SIMPLE' | 'MEDIUM' | 'COMPLEX';
+  addressId?: string;
 }
 
 interface AIScopeResult {
@@ -71,6 +81,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
   const [isSubmitting, setIsSubmitting] = React.useState(false);
   const [aiResult, setAiResult] = React.useState<AIScopeResult | null>(null);
   const [showAiScope, setShowAiScope] = React.useState(false);
+  const [addresses, setAddresses] = React.useState<SavedAddress[]>([]);
 
   const [formData, setFormData] = React.useState<FormData>({
     category: isEmergencyMode ? '' : '',
@@ -81,6 +92,21 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
   });
 
   const updateForm = (updates: Partial<FormData>) => { setFormData((prev) => ({ ...prev, ...updates })); };
+
+  // Load customer addresses when reaching step 3
+  React.useEffect(() => {
+    if (step !== 3 || addresses.length > 0) return;
+    fetch('/api/customer/addresses')
+      .then((r) => r.json())
+      .then((json: { addresses?: SavedAddress[] }) => {
+        const list = json.addresses ?? [];
+        setAddresses(list);
+        const def = list.find((a) => a.isDefault) ?? list[0];
+        if (def && !formData.addressId) updateForm({ addressId: def.id });
+      })
+      .catch(() => undefined);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step]);
 
   const analyzeWithAI = async () => {
     if (!formData.description && formData.mediaUrls.length === 0) return;
@@ -139,6 +165,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
           isEmergency: formData.priority === 'EMERGENCY',
           budgetMin: formData.budgetMin,
           budgetMax: formData.budgetMax,
+          addressId: formData.addressId,
           mediaUrls: formData.mediaUrls,
           voiceNoteUrl: formData.voiceNoteUrl,
           preferredTime: formData.preferredTime,
@@ -320,13 +347,41 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
             <p className="mb-6 text-sm text-gray-500">Tell tradies where you are and your rough budget (optional).</p>
 
             <div className="space-y-5">
-              {/* Location (from profile — just show suburb) */}
-              <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/4 p-4">
-                <MapPin size={18} className="text-brand-400 shrink-0" />
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-medium text-white">Your location</p>
-                  <p className="text-xs text-gray-500">Using your saved address — change in profile</p>
-                </div>
+              {/* Address picker */}
+              <div>
+                <p className="mb-2 text-sm font-medium text-gray-400 flex items-center gap-2">
+                  <MapPin size={14} className="text-brand-400" />
+                  Job location
+                </p>
+                {addresses.length === 0 ? (
+                  <div className="rounded-xl border border-white/8 bg-white/4 p-4 text-xs text-gray-500">
+                    Loading your saved addresses…
+                  </div>
+                ) : (
+                  <div className="space-y-2">
+                    {addresses.map((addr) => (
+                      <button
+                        key={addr.id}
+                        type="button"
+                        onClick={() => { updateForm({ addressId: addr.id }); }}
+                        className={cn(
+                          'w-full flex items-center gap-3 rounded-xl border p-3 text-left text-sm transition-all',
+                          formData.addressId === addr.id
+                            ? 'border-brand-500 bg-brand-500/10 text-white ring-2 ring-brand-500/30'
+                            : 'border-white/10 bg-white/4 text-gray-400 hover:border-brand-500/40'
+                        )}
+                      >
+                        <MapPin size={14} className="shrink-0 text-brand-400" />
+                        <span className="flex-1 truncate">
+                          {addr.street}, {addr.suburb} {addr.state} {addr.postcode}
+                        </span>
+                        {addr.isDefault && (
+                          <span className="text-xs text-brand-400">Default</span>
+                        )}
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Budget */}
