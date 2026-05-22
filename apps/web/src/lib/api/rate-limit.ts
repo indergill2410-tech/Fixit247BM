@@ -5,10 +5,9 @@ interface RateLimitEntry {
   resetAt: number;
 }
 
-// In-memory store — single-instance only. Use Redis in multi-instance production.
+// In-memory fallback — used when Upstash env vars are not set (development)
 const store = new Map<string, RateLimitEntry>();
 
-// Prune expired entries every 5 minutes to avoid memory leaks
 setInterval(
   () => {
     const now = Date.now();
@@ -20,11 +19,8 @@ setInterval(
 );
 
 export interface RateLimitOptions {
-  /** Max requests per window */
   limit: number;
-  /** Window duration in seconds */
   windowSecs: number;
-  /** Key suffix to namespace different limits */
   key?: string;
 }
 
@@ -43,13 +39,8 @@ function getClientIp(req: NextRequest): string {
   );
 }
 
-export function rateLimit(req: NextRequest, opts: RateLimitOptions): RateLimitResult {
-  const { limit, windowSecs, key = 'default' } = opts;
-  const ip = getClientIp(req);
-  const storeKey = `rl:${key}:${ip}`;
+function inMemoryLimit(storeKey: string, limit: number, windowMs: number): RateLimitResult {
   const now = Date.now();
-  const windowMs = windowSecs * 1000;
-
   const entry = store.get(storeKey);
 
   if (!entry || entry.resetAt <= now) {
@@ -64,6 +55,58 @@ export function rateLimit(req: NextRequest, opts: RateLimitOptions): RateLimitRe
 
   entry.count++;
   return { success: true, limit, remaining: limit - entry.count, resetAt: entry.resetAt };
+}
+
+// Lazily-initialised Upstash limiter cache (key: `${limit}:${windowSecs}`)
+interface UpstashRateLimiter {
+  limit(key: string): Promise<{ success: boolean; remaining: number; reset: number; limit: number }>;
+}
+
+const upstashLimiters = new Map<string, UpstashRateLimiter>();
+
+async function getUpstashLimiter(limit: number, windowSecs: number): Promise<UpstashRateLimiter | null> {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) return null;
+
+  const cacheKey = `${limit}:${windowSecs}`;
+  const cached = upstashLimiters.get(cacheKey);
+  if (cached) return cached;
+
+  try {
+    const [{ Redis }, { Ratelimit }] = await Promise.all([
+      import('@upstash/redis'),
+      import('@upstash/ratelimit'),
+    ]);
+    const limiter = new Ratelimit({
+      redis: new Redis({ url, token }),
+      limiter: Ratelimit.slidingWindow(limit, `${windowSecs}s`),
+      analytics: false,
+    }) as unknown as UpstashRateLimiter;
+    upstashLimiters.set(cacheKey, limiter);
+    return limiter;
+  } catch {
+    return null;
+  }
+}
+
+export async function rateLimit(req: NextRequest, opts: RateLimitOptions): Promise<RateLimitResult> {
+  const { limit, windowSecs, key = 'default' } = opts;
+  const ip = getClientIp(req);
+  const storeKey = `rl:${key}:${ip}`;
+
+  const upstash = await getUpstashLimiter(limit, windowSecs);
+  if (upstash) {
+    const result = await upstash.limit(storeKey);
+    return {
+      success: result.success,
+      limit: result.limit,
+      remaining: result.remaining,
+      resetAt: result.reset,
+    };
+  }
+
+  return inMemoryLimit(storeKey, limit, windowSecs * 1000);
 }
 
 export function rateLimitResponse(result: RateLimitResult): NextResponse {
@@ -81,7 +124,6 @@ export function rateLimitResponse(result: RateLimitResult): NextResponse {
   );
 }
 
-/** Preconfigured limits for common route types */
 export const LIMITS = {
   auth: { limit: 10, windowSecs: 60, key: 'auth' },
   // Login: 5 attempts per 15 minutes per IP

@@ -1,5 +1,6 @@
 import path from 'path';
 import type { NextConfig } from 'next';
+import { withSentryConfig } from '@sentry/nextjs';
 
 const isProd = process.env['NODE_ENV'] === 'production';
 
@@ -27,11 +28,7 @@ const csp = [
 
 const nextConfig: NextConfig = {
   output: 'standalone',
-  // Trace files from the workspace root so monorepo packages (Prisma engine,
-  // payments, matching, etc.) are included in the standalone bundle.
   outputFileTracingRoot: path.resolve(__dirname, '../../'),
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
   transpilePackages: [
     '@fixit247/ui',
     '@fixit247/auth',
@@ -97,4 +94,12 @@ const nextConfig: NextConfig = {
   },
 };
 
-export default nextConfig;
+export default withSentryConfig(nextConfig, {
+  org: process.env.SENTRY_ORG,
+  project: process.env.SENTRY_PROJECT ?? 'fixit247-web',
+  silent: !process.env.CI,
+  widenClientFileUpload: true,
+  hideSourceMaps: true,
+  disableLogger: true,
+  automaticVercelMonitors: false,
+});

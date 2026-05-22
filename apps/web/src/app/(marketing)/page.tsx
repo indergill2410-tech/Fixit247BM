@@ -4,9 +4,18 @@ import { ArrowRight, CheckCircle2, Clock, MapPin, Phone, Shield, Star, Zap } fro
 import { RecentActivityFeed } from '@/components/features/growth/recent-activity-feed';
 import { HowItWorksTabs } from '@/components/features/marketing/how-it-works-tabs';
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247.com.au';
+
 export const metadata: Metadata = {
   title: 'Fixit 24/7 | Emergency Tradies, Verified & Available Now',
   description: 'Australia\'s most trusted emergency trades platform. Verified plumbers, electricians, locksmiths & more — dispatched in minutes, 24/7.',
+  alternates: { canonical: APP_URL },
+  openGraph: {
+    url: APP_URL,
+    title: 'Fixit 24/7 | Emergency Tradies, Verified & Available Now',
+    description: 'Australia\'s most trusted emergency trades platform. Verified plumbers, electricians, locksmiths & more — dispatched in minutes, 24/7.',
+    images: [{ url: `${APP_URL}/og-home.png`, width: 1200, height: 630, alt: 'Fixit 24/7' }],
+  },
 };
 
 export default function HomePage() {

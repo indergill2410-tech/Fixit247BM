@@ -11,8 +11,10 @@
   },
   "dependencies": {
     "@fixit247/database": "workspace:*",
-    "@supabase/supabase-js": "^2.43.4",
     "@supabase/ssr": "^0.5.0",
+    "@supabase/supabase-js": "^2.43.4",
+    "@upstash/ratelimit": "^2.0.8",
+    "@upstash/redis": "^1.38.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {

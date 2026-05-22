@@ -518,7 +518,8 @@ export const SubscriptionStatus: {
   ACTIVE: 'ACTIVE',
   CANCELLED: 'CANCELLED',
   PAUSED: 'PAUSED',
-  EXPIRED: 'EXPIRED'
+  EXPIRED: 'EXPIRED',
+  PAST_DUE: 'PAST_DUE'
 };
 
 export type SubscriptionStatus = (typeof SubscriptionStatus)[keyof typeof SubscriptionStatus]

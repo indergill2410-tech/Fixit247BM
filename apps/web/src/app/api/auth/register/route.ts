@@ -5,8 +5,7 @@ import { registerSchema } from '@/lib/validators/auth';
 import { rateLimit, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
 
 export async function POST(request: NextRequest) {
-  // 3 requests per hour per IP
-  const rl = rateLimit(request, LIMITS.register);
+  const rl = await rateLimit(request, LIMITS.register);
   if (!rl.success) return rateLimitResponse(rl);
   const body = await request.json() as unknown;
   const parsed = registerSchema.safeParse(body);

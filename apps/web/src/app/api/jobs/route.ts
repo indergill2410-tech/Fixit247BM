@@ -32,7 +32,7 @@ const CreateJobSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     // IP-level guard first (before auth) to stop unauthenticated flood
-    const ipRl = rateLimit(req, LIMITS.api);
+    const ipRl = await rateLimit(req, LIMITS.api);
     if (!ipRl.success) return rateLimitResponse(ipRl);
 
     const session = await requireSession();
