@@ -1666,7 +1666,8 @@ exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
   ACTIVE: 'ACTIVE',
   CANCELLED: 'CANCELLED',
   PAUSED: 'PAUSED',
-  EXPIRED: 'EXPIRED'
+  EXPIRED: 'EXPIRED',
+  PAST_DUE: 'PAST_DUE'
 };
 
 exports.TransactionType = exports.$Enums.TransactionType = {

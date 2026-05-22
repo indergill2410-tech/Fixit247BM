@@ -148,6 +148,7 @@ enum SubscriptionStatus {
   CANCELLED
   PAUSED
   EXPIRED
+  PAST_DUE
 }
 
 enum TransactionType {
@@ -530,6 +531,7 @@ model Job {
   @@index([status, isEmergency])
   @@index([tradieId, status])
   @@index([customerId, status])
+  @@index([status, createdAt])
   @@map("jobs")
 }
 
@@ -694,12 +696,13 @@ model Payment {
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
 
-  job Job @relation(fields: [jobId], references: [id])
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([tradieId])
   @@index([status])
   @@index([createdAt])
+  @@index([status, createdAt])
   @@map("payments")
 }
 
@@ -1327,12 +1330,13 @@ model Dispute {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  job Job @relation(fields: [jobId], references: [id])
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([tradieId])
   @@index([status])
   @@index([createdAt])
+  @@index([status, createdAt])
   @@map("disputes")
 }
 
