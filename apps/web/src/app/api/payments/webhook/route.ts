@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     event.type === 'payment_intent.succeeded' ||
     event.type === 'payment_intent.payment_failed'
   ) {
-    const pi = event.data.object as Stripe.PaymentIntent;
+    const pi = event.data.object as unknown as Stripe.PaymentIntent;
     const existing = await db.payment.findUnique({
       where: { stripePaymentIntentId: pi.id },
       select: { status: true },
@@ -91,15 +91,15 @@ export async function POST(req: NextRequest) {
         break;
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
-        await handleSubscriptionUpdated(event.data.object as Stripe.Subscription);
+        await handleSubscriptionUpdated(event.data.object as unknown as Stripe.Subscription);
         markEventProcessed(event.id);
         break;
       case 'transfer.created':
-        await handleTransferCreated(event.data.object as Stripe.Transfer);
+        await handleTransferCreated(event.data.object as unknown as Stripe.Transfer);
         markEventProcessed(event.id);
         break;
       case 'account.updated':
-        await handleConnectedAccountUpdated(event.data.object as Stripe.Account);
+        await handleConnectedAccountUpdated(event.data.object as unknown as Stripe.Account);
         markEventProcessed(event.id);
         break;
       default:

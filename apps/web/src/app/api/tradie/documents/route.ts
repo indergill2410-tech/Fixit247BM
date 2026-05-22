@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
 import { requireRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';

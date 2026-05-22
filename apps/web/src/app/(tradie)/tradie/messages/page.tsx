@@ -19,6 +19,7 @@ export default async function TradieMessagesPage() {
   });
 
   // Get jobs where this tradie is assigned, with latest message
+  // Message has no sender relation — use senderId and compare against session.id
   const activeJobs = tradieProfile
     ? await db.job.findMany({
         where: {
@@ -29,9 +30,7 @@ export default async function TradieMessagesPage() {
           messages: {
             orderBy: { createdAt: 'desc' },
             take: 1,
-            include: {
-              sender: { select: { firstName: true, lastName: true, role: true } },
-            },
+            select: { id: true, senderId: true, content: true, createdAt: true, readAt: true, receiverId: true },
           },
           customer: {
             include: {
@@ -84,6 +83,7 @@ export default async function TradieMessagesPage() {
             const lastMsg = job.messages[0];
             const unreadCount = job._count.messages;
             const customer = job.customer.user;
+            const isFromMe = lastMsg?.senderId === session.id;
 
             return (
               <Link
@@ -122,7 +122,7 @@ export default async function TradieMessagesPage() {
 
                   {lastMsg ? (
                     <p className={`mt-1 truncate text-xs ${unreadCount > 0 ? 'font-semibold text-gray-200' : 'text-gray-500'}`}>
-                      {lastMsg.sender.role !== 'TRADIE' ? `${lastMsg.sender.firstName}: ` : 'You: '}
+                      {isFromMe ? 'You: ' : `${customer.firstName ?? 'Customer'}: `}
                       {lastMsg.content}
                     </p>
                   ) : (

@@ -159,7 +159,7 @@ export async function middleware(request: NextRequest) {
         role = cached.role;
       } else {
         const meta = user.user_metadata as Record<string, unknown>;
-        role = (meta['role'] as Role | undefined) ?? 'CUSTOMER';
+        role = (meta.role as Role | undefined) ?? 'CUSTOMER';
       }
       return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
     }
@@ -190,13 +190,13 @@ export async function middleware(request: NextRequest) {
       .single();
 
     if (dbUser) {
-      role = (dbUser['role'] as Role | undefined) ?? 'CUSTOMER';
-      onboardingComplete = Boolean(dbUser['onboarding_complete'] ?? false);
+      role = (dbUser.role as Role | undefined) ?? 'CUSTOMER';
+      onboardingComplete = Boolean(dbUser.onboarding_complete ?? false);
     } else {
       // Fallback to JWT metadata if DB lookup fails (e.g. new user not yet synced)
       const meta = user.user_metadata as Record<string, unknown>;
-      role = (meta['role'] as Role | undefined) ?? 'CUSTOMER';
-      onboardingComplete = Boolean((meta['onboardingComplete'] as boolean | undefined) ?? false);
+      role = (meta.role as Role | undefined) ?? 'CUSTOMER';
+      onboardingComplete = Boolean((meta.onboardingComplete as boolean | undefined) ?? false);
     }
 
     // Write the cache cookie onto the response
@@ -209,7 +209,7 @@ export async function middleware(request: NextRequest) {
     response.cookies.set(ROLE_CACHE_COOKIE, serializeRoleCache(cachePayload), {
       httpOnly: true,
       sameSite: 'lax',
-      secure: process.env['NODE_ENV'] === 'production',
+      secure: process.env.NODE_ENV === 'production',
       maxAge: Math.floor(ROLE_CACHE_TTL_MS / 1000),
       path: '/',
     });

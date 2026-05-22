@@ -97,7 +97,7 @@ export default function TradieDocumentsPage() {
           fileUrl: fakeUrl,
           fileSize: file.size,
           mimeType: file.type,
-          expiresAt: expiryDates[type] ? new Date(expiryDates[type]!).toISOString() : undefined,
+          expiresAt: expiryDates[type] ? new Date(expiryDates[type]).toISOString() : undefined,
         }),
       });
 
@@ -171,7 +171,7 @@ export default function TradieDocumentsPage() {
               {requiredTypes.map((type) => {
                 const config = DOC_CONFIG[type];
                 const doc = getDocForType(type);
-                const statusCfg = STATUS_CONFIG[doc?.status ?? 'UNVERIFIED']!;
+                const statusCfg = STATUS_CONFIG[doc?.status ?? 'UNVERIFIED'];
                 const isUploading = uploading === type;
 
                 return (
@@ -264,7 +264,7 @@ export default function TradieDocumentsPage() {
               {optionalTypes.map((type) => {
                 const config = DOC_CONFIG[type];
                 const doc = getDocForType(type);
-                const statusCfg = STATUS_CONFIG[doc?.status ?? 'UNVERIFIED']!;
+                const statusCfg = STATUS_CONFIG[doc?.status ?? 'UNVERIFIED'];
                 const isUploading = uploading === type;
 
                 return (

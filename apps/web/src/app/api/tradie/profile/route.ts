@@ -1,4 +1,6 @@
-import { NextRequest, NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
+import { NextResponse } from 'next/server';
+import type { TradeCategory } from '@fixit247/database';
 import { requireRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
@@ -52,7 +54,7 @@ export async function PATCH(req: NextRequest) {
       data: {
         ...(data.businessName !== undefined && { businessName: data.businessName }),
         ...(data.bio !== undefined && { bio: data.bio }),
-        ...(data.trades !== undefined && { trades: data.trades as import('@prisma/client').$Enums.TradeCategory[] }),
+        ...(data.trades !== undefined && { trades: data.trades as TradeCategory[] }),
         ...(data.hourlyRate !== undefined && { hourlyRate: data.hourlyRate }),
         ...(data.calloutFee !== undefined && { calloutFee: data.calloutFee }),
         ...(data.yearsExperience !== undefined && { yearsExperience: data.yearsExperience }),

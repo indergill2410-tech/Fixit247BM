@@ -10,7 +10,7 @@
 export async function register() {
   // Only validate on the Node.js runtime (server side).
   // Edge runtime does not have process.exit and has a restricted env surface.
-  if (process.env['NEXT_RUNTIME'] === 'nodejs') {
+  if (process.env.NEXT_RUNTIME === 'nodejs') {
     const { validateEnv } = await import('@/lib/validate-env');
     validateEnv();
   }

@@ -101,7 +101,7 @@ export default function TradieAvailabilityPage() {
     }
   };
 
-  const currentOption = STATUS_OPTIONS.find((o) => o.id === status) ?? STATUS_OPTIONS[2]!;
+  const currentOption = STATUS_OPTIONS.find((o) => o.id === status) ?? STATUS_OPTIONS[2];
 
   if (isLoading) {
     return (
@@ -266,7 +266,7 @@ export default function TradieAvailabilityPage() {
                     h.isAvailable ? 'bg-brand-500 text-gray-900' : 'bg-white/8 text-gray-500',
                   )}
                 >
-                  {DAYS[idx]!.slice(0, 2)}
+                  {DAYS[idx]?.slice(0, 2)}
                 </button>
                 <span className="w-20 text-sm font-medium text-gray-300 shrink-0">{DAYS[idx]}</span>
                 {h.isAvailable ? (
