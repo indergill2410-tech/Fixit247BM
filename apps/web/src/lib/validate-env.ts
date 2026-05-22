@@ -29,7 +29,7 @@ export function validateEnv(): Env {
   if (!requiredResult.success) {
     const errors = requiredResult.error.flatten().fieldErrors;
     const missing = Object.entries(errors)
-      .map(([key, msgs]) => `  ${key}: ${(msgs ?? []).join(', ')}`)
+      .map(([key, msgs]) => `  ${key}: ${msgs.join(', ')}`)
       .join('\n');
 
     console.error(
