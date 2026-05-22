@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const DEFAULT_CONFIG: Record<string, string> = {
   platform_fee_percent: '15',
@@ -27,7 +28,7 @@ export async function GET() {
 
     return NextResponse.json({ config: configMap });
   } catch (err) {
-    console.error('[GET /api/admin/pricing]', err);
+    logger.error('[GET /api/admin/pricing]', err);
     return NextResponse.json({ error: 'Failed to fetch config' }, { status: 500 });
   }
 }
@@ -59,7 +60,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: true, updated: Object.keys(updates).length });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Invalid data', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/admin/pricing]', err);
+    logger.error('[PATCH /api/admin/pricing]', err);
     return NextResponse.json({ error: 'Failed to update config' }, { status: 500 });
   }
 }

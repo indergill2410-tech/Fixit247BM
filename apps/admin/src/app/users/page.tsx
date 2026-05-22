@@ -1,29 +1,62 @@
 import type { Metadata } from 'next';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { Card, CardContent, Badge, Button } from '@fixit247/ui';
+import { db } from '@fixit247/database';
 import Link from 'next/link';
 
 export const metadata: Metadata = { title: 'User Management' };
+export const dynamic = 'force-dynamic';
 
-export default function UsersPage() {
+export default async function UsersPage() {
+  // Fetch accurate counts and the latest 100 users in parallel.
+  // Counts come from separate COUNT queries — never inferred from the
+  // limited result set, which would under-report on platforms with >100 users.
+  const [users, totalCount, customerCount, tradieCount, adminCount, suspendedCount] =
+    await Promise.all([
+      db.user.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+        },
+      }),
+      db.user.count(),
+      db.user.count({ where: { role: 'CUSTOMER' } }),
+      db.user.count({ where: { role: 'TRADIE' } }),
+      db.user.count({ where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } } }),
+      db.user.count({ where: { isActive: false } }),
+    ]);
+
   return (
     <AdminShell>
       <div className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Users</h1>
-          <p className="mt-1.5 text-sm text-gray-500">Manage all platform users</p>
-        </div>
-        <div className="flex gap-2">
-          <input placeholder="Search users…" className="rounded-xl border border-gray-200 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-brand-500" />
+          <p className="mt-1.5 text-sm text-gray-500">
+            {totalCount.toLocaleString()} total · {tradieCount} tradies · {suspendedCount} suspended
+          </p>
         </div>
       </div>
-      <div className="mb-4 flex gap-2">
-        {['All Users', 'Customers', 'Tradies', 'Admins', 'Suspended'].map((tab) => (
-          <button key={tab} className="rounded-lg px-3 py-1.5 text-sm font-medium text-gray-600 hover:bg-gray-100 first:bg-brand-50 first:text-brand-700">
-            {tab}
-          </button>
+
+      <div className="mb-4 flex gap-2 text-sm">
+        {[
+          { label: `All (${totalCount.toLocaleString()})` },
+          { label: `Customers (${customerCount.toLocaleString()})` },
+          { label: `Tradies (${tradieCount.toLocaleString()})` },
+          { label: `Admins (${adminCount.toLocaleString()})` },
+        ].map((tab) => (
+          <span key={tab.label} className="rounded-lg px-3 py-1.5 font-medium text-gray-600 bg-gray-100">
+            {tab.label}
+          </span>
         ))}
       </div>
+
       <Card>
         <CardContent className="p-0">
           <table className="w-full">
@@ -35,26 +68,42 @@ export default function UsersPage() {
               </tr>
             </thead>
             <tbody className="divide-y">
-              {MOCK_USERS.map((u) => (
+              {users.map((u) => (
                 <tr key={u.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-4 font-medium text-gray-900">{u.name}</td>
+                  <td className="px-4 py-4 font-medium text-gray-900">{u.firstName} {u.lastName}</td>
                   <td className="px-4 py-4 text-sm text-gray-500">{u.email}</td>
-                  <td className="px-4 py-4"><Badge variant={u.role === 'TRADIE' ? 'default' : 'secondary'}>{u.role}</Badge></td>
-                  <td className="px-4 py-4"><Badge variant={u.active ? 'success' : 'destructive'}>{u.active ? 'Active' : 'Suspended'}</Badge></td>
-                  <td className="px-4 py-4 text-sm text-gray-500">{u.joined}</td>
-                  <td className="px-4 py-4"><Button size="sm" variant="outline" asChild><Link href={`/users/${u.id}`}>View</Link></Button></td>
+                  <td className="px-4 py-4">
+                    <Badge variant={u.role === 'TRADIE' ? 'default' : u.role === 'ADMIN' || u.role === 'SUPER_ADMIN' ? 'destructive' : 'secondary'}>
+                      {u.role}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-4">
+                    <Badge variant={u.isActive ? 'success' : 'destructive'}>
+                      {u.isActive ? 'Active' : 'Suspended'}
+                    </Badge>
+                  </td>
+                  <td className="px-4 py-4 text-sm text-gray-500">
+                    {u.createdAt.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
+                  </td>
+                  <td className="px-4 py-4">
+                    <Button size="sm" variant="outline" asChild>
+                      <Link href={`/users/${u.id}`}>View</Link>
+                    </Button>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
+          {users.length === 0 && (
+            <p className="py-12 text-center text-sm text-gray-400">No users yet</p>
+          )}
+          {totalCount > 100 && (
+            <p className="border-t px-4 py-3 text-center text-xs text-gray-400">
+              Showing latest 100 of {totalCount.toLocaleString()} users
+            </p>
+          )}
         </CardContent>
       </Card>
     </AdminShell>
   );
 }
-
-const MOCK_USERS = [
-  { id: '1', name: 'Alice Johnson', email: 'alice@example.com', role: 'CUSTOMER', active: true, joined: 'May 10' },
-  { id: '2', name: 'Bob Smith', email: 'bob@example.com', role: 'TRADIE', active: true, joined: 'May 8' },
-  { id: '3', name: 'Carol White', email: 'carol@example.com', role: 'CUSTOMER', active: false, joined: 'May 5' },
-];

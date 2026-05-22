@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function PATCH(
   _req: NextRequest,
@@ -27,7 +28,7 @@ export async function PATCH(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[PATCH /api/notifications/:id/read]', err);
+    logger.error('[PATCH /api/notifications/:id/read]', err);
     return NextResponse.json({ error: 'Failed to mark as read' }, { status: 500 });
   }
 }

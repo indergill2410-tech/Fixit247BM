@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const ResolveSchema = z.object({
   resolution: z.enum(['RESOLVED_SAFE', 'RESOLVED_FRAUD', 'ESCALATED']),
@@ -23,7 +24,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ fla
     if (!flag) return NextResponse.json({ error: 'Flag not found' }, { status: 404 });
     return NextResponse.json({ flag });
   } catch (err) {
-    console.error('[GET /api/admin/fraud/:flagId]', err);
+    logger.error('[GET /api/admin/fraud/:flagId]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -56,7 +57,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ fl
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/admin/fraud/:flagId]', err);
+    logger.error('[PATCH /api/admin/fraud/:flagId]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

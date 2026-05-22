@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { db } from '@fixit247/database';
 import { customerOnboardingSchema } from '@/lib/validators/onboarding';
+import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
   const cookieStore = await cookies();
@@ -51,10 +52,17 @@ export async function POST(request: Request) {
       });
     });
 
+    // Award 5 referral/welcome credits to the customer on first onboarding completion
+    await db.creditsWallet.upsert({
+      where: { userId: user.id },
+      create: { userId: user.id, balance: 5, lifetimeEarned: 5, lifetimeSpent: 0 },
+      update: {}, // do not overwrite an existing wallet balance
+    });
+
     await supabase.auth.updateUser({ data: { firstName, lastName, onboardingComplete: true } });
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, freeCreditsAwarded: 5 });
   } catch (err) {
-    console.error('Customer onboarding error:', err);
+    logger.error('Customer onboarding error:', err);
     return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
   }
 }

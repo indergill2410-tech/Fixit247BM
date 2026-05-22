@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { getWalletBalance, getAvailableCreditPackages } from '@fixit247/payments';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -20,7 +21,7 @@ export async function GET() {
 
     return NextResponse.json({ balance, packages, subscription });
   } catch (err) {
-    console.error('[GET /api/credits/balance]', err);
+    logger.error('[GET /api/credits/balance]', err);
     return NextResponse.json({ error: 'Failed to fetch balance' }, { status: 500 });
   }
 }

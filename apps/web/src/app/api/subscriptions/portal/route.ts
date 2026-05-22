@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { createBillingPortalSession, cancelSubscription } from '@fixit247/payments';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -37,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ url });
   } catch (err) {
-    console.error('[POST /api/subscriptions/portal]', err);
+    logger.error('[POST /api/subscriptions/portal]', err);
     return NextResponse.json({ error: 'Failed to create portal session' }, { status: 500 });
   }
 }

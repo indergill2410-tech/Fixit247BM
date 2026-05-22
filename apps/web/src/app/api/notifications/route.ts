@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -30,7 +31,7 @@ export async function GET(req: NextRequest) {
       nextCursor: notifications.length === limit ? notifications[notifications.length - 1]?.createdAt.toISOString() : null,
     });
   } catch (err) {
-    console.error('[GET /api/notifications]', err);
+    logger.error('[GET /api/notifications]', err);
     return NextResponse.json({ error: 'Failed to fetch notifications' }, { status: 500 });
   }
 }
