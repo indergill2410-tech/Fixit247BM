@@ -11,7 +11,9 @@ services:
       pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/web build
-    startCommand: pnpm --filter @fixit247/web start
+    startCommand: >
+      cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static &&
+      node apps/web/.next/standalone/apps/web/server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
@@ -105,7 +107,9 @@ services:
       pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/admin build
-    startCommand: pnpm --filter @fixit247/admin start
+    startCommand: >
+      cp -r apps/admin/.next/static apps/admin/.next/standalone/apps/admin/.next/static &&
+      node apps/admin/.next/standalone/apps/admin/server.js
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION

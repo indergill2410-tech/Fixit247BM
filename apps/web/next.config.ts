@@ -1,3 +1,4 @@
+import path from 'path';
 import type { NextConfig } from 'next';
 
 const isProd = process.env['NODE_ENV'] === 'production';
@@ -25,6 +26,10 @@ const csp = [
   .join('; ');
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  // Trace files from the workspace root so monorepo packages (Prisma engine,
+  // payments, matching, etc.) are included in the standalone bundle.
+  outputFileTracingRoot: path.resolve(__dirname, '../../'),
   typescript: { ignoreBuildErrors: true },
   eslint: { ignoreDuringBuilds: true },
   transpilePackages: [
