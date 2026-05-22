@@ -1,10 +1,19 @@
 import webpush from 'web-push';
 
-webpush.setVapidDetails(
-  'mailto:' + (process.env['EMAIL_FROM'] ?? 'noreply@fixit247.com.au'),
-  process.env['NEXT_PUBLIC_VAPID_PUBLIC_KEY'] ?? '',
-  process.env['VAPID_PRIVATE_KEY'] ?? '',
-);
+let _vapidInitialized = false;
+function ensureVapid(): boolean {
+  if (_vapidInitialized) return true;
+  const pub = process.env['NEXT_PUBLIC_VAPID_PUBLIC_KEY'];
+  const priv = process.env['VAPID_PRIVATE_KEY'];
+  if (!pub || !priv) return false;
+  webpush.setVapidDetails(
+    'mailto:' + (process.env['EMAIL_FROM'] ?? 'noreply@fixit247.com.au'),
+    pub,
+    priv,
+  );
+  _vapidInitialized = true;
+  return true;
+}
 
 export interface PushPayload {
   title: string;
@@ -29,6 +38,8 @@ export async function sendPushNotification(
   userId: string,
   payload: PushPayload,
 ): Promise<void> {
+  if (!ensureVapid()) return;
+
   // Lazy-import db so this module can be used outside Next.js without
   // pulling in the full Prisma client at import-time.
   const { db } = await import('@fixit247/database');
