@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { db } from '@fixit247/database';
 import { ChevronRight, Shield, Star, MapPin, Zap, Users } from 'lucide-react';
 
+export const revalidate = 3600; // Re-generate suburb pages at most once per hour
+
 const STATE_MAP: Record<string, string> = {
   nsw: 'New South Wales',
   vic: 'Victoria',

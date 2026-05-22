@@ -11,7 +11,7 @@ export async function releaseJobPayment(jobId: string): Promise<{ payoutId: stri
   // Capture the held payment intent (releases funds)
   await stripe.paymentIntents.capture(payment.stripePaymentIntentId);
 
-  const payout = await db.$transaction(async (tx: Prisma.TransactionClient) => {
+  const payout = await db.$transaction(async (tx) => {
     await tx.payment.update({
       where: { jobId },
       data: { status: 'RELEASED', releasedAt: new Date() },

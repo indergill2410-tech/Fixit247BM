@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { db } from '@fixit247/database';
 import { ChevronRight, Clock, Shield, Star, MapPin, CheckCircle, Calendar } from 'lucide-react';
 
+export const revalidate = 3600; // Re-generate trade/suburb pages at most once per hour
+
 // Trade display names
 const TRADE_MAP: Record<string, { name: string; singular: string; emoji: string; description: string }> = {
   plumbing: { name: 'Plumbing', singular: 'Plumber', emoji: '🔧', description: 'from blocked drains and burst pipes to hot water systems and bathroom renovations' },

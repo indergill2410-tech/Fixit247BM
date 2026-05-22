@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { db } from '@fixit247/database';
 import { ChevronLeft, Star, Shield, Clock, MapPin, CheckCircle, Zap } from 'lucide-react';
 
+export const revalidate = 1800; // Re-generate tradie profiles at most every 30 minutes
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const tradie = await db.tradieProfile.findUnique({

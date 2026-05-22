@@ -1,23 +1,53 @@
 import { PrismaClient } from './generated/client';
 
+// ─── Soft-delete query extension ──────────────────────────────────────────────
+//
+// Automatically appends `deletedAt: null` to read operations on models that
+// support soft-delete. Admin code that intentionally queries deleted records
+// should bypass via db.$extends or raw $queryRaw.
+
+const SOFT_DELETE_MODELS = new Set(['User', 'CustomerProfile', 'TradieProfile', 'Address']);
+const READ_OPS = new Set(['findFirst', 'findMany', 'findUnique', 'count', 'aggregate']);
+
+function withSoftDeleteExtension(client: PrismaClient) {
+  return client.$extends({
+    query: {
+      $allModels: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        async $allOperations({ model, operation, args, query }: { model?: string; operation: string; args: any; query: (args: any) => Promise<any> }) {
+          if (model && SOFT_DELETE_MODELS.has(model) && READ_OPS.has(operation)) {
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+            args.where = { deletedAt: null, ...(args.where ?? {}) };
+          }
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+          return query(args);
+        },
+      },
+    },
+  });
+}
+
 // ─── Singleton Prisma client ───────────────────────────────────────────────────
 //
 // In development, Next.js reloads the module graph on every HMR cycle.
 // Attaching the instance to `globalThis` prevents exhausting the DB connection
 // pool by re-creating a client on each reload.
 
+type ExtendedPrismaClient = ReturnType<typeof withSoftDeleteExtension>;
+
 const globalForPrisma = globalThis as unknown as {
-  prisma: PrismaClient | undefined;
+  prisma: ExtendedPrismaClient | undefined;
 };
 
-export const db: PrismaClient =
-  globalForPrisma.prisma ??
-  new PrismaClient({
-    log:
-      process.env.NODE_ENV === 'development'
-        ? ['query', 'error', 'warn']
-        : ['error'],
-  });
+const baseClient = new PrismaClient({
+  log:
+    process.env.NODE_ENV === 'development'
+      ? ['query', 'error', 'warn']
+      : ['error'],
+});
+
+export const db: ExtendedPrismaClient =
+  globalForPrisma.prisma ?? withSoftDeleteExtension(baseClient);
 
 if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = db;

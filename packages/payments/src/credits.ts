@@ -29,9 +29,13 @@ export async function deductCreditsForJob(opts: {
 }): Promise<{ success: boolean; creditsDeducted: number; balanceAfter: number; error?: string }> {
   const creditCost = calculateCreditCost(opts.complexity, opts.priority, opts.subscriptionTier);
 
-  return db.$transaction(async (tx: Prisma.TransactionClient) => {
-    const wallet = await tx.creditsWallet.findUnique({ where: { userId: opts.userId } });
-    const currentBalance = Number(wallet?.balance ?? 0);
+  return db.$transaction(async (tx) => {
+    // SELECT FOR UPDATE locks the row so concurrent transactions queue behind this one,
+    // preventing the TOCTOU race where two requests both see sufficient balance.
+    const rows = await tx.$queryRaw<Array<{ balance: number }>>`
+      SELECT balance FROM credits_wallets WHERE "userId" = ${opts.userId}::uuid FOR UPDATE
+    `;
+    const currentBalance = Number(rows[0]?.balance ?? 0);
 
     if (currentBalance < creditCost) {
       return { success: false, creditsDeducted: 0, balanceAfter: currentBalance, error: 'Insufficient credits' };
@@ -71,7 +75,7 @@ export async function addCredits(opts: {
   referenceId?: string;
   packageId?: string;
 }): Promise<{ balanceAfter: number }> {
-  return db.$transaction(async (tx: Prisma.TransactionClient) => {
+  return db.$transaction(async (tx) => {
     const wallet = await tx.creditsWallet.upsert({
       where: { userId: opts.userId },
       create: {
