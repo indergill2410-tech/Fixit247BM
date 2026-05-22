@@ -91,18 +91,16 @@ interface UpstashLimiter {
   limit(key: string): Promise<{ success: boolean; remaining: number; reset: number; limit: number }>;
 }
 
-function makeUpstashLimiter(tokens: number, windowSeconds: number): UpstashLimiter | null {
+async function makeUpstashLimiter(tokens: number, windowSeconds: number): Promise<UpstashLimiter | null> {
   const url = process.env.UPSTASH_REDIS_REST_URL;
   const token = process.env.UPSTASH_REDIS_REST_TOKEN;
   if (!url || !token) return null;
 
   try {
-    // Dynamic require to avoid bundling Redis at import-time
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Redis } = require('@upstash/redis') as typeof import('@upstash/redis');
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const { Ratelimit } = require('@upstash/ratelimit') as typeof import('@upstash/ratelimit');
-
+    const [{ Redis }, { Ratelimit }] = await Promise.all([
+      import('@upstash/redis'),
+      import('@upstash/ratelimit'),
+    ]);
     const redis = new Redis({ url, token });
     const limiter = new Ratelimit({
       redis,
@@ -116,12 +114,13 @@ function makeUpstashLimiter(tokens: number, windowSeconds: number): UpstashLimit
 }
 
 async function checkWithUpstash(
-  limiter: UpstashLimiter | null,
+  getUpstash: () => Promise<UpstashLimiter | null>,
   fallback: RateLimiter,
   key: string,
   limit: number,
   windowMs: number,
 ): Promise<RateLimitResult> {
+  const limiter = await getUpstash();
   if (limiter) {
     const result = await limiter.limit(key);
     return {
@@ -135,30 +134,34 @@ async function checkWithUpstash(
 }
 
 // ─── Pre-configured limiters ──────────────────────────────────────────────────
+// Each limiter is lazily initialised on first use and cached for subsequent calls.
 
 export const LOGIN_LIMIT = 5;
 export const LOGIN_WINDOW_MS = 15 * 60 * 1000;
 const _loginFallback = new RateLimiter();
-const _loginUpstash = makeUpstashLimiter(LOGIN_LIMIT, LOGIN_WINDOW_MS / 1000);
+let _loginUpstash: Promise<UpstashLimiter | null> | undefined;
 
 export async function checkLoginRateLimit(ipAddress: string): Promise<RateLimitResult> {
-  return checkWithUpstash(_loginUpstash, _loginFallback, `login:${ipAddress}`, LOGIN_LIMIT, LOGIN_WINDOW_MS);
+  _loginUpstash ??= makeUpstashLimiter(LOGIN_LIMIT, LOGIN_WINDOW_MS / 1000);
+  return checkWithUpstash(() => _loginUpstash ?? Promise.resolve(null), _loginFallback, `login:${ipAddress}`, LOGIN_LIMIT, LOGIN_WINDOW_MS);
 }
 
 export const REGISTER_LIMIT = 3;
 export const REGISTER_WINDOW_MS = 60 * 60 * 1000;
 const _registerFallback = new RateLimiter();
-const _registerUpstash = makeUpstashLimiter(REGISTER_LIMIT, REGISTER_WINDOW_MS / 1000);
+let _registerUpstash: Promise<UpstashLimiter | null> | undefined;
 
 export async function checkRegisterRateLimit(ipAddress: string): Promise<RateLimitResult> {
-  return checkWithUpstash(_registerUpstash, _registerFallback, `register:${ipAddress}`, REGISTER_LIMIT, REGISTER_WINDOW_MS);
+  _registerUpstash ??= makeUpstashLimiter(REGISTER_LIMIT, REGISTER_WINDOW_MS / 1000);
+  return checkWithUpstash(() => _registerUpstash ?? Promise.resolve(null), _registerFallback, `register:${ipAddress}`, REGISTER_LIMIT, REGISTER_WINDOW_MS);
 }
 
 export const PASSWORD_RESET_LIMIT = 3;
 export const PASSWORD_RESET_WINDOW_MS = 60 * 60 * 1000;
 const _pwResetFallback = new RateLimiter();
-const _pwResetUpstash = makeUpstashLimiter(PASSWORD_RESET_LIMIT, PASSWORD_RESET_WINDOW_MS / 1000);
+let _pwResetUpstash: Promise<UpstashLimiter | null> | undefined;
 
 export async function checkPasswordResetRateLimit(email: string): Promise<RateLimitResult> {
-  return checkWithUpstash(_pwResetUpstash, _pwResetFallback, `pwreset:${email}`, PASSWORD_RESET_LIMIT, PASSWORD_RESET_WINDOW_MS);
+  _pwResetUpstash ??= makeUpstashLimiter(PASSWORD_RESET_LIMIT, PASSWORD_RESET_WINDOW_MS / 1000);
+  return checkWithUpstash(() => _pwResetUpstash ?? Promise.resolve(null), _pwResetFallback, `pwreset:${email}`, PASSWORD_RESET_LIMIT, PASSWORD_RESET_WINDOW_MS);
 }
