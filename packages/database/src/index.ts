@@ -7,7 +7,10 @@ import { PrismaClient } from './generated/client';
 // should bypass via db.$extends or raw $queryRaw.
 
 const SOFT_DELETE_MODELS = new Set(['User', 'CustomerProfile', 'TradieProfile', 'Address']);
-const READ_OPS = new Set(['findFirst', 'findMany', 'findUnique', 'count', 'aggregate']);
+// findUnique is excluded: Prisma rejects extra fields in unique-index where clauses.
+// We rewrite findUnique → findFirst so we can safely append deletedAt: null.
+const FILTER_OPS = new Set(['findFirst', 'findMany', 'count', 'aggregate']);
+const REWRITE_TO_FIRST_OPS = new Set(['findUnique', 'findUniqueOrThrow']);
 
 function withSoftDeleteExtension(client: PrismaClient) {
   return client.$extends({
@@ -15,9 +18,20 @@ function withSoftDeleteExtension(client: PrismaClient) {
       $allModels: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         async $allOperations({ model, operation, args, query }: { model?: string; operation: string; args: any; query: (args: any) => Promise<any> }) {
-          if (model && SOFT_DELETE_MODELS.has(model) && READ_OPS.has(operation)) {
-            // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-            args.where = { deletedAt: null, ...(args.where ?? {}) };
+          if (model && SOFT_DELETE_MODELS.has(model)) {
+            if (FILTER_OPS.has(operation)) {
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+              args.where = { deletedAt: null, ...(args.where ?? {}) };
+            } else if (REWRITE_TO_FIRST_OPS.has(operation)) {
+              // findUnique requires a pure unique-index where clause — adding
+              // deletedAt would cause a Prisma runtime error. Rewrite to
+              // findFirst so the soft-delete filter can be applied safely.
+              const rewrittenOp = operation === 'findUniqueOrThrow' ? 'findFirstOrThrow' : 'findFirst';
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
+              args.where = { deletedAt: null, ...(args.where ?? {}) };
+              // eslint-disable-next-line @typescript-eslint/no-unsafe-return, @typescript-eslint/no-explicit-any
+              return (client as any)[model][rewrittenOp](args);
+            }
           }
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
           return query(args);
