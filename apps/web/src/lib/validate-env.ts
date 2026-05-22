@@ -43,7 +43,7 @@ export function validateEnv(): Env {
   const optional = optionalResult.success ? optionalResult.data : {};
 
   // Warn about missing optional integrations so ops can see what's unconfigured
-  const missingOptional = (Object.keys(optionalSchema.shape) as Array<keyof typeof optionalSchema.shape>)
+  const missingOptional = (Object.keys(optionalSchema.shape) as (keyof typeof optionalSchema.shape)[])
     .filter((key) => !process.env[key]);
 
   if (missingOptional.length > 0) {
