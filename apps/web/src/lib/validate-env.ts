@@ -43,7 +43,7 @@ export function validateEnv(): Env {
   const optional = optionalResult.success ? optionalResult.data : {};
 
   // Warn about missing optional integrations so ops can see what's unconfigured
-  const missingOptional = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET', 'RESEND_API_KEY', 'TWILIO_ACCOUNT_SID']
+  const missingOptional = (Object.keys(optionalSchema.shape) as Array<keyof typeof optionalSchema.shape>)
     .filter((key) => !process.env[key]);
 
   if (missingOptional.length > 0) {
