@@ -51,7 +51,8 @@ async function seedTestUsers() {
       create: { email: c.email, firstName: c.firstName, lastName: c.lastName, phone: c.phone, role: 'CUSTOMER', isActive: true, emailVerified: new Date() },
       update: { isActive: true },
     });
-    const suburb = SUBURBS[i % SUBURBS.length]!;
+    const suburb = SUBURBS[i % SUBURBS.length];
+    if (!suburb) throw new Error(`SUBURBS array has no entry at index ${i % SUBURBS.length}`);
     const existingAddress = await db.address.findFirst({ where: { userId: user.id } });
     const address = existingAddress ?? await db.address.create({
       data: { userId: user.id, street: `${10 + i} Test St`, suburb: suburb.suburb, city: suburb.suburb, state: suburb.state, postcode: suburb.postcode, country: 'AU' },
@@ -145,8 +146,10 @@ async function seedTestJobs(customerProfiles: Awaited<ReturnType<typeof seedTest
 
   let created = 0;
   for (const [i, tmpl] of jobTemplates.entries()) {
-    const customer = customerProfiles[i % customerProfiles.length]!;
+    const customer = customerProfiles[i % customerProfiles.length];
+    if (!customer) throw new Error(`customerProfiles has no entry at index ${i % customerProfiles.length}`);
     const address = await db.address.findFirst({ where: { userId: customer.user.id } });
+    const assignedTradie = tradieProfiles[i % tradieProfiles.length];
 
     const jobBase = {
       title: tmpl.title,
@@ -160,21 +163,20 @@ async function seedTestJobs(customerProfiles: Awaited<ReturnType<typeof seedTest
     };
     const jobExtras = {
       ...(address?.id && { addressId: address.id }),
-      ...(tmpl.status !== 'OPEN' && { tradieId: tradieProfiles[i % tradieProfiles.length]!.profile.id }),
+      ...(tmpl.status !== 'OPEN' && assignedTradie && { tradieId: assignedTradie.profile.id }),
       ...(tmpl.status === 'COMPLETED' && { completedAt: new Date(Date.now() - i * 86400000) }),
       ...(tmpl.status === 'CLAIMED' && { claimedAt: new Date(Date.now() - i * 3600000) }),
     };
     const job = await db.job.create({ data: { ...jobBase, ...jobExtras } as never });
 
     // Add payment for completed jobs
-    if (tmpl.status === 'COMPLETED') {
-      const tradie = tradieProfiles[i % tradieProfiles.length]!;
+    if (tmpl.status === 'COMPLETED' && assignedTradie) {
       await db.payment.upsert({
         where: { jobId: job.id },
         create: {
           jobId: job.id,
           customerId: customer.profile.id,
-          tradieId: tradie.profile.id,
+          tradieId: assignedTradie.profile.id,
           amount: 150 + i * 25,
           platformFee: 15 + i * 2,
           tradieAmount: 135 + i * 23,

@@ -1,5 +1,4 @@
 import { db } from '@fixit247/database';
-import type { Prisma } from '@fixit247/database';
 import type { JobComplexity, JobPriority } from './pricing';
 import { calculateCreditCost } from './pricing';
 

@@ -532,7 +532,6 @@ model Job {
   @@index([tradieId, status])
   @@index([customerId, status])
   @@index([status, createdAt])
-  @@index([customerId, status])
   @@map("jobs")
 }
 
