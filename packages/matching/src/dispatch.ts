@@ -34,6 +34,9 @@ export interface JobForMatching {
  */
 export async function matchAndDispatch(job: JobForMatching): Promise<void> {
   // 1. Resolve job location from the address record (if present)
+  // If coordinates are missing or default to 0,0 ("Null Island" — off the coast of Africa),
+  // we cannot calculate meaningful distances for Australian jobs. Skip dispatch entirely
+  // and log for ops visibility so geocoding can be retried.
   let latitude = 0;
   let longitude = 0;
   let suburb = '';
@@ -50,6 +53,25 @@ export async function matchAndDispatch(job: JobForMatching): Promise<void> {
       suburb = address.suburb ?? '';
       state = address.state ?? '';
     }
+  }
+
+  // Reject coordinates at or near (0, 0) — no legitimate Australian address maps there.
+  // This guards against un-geocoded addresses silently producing wrong match results.
+  const hasValidCoords = Math.abs(latitude) > 0.01 || Math.abs(longitude) > 0.01;
+  if (!hasValidCoords) {
+    await db.jobEvent.create({
+      data: {
+        jobId: job.id,
+        type: 'MATCHING_STARTED',
+        metadata: {
+          totalCandidates: 0,
+          matched: 0,
+          skippedReason: 'missing_coordinates',
+          addressId: job.addressId ?? null,
+        },
+      },
+    });
+    return;
   }
 
   // 2. Build JobRequirements for the matching engine

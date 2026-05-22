@@ -982,6 +982,12 @@ exports.Prisma.AIConversationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.StripeProcessedEventScalarFieldEnum = {
+  eventId: 'eventId',
+  processedAt: 'processedAt',
+  eventType: 'eventType'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1487,6 +1493,11 @@ exports.Prisma.AIConversationOrderByRelevanceFieldEnum = {
   sessionId: 'sessionId',
   aiSummary: 'aiSummary',
   tradeCategory: 'tradeCategory'
+};
+
+exports.Prisma.StripeProcessedEventOrderByRelevanceFieldEnum = {
+  eventId: 'eventId',
+  eventType: 'eventType'
 };
 exports.Role = exports.$Enums.Role = {
   CUSTOMER: 'CUSTOMER',
@@ -2026,7 +2037,8 @@ exports.Prisma.ModelName = {
   VoiceCall: 'VoiceCall',
   VoiceEvent: 'VoiceEvent',
   EmergencyAssessment: 'EmergencyAssessment',
-  AIConversation: 'AIConversation'
+  AIConversation: 'AIConversation',
+  StripeProcessedEvent: 'StripeProcessedEvent'
 };
 
 /**

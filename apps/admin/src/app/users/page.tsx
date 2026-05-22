@@ -8,27 +8,30 @@ export const metadata: Metadata = { title: 'User Management' };
 export const dynamic = 'force-dynamic';
 
 export default async function UsersPage() {
-  const users = await db.user.findMany({
-    orderBy: { createdAt: 'desc' },
-    take: 100,
-    select: {
-      id: true,
-      firstName: true,
-      lastName: true,
-      email: true,
-      role: true,
-      isActive: true,
-      createdAt: true,
-    },
-  });
-
-  const counts = {
-    all: users.length,
-    customers: users.filter((u) => u.role === 'CUSTOMER').length,
-    tradies: users.filter((u) => u.role === 'TRADIE').length,
-    admins: users.filter((u) => u.role === 'ADMIN' || u.role === 'SUPER_ADMIN').length,
-    suspended: users.filter((u) => !u.isActive).length,
-  };
+  // Fetch accurate counts and the latest 100 users in parallel.
+  // Counts come from separate COUNT queries — never inferred from the
+  // limited result set, which would under-report on platforms with >100 users.
+  const [users, totalCount, customerCount, tradieCount, adminCount, suspendedCount] =
+    await Promise.all([
+      db.user.findMany({
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          email: true,
+          role: true,
+          isActive: true,
+          createdAt: true,
+        },
+      }),
+      db.user.count(),
+      db.user.count({ where: { role: 'CUSTOMER' } }),
+      db.user.count({ where: { role: 'TRADIE' } }),
+      db.user.count({ where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] } } }),
+      db.user.count({ where: { isActive: false } }),
+    ]);
 
   return (
     <AdminShell>
@@ -36,17 +39,17 @@ export default async function UsersPage() {
         <div>
           <h1 className="text-3xl font-bold text-gray-900">Users</h1>
           <p className="mt-1.5 text-sm text-gray-500">
-            {counts.all.toLocaleString()} total · {counts.tradies} tradies · {counts.suspended} suspended
+            {totalCount.toLocaleString()} total · {tradieCount} tradies · {suspendedCount} suspended
           </p>
         </div>
       </div>
 
       <div className="mb-4 flex gap-2 text-sm">
         {[
-          { label: `All (${counts.all})`, role: null },
-          { label: `Customers (${counts.customers})`, role: 'CUSTOMER' },
-          { label: `Tradies (${counts.tradies})`, role: 'TRADIE' },
-          { label: `Admins (${counts.admins})`, role: 'ADMIN' },
+          { label: `All (${totalCount.toLocaleString()})` },
+          { label: `Customers (${customerCount.toLocaleString()})` },
+          { label: `Tradies (${tradieCount.toLocaleString()})` },
+          { label: `Admins (${adminCount.toLocaleString()})` },
         ].map((tab) => (
           <span key={tab.label} className="rounded-lg px-3 py-1.5 font-medium text-gray-600 bg-gray-100">
             {tab.label}
@@ -93,6 +96,11 @@ export default async function UsersPage() {
           </table>
           {users.length === 0 && (
             <p className="py-12 text-center text-sm text-gray-400">No users yet</p>
+          )}
+          {totalCount > 100 && (
+            <p className="border-t px-4 py-3 text-center text-xs text-gray-400">
+              Showing latest 100 of {totalCount.toLocaleString()} users
+            </p>
           )}
         </CardContent>
       </Card>

@@ -1818,3 +1818,16 @@ model AIConversation {
   @@index([isEmergency])
   @@map("ai_conversations")
 }
+
+// ─── Stripe Webhook Idempotency ───────────────────────────────────────────────
+// Tracks processed Stripe event IDs so duplicate deliveries are safely skipped.
+// Works across multiple server instances and process restarts.
+
+model StripeProcessedEvent {
+  eventId     String   @id
+  processedAt DateTime @default(now())
+  eventType   String
+
+  @@index([processedAt])
+  @@map("stripe_processed_events")
+}

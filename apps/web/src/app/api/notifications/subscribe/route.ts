@@ -16,8 +16,11 @@ const SubscriptionSchema = z.object({
 /**
  * POST /api/notifications/subscribe
  * Save a Web Push subscription for the authenticated user.
- * Subscriptions are stored as a JSON array in the notification_preferences
- * table's push_subscriptions column (avoids a schema migration).
+ *
+ * If a subscription with the same endpoint already exists it is REPLACED —
+ * browsers can regenerate keys (new p256dh/auth) for the same endpoint, and
+ * stale keys cause silent push failures. We remove-then-append so the stored
+ * object always has the most recent keys.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -32,15 +35,15 @@ export async function POST(req: NextRequest) {
       update: {},
     });
 
-    // Append the new subscription (deduplicating by endpoint).
+    // Remove any existing entry for this endpoint, then append the fresh subscription.
+    // This handles re-registration (same endpoint, new crypto keys) correctly.
     await db.$executeRaw`
       UPDATE notification_preferences
-      SET push_subscriptions = COALESCE(push_subscriptions, '[]'::jsonb)
-        || CASE
-             WHEN push_subscriptions @> ${JSON.stringify([{ endpoint: sub.endpoint }])}::jsonb
-             THEN '[]'::jsonb
-             ELSE ${JSON.stringify([sub])}::jsonb
-           END
+      SET push_subscriptions = (
+        SELECT COALESCE(jsonb_agg(elem), '[]'::jsonb)
+        FROM jsonb_array_elements(COALESCE(push_subscriptions, '[]'::jsonb)) elem
+        WHERE elem->>'endpoint' != ${sub.endpoint}
+      ) || ${JSON.stringify([sub])}::jsonb
       WHERE "userId" = ${session.id}::uuid
     `;
 
