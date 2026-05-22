@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { z } from 'zod';
 import { initiateRefund } from '@fixit247/payments';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   jobId: z.string().uuid(),
@@ -26,7 +27,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, ...result });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Invalid data', details: err.errors }, { status: 400 });
-    console.error('[POST /api/payments/refund]', err);
+    logger.error('[POST /api/payments/refund]', err);
     return NextResponse.json({ error: 'Failed to initiate refund' }, { status: 500 });
   }
 }

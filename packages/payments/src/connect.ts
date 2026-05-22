@@ -38,29 +38,48 @@ export async function createPaymentIntent(opts: {
   connectedAccountId: string;
   platformFee: number;
   metadata: Record<string, string>;
+  jobId?: string;
 }) {
-  return stripe.paymentIntents.create({
-    amount: Math.round(opts.amount * 100),
-    currency: opts.currency,
-    customer: opts.customerId,
-    application_fee_amount: Math.round(opts.platformFee * 100),
-    transfer_data: { destination: opts.connectedAccountId },
-    metadata: opts.metadata,
-    capture_method: 'manual',
-  });
+  // Idempotency key prevents double-charges if the request is retried
+  const idempotencyKey = opts.jobId
+    ? `pi_${opts.jobId}_${opts.customerId}`
+    : undefined;
+
+  return stripe.paymentIntents.create(
+    {
+      amount: Math.round(opts.amount * 100),
+      currency: opts.currency,
+      customer: opts.customerId,
+      application_fee_amount: Math.round(opts.platformFee * 100),
+      transfer_data: { destination: opts.connectedAccountId },
+      metadata: opts.metadata,
+      capture_method: 'manual',
+    },
+    idempotencyKey ? { idempotencyKey } : undefined,
+  );
 }
 
 export async function capturePaymentIntent(paymentIntentId: string) {
-  return stripe.paymentIntents.capture(paymentIntentId);
+  // Idempotency key prevents double-capture if the request is retried
+  return stripe.paymentIntents.capture(
+    paymentIntentId,
+    {},
+    { idempotencyKey: `capture_${paymentIntentId}` },
+  );
 }
 
 export async function refundPayment(paymentIntentId: string, amount?: number) {
-  return stripe.refunds.create({
-    payment_intent: paymentIntentId,
-    ...(amount !== undefined && { amount: Math.round(amount * 100) }),
-    refund_application_fee: true,
-    reverse_transfer: true,
-  });
+  // Idempotency key uses a timestamp suffix so partial refunds can be retried
+  // independently, but a given retry window won't create duplicate refunds
+  return stripe.refunds.create(
+    {
+      payment_intent: paymentIntentId,
+      ...(amount !== undefined && { amount: Math.round(amount * 100) }),
+      refund_application_fee: true,
+      reverse_transfer: true,
+    },
+    { idempotencyKey: `refund_${paymentIntentId}_${Date.now()}` },
+  );
 }
 
 export function constructWebhookEvent(payload: string | Buffer, sig: string) {

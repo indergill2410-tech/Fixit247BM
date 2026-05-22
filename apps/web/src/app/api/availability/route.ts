@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const AvailabilitySchema = z.object({
   onlineStatus: z.enum(['ONLINE', 'OFFLINE', 'BUSY', 'EMERGENCY_ONLY', 'AWAY']),
@@ -60,7 +61,7 @@ export async function PATCH(req: NextRequest) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid data', details: err.errors }, { status: 400 });
     }
-    console.error('[PATCH /api/availability]', err);
+    logger.error('[PATCH /api/availability]', err);
     return NextResponse.json({ error: 'Failed to update availability' }, { status: 500 });
   }
 }
@@ -81,7 +82,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ status });
   } catch (err) {
-    console.error('[GET /api/availability]', err);
+    logger.error('[GET /api/availability]', err);
     return NextResponse.json({ error: 'Failed to fetch availability' }, { status: 500 });
   }
 }

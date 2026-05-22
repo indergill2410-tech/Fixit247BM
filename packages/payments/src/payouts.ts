@@ -8,8 +8,13 @@ export async function releaseJobPayment(jobId: string): Promise<{ payoutId: stri
   if (!payment.stripePaymentIntentId) throw new Error('No payment intent');
   if (payment.status !== 'HELD_IN_ESCROW') throw new Error('Payment not in escrow');
 
-  // Capture the held payment intent (releases funds)
-  await stripe.paymentIntents.capture(payment.stripePaymentIntentId);
+  // Capture the held payment intent (releases funds).
+  // Idempotency key prevents double-capture on retries.
+  await stripe.paymentIntents.capture(
+    payment.stripePaymentIntentId,
+    {},
+    { idempotencyKey: `capture_${payment.stripePaymentIntentId}` },
+  );
 
   const payout = await db.$transaction(async (tx) => {
     await tx.payment.update({

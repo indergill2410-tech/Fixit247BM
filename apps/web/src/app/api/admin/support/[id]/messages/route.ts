@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -18,7 +19,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     if (!ticket) return NextResponse.json({ error: 'Ticket not found' }, { status: 404 });
     return NextResponse.json({ ticket, messages });
   } catch (err) {
-    console.error('[GET /api/admin/support/:id/messages]', err);
+    logger.error('[GET /api/admin/support/:id/messages]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -38,7 +39,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ message }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/admin/support/:id/messages]', err);
+    logger.error('[POST /api/admin/support/:id/messages]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

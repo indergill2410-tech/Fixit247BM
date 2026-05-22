@@ -1,3 +1,4 @@
+import path from 'path';
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 
@@ -26,6 +27,8 @@ const csp = [
   .join('; ');
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
+  outputFileTracingRoot: path.resolve(__dirname, '../../'),
   transpilePackages: [
     '@fixit247/ui',
     '@fixit247/auth',

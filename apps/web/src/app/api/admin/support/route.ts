@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const CreateSchema = z.object({
   userId: z.string().uuid(),
@@ -36,7 +37,7 @@ export async function GET(req: NextRequest) {
     const counts = await db.supportTicket.groupBy({ by: ['status'], _count: { id: true }, where: { status: { not: 'CLOSED' } } });
     return NextResponse.json({ tickets, counts });
   } catch (err) {
-    console.error('[GET /api/admin/support]', err);
+    logger.error('[GET /api/admin/support]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -53,7 +54,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ticket }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/admin/support]', err);
+    logger.error('[POST /api/admin/support]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

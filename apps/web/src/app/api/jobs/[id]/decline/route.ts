@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function POST(
   req: NextRequest,
@@ -38,7 +39,7 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[POST /api/jobs/[id]/decline]', err);
+    logger.error('[POST /api/jobs/[id]/decline]', err);
     return NextResponse.json({ error: 'Failed to decline job' }, { status: 500 });
   }
 }

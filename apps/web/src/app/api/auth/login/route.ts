@@ -10,7 +10,7 @@ const loginSchema = z.object({
 });
 
 export async function POST(request: NextRequest) {
-  const rl = await rateLimit(request, LIMITS.auth);
+  const rl = await rateLimit(request, LIMITS.login);
   if (!rl.success) return rateLimitResponse(rl);
 
   const body = await request.json() as unknown;

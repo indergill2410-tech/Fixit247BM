@@ -1,6 +1,7 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       duration: result.duration,
     });
   } catch (err) {
-    console.error('[POST /api/ai/transcribe]', err);
+    logger.error('[POST /api/ai/transcribe]', err);
     return NextResponse.json({ error: 'Transcription failed' }, { status: 500 });
   }
 }

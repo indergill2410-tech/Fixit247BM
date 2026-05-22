@@ -5,6 +5,7 @@ import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { stripe, addCredits } from '@fixit247/payments';
 import { randomUUID } from 'crypto';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   packageId: z.string().uuid(),
@@ -72,7 +73,7 @@ export async function POST(req: NextRequest) {
     });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Invalid data', details: err.errors }, { status: 400 });
-    console.error('[POST /api/credits/purchase]', err);
+    logger.error('[POST /api/credits/purchase]', err);
     return NextResponse.json({ error: 'Failed to purchase credits' }, { status: 500 });
   }
 }

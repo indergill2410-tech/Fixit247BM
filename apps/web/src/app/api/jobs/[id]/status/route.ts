@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { notify } from '@fixit247/notifications';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   status: z.enum(['EN_ROUTE', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
@@ -104,7 +105,7 @@ export async function PATCH(
     return NextResponse.json({ job: updatedJob });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/jobs/:id/status]', err);
+    logger.error('[PATCH /api/jobs/:id/status]', err);
     return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
   }
 }
