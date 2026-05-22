@@ -34,9 +34,6 @@ export type { AuditAction, AuditLogEntry, LogAuthEventOptions } from './audit';
 // Rate limiting
 export {
   RateLimiter,
-  loginLimiter,
-  registerLimiter,
-  passwordResetLimiter,
   checkLoginRateLimit,
   checkRegisterRateLimit,
   checkPasswordResetRateLimit,

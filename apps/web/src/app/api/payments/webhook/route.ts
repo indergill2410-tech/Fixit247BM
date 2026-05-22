@@ -8,6 +8,8 @@ import {
   handleTransferCreated,
   handleConnectedAccountUpdated,
 } from '@fixit247/payments';
+import { db } from '@fixit247/database';
+import { notify } from '@fixit247/notifications';
 import type Stripe from 'stripe';
 
 export const runtime = 'nodejs';
@@ -28,12 +30,50 @@ export async function POST(req: NextRequest) {
 
   try {
     switch (event.type) {
-      case 'payment_intent.succeeded':
-        await handlePaymentIntentSucceeded(event.data.object);
+      case 'payment_intent.succeeded': {
+        const pi = event.data.object;
+        await handlePaymentIntentSucceeded(pi);
+        if (pi.metadata.jobId) {
+          const job = await db.job.findUnique({
+            where: { id: pi.metadata.jobId },
+            select: {
+              title: true,
+              customer: { select: { userId: true } },
+              tradie: { select: { businessName: true } },
+            },
+          });
+          if (job) {
+            const amount = (pi.amount / 100).toFixed(2);
+            const tradieName = job.tradie?.businessName ?? 'Your tradie';
+            void notify({
+              userId: job.customer.userId,
+              jobId: pi.metadata.jobId,
+              type: 'PAYMENT_HELD',
+              data: { amount, tradieName, jobTitle: job.title },
+            });
+          }
+        }
         break;
-      case 'payment_intent.payment_failed':
-        await handlePaymentIntentFailed(event.data.object);
+      }
+      case 'payment_intent.payment_failed': {
+        const pi = event.data.object;
+        await handlePaymentIntentFailed(pi);
+        if (pi.metadata.jobId) {
+          const job = await db.job.findUnique({
+            where: { id: pi.metadata.jobId },
+            select: { title: true, customer: { select: { userId: true } } },
+          });
+          if (job) {
+            void notify({
+              userId: job.customer.userId,
+              jobId: pi.metadata.jobId,
+              type: 'PAYMENT_FAILED',
+              data: { jobTitle: job.title },
+            });
+          }
+        }
         break;
+      }
       case 'customer.subscription.updated':
       case 'customer.subscription.deleted':
         await handleSubscriptionUpdated(event.data.object);

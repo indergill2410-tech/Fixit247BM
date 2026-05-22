@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { stripe, addCredits } from '@fixit247/payments';
+import { randomUUID } from 'crypto';
 
 const Schema = z.object({
   packageId: z.string().uuid(),
@@ -26,20 +27,26 @@ export async function POST(req: NextRequest) {
     const tradieProfile = await db.tradieProfile.findUnique({ where: { userId: session.id } });
     if (!tradieProfile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
 
+    // Idempotency key scoped to user + package to prevent double-charges on retries
+    const idempotencyKey = `credit-purchase-${session.id}-${packageId}-${randomUUID()}`;
+
     // Charge the payment method
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(Number(pkg.priceAud) * 100),
-      currency: 'aud',
-      payment_method: paymentMethodId,
-      confirm: true,
-      metadata: {
-        type: 'credit_purchase',
-        userId: session.id,
-        packageId,
-        credits: String(pkg.credits + pkg.bonusCredits),
+    const paymentIntent = await stripe.paymentIntents.create(
+      {
+        amount: Math.round(Number(pkg.priceAud) * 100),
+        currency: 'aud',
+        payment_method: paymentMethodId,
+        confirm: true,
+        metadata: {
+          type: 'credit_purchase',
+          userId: session.id,
+          packageId,
+          credits: String(pkg.credits + pkg.bonusCredits),
+        },
+        return_url: `${process.env.NEXT_PUBLIC_APP_URL}/tradie/wallet`,
       },
-      return_url: `${process.env.NEXT_PUBLIC_APP_URL}/tradie/wallet`,
-    });
+      { idempotencyKey },
+    );
 
     if (paymentIntent.status !== 'succeeded') {
       return NextResponse.json({ error: 'Payment did not succeed', status: paymentIntent.status }, { status: 402 });

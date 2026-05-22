@@ -21,6 +21,12 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
+  const apiKey = req.headers.get('x-internal-api-key');
+  const expectedKey = process.env.INTERNAL_API_KEY;
+  if (expectedKey && apiKey !== expectedKey) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const body = schema.safeParse(await req.json());
   if (!body.success) return NextResponse.json({ error: 'Invalid' }, { status: 400 });
   const { callId, conversationId, jobData } = body.data;

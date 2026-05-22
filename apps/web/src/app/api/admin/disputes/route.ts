@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { notify } from '@fixit247/notifications';
 import { z } from 'zod';
 
 const CreateSchema = z.object({
@@ -56,6 +57,19 @@ export async function POST(req: NextRequest) {
     await db.adminAuditLog.create({
       data: { adminId: session.id, action: 'DISPUTE_CREATED', entity: 'Dispute', entityId: dispute.id, metadata: { reason: data.reason } as never },
     });
+
+    // Notify both parties about the dispute
+    const job = await db.job.findUnique({
+      where: { id: data.jobId },
+      select: { title: true, customer: { select: { userId: true } }, tradie: { select: { userId: true } } },
+    });
+    if (job) {
+      const notifData = { jobTitle: job.title };
+      void notify({ userId: job.customer.userId, jobId: data.jobId, type: 'DISPUTE_OPENED', data: notifData });
+      if (job.tradie?.userId) {
+        void notify({ userId: job.tradie.userId, jobId: data.jobId, type: 'DISPUTE_OPENED', data: notifData });
+      }
+    }
 
     return NextResponse.json({ dispute }, { status: 201 });
   } catch (err) {

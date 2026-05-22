@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { notify } from '@fixit247/notifications';
 import { z } from 'zod';
 
 const AcceptSchema = z.object({
@@ -27,7 +28,10 @@ export async function POST(
     const tradieProfile = await db.tradieProfile.findUnique({ where: { userId: session.id } });
     if (!tradieProfile) return NextResponse.json({ error: 'Tradie profile not found' }, { status: 404 });
 
-    const job = await db.job.findUnique({ where: { id: jobId } });
+    const job = await db.job.findUnique({
+      where: { id: jobId },
+      include: { customer: { select: { userId: true } } },
+    });
     if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
     if (job.status !== 'OPEN') return NextResponse.json({ error: 'Job is no longer available' }, { status: 409 });
 
@@ -80,6 +84,15 @@ export async function POST(
       });
 
       return { claim, job: updatedJob };
+    });
+
+    // Notify customer that their job has been accepted
+    const tradieName = tradieProfile.businessName ?? session.firstName ?? 'Your tradie';
+    void notify({
+      userId: job.customer.userId,
+      jobId,
+      type: 'JOB_ACCEPTED',
+      data: { jobTitle: job.title, tradieName },
     });
 
     return NextResponse.json({ success: true, ...result });
