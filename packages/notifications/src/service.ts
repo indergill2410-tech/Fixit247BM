@@ -45,7 +45,7 @@ export async function notify(opts: NotifyOptions): Promise<void> {
     notificationQueue.enqueue(() => sendEmailNotification({ to: user.email!, title: resolvedTitle, body: resolvedBody, type, data }));
   }
   if (shouldSendChannel(prefs, type, 'push')) {
-    notificationQueue.enqueue(() => sendPushNotification({ userId, title: resolvedTitle, body: resolvedBody, data }));
+    notificationQueue.enqueue(() => sendPushNotification(userId, { title: resolvedTitle, body: resolvedBody, data }));
   }
 }
 
