@@ -174,7 +174,7 @@ export default function TradieOffersPage() {
               key={offer.id}
               className={cn(
                 'rounded-2xl border p-5 transition-all',
-                PRIORITY_STYLES[offer.job.priority] ?? PRIORITY_STYLES['STANDARD'],
+                PRIORITY_STYLES[offer.job.priority] ?? PRIORITY_STYLES.STANDARD,
               )}
             >
               {/* Header */}
@@ -187,7 +187,7 @@ export default function TradieOffersPage() {
                         Emergency
                       </span>
                     )}
-                    <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', PRIORITY_BADGE[offer.job.priority] ?? PRIORITY_BADGE['STANDARD'])}>
+                    <span className={cn('rounded-full px-2 py-0.5 text-xs font-medium', PRIORITY_BADGE[offer.job.priority] ?? PRIORITY_BADGE.STANDARD)}>
                       {offer.job.priority}
                     </span>
                     <span className="rounded-full bg-white/8 px-2 py-0.5 text-xs text-gray-400">
