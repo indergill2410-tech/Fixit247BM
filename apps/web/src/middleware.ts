@@ -129,6 +129,18 @@ function getDashboardPath(role: Role): string {
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Supabase OAuth sends the `code` to the Site URL when the redirectTo URL is
+  // not in the allowed list. Catch any misdirected callback and forward it to
+  // the correct handler so the session exchange still works.
+  if (pathname !== '/auth/callback' && request.nextUrl.searchParams.has('code')) {
+    const callbackUrl = new URL('/auth/callback', request.url);
+    request.nextUrl.searchParams.forEach((value, key) => {
+      callbackUrl.searchParams.set(key, value);
+    });
+    return NextResponse.redirect(callbackUrl);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
