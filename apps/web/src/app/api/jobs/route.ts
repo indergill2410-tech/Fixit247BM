@@ -69,6 +69,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Verify the submitted address belongs to this user before linking it to the job.
+    if (data.addressId) {
+      const addr = await db.address.findFirst({ where: { id: data.addressId, userId: session.id } });
+      if (!addr) {
+        return NextResponse.json({ error: 'Address not found' }, { status: 404 });
+      }
+    }
+
     const job = await db.$transaction(async (tx) => {
       const newJob = await tx.job.create({
         data: {

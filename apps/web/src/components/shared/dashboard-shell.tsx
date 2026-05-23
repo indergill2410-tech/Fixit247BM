@@ -27,7 +27,8 @@ const NAV_CONFIG: Record<string, { label: string; href: string; icon: React.Elem
   ],
   TRADIE: [
     { label: 'Dashboard', href: '/tradie/dashboard', icon: LayoutDashboard },
-    { label: 'New Jobs', href: '/tradie/jobs', icon: Wrench },
+    { label: 'Offers', href: '/tradie/offers', icon: Zap, highlight: true },
+    { label: 'My Jobs', href: '/tradie/jobs', icon: Wrench },
     { label: 'Availability', href: '/tradie/availability', icon: Calendar },
     { label: 'Earnings', href: '/tradie/earnings', icon: DollarSign },
     { label: 'Documents', href: '/tradie/documents', icon: FileText },
