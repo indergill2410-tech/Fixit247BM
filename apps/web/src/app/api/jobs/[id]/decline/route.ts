@@ -23,7 +23,7 @@ export async function POST(
 
     await db.$transaction([
       db.jobMatchingQueue.updateMany({
-        where: { jobId, tradieId: tradieProfile.id, status: 'SENT' },
+        where: { jobId, tradieId: tradieProfile.id, status: { in: ['PENDING', 'SENT'] } },
         data: { status: 'DECLINED', respondedAt: new Date(), declineReason: reason },
       }),
       db.jobEvent.create({

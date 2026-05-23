@@ -100,7 +100,7 @@ export default function TradieOffersPage() {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          quotedPrice: offer.job.budgetMin ?? 150,
+          quotedPrice: (offer.job.budgetMin != null && offer.job.budgetMin > 0) ? offer.job.budgetMin : 150,
           estimatedHours: 2,
           message: 'I can help with this job.',
         }),
@@ -122,12 +122,17 @@ export default function TradieOffersPage() {
     setDeclining(offer.id);
     setError(null);
     try {
-      await fetch(`/api/jobs/${offer.job.id}/decline`, {
+      const res = await fetch(`/api/jobs/${offer.job.id}/decline`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ reason: 'Not available' }),
       });
-      setOffers((prev) => prev.filter((o) => o.id !== offer.id));
+      if (res.ok) {
+        setOffers((prev) => prev.filter((o) => o.id !== offer.id));
+      } else {
+        const body = await res.json() as { error?: string };
+        setError(body.error ?? 'Failed to decline — please try again');
+      }
     } catch {
       setError('Failed to decline — please try again');
     } finally {
