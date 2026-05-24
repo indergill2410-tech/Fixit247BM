@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { DashboardShell, PageHeader } from '@/components/shared/dashboard-shell';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@fixit247/ui';
+import { Badge, Card, CardContent, CardHeader, CardTitle } from '@fixit247/ui';
 import { FileText, Upload, CheckCircle, Clock, AlertTriangle, X, ExternalLink, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { cn } from '@fixit247/ui/src/lib/utils';
@@ -71,12 +71,12 @@ export default function TradieDocumentsPage() {
 
   React.useEffect(() => {
     fetch('/api/tradie/documents')
-      .then((r) => r.json())
+      .then((r) => r.json() as Promise<{ documents?: TradieDocument[] }>)
       .then((data) => {
         setDocuments(data.documents ?? []);
         setIsLoading(false);
       })
-      .catch(() => setIsLoading(false));
+      .catch(() => { setIsLoading(false); });
   }, []);
 
   const getDocForType = (type: DocType) => documents.find((d) => d.type === type);
@@ -102,7 +102,7 @@ export default function TradieDocumentsPage() {
       });
 
       if (!res.ok) throw new Error();
-      const data = await res.json();
+      const data = await res.json() as { document: TradieDocument };
       setDocuments((prev) => {
         const existing = prev.find((d) => d.type === type);
         if (existing) return prev.map((d) => d.type === type ? data.document : d);
@@ -118,7 +118,7 @@ export default function TradieDocumentsPage() {
 
   const handleFileChange = (type: DocType, e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) handleUpload(type, file);
+    if (file) void handleUpload(type, file);
     e.target.value = '';
   };
 
@@ -223,7 +223,7 @@ export default function TradieDocumentsPage() {
                             <input
                               type="date"
                               value={expiryDates[type] ?? ''}
-                              onChange={(e) => setExpiryDates((p) => ({ ...p, [type]: e.target.value }))}
+                              onChange={(e) => { setExpiryDates((p) => ({ ...p, [type]: e.target.value })); }}
                               className="mt-0.5 block rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:dark]"
                             />
                           </div>
@@ -246,7 +246,7 @@ export default function TradieDocumentsPage() {
                             accept=".pdf,.jpg,.jpeg,.png"
                             className="hidden"
                             disabled={isUploading}
-                            onChange={(e) => handleFileChange(type, e)}
+                            onChange={(e) => { handleFileChange(type, e); }}
                           />
                         </label>
                       </div>

@@ -153,7 +153,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
               <Avatar className="h-8 w-8 shrink-0">
                 <AvatarImage src={user?.avatarUrl ?? undefined} />
                 <AvatarFallback className="bg-brand-500/20 text-brand-400 text-xs">
-                  {(user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')}
+                  {(user?.firstName[0] ?? '') + (user?.lastName[0] ?? '')}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
@@ -186,7 +186,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
             <Avatar className="h-8 w-8 cursor-pointer">
               <AvatarImage src={user?.avatarUrl ?? undefined} />
               <AvatarFallback className="bg-brand-500/20 text-brand-400 text-xs">
-                {(user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')}
+                {(user?.firstName[0] ?? '') + (user?.lastName[0] ?? '')}
               </AvatarFallback>
             </Avatar>
           </div>

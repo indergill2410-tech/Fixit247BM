@@ -42,8 +42,15 @@ export default function TradieAvailabilityPage() {
   const [isUpdatingStatus, setIsUpdatingStatus] = React.useState(false);
 
   React.useEffect(() => {
+    interface AvailabilityResponse {
+      status?: {
+        onlineStatus?: OnlineStatus;
+        travelRadiusKm?: number;
+        isAutoAccept?: boolean;
+      };
+    }
     fetch('/api/availability')
-      .then((r) => r.json())
+      .then((r) => r.json() as Promise<AvailabilityResponse>)
       .then((data) => {
         if (data.status) {
           setStatus(data.status.onlineStatus ?? 'OFFLINE');
@@ -52,7 +59,7 @@ export default function TradieAvailabilityPage() {
         }
         setIsLoading(false);
       })
-      .catch(() => setIsLoading(false));
+      .catch(() => { setIsLoading(false); });
   }, []);
 
   const updateStatus = async (newStatus: OnlineStatus) => {
@@ -150,7 +157,7 @@ export default function TradieAvailabilityPage() {
             {STATUS_OPTIONS.map((opt) => (
               <button
                 key={opt.id}
-                onClick={() => updateStatus(opt.id)}
+                onClick={() => { void updateStatus(opt.id); }}
                 disabled={isUpdatingStatus}
                 className={cn(
                   'w-full flex items-center gap-3 rounded-xl border p-4 text-left transition-all',
@@ -205,7 +212,7 @@ export default function TradieAvailabilityPage() {
                 max="150"
                 step="5"
                 value={travelRadius}
-                onChange={(e) => setTravelRadius(Number(e.target.value))}
+                onChange={(e) => { setTravelRadius(Number(e.target.value)); }}
                 className="w-full accent-amber-500"
               />
               <div className="mt-1 flex justify-between text-xs text-gray-600">
@@ -220,7 +227,7 @@ export default function TradieAvailabilityPage() {
                 <p className="text-xs text-gray-500">Automatically claim matching jobs</p>
               </div>
               <button
-                onClick={() => setIsAutoAccept((p) => !p)}
+                onClick={() => { setIsAutoAccept((p) => !p); }}
                 className={cn(
                   'relative h-6 w-11 rounded-full transition-colors',
                   isAutoAccept ? 'bg-brand-500' : 'bg-white/10',
@@ -260,7 +267,7 @@ export default function TradieAvailabilityPage() {
                 h.isAvailable ? 'bg-white/4 border border-white/8' : 'bg-white/2 border border-white/4 opacity-60',
               )}>
                 <button
-                  onClick={() => toggleDay(idx)}
+                  onClick={() => { toggleDay(idx); }}
                   className={cn(
                     'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold transition-all',
                     h.isAvailable ? 'bg-brand-500 text-gray-900' : 'bg-white/8 text-gray-500',
@@ -274,14 +281,14 @@ export default function TradieAvailabilityPage() {
                     <input
                       type="time"
                       value={h.startTime}
-                      onChange={(e) => updateHours(idx, 'startTime', e.target.value)}
+                      onChange={(e) => { updateHours(idx, 'startTime', e.target.value); }}
                       className="rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:dark]"
                     />
                     <span className="text-xs text-gray-500">to</span>
                     <input
                       type="time"
                       value={h.endTime}
-                      onChange={(e) => updateHours(idx, 'endTime', e.target.value)}
+                      onChange={(e) => { updateHours(idx, 'endTime', e.target.value); }}
                       className="rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:dark]"
                     />
                   </div>

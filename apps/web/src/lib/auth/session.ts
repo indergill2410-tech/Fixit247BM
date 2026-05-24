@@ -42,6 +42,8 @@ export async function requireSession(): Promise<SessionUser> {
     const { redirect } = await import('next/navigation');
     redirect('/login');
   }
+  // TypeScript can't infer that redirect() throws, so help it with non-null assertion
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return session!;
 }
 

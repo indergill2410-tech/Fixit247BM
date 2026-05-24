@@ -68,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseBrowserClient();
-    if (supabase) await supabase.auth.signOut();
+    await supabase.auth.signOut();
     window.location.href = '/login';
   }, []);
 
