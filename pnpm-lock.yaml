@@ -42,7 +42,7 @@ importers:
         specifier: ^2.0.0
         version: 2.9.14
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   apps/admin:
@@ -81,15 +81,15 @@ importers:
         specifier: ^1.5.0
         version: 1.7.4(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
       zod:
         specifier: ^3.23.8
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
@@ -181,15 +181,15 @@ importers:
         specifier: ^1.5.0
         version: 1.7.4(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
       zod:
         specifier: ^3.23.8
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
@@ -219,10 +219,10 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/auth:
@@ -253,10 +253,10 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/database:
@@ -278,8 +278,8 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       '@types/pg':
         specifier: ^8.11.10
         version: 8.20.0
@@ -290,7 +290,7 @@ importers:
         specifier: ^4.11.0
         version: 4.22.0
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/fraud:
@@ -303,10 +303,10 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/growth:
@@ -316,7 +316,7 @@ importers:
         version: link:../database
     devDependencies:
       typescript:
-        specifier: ^5.0.0
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/matching:
@@ -326,10 +326,10 @@ importers:
         version: link:../database
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/notifications:
@@ -348,13 +348,13 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       '@types/web-push':
         specifier: ^3.6.3
         version: 3.6.4
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/payments:
@@ -370,10 +370,10 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/realtime:
@@ -389,10 +389,10 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/referral:
@@ -402,7 +402,7 @@ importers:
         version: link:../database
     devDependencies:
       typescript:
-        specifier: ^5.0.0
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/seo:
@@ -412,7 +412,7 @@ importers:
         version: link:../database
     devDependencies:
       typescript:
-        specifier: ^5.0.0
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/trust:
@@ -425,10 +425,10 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/ui:
@@ -492,8 +492,8 @@ importers:
         version: 2.6.1
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       '@types/react':
         specifier: ^19.0.0
         version: 19.2.14
@@ -501,7 +501,7 @@ importers:
         specifier: ^19.0.0
         version: 19.2.3(@types/react@19.2.14)
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
   packages/voice:
@@ -517,10 +517,10 @@ importers:
         version: 3.25.76
     devDependencies:
       '@types/node':
-        specifier: ^20.14.0
-        version: 20.19.41
+        specifier: ^22.0.0
+        version: 22.19.19
       typescript:
-        specifier: ^5.4.5
+        specifier: ^5.9.0
         version: 5.9.3
 
 packages:
@@ -2163,8 +2163,8 @@ packages:
   '@types/node@18.19.130':
     resolution: {integrity: sha512-GRaXQx6jGfL8sKfaIDD6OupbIHBr9jv7Jnaml9tB7l4v068PAOXqfcujMMo5PhbIs6ggR1XODELqahT2R8v0fg==}
 
-  '@types/node@20.19.41':
-    resolution: {integrity: sha512-ECymXOukMnOoVkC2bb1Vc/w/836DXncOg5m8Xj1RH7xSHZJWNYY6Zh7EH477vcnD5egKNNfy2RpNOmuChhFPgQ==}
+  '@types/node@22.19.19':
+    resolution: {integrity: sha512-dyh/xO2Fh5bYrfWaaqGrRQQGkNdmYw6AmaAUvYeUMNTWQtvb796ikLdmTchRmOlOiIJ1TDXfWgVx1QkUlQ6Hew==}
 
   '@types/pg-pool@2.0.6':
     resolution: {integrity: sha512-TaAUE5rq2VQYxab5Ts7WZhKNmuN78Q6PiFonTDdpbx8a1H0M1vhy3rhiMjl+e2iHmogyMw7jZF4FrE6eJUy5HQ==}
@@ -6697,13 +6697,13 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
 
   '@types/cookie@0.6.0': {}
 
   '@types/cors@2.8.19':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
 
   '@types/diff-match-patch@1.0.36': {}
 
@@ -6715,18 +6715,18 @@ snapshots:
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
 
   '@types/node-fetch@2.6.13':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
       form-data: 4.0.5
 
   '@types/node@18.19.130':
     dependencies:
       undici-types: 5.26.5
 
-  '@types/node@20.19.41':
+  '@types/node@22.19.19':
     dependencies:
       undici-types: 6.21.0
 
@@ -6736,13 +6736,13 @@ snapshots:
 
   '@types/pg@8.20.0':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
       pg-protocol: 1.14.0
       pg-types: 2.2.0
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
       pg-protocol: 1.14.0
       pg-types: 2.2.0
 
@@ -6758,17 +6758,17 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
 
   '@types/trusted-types@2.0.7': {}
 
   '@types/web-push@3.6.4':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
 
   '@types/ws@8.18.1':
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
 
   '@typescript-eslint/eslint-plugin@7.18.0(@typescript-eslint/parser@7.18.0(eslint@8.57.1)(typescript@5.9.3))(eslint@8.57.1)(typescript@5.9.3)':
     dependencies:
@@ -7591,7 +7591,7 @@ snapshots:
   engine.io@6.6.7:
     dependencies:
       '@types/cors': 2.8.19
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
       '@types/ws': 8.18.1
       accepts: 1.3.8
       base64id: 2.0.0
@@ -8460,7 +8460,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -9435,7 +9435,7 @@ snapshots:
 
   stripe@16.12.0:
     dependencies:
-      '@types/node': 20.19.41
+      '@types/node': 22.19.19
       qs: 6.15.1
 
   styled-jsx@5.1.6(@babel/core@7.29.0)(react@19.2.6):
