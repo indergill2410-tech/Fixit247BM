@@ -54,8 +54,20 @@ export default function TradieProfileEditPage() {
   });
 
   React.useEffect(() => {
+    interface ProfileResponse {
+      profile?: {
+        businessName?: string | null;
+        bio?: string | null;
+        trades?: string[];
+        hourlyRate?: number | null;
+        calloutFee?: number | null;
+        yearsExperience?: number | null;
+        serviceRadiusKm?: number | null;
+        abn?: string | null;
+      };
+    }
     fetch('/api/tradie/profile')
-      .then((r) => r.json())
+      .then((r) => r.json() as Promise<ProfileResponse>)
       .then((data) => {
         const p = data.profile;
         if (p) {
@@ -63,10 +75,10 @@ export default function TradieProfileEditPage() {
             businessName: p.businessName ?? '',
             bio: p.bio ?? '',
             trades: p.trades ?? [],
-            hourlyRate: p.hourlyRate ? String(p.hourlyRate) : '',
-            calloutFee: p.calloutFee ? String(p.calloutFee) : '',
+            hourlyRate: p.hourlyRate != null ? String(p.hourlyRate) : '',
+            calloutFee: p.calloutFee != null ? String(p.calloutFee) : '',
             yearsExperience: p.yearsExperience != null ? String(p.yearsExperience) : '',
-            serviceRadiusKm: p.serviceRadiusKm ? String(p.serviceRadiusKm) : '25',
+            serviceRadiusKm: p.serviceRadiusKm != null ? String(p.serviceRadiusKm) : '25',
             abn: p.abn ?? '',
           });
         }
