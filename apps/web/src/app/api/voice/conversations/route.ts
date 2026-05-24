@@ -18,12 +18,12 @@ export async function POST(req: Request) {
 
   // Load existing conversation
   const existing = await db.aIConversation.findUnique({ where: { sessionId } });
-  const existingMessages: ConversationTurn[] = existing ? (existing.messages as ConversationTurn[]) : [];
+  const existingMessages: ConversationTurn[] = existing ? (existing.messages as unknown as ConversationTurn[]) : [];
 
   const context: ConversationContext = {
     sessionId,
     messages: existingMessages,
-    extractedData: (existing?.extractedEntities as any) ?? {},
+    extractedData: ((existing?.extractedEntities as unknown) ?? {}) as Record<string, unknown>,
     turnCount: existingMessages.filter((m) => m.role === 'user').length,
     isComplete: false,
     isEmergency: existing?.isEmergency ?? false,
@@ -42,16 +42,16 @@ export async function POST(req: Request) {
     where: { sessionId },
     create: {
       sessionId,
-      messages: newMessages as any,
-      extractedEntities: aiResponse.extractedJobData as any ?? {},
+      messages: newMessages as never,
+      extractedEntities: (aiResponse.extractedJobData ?? {}) as never,
       isEmergency: aiResponse.emergencyDetected,
       urgencyScore: aiResponse.emergencyScore,
       turnCount: 1,
       ...(session?.id && {}),
     },
     update: {
-      messages: newMessages as any,
-      extractedEntities: aiResponse.isJobReady && aiResponse.extractedJobData ? aiResponse.extractedJobData as any : undefined,
+      messages: newMessages as never,
+      extractedEntities: aiResponse.isJobReady && aiResponse.extractedJobData ? aiResponse.extractedJobData as never : undefined,
       isEmergency: aiResponse.emergencyDetected,
       urgencyScore: aiResponse.emergencyScore,
       turnCount: { increment: 1 },

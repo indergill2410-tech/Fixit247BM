@@ -1,17 +1,21 @@
 /**
- * Next.js Instrumentation Hook
- * https://nextjs.org/docs/app/building-your-application/optimizing/instrumentation
- *
- * This file runs once when the Next.js server starts up (both Node.js runtime
- * and Edge runtime). We use it to validate required environment variables so
- * the server refuses to boot with a missing configuration rather than silently
- * failing at request-time.
+ * Next.js instrumentation hook — runs once in nodejs and edge runtimes.
+ * Initialises Sentry before any request is handled.
  */
 export async function register() {
-  // Only validate on the Node.js runtime (server side).
-  // Edge runtime does not have process.exit and has a restricted env surface.
+  const sentryConfig = {
+    dsn: process.env.SENTRY_DSN ?? process.env.NEXT_PUBLIC_SENTRY_DSN,
+    tracesSampleRate: process.env.NODE_ENV === 'production' ? 0.1 : 1.0,
+    debug: false,
+  };
   if (process.env.NEXT_RUNTIME === 'nodejs') {
     const { validateEnv } = await import('@/lib/validate-env');
     validateEnv();
+    const Sentry = await import('@sentry/nextjs');
+    Sentry.init(sentryConfig);
+  }
+  if (process.env.NEXT_RUNTIME === 'edge') {
+    const Sentry = await import('@sentry/nextjs');
+    Sentry.init(sentryConfig);
   }
 }

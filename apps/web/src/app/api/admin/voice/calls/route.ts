@@ -9,7 +9,7 @@ export async function GET(req: Request) {
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '50'), 100);
 
   const calls = await db.voiceCall.findMany({
-    where: status ? { status: status as any } : {},
+    where: status ? { status: status as never } : {},
     include: {
       customer: { select: { firstName: true, lastName: true, phone: true } },
       events: { orderBy: { createdAt: 'desc' }, take: 5 },

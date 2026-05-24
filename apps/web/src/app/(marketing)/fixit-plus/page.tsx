@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle, Shield, Home, Car, Clock, Star, Zap, Phone } from 'lucide-react';
+import { CheckCircle, Shield, Star, Zap, Phone } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Fixit Plus — Homeowner Peace of Mind | Fixit247',

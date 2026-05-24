@@ -15,7 +15,8 @@ export async function POST(
     }
 
     const { id: jobId } = await params;
-    const body = await req.json().catch(() => ({}));
+    const raw = await (req.json() as Promise<unknown>).catch(() => ({}) as unknown);
+    const body = (typeof raw === 'object' && raw !== null) ? raw as Record<string, unknown> : {};
     const reason = typeof body.reason === 'string' ? body.reason : undefined;
 
     const tradieProfile = await db.tradieProfile.findUnique({ where: { userId: session.id } });

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Copy, Share2, CheckCircle, Gift, Users, DollarSign } from 'lucide-react';
+import { Copy, Share2, CheckCircle, Users, DollarSign } from 'lucide-react';
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -21,16 +21,16 @@ export default function ReferPage() {
     fetch('/api/referral/code')
       .then((r) => {
         if (r.status === 401) { setNotAuthed(true); return null; }
-        return r.json();
+        return r.json() as Promise<ReferralData>;
       })
-      .then((d) => d && setData(d))
+      .then((d) => { if (d) setData(d); })
       .catch(() => { setNotAuthed(true); })
       .finally(() => { setLoading(false); });
   }, []);
 
   function copyLink() {
     if (!data) return;
-    navigator.clipboard.writeText(data.link);
+    void navigator.clipboard.writeText(data.link);
     setCopied(true);
     toast.success('Referral link copied!');
     setTimeout(() => { setCopied(false); }, 2000);
@@ -49,8 +49,8 @@ export default function ReferPage() {
   }
 
   function nativeShare() {
-    if (!data || !navigator.share) return;
-    navigator.share({ title: 'Fixit 24/7 — $20 off your first job', url: data.link });
+    if (!data) return;
+    void navigator.share({ title: 'Fixit 24/7 — $20 off your first job', url: data.link });
   }
 
   return (

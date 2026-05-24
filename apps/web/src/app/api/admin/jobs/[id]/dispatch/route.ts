@@ -21,7 +21,7 @@ export async function POST(
     }
 
     const { id: jobId } = await params;
-    const body = await req.json().catch(() => ({}));
+    const body = await (req.json() as Promise<unknown>).catch(() => ({}) as unknown);
     const { reason, batchSize } = Schema.parse(body);
 
     const job = await db.job.findUnique({
@@ -39,7 +39,7 @@ export async function POST(
       data: { status: 'EXPIRED' },
     });
 
-    const newBatch = (job.matchingBatchNo ?? 0) + 1;
+    const newBatch = (job.matchingBatchNo || 0) + 1;
 
     await db.$transaction([
       db.job.update({ where: { id: jobId }, data: { status: 'OPEN' as const, matchingBatchNo: newBatch } }),

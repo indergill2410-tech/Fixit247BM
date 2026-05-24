@@ -8,9 +8,9 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Building2, ShieldCheck, Briefcase, Clock, CreditCard, CheckCircle,
-  Plus, X, Upload, Info,
+  Upload, Info,
 } from 'lucide-react';
-import { Button, Card, CardContent, Input, Badge } from '@fixit247/ui';
+import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import {
   tradieBusinessSchema,
   tradieVerificationSchema,
@@ -246,7 +246,7 @@ function Step1Business({ onNext }: { onNext: (d: TradieBusinessValues) => void }
 // ─── Step 2: Verification ─────────────────────────────────────────────────────
 
 function Step2Verification({ onBack, onNext }: { onBack: () => void; onNext: (d: TradieVerificationValues) => void }) {
-  const { register, handleSubmit, formState: { errors } } = useForm<TradieVerificationValues>({
+  const { register, handleSubmit, formState: { errors: _errors } } = useForm<TradieVerificationValues>({
     resolver: zodResolver(tradieVerificationSchema),
     defaultValues: { hasLicense: false, hasInsurance: false },
   });
@@ -418,7 +418,7 @@ function Step3Profile({ onBack, onNext }: { onBack: () => void; onNext: (d: Trad
 // ─── Step 4: Availability ─────────────────────────────────────────────────────
 
 function Step4Availability({ onBack, onNext }: { onBack: () => void; onNext: (d: TradieAvailabilityValues) => void }) {
-  const { register, handleSubmit, watch, setValue, formState: { errors } } = useForm<TradieAvailabilityValues>({
+  const { register, handleSubmit, watch } = useForm<TradieAvailabilityValues>({
     resolver: zodResolver(tradieAvailabilitySchema),
     defaultValues: {
       isEmergencyAvailable: false,
@@ -505,7 +505,7 @@ function Step5Payments({ onBack, onNext }: { onBack: () => void; onNext: (d: Tra
     }
   }
 
-  async function handleSkip() {
+  function handleSkip() {
     // Allow skipping Stripe — can complete later
     const fakeAvailability: TradieAvailabilityValues = {
       isEmergencyAvailable: false,
@@ -514,7 +514,7 @@ function Step5Payments({ onBack, onNext }: { onBack: () => void; onNext: (d: Tra
       emergencySurchargePercent: 50,
       availability: [],
     };
-    await onNext(fakeAvailability);
+    onNext(fakeAvailability);
   }
 
   return (

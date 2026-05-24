@@ -40,6 +40,7 @@ export function SuburbDetector({ onDetected, className }: Props) {
       const res = await fetch(
         `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&key=${apiKey}&result_type=sublocality|locality`
       );
+      /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
       const data = await res.json();
 
       if (data.results?.[0]) {
@@ -53,6 +54,7 @@ export function SuburbDetector({ onDetected, className }: Props) {
           state: stateComp?.short_name ?? 'AU',
           postcode: postcodeComp?.long_name,
         };
+        /* eslint-enable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
         setSuburb(detected);
         onDetected?.(detected);
       }

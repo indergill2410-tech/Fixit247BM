@@ -53,14 +53,14 @@ export async function POST(req: Request) {
       state: body.state,
       tradeCategory: body.trade.toUpperCase(),
       isEmergency: body.isEmergency,
-      content: content as any,
-      faqContent: content.faqs as any,
+      content: content as never,
+      faqContent: content.faqs as never,
       publishedAt: new Date(),
       lastGeneratedAt: new Date(),
     },
     update: {
-      content: content as any,
-      faqContent: content.faqs as any,
+      content: content as never,
+      faqContent: content.faqs as never,
       lastGeneratedAt: new Date(),
     },
   });

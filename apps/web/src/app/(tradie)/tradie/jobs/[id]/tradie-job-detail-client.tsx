@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MessageCircle, Navigation, CheckCircle2, Loader2, MapPin, Clock } from 'lucide-react';
-import { Button } from '@fixit247/ui';
 import { toast } from 'sonner';
 import { DashboardShell } from '@/components/shared/dashboard-shell';
 import { ChatWindow } from '@/components/features/chat/chat-window';

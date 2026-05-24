@@ -25,7 +25,7 @@ const SubscriptionSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const sub = SubscriptionSchema.parse(body);
 
     // Ensure the preference row exists.
@@ -66,7 +66,7 @@ export async function DELETE(req: NextRequest) {
   try {
     const session = await requireSession();
     const body = await req.json() as { endpoint?: string };
-    const endpoint = body?.endpoint;
+    const endpoint = body.endpoint;
 
     if (!endpoint || typeof endpoint !== 'string') {
       return NextResponse.json({ error: 'Missing endpoint' }, { status: 400 });

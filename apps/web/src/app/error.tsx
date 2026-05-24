@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import Link from 'next/link';
+import * as Sentry from '@sentry/nextjs';
 
 export default function GlobalError({
   error,
@@ -11,12 +12,7 @@ export default function GlobalError({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Report to Sentry when available
-    if (typeof window !== 'undefined' && 'Sentry' in window) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      (window as any).Sentry?.captureException(error);
-    }
-    console.error('[GlobalError]', error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

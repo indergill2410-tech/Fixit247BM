@@ -25,7 +25,7 @@ const CreateSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { tier, stripeCustomerId } = CreateSchema.parse(body);
 
     const result = await createSubscription({

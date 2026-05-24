@@ -33,7 +33,7 @@ export function TransactionHistory({ entries, isLoading, className }: Transactio
   if (isLoading) {
     return (
       <div className={cn('space-y-3', className)}>
-        {[...Array(5)].map((_, i) => (
+        {Array.from({ length: 5 }).map((_, i) => (
           <div key={i} className="h-14 animate-pulse rounded-xl bg-gray-100" />
         ))}
       </div>

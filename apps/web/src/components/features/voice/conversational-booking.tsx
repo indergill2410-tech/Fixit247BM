@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Mic, MicOff, Send, AlertTriangle, CheckCircle, Loader2, Phone } from 'lucide-react';
+import { Mic, MicOff, Send, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { VoiceWaveform } from './voice-waveform';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -59,8 +58,9 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
 
   useEffect(() => {
     if (initialMessage) {
-      setTimeout(() => sendMessage(initialMessage), 500);
+      setTimeout(() => { void sendMessage(initialMessage); }, 500);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   async function sendMessage(text: string) {
@@ -77,7 +77,14 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, message: text }),
       });
-      const data = await res.json();
+      const data = await res.json() as {
+        sessionId: string;
+        message: string;
+        emergencyDetected?: boolean;
+        safetyInstructions?: string[];
+        isJobReady?: boolean;
+        extractedJobData?: ExtractedJobData;
+      };
 
       setSessionId(data.sessionId);
 
@@ -135,7 +142,7 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
       const res = await fetch('/api/voice/transcribe', { method: 'POST', body: formData });
-      const data = await res.json();
+      const data = await res.json() as { transcript?: string };
       if (data.transcript) {
         await sendMessage(data.transcript);
       }
@@ -211,7 +218,7 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
       {messages.length === 1 && (
         <div className="px-4 pb-2 flex flex-wrap gap-2">
           {EMERGENCY_OPENERS.slice(0, 3).map((opener) => (
-            <button key={opener} onClick={() => sendMessage(opener)}
+            <button key={opener} onClick={() => { void sendMessage(opener); }}
               className="rounded-full border border-gray-200 px-3 py-1 text-xs text-gray-600 hover:bg-gray-100 transition-colors">
               {opener}
             </button>
@@ -239,13 +246,13 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
           <input
             value={input}
             onChange={(e) => { setInput(e.target.value); }}
-            onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
+            onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) void sendMessage(input); }}
             placeholder={emergencyDetected ? 'Describe the situation...' : "What's happening?"}
             className="flex-1 rounded-xl border border-gray-200 px-3 py-2 text-sm outline-none focus:border-red-300 focus:ring-1 focus:ring-red-100"
             disabled={loading}
           />
           <button
-            onClick={() => sendMessage(input)}
+            onClick={() => { void sendMessage(input); }}
             disabled={!input.trim() || loading}
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-red-600 text-white hover:bg-red-700 disabled:opacity-50 transition-colors"
           >

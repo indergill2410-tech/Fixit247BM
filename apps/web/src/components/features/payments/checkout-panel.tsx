@@ -60,10 +60,10 @@ export function CheckoutPanel({
         body: JSON.stringify({ jobId }),
       });
       if (!res.ok) {
-        const err = await res.json();
+        const err = await res.json() as { error?: string };
         throw new Error(err.error ?? 'Failed to create payment');
       }
-      const { clientSecret: secret } = await res.json();
+      const { clientSecret: secret } = await res.json() as { clientSecret: string };
       setClientSecret(secret);
       setStep('payment');
     } catch (err: unknown) {

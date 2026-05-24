@@ -173,14 +173,14 @@ export default async function TradieProfilePage() {
             <CardContent className="space-y-2">
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">Licence</span>
-                <span className={tradieProfile?.licences?.[0] ? 'text-green-400' : 'text-amber-400'}>
-                  {tradieProfile?.licences?.[0] ? tradieProfile.licences[0]?.status : 'Missing'}
+                <span className={tradieProfile?.licences[0] ? 'text-green-400' : 'text-amber-400'}>
+                  {tradieProfile?.licences[0] ? tradieProfile.licences[0]?.status : 'Missing'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
                 <span className="text-gray-400">Insurance</span>
-                <span className={tradieProfile?.insurances?.[0] ? 'text-green-400' : 'text-amber-400'}>
-                  {tradieProfile?.insurances?.[0] ? tradieProfile.insurances[0]?.status : 'Missing'}
+                <span className={tradieProfile?.insurances[0] ? 'text-green-400' : 'text-amber-400'}>
+                  {tradieProfile?.insurances[0] ? tradieProfile.insurances[0]?.status : 'Missing'}
                 </span>
               </div>
               <Button asChild size="sm" variant="outline" className="mt-3 w-full">

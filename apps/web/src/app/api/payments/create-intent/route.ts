@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
     const userRl = rateLimitByUser(session.id, LIMITS.paymentIntent);
     if (!userRl.success) return rateLimitResponse(userRl);
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { jobId, agreedPrice } = Schema.parse(body);
 
     const job = await db.job.findUnique({
@@ -53,7 +53,7 @@ export async function POST(req: NextRequest) {
 
     const basePricing = calculateJobPricing({
       baseAmount: agreedPrice,
-      complexity: (job.complexity as 'SIMPLE' | 'MEDIUM' | 'COMPLEX') ?? 'MEDIUM',
+      complexity: (job.complexity as 'SIMPLE' | 'MEDIUM' | 'COMPLEX'),
       priority: (job.priority as 'STANDARD' | 'URGENT' | 'EMERGENCY'),
     });
 
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
       create: {
         jobId,
         customerId: job.customerId,
-        tradieId: job.tradieId!,
+        tradieId: job.tradieId ?? '',
         amount: pricing.totalCustomerPayment,
         platformFee: pricing.platformFee,
         tradieAmount: pricing.tradieAmount,

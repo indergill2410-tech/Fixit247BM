@@ -7,8 +7,8 @@ import { db } from '@fixit247/database';
 export async function POST() {
   const cookieStore = await cookies();
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
     { cookies: { getAll() { return cookieStore.getAll(); }, setAll(c: { name: string; value: string; options: Record<string, unknown> }[]) { c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); } } },
   );
 
@@ -20,7 +20,7 @@ export async function POST() {
 
   let stripeAccountId = tradieProfile.stripeAccountId;
   if (!stripeAccountId) {
-    stripeAccountId = await createConnectedAccount(user.email!);
+    stripeAccountId = await createConnectedAccount(user.email ?? '');
     await db.tradieProfile.update({ where: { id: tradieProfile.id }, data: { stripeAccountId } });
   }
 

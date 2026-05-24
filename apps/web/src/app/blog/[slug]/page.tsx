@@ -3,7 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ChevronLeft, Clock, Shield } from 'lucide-react';
 
-const ARTICLES: Record<string, { title: string; category: string; readTime: string; content: string; metaDescription: string }> = {
+const ARTICLES: Partial<Record<string, { title: string; category: string; readTime: string; content: string; metaDescription: string }>> = {
   'burst-pipe-emergency': {
     title: 'What to Do When a Pipe Bursts at 2am',
     category: 'Emergency',
@@ -124,9 +124,9 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
 
   // Convert basic markdown to HTML (simplified)
   const paragraphs = article.content.split('\n\n').map((block) => {
-    if (block.startsWith('## ')) return { type: 'h2', text: block.slice(3) };
-    if (block.startsWith('- ')) return { type: 'ul', items: block.split('\n').map((l) => l.slice(2)) };
-    return { type: 'p', text: block };
+    if (block.startsWith('## ')) return { type: 'h2' as const, text: block.slice(3) };
+    if (block.startsWith('- ')) return { type: 'ul' as const, items: block.split('\n').map((l) => l.slice(2)) };
+    return { type: 'p' as const, text: block };
   });
 
   return (
@@ -143,7 +143,9 @@ export default async function BlogArticlePage({ params }: { params: Promise<{ sl
         <div className="prose prose-invert max-w-none">
           {paragraphs.map((block, i) => {
             if (block.type === 'h2') return <h2 key={i} className="mt-8 mb-3 text-xl font-bold text-white">{block.text}</h2>;
-            if (block.type === 'ul') return <ul key={i} className="mb-4 space-y-1 pl-4">{(block as any).items?.map((item: string, j: number) => <li key={j} className="text-gray-400 text-sm list-disc">{item}</li>)}</ul>;
+            if (block.type === 'ul') {
+              return <ul key={i} className="mb-4 space-y-1 pl-4">{block.items.map((item, j) => <li key={j} className="text-gray-400 text-sm list-disc">{item}</li>)}</ul>;
+            }
             return <p key={i} className="mb-4 text-gray-400 leading-relaxed">{block.text}</p>;
           })}
         </div>

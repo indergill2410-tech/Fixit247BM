@@ -5,7 +5,7 @@ import { StatCard } from '@/components/shared/stat-card';
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@fixit247/ui';
 import { TrustScoreMeter, TrustBadge } from '@fixit247/ui';
 import Link from 'next/link';
-import { CheckCircle, Clock, AlertTriangle } from 'lucide-react';
+import { CheckCircle, AlertTriangle } from 'lucide-react';
 import { db } from '@fixit247/database';
 
 export const metadata: Metadata = { title: 'Tradie Dashboard' };

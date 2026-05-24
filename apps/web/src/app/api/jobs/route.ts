@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
     const userRl = rateLimitByUser(session.id, LIMITS.jobsCreate);
     if (!userRl.success) return rateLimitResponse(userRl);
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = CreateJobSchema.parse(body);
 
     // Get customer profile
@@ -54,7 +54,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Validate optional promo code (static lookup — no DB round-trip)
-    const PROMO_CODES: Record<string, { discountPercent: number; description: string }> = {
+    const PROMO_CODES: Partial<Record<string, { discountPercent: number; description: string }>> = {
       'FIRST20':     { discountPercent: 20, description: '20% off your first job' },
       'WELCOME10':   { discountPercent: 10, description: '10% off for new customers' },
       'EMERGENCY15': { discountPercent: 15, description: '15% off emergency callouts' },
@@ -83,9 +83,9 @@ export async function POST(req: NextRequest) {
           customerId: customerProfile.id,
           title: data.title,
           description: data.description,
-          category: data.category as any,
+          category: data.category as never,
           isEmergency: data.isEmergency,
-          priority: data.priority as any,
+          priority: data.priority as never,
           budgetMin: data.budgetMin,
           budgetMax: data.budgetMax,
           addressId: data.addressId,
@@ -93,7 +93,7 @@ export async function POST(req: NextRequest) {
           preferredTime: data.preferredTime,
           mediaUrls: data.mediaUrls,
           voiceNoteUrl: data.voiceNoteUrl,
-          complexity: data.complexity as any,
+          complexity: data.complexity as never,
           leadPrice: data.leadPrice,
           status: 'OPEN',
         },
@@ -171,7 +171,7 @@ export async function GET(req: NextRequest) {
 
     const [jobs, total] = await Promise.all([
       db.job.findMany({
-        where: whereClause as any,
+        where: whereClause as never,
         include: {
           address: true,
           aiInsight: { select: { urgencyScore: true, confidenceScore: true, suggestedTitle: true } },
@@ -181,7 +181,7 @@ export async function GET(req: NextRequest) {
         take: limit,
         skip: offset,
       }),
-      db.job.count({ where: whereClause as any }),
+      db.job.count({ where: whereClause as never }),
     ]);
 
     return NextResponse.json({ jobs, total, limit, offset });

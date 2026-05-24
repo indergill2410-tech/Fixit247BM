@@ -227,7 +227,7 @@ export default function HomePage() {
             <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-500">Real people, real results</p>
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Trusted by thousands of Australians</h2>
             <div className="mt-4 flex items-center justify-center gap-1.5">
-              {[...Array(5)].map((_, i) => (
+              {Array.from({ length: 5 }).map((_, i) => (
                 <Star key={i} size={16} className="fill-brand-400 text-brand-400" />
               ))}
               <span className="ml-2 text-sm font-semibold text-white">4.8</span>
@@ -238,7 +238,7 @@ export default function HomePage() {
             {TESTIMONIALS.map((t) => (
               <div key={t.name} className="flex flex-col rounded-2xl border border-white/[0.07] bg-white/[0.03] p-6">
                 <div className="mb-3 flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
+                  {Array.from({ length: 5 }).map((_, i) => (
                     <Star key={i} size={12} className="fill-brand-400 text-brand-400" />
                   ))}
                 </div>

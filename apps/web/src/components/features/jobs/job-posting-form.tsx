@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Zap, Clock, ChevronRight, ChevronLeft, Loader2, Sparkles } from 'lucide-react';
-import { Button, Badge } from '@fixit247/ui';
+import { Button } from '@fixit247/ui';
 import { cn } from '@fixit247/ui/src/lib/utils';
 import { MediaUpload } from './media-upload';
 import { AIScopeDisplay } from './ai-scope-display';
@@ -84,7 +84,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
   const [addresses, setAddresses] = React.useState<SavedAddress[]>([]);
 
   const [formData, setFormData] = React.useState<FormData>({
-    category: isEmergencyMode ? '' : '',
+    category: '',
     description: '',
     priority: isEmergencyMode ? 'EMERGENCY' : 'STANDARD',
     mediaUrls: [],
@@ -101,7 +101,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
       .then((json: { addresses?: SavedAddress[] }) => {
         const list = json.addresses ?? [];
         setAddresses(list);
-        const def = list.find((a) => a.isDefault) ?? list[0];
+        const def: SavedAddress | undefined = list.find((a) => a.isDefault) ?? list.at(0);
         if (def && !formData.addressId) updateForm({ addressId: def.id });
       })
       .catch(() => undefined);
@@ -121,8 +121,8 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         }),
       });
       if (res.ok) {
-        const { result } = await res.json();
-        setAiResult(result as AIScopeResult);
+        const { result } = await res.json() as { result: AIScopeResult };
+        setAiResult(result);
         setShowAiScope(true);
         // Auto-apply AI suggestions
         updateForm({
@@ -179,7 +179,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
       });
 
       if (res.ok) {
-        const { job } = await res.json();
+        const { job } = await res.json() as { job: { id: string } };
         router.push(`/jobs/${job.id}`);
       }
     } catch {

@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const since = new Date(Date.now() - days * 86_400_000);
 
     const [
-      jobStats, userGrowth, revenueByDay, topTrades, tradieRetention,
+      jobStats, _userGrowth, revenueByDay, topTrades, tradieRetention,
       subscriptionBreakdown, emergencyStats, disputeRate,
     ] = await Promise.all([
       // Job completion funnel
