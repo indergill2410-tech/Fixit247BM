@@ -93,7 +93,7 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
 
       if (data.emergencyDetected && !emergencyDetected) {
         setEmergencyDetected(true);
-        if (data.safetyInstructions?.length > 0) {
+        if (data.safetyInstructions && data.safetyInstructions.length > 0) {
           setSafetyInstructions(data.safetyInstructions);
         }
       }

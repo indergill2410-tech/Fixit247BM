@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@fixit247/database';
 import { generateJobSummary } from '@fixit247/voice';
-import type { ConversationContext } from '@fixit247/voice';
+import type { ConversationContext, ConversationTurn } from '@fixit247/voice';
 import { z } from 'zod';
 import { toLocalFormat } from '@/lib/utils/phone';
 
