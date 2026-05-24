@@ -1,9 +1,14 @@
 'use client';
 
 import * as React from 'react';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements, PaymentElement, useStripe, useElements } from '@stripe/react-stripe-js';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Star, Loader2, CheckCircle } from 'lucide-react';
+import { toast } from 'sonner';
 import { cn } from '@fixit247/ui/src/lib/utils';
+
+const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY ?? '');
 
 interface CreditPackage {
   id: string;
@@ -20,28 +25,122 @@ interface CreditPurchaseModalProps {
   packages: CreditPackage[];
 }
 
+interface StripePayStepProps {
+  selectedPkg: CreditPackage;
+  onSuccess: () => void;
+  onBack: () => void;
+}
+
+function StripePayStep({ selectedPkg, onSuccess, onBack }: StripePayStepProps) {
+  const stripe = useStripe();
+  const elements = useElements();
+  const [isProcessing, setIsProcessing] = React.useState(false);
+
+  async function handlePay() {
+    if (!stripe || !elements) return;
+    setIsProcessing(true);
+    try {
+      const { error, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/tradie/wallet`,
+        },
+        redirect: 'if_required',
+      });
+      if (error) {
+        toast.error(error.message ?? 'Payment failed. Please try again.');
+        setIsProcessing(false);
+        return;
+      }
+      if (paymentIntent?.status === 'succeeded') {
+        const res = await fetch('/api/credits/confirm', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentIntentId: paymentIntent.id }),
+        });
+        if (!res.ok) {
+          toast.error('Payment succeeded but credits could not be added. Contact support.');
+        }
+        onSuccess();
+      }
+    } catch {
+      toast.error('Payment failed. Please try again.');
+      setIsProcessing(false);
+    }
+  }
+
+  return (
+    <div>
+      <div className="mb-4 rounded-2xl bg-gray-50 p-4">
+        <p className="text-xs text-gray-500 mb-1">Paying for</p>
+        <p className="text-lg font-bold text-gray-900">
+          {selectedPkg.credits + selectedPkg.bonusCredits} credits — ${Number(selectedPkg.priceAud).toFixed(2)} AUD
+        </p>
+      </div>
+      <div className="mb-5">
+        <PaymentElement options={{ layout: 'tabs' }} />
+      </div>
+      <p className="mb-4 text-xs text-gray-400">
+        Credits are non-refundable once used.
+      </p>
+      <div className="flex gap-3">
+        <button
+          onClick={onBack}
+          disabled={isProcessing}
+          className="flex-1 rounded-2xl border border-gray-200 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50 disabled:opacity-50"
+        >
+          Back
+        </button>
+        <button
+          onClick={handlePay}
+          disabled={isProcessing || !stripe}
+          className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
+        >
+          {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
+          {isProcessing ? 'Processing…' : `Pay $${Number(selectedPkg.priceAud).toFixed(2)}`}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export function CreditPurchaseModal({ open, onClose, packages }: CreditPurchaseModalProps) {
   const [selected, setSelected] = React.useState<string | null>(null);
-  const [step, setStep] = React.useState<'select' | 'confirm' | 'success'>('select');
-  const [isProcessing, setIsProcessing] = React.useState(false);
+  const [step, setStep] = React.useState<'select' | 'payment' | 'success'>('select');
+  const [clientSecret, setClientSecret] = React.useState<string | null>(null);
+  const [isCreatingIntent, setIsCreatingIntent] = React.useState(false);
 
   const selectedPkg = packages.find((p) => p.id === selected);
 
-  const handlePurchase = async () => {
+  async function handleContinue() {
     if (!selectedPkg) return;
-    setIsProcessing(true);
+    setIsCreatingIntent(true);
     try {
-      // In production: collect payment method first, then POST to /api/credits/purchase
-      // For now simulate success
-      await new Promise((r) => setTimeout(r, 1500));
-      setStep('success');
+      const res = await fetch('/api/credits/create-intent', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ packageId: selectedPkg.id }),
+      });
+      if (!res.ok) {
+        const err = await res.json() as { error?: string };
+        throw new Error(err.error ?? 'Failed to start checkout');
+      }
+      const { clientSecret: secret } = await res.json() as { clientSecret: string };
+      setClientSecret(secret);
+      setStep('payment');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to start checkout');
     } finally {
-      setIsProcessing(false);
+      setIsCreatingIntent(false);
     }
-  };
+  }
 
   React.useEffect(() => {
-    if (!open) { setStep('select'); setSelected(null); }
+    if (!open) {
+      setStep('select');
+      setSelected(null);
+      setClientSecret(null);
+    }
   }, [open]);
 
   return (
@@ -108,7 +207,7 @@ export function CreditPurchaseModal({ open, onClose, packages }: CreditPurchaseM
                           {pkg.bonusCredits > 0 && (
                             <div className="mt-2 flex items-center gap-1 text-xs text-green-600">
                               <Star size={11} />
-                              <span>{Math.round((pkg.bonusCredits / pkg.credits) * 100)}% bonus credits included</span>
+                              <span>{Math.round((pkg.bonusCredits / pkg.credits) * 100)}% bonus credits included · {total} total</span>
                             </div>
                           )}
                         </button>
@@ -117,53 +216,30 @@ export function CreditPurchaseModal({ open, onClose, packages }: CreditPurchaseM
                   </div>
 
                   <button
-                    onClick={() => selected && setStep('confirm')}
-                    disabled={!selected}
+                    onClick={handleContinue}
+                    disabled={!selected || isCreatingIntent}
                     className={cn(
-                      'mt-5 w-full rounded-2xl py-3.5 text-sm font-semibold text-white transition-all',
-                      selected ? 'bg-brand-600 hover:bg-brand-700' : 'bg-gray-200 cursor-not-allowed text-gray-400'
+                      'mt-5 w-full flex items-center justify-center gap-2 rounded-2xl py-3.5 text-sm font-semibold text-white transition-all',
+                      selected && !isCreatingIntent ? 'bg-brand-600 hover:bg-brand-700' : 'bg-gray-200 cursor-not-allowed text-gray-400'
                     )}
                   >
-                    Continue
+                    {isCreatingIntent && <Loader2 size={16} className="animate-spin" />}
+                    {isCreatingIntent ? 'Preparing…' : 'Continue to Payment'}
                   </button>
                 </>
               )}
 
-              {step === 'confirm' && selectedPkg && (
-                <div>
-                  <div className="mb-5 rounded-2xl bg-gray-50 p-4">
-                    <p className="text-xs text-gray-500 mb-1">You're purchasing</p>
-                    <p className="text-2xl font-bold text-gray-900">
-                      {selectedPkg.credits + selectedPkg.bonusCredits} credits
-                    </p>
-                    <p className="text-sm text-gray-500">{selectedPkg.name}</p>
-                    <div className="mt-3 flex items-center justify-between text-sm">
-                      <span className="text-gray-600">Total</span>
-                      <span className="font-bold text-gray-900">${Number(selectedPkg.priceAud).toFixed(2)} AUD</span>
-                    </div>
-                  </div>
-
-                  <p className="mb-4 text-xs text-gray-400">
-                    Payment will be charged to your saved payment method. Credits are non-refundable once used.
-                  </p>
-
-                  <div className="flex gap-3">
-                    <button
-                      onClick={() => { setStep('select'); }}
-                      className="flex-1 rounded-2xl border border-gray-200 py-3 text-sm font-medium text-gray-600 hover:bg-gray-50"
-                    >
-                      Back
-                    </button>
-                    <button
-                      onClick={handlePurchase}
-                      disabled={isProcessing}
-                      className="flex-1 flex items-center justify-center gap-2 rounded-2xl bg-brand-600 py-3 text-sm font-semibold text-white hover:bg-brand-700 disabled:opacity-60"
-                    >
-                      {isProcessing ? <Loader2 size={16} className="animate-spin" /> : <Zap size={16} />}
-                      {isProcessing ? 'Processing…' : 'Pay now'}
-                    </button>
-                  </div>
-                </div>
+              {step === 'payment' && clientSecret && selectedPkg && (
+                <Elements
+                  stripe={stripePromise}
+                  options={{ clientSecret, appearance: { theme: 'stripe' } }}
+                >
+                  <StripePayStep
+                    selectedPkg={selectedPkg}
+                    onSuccess={() => { setStep('success'); }}
+                    onBack={() => { setStep('select'); setClientSecret(null); }}
+                  />
+                </Elements>
               )}
 
               {step === 'success' && (

@@ -71,8 +71,11 @@ export async function POST(req: Request) {
   });
 }
 
-// GET — get conversation by sessionId
+// GET — get conversation by sessionId (auth required)
 export async function GET(req: Request) {
+  const session = await getSession().catch(() => null);
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+
   const { searchParams } = new URL(req.url);
   const sessionId = searchParams.get('sessionId');
   if (!sessionId) return NextResponse.json({ error: 'Missing sessionId' }, { status: 400 });

@@ -52,7 +52,13 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
     serverActions: {
-      allowedOrigins: ['fixit247bm.onrender.com', '*.onrender.com'],
+      allowedOrigins: [
+        'fixit247.com.au',
+        'www.fixit247.com.au',
+        'admin.fixit247.com.au',
+        'fixit247bm.onrender.com',
+        '*.onrender.com',
+      ],
     },
   },
   async redirects() {

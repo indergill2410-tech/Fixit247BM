@@ -93,6 +93,28 @@ services:
       - key: NEXT_PUBLIC_SENTRY_DSN
         sync: false
 
+      # ── Stripe subscription prices ──
+      - key: STRIPE_PRICE_BASIC
+        sync: false
+      - key: STRIPE_PRICE_PROFESSIONAL
+        sync: false
+      - key: STRIPE_PRICE_ELITE
+        sync: false
+
+      # ── Analytics pixels (optional) ──
+      - key: NEXT_PUBLIC_GA_ID
+        sync: false
+      - key: NEXT_PUBLIC_META_PIXEL_ID
+        sync: false
+      - key: NEXT_PUBLIC_TIKTOK_PIXEL_ID
+        sync: false
+
+      # ── Socket / realtime ──
+      - key: SOCKET_SECRET
+        sync: false
+      - key: NEXT_PUBLIC_SOCKET_URL
+        sync: false
+
   # ── Admin app ───────────────────────────────────────────────────────────────
   - type: web
     name: fixit247-admin

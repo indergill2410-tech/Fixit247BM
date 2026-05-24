@@ -17,7 +17,7 @@ import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 
-const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247.com.au').replace(/\/$/, '');
 
 function extractPathname(url: string): string {
   try {

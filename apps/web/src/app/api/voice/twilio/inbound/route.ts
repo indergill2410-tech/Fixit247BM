@@ -7,7 +7,7 @@ import crypto from 'crypto';
 
 export const runtime = 'nodejs';
 
-const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247bm.onrender.com').replace(/\/$/, '');
+const APP_BASE = (process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247.com.au').replace(/\/$/, '');
 
 // Simple in-memory rate limiter: max 5 calls per phone per 10 minutes
 const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
@@ -82,21 +82,9 @@ function validateTwilioSignature(req: Request, body: string): boolean {
   return valid;
 }
 
-// GET: quick liveness check — curl https://fixit247bm.onrender.com/api/voice/twilio/inbound
 export function GET() {
   checkEnvOnce();
-  return NextResponse.json({
-    status: 'ok',
-    route: 'twilio-inbound',
-    webhookBase: APP_BASE,
-    env: {
-      TWILIO_ACCOUNT_SID: process.env.TWILIO_ACCOUNT_SID ? 'set' : 'MISSING',
-      TWILIO_AUTH_TOKEN: process.env.TWILIO_AUTH_TOKEN ? 'set' : 'MISSING',
-      TWILIO_PHONE_NUMBER: process.env.TWILIO_PHONE_NUMBER ?? 'MISSING',
-      OPENAI_API_KEY: process.env.OPENAI_API_KEY ? 'set' : 'MISSING',
-      DATABASE_URL: process.env.DATABASE_URL ? 'set' : 'MISSING',
-    },
-  });
+  return NextResponse.json({ status: 'ok', route: 'twilio-inbound' });
 }
 
 export async function POST(req: Request) {

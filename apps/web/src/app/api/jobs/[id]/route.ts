@@ -8,7 +8,7 @@ export async function GET(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await requireSession();
+    const session = await requireSession();
     const { id } = await params;
 
     const job = await db.job.findUnique({
@@ -33,6 +33,23 @@ export async function GET(
 
     if (!job) {
       return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    }
+
+    // Verify the requesting user has access to this job
+    const isAdmin = session.role === 'ADMIN' || session.role === 'SUPER_ADMIN';
+    if (!isAdmin) {
+      const [customerProfile, tradieProfile] = await Promise.all([
+        db.customerProfile.findUnique({ where: { userId: session.id } }),
+        db.tradieProfile.findUnique({ where: { userId: session.id } }),
+      ]);
+      const isOwner = job.customerId === customerProfile?.id;
+      const isAssignedTradie = job.tradieId != null && job.tradieId === tradieProfile?.id;
+      const hasClaim = tradieProfile
+        ? (await db.jobClaim.count({ where: { jobId: id, tradieId: tradieProfile.id } })) > 0
+        : false;
+      if (!isOwner && !isAssignedTradie && !hasClaim) {
+        return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+      }
     }
 
     return NextResponse.json({ job });
