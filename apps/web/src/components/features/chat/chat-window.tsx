@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Send, Loader2, Image as ImageIcon, X } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@fixit247/ui';
 import { toast } from 'sonner';
 import { MessageBubble } from './message-bubble';
@@ -89,7 +89,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
   useEffect(() => {
     const unread = messages.filter((m) => m.senderId !== currentUserId);
     if (unread.length > 0) {
-      fetch(`/api/messages/${jobId}/read`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      void fetch(`/api/messages/${jobId}/read`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
   }, [messages, jobId, currentUserId]);
 

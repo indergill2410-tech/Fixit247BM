@@ -28,7 +28,8 @@ export function EmergencyQuickPost() {
     setIsPosting(true);
 
     try {
-      const trade = EMERGENCY_TRADES.find((t) => t.id === selected)!;
+      const trade = EMERGENCY_TRADES.find((t) => t.id === selected);
+      if (!trade) return;
       const res = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

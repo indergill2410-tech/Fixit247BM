@@ -26,7 +26,7 @@ export function CustomerOnboarding() {
   const [step, setStep] = React.useState(1);
   const [isComplete, setIsComplete] = React.useState(false);
 
-  const { register, handleSubmit, trigger, getValues, formState: { errors, isSubmitting } } = useForm<CustomerOnboardingValues>({
+  const { register, handleSubmit, trigger, formState: { errors, isSubmitting } } = useForm<CustomerOnboardingValues>({
     resolver: zodResolver(customerOnboardingSchema),
     defaultValues: {
       notifyBySms: true,

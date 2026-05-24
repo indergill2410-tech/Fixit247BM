@@ -4,7 +4,7 @@ import * as React from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MapPin, Zap, Clock, ChevronRight, ChevronLeft, Loader2, Sparkles } from 'lucide-react';
-import { Button, Badge } from '@fixit247/ui';
+import { Button } from '@fixit247/ui';
 import { cn } from '@fixit247/ui/src/lib/utils';
 import { MediaUpload } from './media-upload';
 import { AIScopeDisplay } from './ai-scope-display';
@@ -84,7 +84,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
   const [addresses, setAddresses] = React.useState<SavedAddress[]>([]);
 
   const [formData, setFormData] = React.useState<FormData>({
-    category: isEmergencyMode ? '' : '',
+    category: '',
     description: '',
     priority: isEmergencyMode ? 'EMERGENCY' : 'STANDARD',
     mediaUrls: [],

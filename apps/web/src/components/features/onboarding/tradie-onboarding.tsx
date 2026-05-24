@@ -8,7 +8,7 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Building2, ShieldCheck, Briefcase, Clock, CreditCard, CheckCircle,
-  Plus, X, Upload, Info,
+  Upload, Info,
 } from 'lucide-react';
 import { Button, Card, CardContent, Input, Badge } from '@fixit247/ui';
 import {
@@ -514,7 +514,7 @@ function Step5Payments({ onBack, onNext }: { onBack: () => void; onNext: (d: Tra
       emergencySurchargePercent: 50,
       availability: [],
     };
-    await onNext(fakeAvailability);
+    onNext(fakeAvailability);
   }
 
   return (

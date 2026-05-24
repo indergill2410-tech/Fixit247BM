@@ -181,6 +181,7 @@ export function useLocationBroadcast(jobId: string | undefined, enabled: boolean
           speed: pos.coords.speed ?? undefined,
         });
       },
+      // eslint-disable-next-line no-console
       (err) => { console.warn('[location]', err.message); },
       { enableHighAccuracy: true, maximumAge: 5000, timeout: 10000 }
     );

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Camera, Mic, MicOff, Upload, X, Loader2, AlertTriangle } from 'lucide-react';
+import { Camera, Mic, MicOff, X, Loader2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {

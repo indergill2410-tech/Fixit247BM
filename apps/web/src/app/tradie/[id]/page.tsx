@@ -17,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const name = `${tradie.user.firstName} ${tradie.user.lastName}`;
   const trade = tradie.trades[0]?.replace(/_/g, ' ') ?? 'Tradie';
   const suburb = 'Australia';
-  const rating = tradie.avgRating ? `${Number(tradie.avgRating).toFixed(1)}★ ` : '';
+  const rating = tradie.avgRating != null ? `${Number(tradie.avgRating).toFixed(1)}★ ` : '';
 
   const title = `${name} — ${rating}Verified ${trade} in ${suburb} | Fixit 24/7`;
   const description = `Book ${name}, a verified and licensed ${trade.toLowerCase()} in ${suburb}. ${rating ? `Rated ${rating}by customers. ` : ''}Fast response, upfront pricing, background checked.`;
@@ -64,7 +64,7 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
   const trades = tradie.trades.map((t) => TRADE_MAP[t] ?? t.replace(/_/g, ' '));
   const primaryTrade = trades[0] ?? 'Tradie';
   const suburb = 'Australia';
-  const rating = tradie.avgRating ? Number(tradie.avgRating) : null;
+  const rating = tradie.avgRating != null ? Number(tradie.avgRating) : null;
   const isVerified = tradie.verificationStatus === 'VERIFIED';
 
   // JSON-LD Person schema

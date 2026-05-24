@@ -65,7 +65,7 @@ export function TradieNavigationPanel({ jobId, jobAddress, jobLatitude, jobLongi
         <div>
           <p className="text-xs text-gray-400">Job address</p>
           <p className="text-sm font-medium text-gray-900">{jobAddress}</p>
-          {etaMinutes && <p className="mt-0.5 text-xs text-green-600">~{etaMinutes} min from current location</p>}
+          {etaMinutes != null && <p className="mt-0.5 text-xs text-green-600">~{etaMinutes} min from current location</p>}
         </div>
       </div>
 

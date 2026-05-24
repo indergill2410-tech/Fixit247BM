@@ -42,7 +42,7 @@ export async function requireSession(): Promise<SessionUser> {
     const { redirect } = await import('next/navigation');
     redirect('/login');
   }
-  return session!;
+  return session as SessionUser;
 }
 
 export async function requireRole(role: Role | Role[]): Promise<SessionUser> {

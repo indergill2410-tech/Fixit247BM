@@ -14,18 +14,6 @@ function formatTimeAgo(iso: string): string {
   return `${Math.floor(diff / 86_400_000)}d ago`;
 }
 
-const TYPE_COLORS: Record<string, string> = {
-  JOB_ACCEPTED: 'bg-green-100',
-  TRADIE_EN_ROUTE: 'bg-brand-500/20',
-  TRADIE_ARRIVED: 'bg-brand-500/30',
-  JOB_COMPLETED: 'bg-purple-100',
-  PAYMENT_RELEASED: 'bg-green-100',
-  PAYMENT_FAILED: 'bg-red-100',
-  DISPUTE_OPENED: 'bg-red-100',
-  NEW_MESSAGE: 'bg-gray-100',
-  CREDIT_LOW: 'bg-orange-100',
-  DEFAULT: 'bg-gray-100',
-};
 
 export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCount?: number }) {
   const [open, setOpen] = useState(false);
@@ -44,7 +32,7 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
     fetch('/api/notifications?limit=20')
       .then((r) => r.json())
       .then((data) => { setServerNotifs(data.notifications ?? []); })
-      .catch(() => {})
+      .catch(() => undefined)
       .finally(() => { setLoadingServer(false); });
   }, [open]);
 
@@ -59,14 +47,14 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
 
   async function handleMarkAllRead() {
     markAllRead();
-    await fetch('/api/notifications/all/read', { method: 'PATCH' }).catch(() => {});
+    await fetch('/api/notifications/all/read', { method: 'PATCH' }).catch(() => undefined);
     setServerNotifs((prev) => prev.map((n) => ({ ...n })));
     toast.success('All notifications marked as read');
   }
 
   async function handleMarkRead(id: string) {
     markRead(id);
-    await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' }).catch(() => {});
+    await fetch(`/api/notifications/${id}/read`, { method: 'PATCH' }).catch(() => undefined);
   }
 
   const allNotifs = [
@@ -104,7 +92,7 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
               <h3 className="text-sm font-semibold text-gray-900">Notifications</h3>
               {allNotifs.length > 0 && (
                 <button
-                  onClick={handleMarkAllRead}
+                  onClick={() => { void handleMarkAllRead(); }}
                   className="flex items-center gap-1 text-xs text-brand-600 hover:underline"
                 >
                   <CheckCheck size={12} />
@@ -127,7 +115,7 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
                 allNotifs.map((notif) => (
                   <button
                     key={notif.id}
-                    onClick={() => handleMarkRead(notif.id)}
+                    onClick={() => { void handleMarkRead(notif.id); }}
                     className="flex w-full items-start gap-3 border-b px-4 py-3 text-left last:border-0 hover:bg-gray-50 transition-colors"
                   >
                     <div className={`mt-1 h-2 w-2 shrink-0 rounded-full ${(notif as { isNew?: boolean }).isNew ? 'bg-brand-500' : 'bg-transparent'}`} />

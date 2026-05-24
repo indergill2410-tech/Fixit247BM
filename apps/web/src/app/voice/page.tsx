@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
-import Link from 'next/link';
-import { Phone, Mic, Shield, Clock, Star } from 'lucide-react';
+import { Mic, Shield, Clock } from 'lucide-react';
 import { EmergencyVoiceButton } from '@/components/features/voice/emergency-voice-button';
 import { ConversationalBooking } from '@/components/features/voice/conversational-booking';
 

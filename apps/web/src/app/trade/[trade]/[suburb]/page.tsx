@@ -95,7 +95,7 @@ export default async function TradeLandingPage({ params }: { params: Promise<{ t
   // Fetch real local tradies from DB
   const localTradies = await db.tradieProfile.findMany({
     where: {
-      trades: { has: tradeCategoryKey as any },
+      trades: { has: tradeCategoryKey as never },
       verificationStatus: 'VERIFIED',
     },
     include: { user: { select: { firstName: true, lastName: true, avatarUrl: true } } },
