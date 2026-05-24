@@ -61,7 +61,7 @@ function createAdapter() {
 }
 
 const baseClient = new PrismaClient({
-  adapter: createAdapter(),
+  datasourceUrl: process.env.DATABASE_URL,
   log:
     process.env.NODE_ENV === 'development'
       ? ['query', 'error', 'warn']
