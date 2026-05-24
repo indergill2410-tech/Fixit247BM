@@ -7,7 +7,7 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      corepack enable &&
+      npm install -g pnpm@9 &&
       pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/web build
@@ -103,9 +103,8 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      corepack enable &&
+      npm install -g pnpm@9 &&
       pnpm install --frozen-lockfile &&
-      pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/admin build
     startCommand: >
       cp -r apps/admin/.next/static apps/admin/.next/standalone/apps/admin/.next/static &&
