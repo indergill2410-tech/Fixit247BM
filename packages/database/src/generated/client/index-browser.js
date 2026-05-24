@@ -1010,10 +1010,492 @@ exports.Prisma.NullsOrder = {
   last: 'last'
 };
 
+exports.Prisma.UserOrderByRelevanceFieldEnum = {
+  id: 'id',
+  email: 'email',
+  phone: 'phone',
+  firstName: 'firstName',
+  lastName: 'lastName',
+  avatarUrl: 'avatarUrl',
+  lastIpAddress: 'lastIpAddress'
+};
+
+exports.Prisma.SessionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  token: 'token',
+  refreshToken: 'refreshToken',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent',
+  deviceType: 'deviceType'
+};
+
 exports.Prisma.JsonNullValueFilter = {
   DbNull: Prisma.DbNull,
   JsonNull: Prisma.JsonNull,
   AnyNull: Prisma.AnyNull
+};
+
+exports.Prisma.AuditLogOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  resource: 'resource',
+  resourceId: 'resourceId',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent'
+};
+
+exports.Prisma.CustomerProfileOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  suburb: 'suburb',
+  postcode: 'postcode',
+  state: 'state',
+  defaultAddressId: 'defaultAddressId',
+  emergencyContactName: 'emergencyContactName',
+  emergencyContactPhone: 'emergencyContactPhone'
+};
+
+exports.Prisma.TradieProfileOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  businessName: 'businessName',
+  abn: 'abn',
+  bio: 'bio',
+  stripeAccountId: 'stripeAccountId'
+};
+
+exports.Prisma.TradieDocumentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  type: 'type',
+  fileName: 'fileName',
+  fileUrl: 'fileUrl',
+  mimeType: 'mimeType',
+  reviewedBy: 'reviewedBy',
+  reviewNotes: 'reviewNotes'
+};
+
+exports.Prisma.TradiePortfolioOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  title: 'title',
+  description: 'description',
+  beforeImageUrl: 'beforeImageUrl',
+  afterImageUrl: 'afterImageUrl'
+};
+
+exports.Prisma.TradeCategoryConfigOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  slug: 'slug',
+  icon: 'icon',
+  description: 'description'
+};
+
+exports.Prisma.AvailabilityOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  startTime: 'startTime',
+  endTime: 'endTime'
+};
+
+exports.Prisma.EmergencySettingsOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId'
+};
+
+exports.Prisma.AddressOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  customerProfileId: 'customerProfileId',
+  label: 'label',
+  street: 'street',
+  suburb: 'suburb',
+  city: 'city',
+  state: 'state',
+  postcode: 'postcode',
+  country: 'country'
+};
+
+exports.Prisma.SavedTradieOrderByRelevanceFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  tradieId: 'tradieId'
+};
+
+exports.Prisma.JobOrderByRelevanceFieldEnum = {
+  id: 'id',
+  customerId: 'customerId',
+  tradieId: 'tradieId',
+  addressId: 'addressId',
+  title: 'title',
+  description: 'description',
+  aiSuggestedTradies: 'aiSuggestedTradies',
+  cancelReason: 'cancelReason',
+  mediaUrls: 'mediaUrls',
+  voiceNoteUrl: 'voiceNoteUrl',
+  preferredTime: 'preferredTime'
+};
+
+exports.Prisma.JobClaimOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  tradieId: 'tradieId',
+  message: 'message'
+};
+
+exports.Prisma.JobStatusHistoryOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  note: 'note',
+  changedBy: 'changedBy'
+};
+
+exports.Prisma.JobImageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  url: 'url',
+  type: 'type',
+  uploadedBy: 'uploadedBy'
+};
+
+exports.Prisma.ReviewOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  reviewerId: 'reviewerId',
+  revieweeId: 'revieweeId',
+  title: 'title',
+  body: 'body',
+  responseText: 'responseText'
+};
+
+exports.Prisma.MessageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  senderId: 'senderId',
+  receiverId: 'receiverId',
+  content: 'content',
+  mediaUrl: 'mediaUrl',
+  mediaType: 'mediaType'
+};
+
+exports.Prisma.NotificationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  jobId: 'jobId',
+  title: 'title',
+  body: 'body'
+};
+
+exports.Prisma.PaymentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  customerId: 'customerId',
+  tradieId: 'tradieId',
+  currency: 'currency',
+  stripePaymentIntentId: 'stripePaymentIntentId',
+  stripeTransferId: 'stripeTransferId',
+  stripeCustomerId: 'stripeCustomerId',
+  refundReason: 'refundReason',
+  disputeId: 'disputeId'
+};
+
+exports.Prisma.SubscriptionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  stripeSubscriptionId: 'stripeSubscriptionId',
+  stripePriceId: 'stripePriceId'
+};
+
+exports.Prisma.CreditsWalletOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId'
+};
+
+exports.Prisma.TransactionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  walletId: 'walletId',
+  description: 'description',
+  referenceId: 'referenceId',
+  referenceType: 'referenceType'
+};
+
+exports.Prisma.LicenceOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  licenceType: 'licenceType',
+  licenceNumber: 'licenceNumber',
+  state: 'state',
+  documentUrl: 'documentUrl'
+};
+
+exports.Prisma.InsuranceOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  insurer: 'insurer',
+  policyNumber: 'policyNumber',
+  coverType: 'coverType',
+  documentUrl: 'documentUrl'
+};
+
+exports.Prisma.CertificationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  name: 'name',
+  issuedBy: 'issuedBy',
+  documentUrl: 'documentUrl'
+};
+
+exports.Prisma.JobMatchingQueueOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  tradieId: 'tradieId',
+  declineReason: 'declineReason'
+};
+
+exports.Prisma.JobEventOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  actorId: 'actorId'
+};
+
+exports.Prisma.TradieRealtimeStatusOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  currentJobId: 'currentJobId'
+};
+
+exports.Prisma.AIJobInsightOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  rawInput: 'rawInput',
+  emergencyIndicators: 'emergencyIndicators',
+  suggestedTitle: 'suggestedTitle',
+  professionalSummary: 'professionalSummary',
+  suggestedMaterials: 'suggestedMaterials',
+  suggestedTrades: 'suggestedTrades',
+  voiceTranscript: 'voiceTranscript',
+  modelUsed: 'modelUsed'
+};
+
+exports.Prisma.PayoutOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  jobId: 'jobId',
+  currency: 'currency',
+  stripeTransferId: 'stripeTransferId',
+  stripePayoutId: 'stripePayoutId',
+  failureReason: 'failureReason',
+  heldReason: 'heldReason',
+  heldBy: 'heldBy'
+};
+
+exports.Prisma.CreditPackageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  stripePriceId: 'stripePriceId'
+};
+
+exports.Prisma.CreditLedgerOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  jobId: 'jobId',
+  packageId: 'packageId',
+  referenceId: 'referenceId',
+  description: 'description'
+};
+
+exports.Prisma.PlatformConfigOrderByRelevanceFieldEnum = {
+  id: 'id',
+  key: 'key',
+  value: 'value',
+  category: 'category',
+  updatedBy: 'updatedBy'
+};
+
+exports.Prisma.SurgePricingRuleOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name',
+  tradeCategories: 'tradeCategories'
+};
+
+exports.Prisma.NotificationPreferenceOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  disabledTypes: 'disabledTypes'
+};
+
+exports.Prisma.LocationTrackingOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  jobId: 'jobId'
+};
+
+exports.Prisma.TrustScoreHistoryOrderByRelevanceFieldEnum = {
+  id: 'id',
+  tradieId: 'tradieId',
+  reason: 'reason',
+  jobId: 'jobId',
+  adminId: 'adminId'
+};
+
+exports.Prisma.FraudFlagOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  title: 'title',
+  description: 'description',
+  jobId: 'jobId',
+  reviewedBy: 'reviewedBy'
+};
+
+exports.Prisma.DisputeOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  customerId: 'customerId',
+  tradieId: 'tradieId',
+  title: 'title',
+  description: 'description',
+  evidenceUrls: 'evidenceUrls',
+  adminNotes: 'adminNotes',
+  resolution: 'resolution',
+  assignedTo: 'assignedTo',
+  resolvedBy: 'resolvedBy'
+};
+
+exports.Prisma.ModerationActionOrderByRelevanceFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  targetUserId: 'targetUserId',
+  reason: 'reason'
+};
+
+exports.Prisma.AdminAuditLogOrderByRelevanceFieldEnum = {
+  id: 'id',
+  adminId: 'adminId',
+  action: 'action',
+  entity: 'entity',
+  entityId: 'entityId',
+  ipAddress: 'ipAddress',
+  userAgent: 'userAgent'
+};
+
+exports.Prisma.SupportTicketOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  jobId: 'jobId',
+  subject: 'subject',
+  description: 'description',
+  assignedTo: 'assignedTo'
+};
+
+exports.Prisma.SupportMessageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  ticketId: 'ticketId',
+  senderId: 'senderId',
+  content: 'content'
+};
+
+exports.Prisma.PlatformAlertOrderByRelevanceFieldEnum = {
+  id: 'id',
+  title: 'title',
+  message: 'message',
+  dismissedBy: 'dismissedBy'
+};
+
+exports.Prisma.ReferralOrderByRelevanceFieldEnum = {
+  id: 'id',
+  inviterId: 'inviterId',
+  invitedEmail: 'invitedEmail',
+  invitedUserId: 'invitedUserId',
+  code: 'code'
+};
+
+exports.Prisma.SEOPageOrderByRelevanceFieldEnum = {
+  id: 'id',
+  slug: 'slug',
+  title: 'title',
+  metaDescription: 'metaDescription',
+  h1: 'h1',
+  suburb: 'suburb',
+  state: 'state',
+  tradeCategory: 'tradeCategory',
+  canonicalUrl: 'canonicalUrl'
+};
+
+exports.Prisma.GrowthEventOrderByRelevanceFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  sessionId: 'sessionId',
+  page: 'page',
+  referrer: 'referrer',
+  suburb: 'suburb',
+  ipHash: 'ipHash',
+  userAgent: 'userAgent'
+};
+
+exports.Prisma.SuburbMetricsOrderByRelevanceFieldEnum = {
+  id: 'id',
+  suburb: 'suburb',
+  state: 'state',
+  postcode: 'postcode'
+};
+
+exports.Prisma.MarketingCampaignOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name'
+};
+
+exports.Prisma.ReviewRequestOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  customerId: 'customerId',
+  tradieId: 'tradieId'
+};
+
+exports.Prisma.ReferralProgramOrderByRelevanceFieldEnum = {
+  id: 'id',
+  name: 'name'
+};
+
+exports.Prisma.VoiceCallOrderByRelevanceFieldEnum = {
+  id: 'id',
+  twilioCallSid: 'twilioCallSid',
+  customerId: 'customerId',
+  phoneNumber: 'phoneNumber',
+  recordingUrl: 'recordingUrl',
+  transcript: 'transcript',
+  jobId: 'jobId',
+  assignedAgentId: 'assignedAgentId'
+};
+
+exports.Prisma.VoiceEventOrderByRelevanceFieldEnum = {
+  id: 'id',
+  callId: 'callId'
+};
+
+exports.Prisma.EmergencyAssessmentOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  callId: 'callId',
+  detectedKeywords: 'detectedKeywords',
+  tradeCategory: 'tradeCategory',
+  recommendedAction: 'recommendedAction',
+  safetyInstructions: 'safetyInstructions'
+};
+
+exports.Prisma.AIConversationOrderByRelevanceFieldEnum = {
+  id: 'id',
+  jobId: 'jobId',
+  callId: 'callId',
+  sessionId: 'sessionId',
+  aiSummary: 'aiSummary',
+  tradeCategory: 'tradeCategory'
+};
+
+exports.Prisma.StripeProcessedEventOrderByRelevanceFieldEnum = {
+  eventId: 'eventId',
+  eventType: 'eventType'
 };
 exports.Role = exports.$Enums.Role = {
   CUSTOMER: 'CUSTOMER',

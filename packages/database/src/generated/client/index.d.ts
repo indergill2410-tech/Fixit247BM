@@ -75531,6 +75531,32 @@ export namespace Prisma {
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
 
 
+  export const UserOrderByRelevanceFieldEnum: {
+    id: 'id',
+    email: 'email',
+    phone: 'phone',
+    firstName: 'firstName',
+    lastName: 'lastName',
+    avatarUrl: 'avatarUrl',
+    lastIpAddress: 'lastIpAddress'
+  };
+
+  export type UserOrderByRelevanceFieldEnum = (typeof UserOrderByRelevanceFieldEnum)[keyof typeof UserOrderByRelevanceFieldEnum]
+
+
+  export const SessionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    token: 'token',
+    refreshToken: 'refreshToken',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent',
+    deviceType: 'deviceType'
+  };
+
+  export type SessionOrderByRelevanceFieldEnum = (typeof SessionOrderByRelevanceFieldEnum)[keyof typeof SessionOrderByRelevanceFieldEnum]
+
+
   export const JsonNullValueFilter: {
     DbNull: typeof DbNull,
     JsonNull: typeof JsonNull,
@@ -75538,6 +75564,633 @@ export namespace Prisma {
   };
 
   export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
+
+
+  export const AuditLogOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    resource: 'resource',
+    resourceId: 'resourceId',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent'
+  };
+
+  export type AuditLogOrderByRelevanceFieldEnum = (typeof AuditLogOrderByRelevanceFieldEnum)[keyof typeof AuditLogOrderByRelevanceFieldEnum]
+
+
+  export const CustomerProfileOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    suburb: 'suburb',
+    postcode: 'postcode',
+    state: 'state',
+    defaultAddressId: 'defaultAddressId',
+    emergencyContactName: 'emergencyContactName',
+    emergencyContactPhone: 'emergencyContactPhone'
+  };
+
+  export type CustomerProfileOrderByRelevanceFieldEnum = (typeof CustomerProfileOrderByRelevanceFieldEnum)[keyof typeof CustomerProfileOrderByRelevanceFieldEnum]
+
+
+  export const TradieProfileOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    businessName: 'businessName',
+    abn: 'abn',
+    bio: 'bio',
+    stripeAccountId: 'stripeAccountId'
+  };
+
+  export type TradieProfileOrderByRelevanceFieldEnum = (typeof TradieProfileOrderByRelevanceFieldEnum)[keyof typeof TradieProfileOrderByRelevanceFieldEnum]
+
+
+  export const TradieDocumentOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    type: 'type',
+    fileName: 'fileName',
+    fileUrl: 'fileUrl',
+    mimeType: 'mimeType',
+    reviewedBy: 'reviewedBy',
+    reviewNotes: 'reviewNotes'
+  };
+
+  export type TradieDocumentOrderByRelevanceFieldEnum = (typeof TradieDocumentOrderByRelevanceFieldEnum)[keyof typeof TradieDocumentOrderByRelevanceFieldEnum]
+
+
+  export const TradiePortfolioOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    title: 'title',
+    description: 'description',
+    beforeImageUrl: 'beforeImageUrl',
+    afterImageUrl: 'afterImageUrl'
+  };
+
+  export type TradiePortfolioOrderByRelevanceFieldEnum = (typeof TradiePortfolioOrderByRelevanceFieldEnum)[keyof typeof TradiePortfolioOrderByRelevanceFieldEnum]
+
+
+  export const TradeCategoryConfigOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    slug: 'slug',
+    icon: 'icon',
+    description: 'description'
+  };
+
+  export type TradeCategoryConfigOrderByRelevanceFieldEnum = (typeof TradeCategoryConfigOrderByRelevanceFieldEnum)[keyof typeof TradeCategoryConfigOrderByRelevanceFieldEnum]
+
+
+  export const AvailabilityOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    startTime: 'startTime',
+    endTime: 'endTime'
+  };
+
+  export type AvailabilityOrderByRelevanceFieldEnum = (typeof AvailabilityOrderByRelevanceFieldEnum)[keyof typeof AvailabilityOrderByRelevanceFieldEnum]
+
+
+  export const EmergencySettingsOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId'
+  };
+
+  export type EmergencySettingsOrderByRelevanceFieldEnum = (typeof EmergencySettingsOrderByRelevanceFieldEnum)[keyof typeof EmergencySettingsOrderByRelevanceFieldEnum]
+
+
+  export const AddressOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    customerProfileId: 'customerProfileId',
+    label: 'label',
+    street: 'street',
+    suburb: 'suburb',
+    city: 'city',
+    state: 'state',
+    postcode: 'postcode',
+    country: 'country'
+  };
+
+  export type AddressOrderByRelevanceFieldEnum = (typeof AddressOrderByRelevanceFieldEnum)[keyof typeof AddressOrderByRelevanceFieldEnum]
+
+
+  export const SavedTradieOrderByRelevanceFieldEnum: {
+    id: 'id',
+    customerId: 'customerId',
+    tradieId: 'tradieId'
+  };
+
+  export type SavedTradieOrderByRelevanceFieldEnum = (typeof SavedTradieOrderByRelevanceFieldEnum)[keyof typeof SavedTradieOrderByRelevanceFieldEnum]
+
+
+  export const JobOrderByRelevanceFieldEnum: {
+    id: 'id',
+    customerId: 'customerId',
+    tradieId: 'tradieId',
+    addressId: 'addressId',
+    title: 'title',
+    description: 'description',
+    aiSuggestedTradies: 'aiSuggestedTradies',
+    cancelReason: 'cancelReason',
+    mediaUrls: 'mediaUrls',
+    voiceNoteUrl: 'voiceNoteUrl',
+    preferredTime: 'preferredTime'
+  };
+
+  export type JobOrderByRelevanceFieldEnum = (typeof JobOrderByRelevanceFieldEnum)[keyof typeof JobOrderByRelevanceFieldEnum]
+
+
+  export const JobClaimOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    tradieId: 'tradieId',
+    message: 'message'
+  };
+
+  export type JobClaimOrderByRelevanceFieldEnum = (typeof JobClaimOrderByRelevanceFieldEnum)[keyof typeof JobClaimOrderByRelevanceFieldEnum]
+
+
+  export const JobStatusHistoryOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    note: 'note',
+    changedBy: 'changedBy'
+  };
+
+  export type JobStatusHistoryOrderByRelevanceFieldEnum = (typeof JobStatusHistoryOrderByRelevanceFieldEnum)[keyof typeof JobStatusHistoryOrderByRelevanceFieldEnum]
+
+
+  export const JobImageOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    url: 'url',
+    type: 'type',
+    uploadedBy: 'uploadedBy'
+  };
+
+  export type JobImageOrderByRelevanceFieldEnum = (typeof JobImageOrderByRelevanceFieldEnum)[keyof typeof JobImageOrderByRelevanceFieldEnum]
+
+
+  export const ReviewOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    reviewerId: 'reviewerId',
+    revieweeId: 'revieweeId',
+    title: 'title',
+    body: 'body',
+    responseText: 'responseText'
+  };
+
+  export type ReviewOrderByRelevanceFieldEnum = (typeof ReviewOrderByRelevanceFieldEnum)[keyof typeof ReviewOrderByRelevanceFieldEnum]
+
+
+  export const MessageOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    senderId: 'senderId',
+    receiverId: 'receiverId',
+    content: 'content',
+    mediaUrl: 'mediaUrl',
+    mediaType: 'mediaType'
+  };
+
+  export type MessageOrderByRelevanceFieldEnum = (typeof MessageOrderByRelevanceFieldEnum)[keyof typeof MessageOrderByRelevanceFieldEnum]
+
+
+  export const NotificationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    jobId: 'jobId',
+    title: 'title',
+    body: 'body'
+  };
+
+  export type NotificationOrderByRelevanceFieldEnum = (typeof NotificationOrderByRelevanceFieldEnum)[keyof typeof NotificationOrderByRelevanceFieldEnum]
+
+
+  export const PaymentOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    customerId: 'customerId',
+    tradieId: 'tradieId',
+    currency: 'currency',
+    stripePaymentIntentId: 'stripePaymentIntentId',
+    stripeTransferId: 'stripeTransferId',
+    stripeCustomerId: 'stripeCustomerId',
+    refundReason: 'refundReason',
+    disputeId: 'disputeId'
+  };
+
+  export type PaymentOrderByRelevanceFieldEnum = (typeof PaymentOrderByRelevanceFieldEnum)[keyof typeof PaymentOrderByRelevanceFieldEnum]
+
+
+  export const SubscriptionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    stripeSubscriptionId: 'stripeSubscriptionId',
+    stripePriceId: 'stripePriceId'
+  };
+
+  export type SubscriptionOrderByRelevanceFieldEnum = (typeof SubscriptionOrderByRelevanceFieldEnum)[keyof typeof SubscriptionOrderByRelevanceFieldEnum]
+
+
+  export const CreditsWalletOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId'
+  };
+
+  export type CreditsWalletOrderByRelevanceFieldEnum = (typeof CreditsWalletOrderByRelevanceFieldEnum)[keyof typeof CreditsWalletOrderByRelevanceFieldEnum]
+
+
+  export const TransactionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    walletId: 'walletId',
+    description: 'description',
+    referenceId: 'referenceId',
+    referenceType: 'referenceType'
+  };
+
+  export type TransactionOrderByRelevanceFieldEnum = (typeof TransactionOrderByRelevanceFieldEnum)[keyof typeof TransactionOrderByRelevanceFieldEnum]
+
+
+  export const LicenceOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    licenceType: 'licenceType',
+    licenceNumber: 'licenceNumber',
+    state: 'state',
+    documentUrl: 'documentUrl'
+  };
+
+  export type LicenceOrderByRelevanceFieldEnum = (typeof LicenceOrderByRelevanceFieldEnum)[keyof typeof LicenceOrderByRelevanceFieldEnum]
+
+
+  export const InsuranceOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    insurer: 'insurer',
+    policyNumber: 'policyNumber',
+    coverType: 'coverType',
+    documentUrl: 'documentUrl'
+  };
+
+  export type InsuranceOrderByRelevanceFieldEnum = (typeof InsuranceOrderByRelevanceFieldEnum)[keyof typeof InsuranceOrderByRelevanceFieldEnum]
+
+
+  export const CertificationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    name: 'name',
+    issuedBy: 'issuedBy',
+    documentUrl: 'documentUrl'
+  };
+
+  export type CertificationOrderByRelevanceFieldEnum = (typeof CertificationOrderByRelevanceFieldEnum)[keyof typeof CertificationOrderByRelevanceFieldEnum]
+
+
+  export const JobMatchingQueueOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    tradieId: 'tradieId',
+    declineReason: 'declineReason'
+  };
+
+  export type JobMatchingQueueOrderByRelevanceFieldEnum = (typeof JobMatchingQueueOrderByRelevanceFieldEnum)[keyof typeof JobMatchingQueueOrderByRelevanceFieldEnum]
+
+
+  export const JobEventOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    actorId: 'actorId'
+  };
+
+  export type JobEventOrderByRelevanceFieldEnum = (typeof JobEventOrderByRelevanceFieldEnum)[keyof typeof JobEventOrderByRelevanceFieldEnum]
+
+
+  export const TradieRealtimeStatusOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    currentJobId: 'currentJobId'
+  };
+
+  export type TradieRealtimeStatusOrderByRelevanceFieldEnum = (typeof TradieRealtimeStatusOrderByRelevanceFieldEnum)[keyof typeof TradieRealtimeStatusOrderByRelevanceFieldEnum]
+
+
+  export const AIJobInsightOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    rawInput: 'rawInput',
+    emergencyIndicators: 'emergencyIndicators',
+    suggestedTitle: 'suggestedTitle',
+    professionalSummary: 'professionalSummary',
+    suggestedMaterials: 'suggestedMaterials',
+    suggestedTrades: 'suggestedTrades',
+    voiceTranscript: 'voiceTranscript',
+    modelUsed: 'modelUsed'
+  };
+
+  export type AIJobInsightOrderByRelevanceFieldEnum = (typeof AIJobInsightOrderByRelevanceFieldEnum)[keyof typeof AIJobInsightOrderByRelevanceFieldEnum]
+
+
+  export const PayoutOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    jobId: 'jobId',
+    currency: 'currency',
+    stripeTransferId: 'stripeTransferId',
+    stripePayoutId: 'stripePayoutId',
+    failureReason: 'failureReason',
+    heldReason: 'heldReason',
+    heldBy: 'heldBy'
+  };
+
+  export type PayoutOrderByRelevanceFieldEnum = (typeof PayoutOrderByRelevanceFieldEnum)[keyof typeof PayoutOrderByRelevanceFieldEnum]
+
+
+  export const CreditPackageOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    stripePriceId: 'stripePriceId'
+  };
+
+  export type CreditPackageOrderByRelevanceFieldEnum = (typeof CreditPackageOrderByRelevanceFieldEnum)[keyof typeof CreditPackageOrderByRelevanceFieldEnum]
+
+
+  export const CreditLedgerOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    jobId: 'jobId',
+    packageId: 'packageId',
+    referenceId: 'referenceId',
+    description: 'description'
+  };
+
+  export type CreditLedgerOrderByRelevanceFieldEnum = (typeof CreditLedgerOrderByRelevanceFieldEnum)[keyof typeof CreditLedgerOrderByRelevanceFieldEnum]
+
+
+  export const PlatformConfigOrderByRelevanceFieldEnum: {
+    id: 'id',
+    key: 'key',
+    value: 'value',
+    category: 'category',
+    updatedBy: 'updatedBy'
+  };
+
+  export type PlatformConfigOrderByRelevanceFieldEnum = (typeof PlatformConfigOrderByRelevanceFieldEnum)[keyof typeof PlatformConfigOrderByRelevanceFieldEnum]
+
+
+  export const SurgePricingRuleOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name',
+    tradeCategories: 'tradeCategories'
+  };
+
+  export type SurgePricingRuleOrderByRelevanceFieldEnum = (typeof SurgePricingRuleOrderByRelevanceFieldEnum)[keyof typeof SurgePricingRuleOrderByRelevanceFieldEnum]
+
+
+  export const NotificationPreferenceOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    disabledTypes: 'disabledTypes'
+  };
+
+  export type NotificationPreferenceOrderByRelevanceFieldEnum = (typeof NotificationPreferenceOrderByRelevanceFieldEnum)[keyof typeof NotificationPreferenceOrderByRelevanceFieldEnum]
+
+
+  export const LocationTrackingOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    jobId: 'jobId'
+  };
+
+  export type LocationTrackingOrderByRelevanceFieldEnum = (typeof LocationTrackingOrderByRelevanceFieldEnum)[keyof typeof LocationTrackingOrderByRelevanceFieldEnum]
+
+
+  export const TrustScoreHistoryOrderByRelevanceFieldEnum: {
+    id: 'id',
+    tradieId: 'tradieId',
+    reason: 'reason',
+    jobId: 'jobId',
+    adminId: 'adminId'
+  };
+
+  export type TrustScoreHistoryOrderByRelevanceFieldEnum = (typeof TrustScoreHistoryOrderByRelevanceFieldEnum)[keyof typeof TrustScoreHistoryOrderByRelevanceFieldEnum]
+
+
+  export const FraudFlagOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    title: 'title',
+    description: 'description',
+    jobId: 'jobId',
+    reviewedBy: 'reviewedBy'
+  };
+
+  export type FraudFlagOrderByRelevanceFieldEnum = (typeof FraudFlagOrderByRelevanceFieldEnum)[keyof typeof FraudFlagOrderByRelevanceFieldEnum]
+
+
+  export const DisputeOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    customerId: 'customerId',
+    tradieId: 'tradieId',
+    title: 'title',
+    description: 'description',
+    evidenceUrls: 'evidenceUrls',
+    adminNotes: 'adminNotes',
+    resolution: 'resolution',
+    assignedTo: 'assignedTo',
+    resolvedBy: 'resolvedBy'
+  };
+
+  export type DisputeOrderByRelevanceFieldEnum = (typeof DisputeOrderByRelevanceFieldEnum)[keyof typeof DisputeOrderByRelevanceFieldEnum]
+
+
+  export const ModerationActionOrderByRelevanceFieldEnum: {
+    id: 'id',
+    adminId: 'adminId',
+    targetUserId: 'targetUserId',
+    reason: 'reason'
+  };
+
+  export type ModerationActionOrderByRelevanceFieldEnum = (typeof ModerationActionOrderByRelevanceFieldEnum)[keyof typeof ModerationActionOrderByRelevanceFieldEnum]
+
+
+  export const AdminAuditLogOrderByRelevanceFieldEnum: {
+    id: 'id',
+    adminId: 'adminId',
+    action: 'action',
+    entity: 'entity',
+    entityId: 'entityId',
+    ipAddress: 'ipAddress',
+    userAgent: 'userAgent'
+  };
+
+  export type AdminAuditLogOrderByRelevanceFieldEnum = (typeof AdminAuditLogOrderByRelevanceFieldEnum)[keyof typeof AdminAuditLogOrderByRelevanceFieldEnum]
+
+
+  export const SupportTicketOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    jobId: 'jobId',
+    subject: 'subject',
+    description: 'description',
+    assignedTo: 'assignedTo'
+  };
+
+  export type SupportTicketOrderByRelevanceFieldEnum = (typeof SupportTicketOrderByRelevanceFieldEnum)[keyof typeof SupportTicketOrderByRelevanceFieldEnum]
+
+
+  export const SupportMessageOrderByRelevanceFieldEnum: {
+    id: 'id',
+    ticketId: 'ticketId',
+    senderId: 'senderId',
+    content: 'content'
+  };
+
+  export type SupportMessageOrderByRelevanceFieldEnum = (typeof SupportMessageOrderByRelevanceFieldEnum)[keyof typeof SupportMessageOrderByRelevanceFieldEnum]
+
+
+  export const PlatformAlertOrderByRelevanceFieldEnum: {
+    id: 'id',
+    title: 'title',
+    message: 'message',
+    dismissedBy: 'dismissedBy'
+  };
+
+  export type PlatformAlertOrderByRelevanceFieldEnum = (typeof PlatformAlertOrderByRelevanceFieldEnum)[keyof typeof PlatformAlertOrderByRelevanceFieldEnum]
+
+
+  export const ReferralOrderByRelevanceFieldEnum: {
+    id: 'id',
+    inviterId: 'inviterId',
+    invitedEmail: 'invitedEmail',
+    invitedUserId: 'invitedUserId',
+    code: 'code'
+  };
+
+  export type ReferralOrderByRelevanceFieldEnum = (typeof ReferralOrderByRelevanceFieldEnum)[keyof typeof ReferralOrderByRelevanceFieldEnum]
+
+
+  export const SEOPageOrderByRelevanceFieldEnum: {
+    id: 'id',
+    slug: 'slug',
+    title: 'title',
+    metaDescription: 'metaDescription',
+    h1: 'h1',
+    suburb: 'suburb',
+    state: 'state',
+    tradeCategory: 'tradeCategory',
+    canonicalUrl: 'canonicalUrl'
+  };
+
+  export type SEOPageOrderByRelevanceFieldEnum = (typeof SEOPageOrderByRelevanceFieldEnum)[keyof typeof SEOPageOrderByRelevanceFieldEnum]
+
+
+  export const GrowthEventOrderByRelevanceFieldEnum: {
+    id: 'id',
+    userId: 'userId',
+    sessionId: 'sessionId',
+    page: 'page',
+    referrer: 'referrer',
+    suburb: 'suburb',
+    ipHash: 'ipHash',
+    userAgent: 'userAgent'
+  };
+
+  export type GrowthEventOrderByRelevanceFieldEnum = (typeof GrowthEventOrderByRelevanceFieldEnum)[keyof typeof GrowthEventOrderByRelevanceFieldEnum]
+
+
+  export const SuburbMetricsOrderByRelevanceFieldEnum: {
+    id: 'id',
+    suburb: 'suburb',
+    state: 'state',
+    postcode: 'postcode'
+  };
+
+  export type SuburbMetricsOrderByRelevanceFieldEnum = (typeof SuburbMetricsOrderByRelevanceFieldEnum)[keyof typeof SuburbMetricsOrderByRelevanceFieldEnum]
+
+
+  export const MarketingCampaignOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name'
+  };
+
+  export type MarketingCampaignOrderByRelevanceFieldEnum = (typeof MarketingCampaignOrderByRelevanceFieldEnum)[keyof typeof MarketingCampaignOrderByRelevanceFieldEnum]
+
+
+  export const ReviewRequestOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    customerId: 'customerId',
+    tradieId: 'tradieId'
+  };
+
+  export type ReviewRequestOrderByRelevanceFieldEnum = (typeof ReviewRequestOrderByRelevanceFieldEnum)[keyof typeof ReviewRequestOrderByRelevanceFieldEnum]
+
+
+  export const ReferralProgramOrderByRelevanceFieldEnum: {
+    id: 'id',
+    name: 'name'
+  };
+
+  export type ReferralProgramOrderByRelevanceFieldEnum = (typeof ReferralProgramOrderByRelevanceFieldEnum)[keyof typeof ReferralProgramOrderByRelevanceFieldEnum]
+
+
+  export const VoiceCallOrderByRelevanceFieldEnum: {
+    id: 'id',
+    twilioCallSid: 'twilioCallSid',
+    customerId: 'customerId',
+    phoneNumber: 'phoneNumber',
+    recordingUrl: 'recordingUrl',
+    transcript: 'transcript',
+    jobId: 'jobId',
+    assignedAgentId: 'assignedAgentId'
+  };
+
+  export type VoiceCallOrderByRelevanceFieldEnum = (typeof VoiceCallOrderByRelevanceFieldEnum)[keyof typeof VoiceCallOrderByRelevanceFieldEnum]
+
+
+  export const VoiceEventOrderByRelevanceFieldEnum: {
+    id: 'id',
+    callId: 'callId'
+  };
+
+  export type VoiceEventOrderByRelevanceFieldEnum = (typeof VoiceEventOrderByRelevanceFieldEnum)[keyof typeof VoiceEventOrderByRelevanceFieldEnum]
+
+
+  export const EmergencyAssessmentOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    callId: 'callId',
+    detectedKeywords: 'detectedKeywords',
+    tradeCategory: 'tradeCategory',
+    recommendedAction: 'recommendedAction',
+    safetyInstructions: 'safetyInstructions'
+  };
+
+  export type EmergencyAssessmentOrderByRelevanceFieldEnum = (typeof EmergencyAssessmentOrderByRelevanceFieldEnum)[keyof typeof EmergencyAssessmentOrderByRelevanceFieldEnum]
+
+
+  export const AIConversationOrderByRelevanceFieldEnum: {
+    id: 'id',
+    jobId: 'jobId',
+    callId: 'callId',
+    sessionId: 'sessionId',
+    aiSummary: 'aiSummary',
+    tradeCategory: 'tradeCategory'
+  };
+
+  export type AIConversationOrderByRelevanceFieldEnum = (typeof AIConversationOrderByRelevanceFieldEnum)[keyof typeof AIConversationOrderByRelevanceFieldEnum]
+
+
+  export const StripeProcessedEventOrderByRelevanceFieldEnum: {
+    eventId: 'eventId',
+    eventType: 'eventType'
+  };
+
+  export type StripeProcessedEventOrderByRelevanceFieldEnum = (typeof StripeProcessedEventOrderByRelevanceFieldEnum)[keyof typeof StripeProcessedEventOrderByRelevanceFieldEnum]
 
 
   /**
@@ -76376,6 +77029,7 @@ export namespace Prisma {
     referralsSent?: ReferralOrderByRelationAggregateInput
     referralsReceived?: ReferralOrderByRelationAggregateInput
     voiceCalls?: VoiceCallOrderByRelationAggregateInput
+    _relevance?: UserOrderByRelevanceInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -76492,6 +77146,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     lastUsedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    _relevance?: SessionOrderByRelevanceInput
   }
 
   export type SessionWhereUniqueInput = Prisma.AtLeast<{
@@ -76573,6 +77228,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    _relevance?: AuditLogOrderByRelevanceInput
   }
 
   export type AuditLogWhereUniqueInput = Prisma.AtLeast<{
@@ -76668,6 +77324,7 @@ export namespace Prisma {
     addresses?: AddressOrderByRelationAggregateInput
     savedTradies?: SavedTradieOrderByRelationAggregateInput
     jobs?: JobOrderByRelationAggregateInput
+    _relevance?: CustomerProfileOrderByRelevanceInput
   }
 
   export type CustomerProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -76833,6 +77490,7 @@ export namespace Prisma {
     documents?: TradieDocumentOrderByRelationAggregateInput
     jobs?: JobOrderByRelationAggregateInput
     jobClaims?: JobClaimOrderByRelationAggregateInput
+    _relevance?: TradieProfileOrderByRelevanceInput
   }
 
   export type TradieProfileWhereUniqueInput = Prisma.AtLeast<{
@@ -76996,6 +77654,7 @@ export namespace Prisma {
     uploadedAt?: SortOrder
     verifiedAt?: SortOrderInput | SortOrder
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: TradieDocumentOrderByRelevanceInput
   }
 
   export type TradieDocumentWhereUniqueInput = Prisma.AtLeast<{
@@ -77085,6 +77744,7 @@ export namespace Prisma {
     completedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: TradiePortfolioOrderByRelevanceInput
   }
 
   export type TradiePortfolioWhereUniqueInput = Prisma.AtLeast<{
@@ -77156,6 +77816,7 @@ export namespace Prisma {
     emergencyAvailable?: SortOrder
     displayOrder?: SortOrder
     isActive?: SortOrder
+    _relevance?: TradeCategoryConfigOrderByRelevanceInput
   }
 
   export type TradeCategoryConfigWhereUniqueInput = Prisma.AtLeast<{
@@ -77223,6 +77884,7 @@ export namespace Prisma {
     endTime?: SortOrder
     isAvailable?: SortOrder
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: AvailabilityOrderByRelevanceInput
   }
 
   export type AvailabilityWhereUniqueInput = Prisma.AtLeast<{
@@ -77290,6 +77952,7 @@ export namespace Prisma {
     autoAccept?: SortOrder
     updatedAt?: SortOrder
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: EmergencySettingsOrderByRelevanceInput
   }
 
   export type EmergencySettingsWhereUniqueInput = Prisma.AtLeast<{
@@ -77380,6 +78043,7 @@ export namespace Prisma {
     user?: UserOrderByWithRelationInput
     customerProfile?: CustomerProfileOrderByWithRelationInput
     jobs?: JobOrderByRelationAggregateInput
+    _relevance?: AddressOrderByRelevanceInput
   }
 
   export type AddressWhereUniqueInput = Prisma.AtLeast<{
@@ -77467,6 +78131,7 @@ export namespace Prisma {
     tradieId?: SortOrder
     createdAt?: SortOrder
     customer?: CustomerProfileOrderByWithRelationInput
+    _relevance?: SavedTradieOrderByRelevanceInput
   }
 
   export type SavedTradieWhereUniqueInput = Prisma.AtLeast<{
@@ -77610,6 +78275,7 @@ export namespace Prisma {
     reviewRequest?: ReviewRequestOrderByWithRelationInput
     emergencyAssessment?: EmergencyAssessmentOrderByWithRelationInput
     aiConversation?: AIConversationOrderByWithRelationInput
+    _relevance?: JobOrderByRelevanceInput
   }
 
   export type JobWhereUniqueInput = Prisma.AtLeast<{
@@ -77784,6 +78450,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     job?: JobOrderByWithRelationInput
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: JobClaimOrderByRelevanceInput
   }
 
   export type JobClaimWhereUniqueInput = Prisma.AtLeast<{
@@ -77861,6 +78528,7 @@ export namespace Prisma {
     changedBy?: SortOrder
     createdAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: JobStatusHistoryOrderByRelevanceInput
   }
 
   export type JobStatusHistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -77924,6 +78592,7 @@ export namespace Prisma {
     uploadedBy?: SortOrder
     createdAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: JobImageOrderByRelevanceInput
   }
 
   export type JobImageWhereUniqueInput = Prisma.AtLeast<{
@@ -78000,6 +78669,7 @@ export namespace Prisma {
     job?: JobOrderByWithRelationInput
     reviewer?: UserOrderByWithRelationInput
     reviewee?: UserOrderByWithRelationInput
+    _relevance?: ReviewOrderByRelevanceInput
   }
 
   export type ReviewWhereUniqueInput = Prisma.AtLeast<{
@@ -78100,6 +78770,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: MessageOrderByRelevanceInput
   }
 
   export type MessageWhereUniqueInput = Prisma.AtLeast<{
@@ -78201,6 +78872,7 @@ export namespace Prisma {
     failedAt?: SortOrderInput | SortOrder
     retryCount?: SortOrder
     createdAt?: SortOrder
+    _relevance?: NotificationOrderByRelevanceInput
   }
 
   export type NotificationWhereUniqueInput = Prisma.AtLeast<{
@@ -78314,6 +78986,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: PaymentOrderByRelevanceInput
   }
 
   export type PaymentWhereUniqueInput = Prisma.AtLeast<{
@@ -78428,6 +79101,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
+    _relevance?: SubscriptionOrderByRelevanceInput
   }
 
   export type SubscriptionWhereUniqueInput = Prisma.AtLeast<{
@@ -78505,6 +79179,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     user?: UserOrderByWithRelationInput
     transactions?: TransactionOrderByRelationAggregateInput
+    _relevance?: CreditsWalletOrderByRelevanceInput
   }
 
   export type CreditsWalletWhereUniqueInput = Prisma.AtLeast<{
@@ -78576,6 +79251,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     wallet?: CreditsWalletOrderByWithRelationInput
+    _relevance?: TransactionOrderByRelevanceInput
   }
 
   export type TransactionWhereUniqueInput = Prisma.AtLeast<{
@@ -78658,6 +79334,7 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: LicenceOrderByRelevanceInput
   }
 
   export type LicenceWhereUniqueInput = Prisma.AtLeast<{
@@ -78740,6 +79417,7 @@ export namespace Prisma {
     verifiedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: InsuranceOrderByRelevanceInput
   }
 
   export type InsuranceWhereUniqueInput = Prisma.AtLeast<{
@@ -78823,6 +79501,7 @@ export namespace Prisma {
     status?: SortOrder
     createdAt?: SortOrder
     tradie?: TradieProfileOrderByWithRelationInput
+    _relevance?: CertificationOrderByRelevanceInput
   }
 
   export type CertificationWhereUniqueInput = Prisma.AtLeast<{
@@ -78904,6 +79583,7 @@ export namespace Prisma {
     declineReason?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: JobMatchingQueueOrderByRelevanceInput
   }
 
   export type JobMatchingQueueWhereUniqueInput = Prisma.AtLeast<{
@@ -78986,6 +79666,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: JobEventOrderByRelevanceInput
   }
 
   export type JobEventWhereUniqueInput = Prisma.AtLeast<{
@@ -79057,6 +79738,7 @@ export namespace Prisma {
     currentLongitude?: SortOrderInput | SortOrder
     isAutoAccept?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: TradieRealtimeStatusOrderByRelevanceInput
   }
 
   export type TradieRealtimeStatusWhereUniqueInput = Prisma.AtLeast<{
@@ -79165,6 +79847,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: AIJobInsightOrderByRelevanceInput
   }
 
   export type AIJobInsightWhereUniqueInput = Prisma.AtLeast<{
@@ -79295,6 +79978,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: PayoutOrderByRelevanceInput
   }
 
   export type PayoutWhereUniqueInput = Prisma.AtLeast<{
@@ -79395,6 +80079,7 @@ export namespace Prisma {
     isPopular?: SortOrder
     displayOrder?: SortOrder
     createdAt?: SortOrder
+    _relevance?: CreditPackageOrderByRelevanceInput
   }
 
   export type CreditPackageWhereUniqueInput = Prisma.AtLeast<{
@@ -79476,6 +80161,7 @@ export namespace Prisma {
     description?: SortOrder
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    _relevance?: CreditLedgerOrderByRelevanceInput
   }
 
   export type CreditLedgerWhereUniqueInput = Prisma.AtLeast<{
@@ -79550,6 +80236,7 @@ export namespace Prisma {
     category?: SortOrder
     updatedBy?: SortOrderInput | SortOrder
     updatedAt?: SortOrder
+    _relevance?: PlatformConfigOrderByRelevanceInput
   }
 
   export type PlatformConfigWhereUniqueInput = Prisma.AtLeast<{
@@ -79619,6 +80306,7 @@ export namespace Prisma {
     priority?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: SurgePricingRuleOrderByRelevanceInput
   }
 
   export type SurgePricingRuleWhereUniqueInput = Prisma.AtLeast<{
@@ -79704,6 +80392,7 @@ export namespace Prisma {
     quietHoursEnd?: SortOrderInput | SortOrder
     disabledTypes?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: NotificationPreferenceOrderByRelevanceInput
   }
 
   export type NotificationPreferenceWhereUniqueInput = Prisma.AtLeast<{
@@ -79781,6 +80470,7 @@ export namespace Prisma {
     heading?: SortOrderInput | SortOrder
     speed?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    _relevance?: LocationTrackingOrderByRelevanceInput
   }
 
   export type LocationTrackingWhereUniqueInput = Prisma.AtLeast<{
@@ -79855,6 +80545,7 @@ export namespace Prisma {
     adminId?: SortOrderInput | SortOrder
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    _relevance?: TrustScoreHistoryOrderByRelevanceInput
   }
 
   export type TrustScoreHistoryWhereUniqueInput = Prisma.AtLeast<{
@@ -79943,6 +80634,7 @@ export namespace Prisma {
     autoDetected?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: FraudFlagOrderByRelevanceInput
   }
 
   export type FraudFlagWhereUniqueInput = Prisma.AtLeast<{
@@ -80058,6 +80750,7 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: DisputeOrderByRelevanceInput
   }
 
   export type DisputeWhereUniqueInput = Prisma.AtLeast<{
@@ -80158,6 +80851,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    _relevance?: ModerationActionOrderByRelevanceInput
   }
 
   export type ModerationActionWhereUniqueInput = Prisma.AtLeast<{
@@ -80227,6 +80921,7 @@ export namespace Prisma {
     ipAddress?: SortOrderInput | SortOrder
     userAgent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    _relevance?: AdminAuditLogOrderByRelevanceInput
   }
 
   export type AdminAuditLogWhereUniqueInput = Prisma.AtLeast<{
@@ -80307,6 +81002,7 @@ export namespace Prisma {
     closedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: SupportTicketOrderByRelevanceInput
   }
 
   export type SupportTicketWhereUniqueInput = Prisma.AtLeast<{
@@ -80385,6 +81081,7 @@ export namespace Prisma {
     isAdmin?: SortOrder
     content?: SortOrder
     createdAt?: SortOrder
+    _relevance?: SupportMessageOrderByRelevanceInput
   }
 
   export type SupportMessageWhereUniqueInput = Prisma.AtLeast<{
@@ -80450,6 +81147,7 @@ export namespace Prisma {
     dismissedBy?: SortOrderInput | SortOrder
     dismissedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    _relevance?: PlatformAlertOrderByRelevanceInput
   }
 
   export type PlatformAlertWhereUniqueInput = Prisma.AtLeast<{
@@ -80537,6 +81235,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     inviter?: UserOrderByWithRelationInput
     invitedUser?: UserOrderByWithRelationInput
+    _relevance?: ReferralOrderByRelevanceInput
   }
 
   export type ReferralWhereUniqueInput = Prisma.AtLeast<{
@@ -80647,6 +81346,7 @@ export namespace Prisma {
     indexable?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: SEOPageOrderByRelevanceInput
   }
 
   export type SEOPageWhereUniqueInput = Prisma.AtLeast<{
@@ -80758,6 +81458,7 @@ export namespace Prisma {
     ipHash?: SortOrderInput | SortOrder
     userAgent?: SortOrderInput | SortOrder
     createdAt?: SortOrder
+    _relevance?: GrowthEventOrderByRelevanceInput
   }
 
   export type GrowthEventWhereUniqueInput = Prisma.AtLeast<{
@@ -80852,6 +81553,7 @@ export namespace Prisma {
     lastCalculatedAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: SuburbMetricsOrderByRelevanceInput
   }
 
   export type SuburbMetricsWhereUniqueInput = Prisma.AtLeast<{
@@ -80967,6 +81669,7 @@ export namespace Prisma {
     metadata?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: MarketingCampaignOrderByRelevanceInput
   }
 
   export type MarketingCampaignWhereUniqueInput = Prisma.AtLeast<{
@@ -81069,6 +81772,7 @@ export namespace Prisma {
     expiresAt?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     job?: JobOrderByWithRelationInput
+    _relevance?: ReviewRequestOrderByRelevanceInput
   }
 
   export type ReviewRequestWhereUniqueInput = Prisma.AtLeast<{
@@ -81154,6 +81858,7 @@ export namespace Prisma {
     conditions?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+    _relevance?: ReferralProgramOrderByRelevanceInput
   }
 
   export type ReferralProgramWhereUniqueInput = Prisma.AtLeast<{
@@ -81264,6 +81969,7 @@ export namespace Prisma {
     events?: VoiceEventOrderByRelationAggregateInput
     assessment?: EmergencyAssessmentOrderByWithRelationInput
     conversation?: AIConversationOrderByWithRelationInput
+    _relevance?: VoiceCallOrderByRelevanceInput
   }
 
   export type VoiceCallWhereUniqueInput = Prisma.AtLeast<{
@@ -81362,6 +82068,7 @@ export namespace Prisma {
     confidence?: SortOrderInput | SortOrder
     createdAt?: SortOrder
     call?: VoiceCallOrderByWithRelationInput
+    _relevance?: VoiceEventOrderByRelevanceInput
   }
 
   export type VoiceEventWhereUniqueInput = Prisma.AtLeast<{
@@ -81440,6 +82147,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     job?: JobOrderByWithRelationInput
     call?: VoiceCallOrderByWithRelationInput
+    _relevance?: EmergencyAssessmentOrderByRelevanceInput
   }
 
   export type EmergencyAssessmentWhereUniqueInput = Prisma.AtLeast<{
@@ -81544,6 +82252,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     job?: JobOrderByWithRelationInput
     call?: VoiceCallOrderByWithRelationInput
+    _relevance?: AIConversationOrderByRelevanceInput
   }
 
   export type AIConversationWhereUniqueInput = Prisma.AtLeast<{
@@ -81626,6 +82335,7 @@ export namespace Prisma {
     eventId?: SortOrder
     processedAt?: SortOrder
     eventType?: SortOrder
+    _relevance?: StripeProcessedEventOrderByRelevanceInput
   }
 
   export type StripeProcessedEventWhereUniqueInput = Prisma.AtLeast<{
@@ -87851,6 +88561,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedUuidFilter<$PrismaModel> | string
   }
@@ -87866,6 +88577,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedStringFilter<$PrismaModel> | string
   }
@@ -87892,6 +88604,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
@@ -88015,6 +88728,12 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type UserOrderByRelevanceInput = {
+    fields: UserOrderByRelevanceFieldEnum | UserOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type UserCountOrderByAggregateInput = {
     id?: SortOrder
     email?: SortOrder
@@ -88091,6 +88810,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
@@ -88109,6 +88829,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
@@ -88141,6 +88862,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
@@ -88201,6 +88923,12 @@ export namespace Prisma {
     isNot?: UserWhereInput
   }
 
+  export type SessionOrderByRelevanceInput = {
+    fields: SessionOrderByRelevanceFieldEnum | SessionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type SessionCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -88251,6 +88979,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedUuidNullableFilter<$PrismaModel> | string | null
   }
@@ -88288,6 +89017,12 @@ export namespace Prisma {
   export type UserNullableScalarRelationFilter = {
     is?: UserWhereInput | null
     isNot?: UserWhereInput | null
+  }
+
+  export type AuditLogOrderByRelevanceInput = {
+    fields: AuditLogOrderByRelevanceFieldEnum | AuditLogOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type AuditLogCountOrderByAggregateInput = {
@@ -88332,6 +89067,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     mode?: QueryMode
     not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
@@ -88404,6 +89140,12 @@ export namespace Prisma {
 
   export type JobOrderByRelationAggregateInput = {
     _count?: SortOrder
+  }
+
+  export type CustomerProfileOrderByRelevanceInput = {
+    fields: CustomerProfileOrderByRelevanceFieldEnum | CustomerProfileOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type CustomerProfileCountOrderByAggregateInput = {
@@ -88618,6 +89360,12 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type TradieProfileOrderByRelevanceInput = {
+    fields: TradieProfileOrderByRelevanceFieldEnum | TradieProfileOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type TradieProfileCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -88810,6 +89558,12 @@ export namespace Prisma {
     isNot?: TradieProfileWhereInput
   }
 
+  export type TradieDocumentOrderByRelevanceInput = {
+    fields: TradieDocumentOrderByRelevanceFieldEnum | TradieDocumentOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type TradieDocumentCountOrderByAggregateInput = {
     id?: SortOrder
     tradieId?: SortOrder
@@ -88873,6 +89627,12 @@ export namespace Prisma {
     not?: NestedEnumTradeCategoryFilter<$PrismaModel> | $Enums.TradeCategory
   }
 
+  export type TradiePortfolioOrderByRelevanceInput = {
+    fields: TradiePortfolioOrderByRelevanceFieldEnum | TradiePortfolioOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type TradiePortfolioCountOrderByAggregateInput = {
     id?: SortOrder
     tradieId?: SortOrder
@@ -88919,6 +89679,12 @@ export namespace Prisma {
     _max?: NestedEnumTradeCategoryFilter<$PrismaModel>
   }
 
+  export type TradeCategoryConfigOrderByRelevanceInput = {
+    fields: TradeCategoryConfigOrderByRelevanceFieldEnum | TradeCategoryConfigOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type TradeCategoryConfigCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -88960,6 +89726,12 @@ export namespace Prisma {
     displayOrder?: SortOrder
   }
 
+  export type AvailabilityOrderByRelevanceInput = {
+    fields: AvailabilityOrderByRelevanceFieldEnum | AvailabilityOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type AvailabilityTradieIdDayOfWeekCompoundUniqueInput = {
     tradieId: string
     dayOfWeek: number
@@ -88998,6 +89770,12 @@ export namespace Prisma {
 
   export type AvailabilitySumOrderByAggregateInput = {
     dayOfWeek?: SortOrder
+  }
+
+  export type EmergencySettingsOrderByRelevanceInput = {
+    fields: EmergencySettingsOrderByRelevanceFieldEnum | EmergencySettingsOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type EmergencySettingsCountOrderByAggregateInput = {
@@ -89043,6 +89821,12 @@ export namespace Prisma {
     maxRadius?: SortOrder
     responseTimeMinutes?: SortOrder
     surchargePercent?: SortOrder
+  }
+
+  export type AddressOrderByRelevanceInput = {
+    fields: AddressOrderByRelevanceFieldEnum | AddressOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type AddressCountOrderByAggregateInput = {
@@ -89112,6 +89896,12 @@ export namespace Prisma {
   export type CustomerProfileScalarRelationFilter = {
     is?: CustomerProfileWhereInput
     isNot?: CustomerProfileWhereInput
+  }
+
+  export type SavedTradieOrderByRelevanceInput = {
+    fields: SavedTradieOrderByRelevanceFieldEnum | SavedTradieOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type SavedTradieCustomerIdTradieIdCompoundUniqueInput = {
@@ -89257,6 +90047,12 @@ export namespace Prisma {
 
   export type JobEventOrderByRelationAggregateInput = {
     _count?: SortOrder
+  }
+
+  export type JobOrderByRelevanceInput = {
+    fields: JobOrderByRelevanceFieldEnum | JobOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type JobCountOrderByAggregateInput = {
@@ -89430,6 +90226,12 @@ export namespace Prisma {
     isNot?: JobWhereInput
   }
 
+  export type JobClaimOrderByRelevanceInput = {
+    fields: JobClaimOrderByRelevanceFieldEnum | JobClaimOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type JobClaimCountOrderByAggregateInput = {
     id?: SortOrder
     jobId?: SortOrder
@@ -89486,6 +90288,12 @@ export namespace Prisma {
     not?: NestedEnumJobStatusNullableFilter<$PrismaModel> | $Enums.JobStatus | null
   }
 
+  export type JobStatusHistoryOrderByRelevanceInput = {
+    fields: JobStatusHistoryOrderByRelevanceFieldEnum | JobStatusHistoryOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type JobStatusHistoryCountOrderByAggregateInput = {
     id?: SortOrder
     jobId?: SortOrder
@@ -89526,6 +90334,12 @@ export namespace Prisma {
     _max?: NestedEnumJobStatusNullableFilter<$PrismaModel>
   }
 
+  export type JobImageOrderByRelevanceInput = {
+    fields: JobImageOrderByRelevanceFieldEnum | JobImageOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type JobImageCountOrderByAggregateInput = {
     id?: SortOrder
     jobId?: SortOrder
@@ -89551,6 +90365,12 @@ export namespace Prisma {
     type?: SortOrder
     uploadedBy?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type ReviewOrderByRelevanceInput = {
+    fields: ReviewOrderByRelevanceFieldEnum | ReviewOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type ReviewCountOrderByAggregateInput = {
@@ -89618,6 +90438,12 @@ export namespace Prisma {
     in?: $Enums.MessageStatus[] | ListEnumMessageStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.MessageStatus[] | ListEnumMessageStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumMessageStatusFilter<$PrismaModel> | $Enums.MessageStatus
+  }
+
+  export type MessageOrderByRelevanceInput = {
+    fields: MessageOrderByRelevanceFieldEnum | MessageOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type MessageCountOrderByAggregateInput = {
@@ -89715,6 +90541,12 @@ export namespace Prisma {
     not?: NestedEnumNotifChannelFilter<$PrismaModel> | $Enums.NotifChannel
   }
 
+  export type NotificationOrderByRelevanceInput = {
+    fields: NotificationOrderByRelevanceFieldEnum | NotificationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type NotificationCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -89807,6 +90639,12 @@ export namespace Prisma {
     in?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.PaymentStatus[] | ListEnumPaymentStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumPaymentStatusFilter<$PrismaModel> | $Enums.PaymentStatus
+  }
+
+  export type PaymentOrderByRelevanceInput = {
+    fields: PaymentOrderByRelevanceFieldEnum | PaymentOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type PaymentCountOrderByAggregateInput = {
@@ -89916,6 +90754,12 @@ export namespace Prisma {
     not?: NestedEnumSubscriptionStatusFilter<$PrismaModel> | $Enums.SubscriptionStatus
   }
 
+  export type SubscriptionOrderByRelevanceInput = {
+    fields: SubscriptionOrderByRelevanceFieldEnum | SubscriptionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type SubscriptionCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -89988,6 +90832,12 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type CreditsWalletOrderByRelevanceInput = {
+    fields: CreditsWalletOrderByRelevanceFieldEnum | CreditsWalletOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type CreditsWalletCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -90037,6 +90887,12 @@ export namespace Prisma {
   export type CreditsWalletScalarRelationFilter = {
     is?: CreditsWalletWhereInput
     isNot?: CreditsWalletWhereInput
+  }
+
+  export type TransactionOrderByRelevanceInput = {
+    fields: TransactionOrderByRelevanceFieldEnum | TransactionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type TransactionCountOrderByAggregateInput = {
@@ -90096,6 +90952,12 @@ export namespace Prisma {
     _max?: NestedEnumTransactionTypeFilter<$PrismaModel>
   }
 
+  export type LicenceOrderByRelevanceInput = {
+    fields: LicenceOrderByRelevanceFieldEnum | LicenceOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type LicenceCountOrderByAggregateInput = {
     id?: SortOrder
     tradieId?: SortOrder
@@ -90133,6 +90995,12 @@ export namespace Prisma {
     status?: SortOrder
     verifiedAt?: SortOrder
     createdAt?: SortOrder
+  }
+
+  export type InsuranceOrderByRelevanceInput = {
+    fields: InsuranceOrderByRelevanceFieldEnum | InsuranceOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type InsuranceCountOrderByAggregateInput = {
@@ -90185,6 +91053,12 @@ export namespace Prisma {
     coverAmount?: SortOrder
   }
 
+  export type CertificationOrderByRelevanceInput = {
+    fields: CertificationOrderByRelevanceFieldEnum | CertificationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type CertificationCountOrderByAggregateInput = {
     id?: SortOrder
     tradieId?: SortOrder
@@ -90226,6 +91100,12 @@ export namespace Prisma {
     in?: $Enums.MatchStatus[] | ListEnumMatchStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.MatchStatus[] | ListEnumMatchStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumMatchStatusFilter<$PrismaModel> | $Enums.MatchStatus
+  }
+
+  export type JobMatchingQueueOrderByRelevanceInput = {
+    fields: JobMatchingQueueOrderByRelevanceFieldEnum | JobMatchingQueueOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type JobMatchingQueueCountOrderByAggregateInput = {
@@ -90309,6 +91189,12 @@ export namespace Prisma {
     not?: NestedEnumRoleNullableFilter<$PrismaModel> | $Enums.Role | null
   }
 
+  export type JobEventOrderByRelevanceInput = {
+    fields: JobEventOrderByRelevanceFieldEnum | JobEventOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type JobEventCountOrderByAggregateInput = {
     id?: SortOrder
     jobId?: SortOrder
@@ -90362,6 +91248,12 @@ export namespace Prisma {
     in?: $Enums.OnlineStatus[] | ListEnumOnlineStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.OnlineStatus[] | ListEnumOnlineStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumOnlineStatusFilter<$PrismaModel> | $Enums.OnlineStatus
+  }
+
+  export type TradieRealtimeStatusOrderByRelevanceInput = {
+    fields: TradieRealtimeStatusOrderByRelevanceFieldEnum | TradieRealtimeStatusOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type TradieRealtimeStatusCountOrderByAggregateInput = {
@@ -90428,6 +91320,12 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumOnlineStatusFilter<$PrismaModel>
     _max?: NestedEnumOnlineStatusFilter<$PrismaModel>
+  }
+
+  export type AIJobInsightOrderByRelevanceInput = {
+    fields: AIJobInsightOrderByRelevanceFieldEnum | AIJobInsightOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type AIJobInsightCountOrderByAggregateInput = {
@@ -90522,6 +91420,12 @@ export namespace Prisma {
     not?: NestedEnumPayoutStatusFilter<$PrismaModel> | $Enums.PayoutStatus
   }
 
+  export type PayoutOrderByRelevanceInput = {
+    fields: PayoutOrderByRelevanceFieldEnum | PayoutOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type PayoutCountOrderByAggregateInput = {
     id?: SortOrder
     tradieId?: SortOrder
@@ -90598,6 +91502,12 @@ export namespace Prisma {
     _max?: NestedEnumPayoutStatusFilter<$PrismaModel>
   }
 
+  export type CreditPackageOrderByRelevanceInput = {
+    fields: CreditPackageOrderByRelevanceFieldEnum | CreditPackageOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type CreditPackageCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -90656,6 +91566,12 @@ export namespace Prisma {
     in?: $Enums.CreditTransactionType[] | ListEnumCreditTransactionTypeFieldRefInput<$PrismaModel>
     notIn?: $Enums.CreditTransactionType[] | ListEnumCreditTransactionTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumCreditTransactionTypeFilter<$PrismaModel> | $Enums.CreditTransactionType
+  }
+
+  export type CreditLedgerOrderByRelevanceInput = {
+    fields: CreditLedgerOrderByRelevanceFieldEnum | CreditLedgerOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type CreditLedgerCountOrderByAggregateInput = {
@@ -90718,6 +91634,12 @@ export namespace Prisma {
     _max?: NestedEnumCreditTransactionTypeFilter<$PrismaModel>
   }
 
+  export type PlatformConfigOrderByRelevanceInput = {
+    fields: PlatformConfigOrderByRelevanceFieldEnum | PlatformConfigOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type PlatformConfigCountOrderByAggregateInput = {
     id?: SortOrder
     key?: SortOrder
@@ -90758,6 +91680,12 @@ export namespace Prisma {
     hasEvery?: number[] | ListIntFieldRefInput<$PrismaModel>
     hasSome?: number[] | ListIntFieldRefInput<$PrismaModel>
     isEmpty?: boolean
+  }
+
+  export type SurgePricingRuleOrderByRelevanceInput = {
+    fields: SurgePricingRuleOrderByRelevanceFieldEnum | SurgePricingRuleOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type SurgePricingRuleCountOrderByAggregateInput = {
@@ -90827,6 +91755,12 @@ export namespace Prisma {
     _max?: NestedEnumSurgeFactorFilter<$PrismaModel>
   }
 
+  export type NotificationPreferenceOrderByRelevanceInput = {
+    fields: NotificationPreferenceOrderByRelevanceFieldEnum | NotificationPreferenceOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type NotificationPreferenceCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -90883,6 +91817,12 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type LocationTrackingOrderByRelevanceInput = {
+    fields: LocationTrackingOrderByRelevanceFieldEnum | LocationTrackingOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type LocationTrackingCountOrderByAggregateInput = {
@@ -90953,6 +91893,12 @@ export namespace Prisma {
     _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
+  export type TrustScoreHistoryOrderByRelevanceInput = {
+    fields: TrustScoreHistoryOrderByRelevanceFieldEnum | TrustScoreHistoryOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type TrustScoreHistoryCountOrderByAggregateInput = {
     id?: SortOrder
     tradieId?: SortOrder
@@ -91016,6 +91962,12 @@ export namespace Prisma {
     in?: $Enums.FraudFlagStatus[] | ListEnumFraudFlagStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.FraudFlagStatus[] | ListEnumFraudFlagStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumFraudFlagStatusFilter<$PrismaModel> | $Enums.FraudFlagStatus
+  }
+
+  export type FraudFlagOrderByRelevanceInput = {
+    fields: FraudFlagOrderByRelevanceFieldEnum | FraudFlagOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type FraudFlagCountOrderByAggregateInput = {
@@ -91125,6 +92077,12 @@ export namespace Prisma {
     not?: NestedEnumDisputeStatusFilter<$PrismaModel> | $Enums.DisputeStatus
   }
 
+  export type DisputeOrderByRelevanceInput = {
+    fields: DisputeOrderByRelevanceFieldEnum | DisputeOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type DisputeCountOrderByAggregateInput = {
     id?: SortOrder
     jobId?: SortOrder
@@ -91221,6 +92179,12 @@ export namespace Prisma {
     not?: NestedEnumModerationActionTypeFilter<$PrismaModel> | $Enums.ModerationActionType
   }
 
+  export type ModerationActionOrderByRelevanceInput = {
+    fields: ModerationActionOrderByRelevanceFieldEnum | ModerationActionOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type ModerationActionCountOrderByAggregateInput = {
     id?: SortOrder
     adminId?: SortOrder
@@ -91260,6 +92224,12 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumModerationActionTypeFilter<$PrismaModel>
     _max?: NestedEnumModerationActionTypeFilter<$PrismaModel>
+  }
+
+  export type AdminAuditLogOrderByRelevanceInput = {
+    fields: AdminAuditLogOrderByRelevanceFieldEnum | AdminAuditLogOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type AdminAuditLogCountOrderByAggregateInput = {
@@ -91315,6 +92285,12 @@ export namespace Prisma {
     in?: $Enums.TicketCategory[] | ListEnumTicketCategoryFieldRefInput<$PrismaModel>
     notIn?: $Enums.TicketCategory[] | ListEnumTicketCategoryFieldRefInput<$PrismaModel>
     not?: NestedEnumTicketCategoryFilter<$PrismaModel> | $Enums.TicketCategory
+  }
+
+  export type SupportTicketOrderByRelevanceInput = {
+    fields: SupportTicketOrderByRelevanceFieldEnum | SupportTicketOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type SupportTicketCountOrderByAggregateInput = {
@@ -91395,6 +92371,12 @@ export namespace Prisma {
     _max?: NestedEnumTicketCategoryFilter<$PrismaModel>
   }
 
+  export type SupportMessageOrderByRelevanceInput = {
+    fields: SupportMessageOrderByRelevanceFieldEnum | SupportMessageOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type SupportMessageCountOrderByAggregateInput = {
     id?: SortOrder
     ticketId?: SortOrder
@@ -91441,6 +92423,12 @@ export namespace Prisma {
     in?: $Enums.AlertStatus[] | ListEnumAlertStatusFieldRefInput<$PrismaModel>
     notIn?: $Enums.AlertStatus[] | ListEnumAlertStatusFieldRefInput<$PrismaModel>
     not?: NestedEnumAlertStatusFilter<$PrismaModel> | $Enums.AlertStatus
+  }
+
+  export type PlatformAlertOrderByRelevanceInput = {
+    fields: PlatformAlertOrderByRelevanceFieldEnum | PlatformAlertOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type PlatformAlertCountOrderByAggregateInput = {
@@ -91524,6 +92512,12 @@ export namespace Prisma {
     not?: NestedEnumReferralStatusFilter<$PrismaModel> | $Enums.ReferralStatus
   }
 
+  export type ReferralOrderByRelevanceInput = {
+    fields: ReferralOrderByRelevanceFieldEnum | ReferralOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type ReferralCountOrderByAggregateInput = {
     id?: SortOrder
     inviterId?: SortOrder
@@ -91605,6 +92599,12 @@ export namespace Prisma {
     in?: $Enums.SEOPageType[] | ListEnumSEOPageTypeFieldRefInput<$PrismaModel>
     notIn?: $Enums.SEOPageType[] | ListEnumSEOPageTypeFieldRefInput<$PrismaModel>
     not?: NestedEnumSEOPageTypeFilter<$PrismaModel> | $Enums.SEOPageType
+  }
+
+  export type SEOPageOrderByRelevanceInput = {
+    fields: SEOPageOrderByRelevanceFieldEnum | SEOPageOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type SEOPageCountOrderByAggregateInput = {
@@ -91695,6 +92695,12 @@ export namespace Prisma {
     not?: NestedEnumGrowthEventTypeFilter<$PrismaModel> | $Enums.GrowthEventType
   }
 
+  export type GrowthEventOrderByRelevanceInput = {
+    fields: GrowthEventOrderByRelevanceFieldEnum | GrowthEventOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type GrowthEventCountOrderByAggregateInput = {
     id?: SortOrder
     userId?: SortOrder
@@ -91754,6 +92760,12 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type SuburbMetricsOrderByRelevanceInput = {
+    fields: SuburbMetricsOrderByRelevanceFieldEnum | SuburbMetricsOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type SuburbMetricsSuburbStateCompoundUniqueInput = {
@@ -91875,6 +92887,12 @@ export namespace Prisma {
     not?: NestedEnumCampaignStatusFilter<$PrismaModel> | $Enums.CampaignStatus
   }
 
+  export type MarketingCampaignOrderByRelevanceInput = {
+    fields: MarketingCampaignOrderByRelevanceFieldEnum | MarketingCampaignOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type MarketingCampaignCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
@@ -91974,6 +92992,12 @@ export namespace Prisma {
     not?: NestedEnumReviewRequestStatusFilter<$PrismaModel> | $Enums.ReviewRequestStatus
   }
 
+  export type ReviewRequestOrderByRelevanceInput = {
+    fields: ReviewRequestOrderByRelevanceFieldEnum | ReviewRequestOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type ReviewRequestJobIdCustomerIdCompoundUniqueInput = {
     jobId: string
     customerId: string
@@ -92026,6 +93050,12 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedEnumReviewRequestStatusFilter<$PrismaModel>
     _max?: NestedEnumReviewRequestStatusFilter<$PrismaModel>
+  }
+
+  export type ReferralProgramOrderByRelevanceInput = {
+    fields: ReferralProgramOrderByRelevanceFieldEnum | ReferralProgramOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type ReferralProgramCountOrderByAggregateInput = {
@@ -92110,6 +93140,12 @@ export namespace Prisma {
 
   export type VoiceEventOrderByRelationAggregateInput = {
     _count?: SortOrder
+  }
+
+  export type VoiceCallOrderByRelevanceInput = {
+    fields: VoiceCallOrderByRelevanceFieldEnum | VoiceCallOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type VoiceCallCountOrderByAggregateInput = {
@@ -92214,6 +93250,12 @@ export namespace Prisma {
     isNot?: VoiceCallWhereInput
   }
 
+  export type VoiceEventOrderByRelevanceInput = {
+    fields: VoiceEventOrderByRelevanceFieldEnum | VoiceEventOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type VoiceEventCountOrderByAggregateInput = {
     id?: SortOrder
     callId?: SortOrder
@@ -92272,6 +93314,12 @@ export namespace Prisma {
   export type VoiceCallNullableScalarRelationFilter = {
     is?: VoiceCallWhereInput | null
     isNot?: VoiceCallWhereInput | null
+  }
+
+  export type EmergencyAssessmentOrderByRelevanceInput = {
+    fields: EmergencyAssessmentOrderByRelevanceFieldEnum | EmergencyAssessmentOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type EmergencyAssessmentCountOrderByAggregateInput = {
@@ -92366,6 +93414,12 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type AIConversationOrderByRelevanceInput = {
+    fields: AIConversationOrderByRelevanceFieldEnum | AIConversationOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
+  }
+
   export type AIConversationCountOrderByAggregateInput = {
     id?: SortOrder
     jobId?: SortOrder
@@ -92458,6 +93512,12 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedJsonFilter<$PrismaModel>
     _max?: NestedJsonFilter<$PrismaModel>
+  }
+
+  export type StripeProcessedEventOrderByRelevanceInput = {
+    fields: StripeProcessedEventOrderByRelevanceFieldEnum | StripeProcessedEventOrderByRelevanceFieldEnum[]
+    sort: SortOrder
+    search: string
   }
 
   export type StripeProcessedEventCountOrderByAggregateInput = {
@@ -95099,6 +96159,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedUuidFilter<$PrismaModel> | string
   }
 
@@ -95113,6 +96174,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedStringFilter<$PrismaModel> | string
   }
 
@@ -95138,6 +96200,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedStringNullableFilter<$PrismaModel> | string | null
   }
 
@@ -95183,6 +96246,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedUuidWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -95200,6 +96264,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedStringWithAggregatesFilter<$PrismaModel> | string
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedStringFilter<$PrismaModel>
@@ -95242,6 +96307,7 @@ export namespace Prisma {
     contains?: string | StringFieldRefInput<$PrismaModel>
     startsWith?: string | StringFieldRefInput<$PrismaModel>
     endsWith?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedStringNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
@@ -95315,6 +96381,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedUuidNullableFilter<$PrismaModel> | string | null
   }
 
@@ -95333,6 +96400,7 @@ export namespace Prisma {
     lte?: string | StringFieldRefInput<$PrismaModel>
     gt?: string | StringFieldRefInput<$PrismaModel>
     gte?: string | StringFieldRefInput<$PrismaModel>
+    search?: string
     not?: NestedUuidNullableWithAggregatesFilter<$PrismaModel> | string | null
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedStringNullableFilter<$PrismaModel>
