@@ -133,11 +133,9 @@ export async function middleware(request: NextRequest) {
   // Supabase OAuth sends the `code` to the Site URL when the redirectTo URL is
   // not in the allowed list. Catch any misdirected callback and forward it to
   // the correct handler so the session exchange still works.
-  if (pathname !== '/auth/callback' && request.nextUrl.searchParams.has('code')) {
+  if (pathname === '/' && request.nextUrl.searchParams.has('code')) {
     const callbackUrl = new URL('/auth/callback', request.url);
-    request.nextUrl.searchParams.forEach((value, key) => {
-      callbackUrl.searchParams.set(key, value);
-    });
+    callbackUrl.search = request.nextUrl.search;
     return NextResponse.redirect(callbackUrl);
   }
 
