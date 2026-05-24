@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
               data: {
                 id: user.id,
                 email: userEmail,
-                firstName: ((meta.firstName as string | undefined) ?? nameParts[0]) || '',
+                firstName: (meta.firstName as string | undefined) ?? nameParts[0] ?? '',
                 lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' '),
                 role: metaRole as never,
                 isActive: true,
