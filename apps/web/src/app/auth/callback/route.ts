@@ -34,6 +34,7 @@ export async function GET(request: NextRequest) {
       if (!user.email) {
         return NextResponse.redirect(`${origin}/login?error=email_required`);
       }
+      const userEmail = user.email;
 
       const meta = user.user_metadata as Record<string, unknown>;
       const metaRole = (meta.role as string | undefined) ?? 'CUSTOMER';
@@ -47,8 +48,8 @@ export async function GET(request: NextRequest) {
             await tx.user.create({
               data: {
                 id: user.id,
-                email: user.email,
-                firstName: (meta.firstName as string | undefined) ?? nameParts[0] || '',
+                email: userEmail,
+                firstName: (meta.firstName as string | undefined) ?? nameParts[0] ?? '',
                 lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' '),
                 role: metaRole as never,
                 isActive: true,

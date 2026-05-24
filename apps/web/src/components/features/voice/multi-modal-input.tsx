@@ -49,8 +49,9 @@ export function MultiModalInput({ onComplete }: Props) {
           const res = await fetch('/api/voice/transcribe', { method: 'POST', body: formData });
           const data = await res.json() as { transcript?: string; emergency?: { score: number } };
           if (data.transcript) {
-            setTranscript(data.transcript);
-            setDescription((prev) => prev ? `${prev} ${data.transcript}` : data.transcript);
+            const transcript = data.transcript;
+            setTranscript(transcript);
+            setDescription((prev) => prev ? `${prev} ${transcript}` : transcript);
             setEmergencyScore(data.emergency?.score ?? 0);
           }
         } catch { toast.error('Transcription failed'); }
