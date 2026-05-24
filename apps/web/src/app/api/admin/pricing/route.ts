@@ -44,7 +44,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { updates } = UpdateSchema.parse(body);
 
     await Promise.all(

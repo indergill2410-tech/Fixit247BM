@@ -80,7 +80,7 @@ export default async function TradieMessagesPage() {
       ) : (
         <div className="divide-y divide-white/8 rounded-2xl border border-white/8 bg-white/2">
           {activeJobs.map((job) => {
-            const lastMsg = job.messages[0];
+            const lastMsg = job.messages.at(0);
             const unreadCount = job._count.messages;
             const customer = job.customer.user;
             const isFromMe = lastMsg !== undefined && lastMsg.senderId === session.id;
@@ -95,7 +95,7 @@ export default async function TradieMessagesPage() {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-sm font-bold text-brand-400">
                   {customer.avatarUrl
                     ? <img src={customer.avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
-                    : (customer.firstName[0] ?? '?')
+                    : (customer.firstName[0])
                   }
                 </div>
 

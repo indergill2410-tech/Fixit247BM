@@ -15,7 +15,7 @@ export function useSocketEvent<K extends keyof ServerToClientEvents>(
 
   useEffect(() => {
     const socket = getSocket();
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
     const listener = (...args: any[]) => { (handlerRef.current as (...a: any[]) => void)(...args); };
     socket.on(event as string, listener as never);
     return () => { socket.off(event as string, listener as never); };
@@ -168,7 +168,7 @@ export function useLocationBroadcast(jobId: string | undefined, enabled: boolean
   }, [jobId]);
 
   useEffect(() => {
-    if (!enabled || !jobId || !navigator.geolocation) return;
+    if (!enabled || !jobId) return;
 
     watchIdRef.current = navigator.geolocation.watchPosition(
       (pos) => {

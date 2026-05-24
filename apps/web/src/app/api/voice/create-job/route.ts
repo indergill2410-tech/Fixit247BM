@@ -59,9 +59,11 @@ export async function POST(req: Request) {
   }
 
   // Generate AI summary
-  const messages = convo ? (convo.messages as any[]) : [];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const messages = convo ? (convo.messages as unknown as ConversationTurn[]) : [];
   const context: ConversationContext = {
     sessionId: `call_${callId}`,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     messages,
     extractedData: {},
     turnCount: messages.length,
@@ -100,7 +102,7 @@ export async function POST(req: Request) {
     data: {
       title: `${jobData.isEmergency ? 'EMERGENCY: ' : ''}${category.replace(/_/g, ' ')} — Voice Booking`,
       description,
-      category: category as any,
+      category: category as never,
       status: 'OPEN',
       priority: jobData.isEmergency ? 'EMERGENCY' : 'URGENT',
       isEmergency: jobData.isEmergency ?? false,
@@ -133,7 +135,7 @@ export async function POST(req: Request) {
 
   // Log job created event
   await db.voiceEvent.create({
-    data: { callId, eventType: 'JOB_CREATED', payload: { jobId: job.id } as any },
+    data: { callId, eventType: 'JOB_CREATED', payload: { jobId: job.id } as never },
   });
 
   return NextResponse.json({ job, success: true });

@@ -12,7 +12,7 @@ export async function POST(req: Request, { params }: { params: Promise<{ id: str
   });
 
   await db.voiceEvent.create({
-    data: { callId: id, eventType: 'HUMAN_TOOK_OVER', payload: { agentId: session.id } as any },
+    data: { callId: id, eventType: 'HUMAN_TOOK_OVER', payload: { agentId: session.id } as never },
   });
 
   return NextResponse.json({ call, success: true });

@@ -28,7 +28,7 @@ export async function PATCH(
   try {
     const session = await requireSession();
     const { id: jobId } = await params;
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { status: newStatus, etaMinutes, metadata } = Schema.parse(body);
 
     const job = await db.job.findUnique({

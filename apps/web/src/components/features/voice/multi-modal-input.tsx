@@ -47,7 +47,7 @@ export function MultiModalInput({ onComplete }: Props) {
           const formData = new FormData();
           formData.append('audio', blob, 'audio.webm');
           const res = await fetch('/api/voice/transcribe', { method: 'POST', body: formData });
-          const data = await res.json();
+          const data = await res.json() as { transcript?: string; emergency?: { score: number } };
           if (data.transcript) {
             setTranscript(data.transcript);
             setDescription((prev) => prev ? `${prev} ${data.transcript}` : data.transcript);

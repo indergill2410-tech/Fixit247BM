@@ -11,7 +11,7 @@ const Schema = z.object({ jobId: z.string().uuid() });
 export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { jobId } = Schema.parse(body);
 
     const job = await db.job.findUnique({ where: { id: jobId } });

@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Only tradies can purchase credits' }, { status: 403 });
     }
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { packageId, paymentMethodId, requestId } = Schema.parse(body);
 
     const pkg = await db.creditPackage.findUnique({ where: { id: packageId, isActive: true } });

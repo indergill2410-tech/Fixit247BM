@@ -36,6 +36,7 @@ export function LiveTrackingMap({ jobId, jobLatitude, jobLongitude, jobAddress }
     const key = process.env.NEXT_PUBLIC_GOOGLE_MAPS_KEY;
     if (!key) { setMapsError(true); return; }
 
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
     if (window.google?.maps) { setMapsReady(true); return; }
 
     const script = document.createElement('script');
@@ -46,6 +47,7 @@ export function LiveTrackingMap({ jobId, jobLatitude, jobLongitude, jobAddress }
     document.head.appendChild(script);
   }, []);
 
+  /* eslint-disable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
   // Initialize map
   useEffect(() => {
     if (!mapsReady || !mapRef.current) return;
@@ -109,6 +111,7 @@ export function LiveTrackingMap({ jobId, jobLatitude, jobLongitude, jobAddress }
     bounds.extend({ lat: jobLatitude, lng: jobLongitude });
     mapInstanceRef.current.fitBounds(bounds, 80);
   }, [location, jobLatitude, jobLongitude]);
+  /* eslint-enable @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-assignment */
 
   if (mapsError) {
     return (

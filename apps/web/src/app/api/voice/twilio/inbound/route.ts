@@ -119,8 +119,8 @@ export async function POST(req: Request) {
 
   const params = Object.fromEntries(new URLSearchParams(body));
   const callSid = params.CallSid;
-  const from = params.From ?? 'unknown';
-  const to = params.To ?? 'unknown';
+  const from = params.From || 'unknown';
+  const to = params.To || 'unknown';
 
   logger.info('[inbound] Call received', { callSid, from, to });
 

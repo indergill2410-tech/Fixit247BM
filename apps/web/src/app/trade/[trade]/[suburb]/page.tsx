@@ -7,7 +7,7 @@ import { ChevronRight, Clock, Shield, Star, MapPin, CheckCircle, Calendar } from
 export const revalidate = 3600; // Re-generate trade/suburb pages at most once per hour
 
 // Trade display names
-const TRADE_MAP: Record<string, { name: string; singular: string; emoji: string; description: string }> = {
+const TRADE_MAP: Partial<Record<string, { name: string; singular: string; emoji: string; description: string }>> = {
   plumbing: { name: 'Plumbing', singular: 'Plumber', emoji: '🔧', description: 'from blocked drains and burst pipes to hot water systems and bathroom renovations' },
   electrical: { name: 'Electrical', singular: 'Electrician', emoji: '⚡', description: 'from power points and lighting to switchboard upgrades and safety inspections' },
   hvac: { name: 'HVAC', singular: 'HVAC Technician', emoji: '❄️', description: 'from air conditioning installation and servicing to heating and ventilation systems' },

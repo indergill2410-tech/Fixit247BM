@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
     if (!rl.success) return rateLimitResponse(rl);
 
     await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = AnalyzeSchema.parse(body);
 
     if (!data.textDescription && !data.voiceTranscript && data.imageUrls.length === 0) {

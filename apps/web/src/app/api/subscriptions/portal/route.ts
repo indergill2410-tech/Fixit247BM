@@ -8,8 +8,8 @@ import { logger } from '@/lib/logger';
 export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json().catch(() => ({}));
-    const action = body.action as string | undefined;
+    const body = await (req.json() as Promise<{ action?: string }>).catch(() => ({} as { action?: string }));
+    const action = body.action;
 
     if (action === 'cancel') {
       await cancelSubscription(session.id);
@@ -20,12 +20,6 @@ export async function POST(req: NextRequest) {
     const payment = await db.payment.findFirst({
       where: { customerId: { not: undefined } },
       select: { stripeCustomerId: true },
-    });
-
-    // Also check tradie profile for stripe account
-    const tradieProfile = await db.tradieProfile.findUnique({
-      where: { userId: session.id },
-      select: { stripeAccountId: true },
     });
 
     const stripeCustomerId = payment?.stripeCustomerId;

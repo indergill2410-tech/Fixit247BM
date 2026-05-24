@@ -45,7 +45,7 @@ export function EmergencyQuickPost() {
       });
 
       if (res.ok) {
-        const { job } = await res.json();
+        const { job } = await res.json() as { job: { id: string } };
         router.push(`/jobs/${job.id}?dispatch=emergency`);
       }
     } catch {

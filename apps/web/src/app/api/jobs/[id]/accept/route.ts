@@ -23,7 +23,7 @@ export async function POST(
     }
 
     const { id: jobId } = await params;
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = AcceptSchema.parse(body);
 
     const tradieProfile = await db.tradieProfile.findUnique({ where: { userId: session.id } });
@@ -134,7 +134,7 @@ export async function POST(
     });
 
     // Notify customer that their job has been accepted
-    const tradieName = tradieProfile.businessName ?? session.firstName ?? 'Your tradie';
+    const tradieName = (tradieProfile.businessName ?? session.firstName) || 'Your tradie';
     void notify({
       userId: job.customer.userId,
       jobId,

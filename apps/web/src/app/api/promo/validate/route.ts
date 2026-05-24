@@ -4,7 +4,7 @@ import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 // Static promo codes — no DB model required
-const PROMO_CODES: Record<string, { discountPercent: number; description: string }> = {
+const PROMO_CODES: Partial<Record<string, { discountPercent: number; description: string }>> = {
   'FIRST20':      { discountPercent: 20, description: '20% off your first job' },
   'WELCOME10':    { discountPercent: 10, description: '10% off for new customers' },
   'EMERGENCY15':  { discountPercent: 15, description: '15% off emergency callouts' },
@@ -17,7 +17,7 @@ const Schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { code, jobValue } = Schema.parse(body);
 
     const normalised = code.trim().toUpperCase();

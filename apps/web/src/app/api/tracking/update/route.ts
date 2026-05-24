@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Only tradies can post location updates' }, { status: 403 });
     }
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { jobId, lat, lng, accuracy, heading, speed } = Schema.parse(body);
 
     const tradieProfile = await db.tradieProfile.findUnique({

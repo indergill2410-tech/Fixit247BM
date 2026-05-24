@@ -3,7 +3,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { Mic, MicOff, Send, AlertTriangle, CheckCircle, Loader2 } from 'lucide-react';
 import { toast } from 'sonner';
-import { VoiceWaveform } from './voice-waveform';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -78,7 +77,14 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ sessionId, message: text }),
       });
-      const data = await res.json();
+      const data = await res.json() as {
+        sessionId: string;
+        message: string;
+        emergencyDetected?: boolean;
+        safetyInstructions?: string[];
+        isJobReady?: boolean;
+        extractedJobData?: ExtractedJobData;
+      };
 
       setSessionId(data.sessionId);
 
@@ -136,7 +142,7 @@ export function ConversationalBooking({ onJobCreated, initialMessage, compact = 
       const formData = new FormData();
       formData.append('audio', audioBlob, 'recording.webm');
       const res = await fetch('/api/voice/transcribe', { method: 'POST', body: formData });
-      const data = await res.json();
+      const data = await res.json() as { transcript?: string };
       if (data.transcript) {
         await sendMessage(data.transcript);
       }

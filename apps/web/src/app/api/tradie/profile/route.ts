@@ -46,7 +46,7 @@ export async function PATCH(req: NextRequest) {
   try {
     const session = await requireRole('TRADIE');
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = UpdateProfileSchema.parse(body);
 
     const profile = await db.tradieProfile.update({

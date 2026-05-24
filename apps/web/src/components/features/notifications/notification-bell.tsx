@@ -31,7 +31,7 @@ export function NotificationBell({ initialUnreadCount = 0 }: { initialUnreadCoun
     setLoadingServer(true);
     fetch('/api/notifications?limit=20')
       .then((r) => r.json())
-      .then((data) => { setServerNotifs(data.notifications ?? []); })
+      .then((data: { notifications?: { id: string; type: string; title: string; body: string; createdAt: string }[] }) => { setServerNotifs(data.notifications ?? []); })
       .catch(() => undefined)
       .finally(() => { setLoadingServer(false); });
   }, [open]);

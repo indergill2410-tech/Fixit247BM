@@ -162,7 +162,7 @@ export default function TradieProfileEditPage() {
                 <label className="mb-1.5 block text-sm font-medium text-gray-300">Business Name</label>
                 <Input
                   value={form.businessName}
-                  onChange={(e) => setForm((p) => ({ ...p, businessName: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, businessName: e.target.value })); }}
                   placeholder="Your business name"
                   className="bg-white/4 border-white/8 text-white placeholder:text-gray-600"
                 />
@@ -172,7 +172,7 @@ export default function TradieProfileEditPage() {
                 <label className="mb-1.5 block text-sm font-medium text-gray-300">ABN</label>
                 <Input
                   value={form.abn}
-                  onChange={(e) => setForm((p) => ({ ...p, abn: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, abn: e.target.value })); }}
                   placeholder="11 digit ABN"
                   className="bg-white/4 border-white/8 text-white placeholder:text-gray-600"
                 />
@@ -182,7 +182,7 @@ export default function TradieProfileEditPage() {
                 <label className="mb-1.5 block text-sm font-medium text-gray-300">Bio</label>
                 <textarea
                   value={form.bio}
-                  onChange={(e) => setForm((p) => ({ ...p, bio: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, bio: e.target.value })); }}
                   placeholder="Tell customers about your experience and what you specialise in..."
                   rows={4}
                   className="w-full rounded-xl border border-white/8 bg-white/4 px-3 py-2.5 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:ring-2 focus:ring-brand-500/50 resize-none"
@@ -203,7 +203,7 @@ export default function TradieProfileEditPage() {
                     <button
                       key={cat.value}
                       type="button"
-                      onClick={() => toggleTrade(cat.value)}
+                      onClick={() => { toggleTrade(cat.value); }}
                       className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
                         selected
                           ? 'bg-brand-500 text-gray-900'
@@ -232,7 +232,7 @@ export default function TradieProfileEditPage() {
                   min="0"
                   step="5"
                   value={form.hourlyRate}
-                  onChange={(e) => setForm((p) => ({ ...p, hourlyRate: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, hourlyRate: e.target.value })); }}
                   placeholder="e.g. 120"
                   className="bg-white/4 border-white/8 text-white placeholder:text-gray-600"
                 />
@@ -244,7 +244,7 @@ export default function TradieProfileEditPage() {
                   min="0"
                   step="5"
                   value={form.calloutFee}
-                  onChange={(e) => setForm((p) => ({ ...p, calloutFee: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, calloutFee: e.target.value })); }}
                   placeholder="e.g. 80"
                   className="bg-white/4 border-white/8 text-white placeholder:text-gray-600"
                 />
@@ -256,7 +256,7 @@ export default function TradieProfileEditPage() {
                   min="0"
                   max="60"
                   value={form.yearsExperience}
-                  onChange={(e) => setForm((p) => ({ ...p, yearsExperience: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, yearsExperience: e.target.value })); }}
                   placeholder="e.g. 10"
                   className="bg-white/4 border-white/8 text-white placeholder:text-gray-600"
                 />
@@ -268,7 +268,7 @@ export default function TradieProfileEditPage() {
                   min="1"
                   max="200"
                   value={form.serviceRadiusKm}
-                  onChange={(e) => setForm((p) => ({ ...p, serviceRadiusKm: e.target.value }))}
+                  onChange={(e) => { setForm((p) => ({ ...p, serviceRadiusKm: e.target.value })); }}
                   placeholder="25"
                   className="bg-white/4 border-white/8 text-white placeholder:text-gray-600"
                 />

@@ -12,8 +12,8 @@ export async function GET(request: NextRequest) {
   if (code) {
     const cookieStore = await cookies();
     const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
       {
         cookies: {
           getAll() { return cookieStore.getAll(); },
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     );
 
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error && data.user) {
+    if (!error) {
       const { user } = data;
 
       // Google OAuth can omit email — reject rather than crash the DB insert.
@@ -47,9 +47,9 @@ export async function GET(request: NextRequest) {
             await tx.user.create({
               data: {
                 id: user.id,
-                email: user.email!,
-                firstName: (meta.firstName as string | undefined) ?? nameParts[0] ?? '',
-                lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' ') ?? '',
+                email: user.email,
+                firstName: (meta.firstName as string | undefined) ?? nameParts[0] || '',
+                lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' '),
                 role: metaRole as never,
                 isActive: true,
                 emailVerified: new Date(),

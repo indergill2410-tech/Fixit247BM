@@ -14,7 +14,7 @@ const Schema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = Schema.parse(body);
 
     const result = await initiateRefund({

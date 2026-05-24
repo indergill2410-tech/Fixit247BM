@@ -16,7 +16,7 @@ export async function PATCH(
   try {
     const session = await requireSession();
     const { jobId } = await params;
-    const body = await req.json().catch(() => ({}));
+    const body = await (req.json() as Promise<unknown>).catch(() => ({}) as unknown);
     const { messageId } = Schema.parse(body);
 
     const now = new Date();

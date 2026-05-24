@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Tradie profile not found' }, { status: 404 });
     }
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = UploadDocSchema.parse(body);
 
     const document = await db.tradieDocument.create({

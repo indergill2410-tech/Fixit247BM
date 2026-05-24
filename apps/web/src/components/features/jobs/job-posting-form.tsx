@@ -101,7 +101,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
       .then((json: { addresses?: SavedAddress[] }) => {
         const list = json.addresses ?? [];
         setAddresses(list);
-        const def = list.find((a) => a.isDefault) ?? list[0];
+        const def: SavedAddress | undefined = list.find((a) => a.isDefault) ?? list.at(0);
         if (def && !formData.addressId) updateForm({ addressId: def.id });
       })
       .catch(() => undefined);
@@ -121,8 +121,8 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         }),
       });
       if (res.ok) {
-        const { result } = await res.json();
-        setAiResult(result as AIScopeResult);
+        const { result } = await res.json() as { result: AIScopeResult };
+        setAiResult(result);
         setShowAiScope(true);
         // Auto-apply AI suggestions
         updateForm({
@@ -179,7 +179,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
       });
 
       if (res.ok) {
-        const { job } = await res.json();
+        const { job } = await res.json() as { job: { id: string } };
         router.push(`/jobs/${job.id}`);
       }
     } catch {

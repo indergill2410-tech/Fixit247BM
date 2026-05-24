@@ -31,7 +31,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
     fetch(`/api/messages/${jobId}`)
       .then((r) => r.json())
       .then((data: { messages: MessagePayload[] }) => {
-        setMessages(data.messages ?? []);
+        setMessages(data.messages);
       })
       .catch(() => toast.error('Could not load messages'))
       .finally(() => { setLoading(false); });
@@ -74,7 +74,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
         body: JSON.stringify({ content, type: 'TEXT' }),
       });
       if (!res.ok) throw new Error('Send failed');
-      const { message } = await res.json();
+      const { message } = await res.json() as { message: MessagePayload };
       // Replace optimistic with real message
       setMessages((prev) => prev.map((m) => m.id === optimistic.id ? message : m));
     } catch {

@@ -43,8 +43,8 @@ export function TradieJobFeed() {
       if (categoryFilter !== 'All') params.set('category', categoryFilter);
       const res = await fetch(`/api/jobs?${params.toString()}`);
       if (res.ok) {
-        const { jobs: fetched } = await res.json();
-        setJobs(emergencyOnly ? (fetched as Job[]).filter((j) => j.isEmergency) : fetched as Job[]);
+        const { jobs: fetched } = await res.json() as { jobs: Job[] };
+        setJobs(emergencyOnly ? fetched.filter((j) => j.isEmergency) : fetched);
       }
     } finally {
       setLoading(false);

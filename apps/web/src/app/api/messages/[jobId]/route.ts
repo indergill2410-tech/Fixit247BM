@@ -74,7 +74,7 @@ export async function POST(
   try {
     const session = await requireSession();
     const { jobId } = await params;
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { content, type, mediaUrl, receiverId } = SendSchema.parse(body);
 
     // Rate limit: max 30 messages per minute per user per job

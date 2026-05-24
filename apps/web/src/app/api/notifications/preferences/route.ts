@@ -39,7 +39,7 @@ export async function GET() {
 export async function PATCH(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = UpdateSchema.parse(body);
 
     const prefs = await db.notificationPreference.upsert({

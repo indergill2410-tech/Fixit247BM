@@ -32,8 +32,8 @@ export function WalletPageClient({ userId }: { userId: string }) {
         fetch('/api/credits/balance'),
         fetch('/api/credits/history?limit=20'),
       ]);
-      if (balRes.ok) setWalletData(await balRes.json());
-      if (histRes.ok) setHistory((await histRes.json()).entries ?? []);
+      if (balRes.ok) setWalletData(await balRes.json() as WalletData);
+      if (histRes.ok) setHistory((await histRes.json() as { entries?: HistoryEntry[] }).entries ?? []);
       setIsLoading(false);
     };
     void load();
@@ -44,7 +44,7 @@ export function WalletPageClient({ userId }: { userId: string }) {
       <div className="space-y-6">
         <div className="h-48 animate-pulse rounded-3xl bg-gray-200" />
         <div className="space-y-3">
-          {[...Array(5)].map((_, i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-gray-100" />)}
+          {Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-14 animate-pulse rounded-xl bg-gray-100" />)}
         </div>
       </div>
     );
@@ -68,7 +68,7 @@ export function WalletPageClient({ userId }: { userId: string }) {
           </div>
           <div className="flex shrink-0 gap-2">
             <button
-              onClick={() => setShowPurchase(true)}
+              onClick={() => { setShowPurchase(true); }}
               className="rounded-lg bg-yellow-500 px-4 py-2 text-sm font-semibold text-white hover:bg-yellow-600 transition-colors"
             >
               Buy credits

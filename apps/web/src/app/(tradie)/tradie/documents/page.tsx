@@ -296,7 +296,7 @@ export default function TradieDocumentsPage() {
                         accept=".pdf,.jpg,.jpeg,.png"
                         className="hidden"
                         disabled={isUploading}
-                        onChange={(e) => handleFileChange(type, e)}
+                        onChange={(e) => { handleFileChange(type, e); }}
                       />
                     </label>
                   </div>

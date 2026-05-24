@@ -8,8 +8,8 @@ import { logger } from '@/lib/logger';
 export async function POST(request: Request) {
   const cookieStore = await cookies();
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
     { cookies: { getAll() { return cookieStore.getAll(); }, setAll(c: { name: string; value: string; options: Record<string, unknown> }[]) { c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); } } },
   );
 
@@ -28,7 +28,7 @@ export async function POST(request: Request) {
     await db.$transaction(async (tx) => {
       await tx.user.upsert({
         where: { id: user.id },
-        create: { id: user.id, email: user.email!, firstName, lastName, role: 'CUSTOMER', phone },
+        create: { id: user.id, email: user.email ?? '', firstName, lastName, role: 'CUSTOMER', phone },
         update: { firstName, lastName, phone },
       });
 
