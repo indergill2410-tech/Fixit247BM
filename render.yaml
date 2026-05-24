@@ -7,7 +7,7 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      corepack enable &&
+      npm install -g pnpm@9 &&
       pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/web build
@@ -17,7 +17,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: "20"
+        value: "22"
       - key: NODE_ENV
         value: production
       - key: NEXT_TELEMETRY_DISABLED
@@ -103,9 +103,8 @@ services:
     plan: starter
     rootDir: .
     buildCommand: >
-      corepack enable &&
+      npm install -g pnpm@9 &&
       pnpm install --frozen-lockfile &&
-      pnpm --filter @fixit247/database run db:generate &&
       pnpm --filter @fixit247/admin build
     startCommand: >
       cp -r apps/admin/.next/static apps/admin/.next/standalone/apps/admin/.next/static &&
@@ -113,7 +112,7 @@ services:
     healthCheckPath: /api/health
     envVars:
       - key: NODE_VERSION
-        value: "20"
+        value: "22"
       - key: NODE_ENV
         value: production
       - key: NEXT_TELEMETRY_DISABLED
