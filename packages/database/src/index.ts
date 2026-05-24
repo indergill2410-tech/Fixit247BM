@@ -1,4 +1,6 @@
 import { PrismaClient } from './generated/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Pool } from 'pg';
 
 // ─── Soft-delete query extension ──────────────────────────────────────────────
 //
@@ -53,7 +55,13 @@ const globalForPrisma = globalThis as unknown as {
   prisma: ExtendedPrismaClient | undefined;
 };
 
+function createAdapter() {
+  const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+  return new PrismaPg(pool);
+}
+
 const baseClient = new PrismaClient({
+  adapter: createAdapter(),
   log:
     process.env.NODE_ENV === 'development'
       ? ['query', 'error', 'warn']
