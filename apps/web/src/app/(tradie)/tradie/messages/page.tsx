@@ -83,7 +83,7 @@ export default async function TradieMessagesPage() {
             const lastMsg = job.messages[0];
             const unreadCount = job._count.messages;
             const customer = job.customer.user;
-            const isFromMe = lastMsg?.senderId === session.id;
+            const isFromMe = lastMsg !== undefined && lastMsg.senderId === session.id;
 
             return (
               <Link
@@ -95,7 +95,7 @@ export default async function TradieMessagesPage() {
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-500/20 text-sm font-bold text-brand-400">
                   {customer.avatarUrl
                     ? <img src={customer.avatarUrl} alt="" className="h-10 w-10 rounded-full object-cover" />
-                    : (customer.firstName?.[0] ?? '?')
+                    : (customer.firstName[0] ?? '?')
                   }
                 </div>
 
@@ -110,7 +110,7 @@ export default async function TradieMessagesPage() {
                           {unreadCount}
                         </span>
                       )}
-                      {lastMsg && (
+                      {lastMsg !== undefined && (
                         <span className="text-xs text-gray-600">
                           {new Date(lastMsg.createdAt).toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
                         </span>
@@ -120,9 +120,9 @@ export default async function TradieMessagesPage() {
 
                   <p className="mt-0.5 truncate text-xs text-gray-500">{job.title}</p>
 
-                  {lastMsg ? (
+                  {lastMsg !== undefined ? (
                     <p className={`mt-1 truncate text-xs ${unreadCount > 0 ? 'font-semibold text-gray-200' : 'text-gray-500'}`}>
-                      {isFromMe ? 'You: ' : `${customer.firstName ?? 'Customer'}: `}
+                      {isFromMe ? 'You: ' : `${customer.firstName}: `}
                       {lastMsg.content}
                     </p>
                   ) : (
