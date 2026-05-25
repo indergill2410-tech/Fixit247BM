@@ -15,7 +15,7 @@ const TabsList = React.forwardRef<
   <TabsPrimitive.List
     ref={ref}
     className={cn(
-      'relative flex items-center gap-0 border-b border-gray-200',
+      'relative flex items-center gap-0 border-b border-border',
       'overflow-x-auto scrollbar-none',
       className,
     )}
@@ -38,10 +38,10 @@ const TabsTrigger = React.forwardRef<
     ref={ref}
     className={cn(
       'relative px-4 py-2.5 text-sm font-medium whitespace-nowrap',
-      'text-gray-500 transition-colors',
-      'hover:text-gray-800',
+      'text-foreground-muted transition-colors',
+      'hover:text-foreground',
       'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2 rounded-t-lg',
-      'data-[state=active]:text-brand-600',
+      'data-[state=active]:text-brand-500',
       'disabled:pointer-events-none disabled:opacity-40',
       className,
     )}
@@ -106,14 +106,14 @@ function MotionTabsList({
   return (
     <div
       ref={listRef}
-      className={cn('relative border-b border-gray-200 overflow-x-auto scrollbar-none', className)}
+      className={cn('relative border-b border-border overflow-x-auto scrollbar-none', className)}
     >
       <TabsPrimitive.List className="flex items-center gap-0" {...props}>
         {children}
       </TabsPrimitive.List>
       {activeRect && (
         <motion.div
-          className={cn('absolute bottom-0 h-0.5 rounded-full bg-brand-600', indicatorClassName)}
+          className={cn('absolute bottom-0 h-0.5 rounded-full bg-brand-500', indicatorClassName)}
           layoutId="tab-indicator"
           style={{ left: activeRect.left, width: activeRect.width }}
           transition={{ type: 'spring', stiffness: 400, damping: 35 }}

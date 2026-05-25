@@ -107,49 +107,49 @@ const PRICING_FAQS = [
 
 export default function PricingPage() {
   return (
-    <>
+    <div className="bg-background text-foreground transition-colors duration-300">
       {/* 1. Hero */}
-      <section className="relative bg-gradient-to-br from-[#0a0a0a] to-[#111111] px-4 py-20 text-center text-white">
+      <section className="relative px-4 py-20 text-center">
         <div className="relative z-10 mx-auto max-w-3xl">
-          <span className="mb-4 inline-flex items-center rounded-full bg-white/10 px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
+          <span className="mb-4 inline-flex items-center rounded-full border border-border bg-background-elevated px-4 py-1.5 text-sm font-medium backdrop-blur-sm">
             💰 No hidden fees, ever
           </span>
           <h1 className="mt-4 text-4xl font-extrabold tracking-tight sm:text-5xl">
             Simple, Transparent Pricing
           </h1>
-          <p className="mx-auto mt-6 max-w-xl text-lg text-gray-300">
+          <p className="mx-auto mt-6 max-w-xl text-lg text-foreground-muted">
             Free for customers. Flexible plans for tradies. You always know what you&apos;re paying before you commit.
           </p>
         </div>
       </section>
 
       {/* 2. Customer Pricing */}
-      <section className="bg-[#0a0a0a] py-20 px-4">
+      <section className="bg-background-alt py-20 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="mb-10 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
               FOR CUSTOMERS
             </span>
-            <h2 className="text-3xl font-extrabold text-white">Free to use — pay only for the job</h2>
-            <p className="mx-auto mt-4 max-w-xl text-gray-400">
+            <h2 className="text-3xl font-extrabold">Free to use — pay only for the job</h2>
+            <p className="mx-auto mt-4 max-w-xl text-foreground-muted">
               No subscription, no posting fees. Post a job for free and pay only when work is done.
             </p>
           </div>
           <div className="grid gap-6 sm:grid-cols-3">
             <div className="rounded-2xl border border-brand-500/30 bg-brand-500/10 p-6 text-center">
-              <p className="mb-2 text-3xl font-extrabold text-brand-400">$0</p>
-              <p className="text-sm font-semibold text-white">To post a job</p>
-              <p className="mt-2 text-xs text-gray-500">No credit card required to get started</p>
+              <p className="mb-2 text-3xl font-extrabold text-brand-500">$0</p>
+              <p className="text-sm font-semibold text-foreground">To post a job</p>
+              <p className="mt-2 text-xs text-foreground-subtle">No credit card required to get started</p>
             </div>
-            <div className="rounded-2xl border border-white/8 bg-white/4 p-6 text-center">
-              <p className="mb-2 text-3xl font-extrabold text-white">Fixed</p>
-              <p className="text-sm font-semibold text-white">Price before you confirm</p>
-              <p className="mt-2 text-xs text-gray-500">AI-generated quote shown upfront</p>
+            <div className="rounded-2xl border border-border bg-background-elevated p-6 text-center">
+              <p className="mb-2 text-3xl font-extrabold text-foreground">Fixed</p>
+              <p className="text-sm font-semibold text-foreground">Price before you confirm</p>
+              <p className="mt-2 text-xs text-foreground-subtle">AI-generated quote shown upfront</p>
             </div>
             <div className="rounded-2xl border border-green-500/30 bg-green-500/10 p-6 text-center">
-              <p className="mb-2 text-3xl font-extrabold text-green-400">Escrow</p>
-              <p className="text-sm font-semibold text-white">Payment protection</p>
-              <p className="mt-2 text-xs text-gray-500">Funds held until you confirm job done</p>
+              <p className="mb-2 text-3xl font-extrabold text-green-500 dark:text-green-400">Escrow</p>
+              <p className="text-sm font-semibold text-foreground">Payment protection</p>
+              <p className="mt-2 text-xs text-foreground-subtle">Funds held until you confirm job done</p>
             </div>
           </div>
           <div className="mt-8 text-center">
@@ -164,14 +164,14 @@ export default function PricingPage() {
       </section>
 
       {/* 3. Tradie Pricing — 3-tier table */}
-      <section className="bg-[#0f0f0f] py-20 px-4">
+      <section className="bg-background py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
               FOR TRADIES
             </span>
-            <h2 className="text-3xl font-extrabold text-white">Tradie subscription plans</h2>
-            <p className="mx-auto mt-4 max-w-xl text-gray-400">
+            <h2 className="text-3xl font-extrabold">Tradie subscription plans</h2>
+            <p className="mx-auto mt-4 max-w-xl text-foreground-muted">
               Start free, upgrade when you&apos;re ready. No lock-in contracts — cancel anytime.
             </p>
           </div>
@@ -184,7 +184,7 @@ export default function PricingPage() {
                 className={`relative rounded-3xl border p-8 ${
                   plan.highlight
                     ? 'border-brand-500/50 bg-brand-500/10 ring-1 ring-brand-500/30'
-                    : 'border-white/8 bg-white/4'
+                    : 'border-border bg-background-elevated'
                 }`}
               >
                 {plan.badge && (
@@ -194,14 +194,14 @@ export default function PricingPage() {
                     </span>
                   </div>
                 )}
-                <h3 className="text-xs font-bold uppercase tracking-widest text-gray-500">{plan.name}</h3>
-                <p className="mt-2 text-3xl font-extrabold text-white">{plan.price}</p>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-foreground-subtle">{plan.name}</h3>
+                <p className="mt-2 text-3xl font-extrabold text-foreground">{plan.price}</p>
                 <Link
                   href={plan.href}
                   className={`mt-6 block w-full rounded-xl py-3 text-center text-sm font-bold transition-colors ${
                     plan.highlight
                       ? 'bg-brand-500 text-gray-900 hover:bg-brand-400'
-                      : 'bg-white/8 text-white hover:bg-white/12'
+                      : 'bg-background-alt text-foreground hover:bg-background-elevated border border-border'
                   }`}
                 >
                   {plan.cta}
@@ -211,16 +211,16 @@ export default function PricingPage() {
           </div>
 
           {/* Feature comparison table */}
-          <div className="overflow-x-auto rounded-2xl border border-white/8 bg-white/4 shadow-sm">
+          <div className="overflow-x-auto rounded-2xl border border-border bg-background-elevated shadow-sm">
             <table className="w-full min-w-[600px] text-sm">
               <thead>
-                <tr className="border-b border-white/8">
-                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Feature</th>
+                <tr className="border-b border-border">
+                  <th className="p-4 text-left text-xs font-semibold uppercase tracking-wide text-foreground-subtle">Feature</th>
                   {TRADIE_PLANS.map((plan) => (
                     <th
                       key={plan.name}
                       className={`p-4 text-center text-xs font-bold uppercase tracking-wide ${
-                        plan.highlight ? 'text-brand-400' : 'text-gray-400'
+                        plan.highlight ? 'text-brand-500' : 'text-foreground-muted'
                       }`}
                     >
                       {plan.name}
@@ -230,13 +230,13 @@ export default function PricingPage() {
               </thead>
               <tbody>
                 {PLAN_FEATURE_ROWS.map((row, idx) => (
-                  <tr key={row.key} className={idx % 2 === 0 ? 'bg-transparent' : 'bg-white/3'}>
-                    <td className="p-4 font-medium text-gray-400">{row.label}</td>
+                  <tr key={row.key} className={idx % 2 === 0 ? 'bg-transparent' : 'bg-background-alt'}>
+                    <td className="p-4 font-medium text-foreground-muted">{row.label}</td>
                     {TRADIE_PLANS.map((plan) => (
                       <td
                         key={plan.name}
                         className={`p-4 text-center ${
-                          plan.highlight ? 'font-semibold text-brand-400' : 'text-gray-400'
+                          plan.highlight ? 'font-semibold text-brand-500' : 'text-foreground-muted'
                         }`}
                       >
                         {plan.features[row.key]}
@@ -251,26 +251,26 @@ export default function PricingPage() {
       </section>
 
       {/* 4. Lead Pricing Breakdown */}
-      <section className="bg-[#0a0a0a] py-20 px-4">
+      <section className="bg-background-alt py-20 px-4">
         <div className="mx-auto max-w-4xl">
           <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
               LEAD CREDITS
             </span>
-            <h2 className="text-3xl font-extrabold text-white">Lead credit pricing by trade</h2>
-            <p className="mx-auto mt-4 max-w-xl text-gray-400">
+            <h2 className="text-3xl font-extrabold">Lead credit pricing by trade</h2>
+            <p className="mx-auto mt-4 max-w-xl text-foreground-muted">
               Credits are purchased in bundles. 1 credit = $5. Professional and Elite subscribers get automatic discounts.
             </p>
           </div>
-          <div className="overflow-x-auto rounded-2xl border border-white/8 bg-white/4 shadow-sm">
+          <div className="overflow-x-auto rounded-2xl border border-border bg-background-elevated shadow-sm">
             <table className="w-full text-sm">
               <thead>
-                <tr className="border-b border-white/8 bg-white/3">
-                  <th className="p-4 text-left font-semibold text-gray-400">Trade</th>
-                  <th className="p-4 text-center font-semibold text-gray-400">Credits per lead</th>
-                  <th className="p-4 text-center font-semibold text-gray-400">Standard price</th>
-                  <th className="p-4 text-center font-semibold text-brand-400">Pro price (−20%)</th>
-                  <th className="p-4 text-center font-semibold text-purple-400">Elite price (−35%)</th>
+                <tr className="border-b border-border bg-background-alt">
+                  <th className="p-4 text-left font-semibold text-foreground-muted">Trade</th>
+                  <th className="p-4 text-center font-semibold text-foreground-muted">Credits per lead</th>
+                  <th className="p-4 text-center font-semibold text-foreground-muted">Standard price</th>
+                  <th className="p-4 text-center font-semibold text-brand-500">Pro price (−20%)</th>
+                  <th className="p-4 text-center font-semibold text-purple-500 dark:text-purple-400">Elite price (−35%)</th>
                 </tr>
               </thead>
               <tbody>
@@ -279,12 +279,12 @@ export default function PricingPage() {
                   const proPrice = Math.round(basePrice * 0.8);
                   const elitePrice = Math.round(basePrice * 0.65);
                   return (
-                    <tr key={row.trade} className={idx % 2 === 0 ? 'bg-transparent' : 'bg-white/3'}>
-                      <td className="p-4 font-medium text-white">{row.trade}</td>
-                      <td className="p-4 text-center text-gray-400">{row.credits}</td>
-                      <td className="p-4 text-center text-gray-400">{row.price}</td>
-                      <td className="p-4 text-center font-medium text-brand-400">${proPrice}</td>
-                      <td className="p-4 text-center font-medium text-purple-400">${elitePrice}</td>
+                    <tr key={row.trade} className={idx % 2 === 0 ? 'bg-transparent' : 'bg-background-alt'}>
+                      <td className="p-4 font-medium text-foreground">{row.trade}</td>
+                      <td className="p-4 text-center text-foreground-muted">{row.credits}</td>
+                      <td className="p-4 text-center text-foreground-muted">{row.price}</td>
+                      <td className="p-4 text-center font-medium text-brand-500">${proPrice}</td>
+                      <td className="p-4 text-center font-medium text-purple-500 dark:text-purple-400">${elitePrice}</td>
                     </tr>
                   );
                 })}
@@ -295,49 +295,49 @@ export default function PricingPage() {
       </section>
 
       {/* 5. Platform Fee */}
-      <section className="bg-[#0f0f0f] py-20 px-4">
+      <section className="bg-background py-20 px-4">
         <div className="mx-auto max-w-3xl text-center">
-          <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
+          <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
             PLATFORM FEE
           </span>
-          <h2 className="text-3xl font-extrabold text-white">15% — released only when the job is done</h2>
-          <p className="mt-6 text-lg text-gray-400">
+          <h2 className="text-3xl font-extrabold">15% — released only when the job is done</h2>
+          <p className="mt-6 text-lg text-foreground-muted">
             Fixit 24/7 charges tradies a 15% platform fee on each completed job. The fee is deducted automatically when the customer marks the job as complete and funds are released from escrow.
           </p>
           <div className="mt-10 grid gap-6 sm:grid-cols-3">
-            <div className="rounded-2xl border border-white/8 bg-white/4 p-6 text-center shadow-sm">
-              <p className="text-4xl font-extrabold text-white">85%</p>
-              <p className="mt-1 text-sm font-semibold text-gray-400">Goes to you</p>
-              <p className="mt-1 text-xs text-gray-500">Direct bank deposit</p>
+            <div className="rounded-2xl border border-border bg-background-elevated p-6 text-center shadow-sm">
+              <p className="text-4xl font-extrabold text-foreground">85%</p>
+              <p className="mt-1 text-sm font-semibold text-foreground-muted">Goes to you</p>
+              <p className="mt-1 text-xs text-foreground-subtle">Direct bank deposit</p>
             </div>
             <div className="rounded-2xl border border-brand-500/30 bg-brand-500/10 p-6 text-center shadow-sm">
-              <p className="text-4xl font-extrabold text-brand-400">15%</p>
-              <p className="mt-1 text-sm font-semibold text-gray-400">Fixit platform fee</p>
-              <p className="mt-1 text-xs text-gray-500">Covers platform, support & payments</p>
+              <p className="text-4xl font-extrabold text-brand-500">15%</p>
+              <p className="mt-1 text-sm font-semibold text-foreground-muted">Fixit platform fee</p>
+              <p className="mt-1 text-xs text-foreground-subtle">Covers platform, support & payments</p>
             </div>
             <div className="rounded-2xl border border-green-500/30 bg-green-500/10 p-6 text-center shadow-sm">
-              <p className="text-4xl font-extrabold text-green-400">$0</p>
-              <p className="mt-1 text-sm font-semibold text-gray-400">Fee before completion</p>
-              <p className="mt-1 text-xs text-gray-500">Only charged when job is done</p>
+              <p className="text-4xl font-extrabold text-green-500 dark:text-green-400">$0</p>
+              <p className="mt-1 text-sm font-semibold text-foreground-muted">Fee before completion</p>
+              <p className="mt-1 text-xs text-foreground-subtle">Only charged when job is done</p>
             </div>
           </div>
         </div>
       </section>
 
       {/* 6. FAQ */}
-      <section className="bg-[#0a0a0a] py-20 px-4">
+      <section className="bg-background-alt py-20 px-4">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-400">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
               FAQ
             </span>
-            <h2 className="text-3xl font-extrabold text-white">Pricing questions</h2>
+            <h2 className="text-3xl font-extrabold">Pricing questions</h2>
           </div>
           <div className="space-y-5">
             {PRICING_FAQS.map((faq) => (
-              <div key={faq.q} className="rounded-2xl border border-white/8 bg-white/4 p-6">
-                <h3 className="mb-2 text-base font-bold text-white">{faq.q}</h3>
-                <p className="text-sm leading-relaxed text-gray-400">{faq.a}</p>
+              <div key={faq.q} className="rounded-2xl border border-border bg-background-elevated p-6">
+                <h3 className="mb-2 text-base font-bold text-foreground">{faq.q}</h3>
+                <p className="text-sm leading-relaxed text-foreground-muted">{faq.a}</p>
               </div>
             ))}
           </div>
@@ -345,9 +345,9 @@ export default function PricingPage() {
       </section>
 
       {/* 7. CTA */}
-      <section className="bg-gradient-to-br from-brand-600 to-brand-800 py-20 px-4 text-center text-white">
+      <section className="bg-gradient-to-br from-brand-600 to-brand-800 py-20 px-4 text-center">
         <div className="mx-auto max-w-2xl">
-          <h2 className="text-3xl font-extrabold sm:text-4xl">Start Free, Upgrade When Ready</h2>
+          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Start Free, Upgrade When Ready</h2>
           <p className="mx-auto mt-4 max-w-lg text-brand-100">
             No lock-in, no credit card required to get started. Join thousands of Australians already using Fixit 24/7.
           </p>
@@ -367,6 +367,6 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
-    </>
+    </div>
   );
 }

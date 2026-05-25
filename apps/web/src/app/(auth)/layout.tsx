@@ -9,7 +9,7 @@ export const metadata: Metadata = {
 
 export default function AuthLayout({ children }: { children: React.ReactNode }) {
   return (
-    <div className="relative flex min-h-screen flex-col overflow-hidden bg-[#080808]">
+    <div className="relative flex min-h-screen flex-col overflow-hidden bg-background transition-colors duration-300">
       {/* Ambient glow */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="absolute left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/[0.07] blur-[120px]" />
@@ -20,10 +20,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Header */}
       <header className="relative z-10 flex h-16 items-center px-6">
         <Link href="/" className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white shadow-lg">
-            <span className="text-base font-black text-brand-700">F</span>
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-brand-500/15 shadow-lg dark:bg-white">
+            <span className="text-base font-black text-brand-600 dark:text-brand-700">F</span>
           </div>
-          <span className="text-lg font-bold text-white">Fixit247</span>
+          <span className="text-lg font-bold text-foreground">Fixit247</span>
         </Link>
       </header>
 
@@ -33,10 +33,10 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       </main>
 
       {/* Footer */}
-      <footer className="relative z-10 py-6 text-center text-xs text-gray-700">
+      <footer className="relative z-10 py-6 text-center text-xs text-foreground-subtle">
         © {new Date().getFullYear()} Fixit247 Pty Ltd · ABN 00 000 000 000 ·{' '}
-        <Link href="/privacy" className="hover:text-gray-400 transition-colors">Privacy</Link>{' '}·{' '}
-        <Link href="/terms" className="hover:text-gray-400 transition-colors">Terms</Link>
+        <Link href="/privacy" className="hover:text-foreground-muted transition-colors">Privacy</Link>{' '}·{' '}
+        <Link href="/terms" className="hover:text-foreground-muted transition-colors">Terms</Link>
       </footer>
     </div>
   );
