@@ -1,9 +1,10 @@
 'use client';
 
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, Phone, X } from 'lucide-react';
+import { ThemeToggle } from '@/components/shared/theme-toggle';
 
 const NAV_LINKS = [
   { href: '/how-it-works', label: 'How it works' },
@@ -26,7 +27,6 @@ export function MarketingNav() {
     return () => { window.removeEventListener('scroll', handleScroll); };
   }, []);
 
-  // Close on route change
   useEffect(() => { setOpen(false); }, [pathname]);
 
   return (
@@ -35,7 +35,7 @@ export function MarketingNav() {
       <nav
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'border-b border-white/[0.07] bg-[#0a0a0a]/95 shadow-[0_1px_0_rgba(255,255,255,0.04)] backdrop-blur-xl'
+            ? 'border-b border-border bg-background/95 shadow-sm-warm backdrop-blur-xl dark:shadow-none dark:bg-background/95'
             : 'border-b border-transparent bg-transparent'
         }`}
       >
@@ -43,11 +43,11 @@ export function MarketingNav() {
           {/* Logo */}
           <Link
             href="/"
-            className="flex items-center gap-2 text-[15px] font-extrabold text-white transition-opacity hover:opacity-80"
+            className="flex items-center gap-2 text-[15px] font-extrabold text-foreground transition-opacity hover:opacity-80"
             onClick={() => { setOpen(false); }}
           >
-            <span className="text-brand-400">🔑</span>
-            Fixit <span className="text-brand-400">24/7</span>
+            <span className="text-brand-500">🔑</span>
+            Fixit <span className="text-brand-500">24/7</span>
           </Link>
 
           {/* Desktop center links */}
@@ -58,8 +58,8 @@ export function MarketingNav() {
                 href={href}
                 className={`rounded-xl px-4 py-2 text-sm font-medium transition-colors ${
                   pathname === href
-                    ? 'bg-white/[0.06] text-white'
-                    : 'text-gray-400 hover:bg-white/[0.04] hover:text-white'
+                    ? 'bg-background-elevated text-foreground'
+                    : 'text-foreground-muted hover:bg-background-alt hover:text-foreground'
                 }`}
               >
                 {label}
@@ -67,11 +67,12 @@ export function MarketingNav() {
             ))}
           </div>
 
-          {/* Right: Emergency + auth + hamburger */}
+          {/* Right: Emergency + auth + theme toggle + hamburger */}
           <div className="flex items-center gap-2">
+            {/* Emergency button */}
             <Link
               href="/emergency"
-              className="hidden items-center gap-1.5 rounded-xl border border-red-500/25 bg-red-500/[0.08] px-3.5 py-2 text-xs font-bold text-red-400 transition-all hover:border-red-500/40 hover:bg-red-500/[0.12] sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-xl border border-emergency/25 bg-emergency/[0.08] px-3.5 py-2 text-xs font-bold text-emergency-600 transition-all hover:border-emergency/40 hover:bg-emergency/[0.12] dark:text-emergency-400 dark:text-red-400 sm:inline-flex"
             >
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
@@ -80,9 +81,12 @@ export function MarketingNav() {
               Emergency
             </Link>
 
+            {/* Theme toggle */}
+            <ThemeToggle className="hidden sm:flex" />
+
             <Link
               href="/login"
-              className="hidden rounded-xl px-4 py-2 text-sm font-medium text-gray-400 transition-colors hover:text-white lg:inline-block"
+              className="hidden rounded-xl px-4 py-2 text-sm font-medium text-foreground-muted transition-colors hover:text-foreground lg:inline-block"
             >
               Sign in
             </Link>
@@ -94,7 +98,7 @@ export function MarketingNav() {
             </Link>
             <button
               onClick={() => { setOpen((v) => !v); }}
-              className="ml-1 rounded-xl p-2 text-gray-400 transition-colors hover:bg-white/[0.06] hover:text-white md:hidden"
+              className="ml-1 rounded-xl p-2 text-foreground-muted transition-colors hover:bg-background-elevated hover:text-foreground md:hidden"
               aria-label="Toggle menu"
             >
               {open ? <X size={20} /> : <Menu size={20} />}
@@ -110,30 +114,33 @@ export function MarketingNav() {
           onClick={() => { setOpen(false); }}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm dark:bg-black/70" />
 
           {/* Drawer */}
           <div
             ref={drawerRef}
-            className="absolute right-0 top-0 flex h-full w-[min(320px,90vw)] flex-col border-l border-white/[0.07] bg-[#0d0d0d] p-6 shadow-2xl"
+            className="absolute right-0 top-0 flex h-full w-[min(320px,90vw)] flex-col border-l border-border bg-background p-6 shadow-xl-warm dark:shadow-2xl"
             onClick={(e) => { e.stopPropagation(); }}
           >
             {/* Header */}
             <div className="mb-8 flex items-center justify-between">
               <Link
                 href="/"
-                className="flex items-center gap-2 text-[15px] font-extrabold text-white"
+                className="flex items-center gap-2 text-[15px] font-extrabold text-foreground"
                 onClick={() => { setOpen(false); }}
               >
-                <span className="text-brand-400">🔑</span>
-                Fixit <span className="text-brand-400">24/7</span>
+                <span className="text-brand-500">🔑</span>
+                Fixit <span className="text-brand-500">24/7</span>
               </Link>
-              <button
-                onClick={() => { setOpen(false); }}
-                className="rounded-xl p-1.5 text-gray-500 hover:text-white transition-colors"
-              >
-                <X size={20} />
-              </button>
+              <div className="flex items-center gap-1">
+                <ThemeToggle compact />
+                <button
+                  onClick={() => { setOpen(false); }}
+                  className="rounded-xl p-1.5 text-foreground-muted transition-colors hover:text-foreground"
+                >
+                  <X size={20} />
+                </button>
+              </div>
             </div>
 
             {/* Nav links */}
@@ -145,8 +152,8 @@ export function MarketingNav() {
                   onClick={() => { setOpen(false); }}
                   className={`rounded-xl px-4 py-3 text-sm font-medium transition-colors ${
                     pathname === href
-                      ? 'bg-white/[0.07] text-white'
-                      : 'text-gray-400 hover:bg-white/[0.04] hover:text-white'
+                      ? 'bg-background-elevated text-foreground'
+                      : 'text-foreground-muted hover:bg-background-alt hover:text-foreground'
                   }`}
                 >
                   {label}
@@ -155,11 +162,11 @@ export function MarketingNav() {
             </div>
 
             {/* Auth buttons */}
-            <div className="mt-6 flex flex-col gap-2.5 border-t border-white/[0.07] pt-6">
+            <div className="mt-6 flex flex-col gap-2.5 border-t border-border pt-6">
               <Link
                 href="/login"
                 onClick={() => { setOpen(false); }}
-                className="w-full rounded-xl border border-white/12 py-3 text-center text-sm font-medium text-white transition-colors hover:bg-white/[0.06]"
+                className="w-full rounded-xl border border-border py-3 text-center text-sm font-medium text-foreground transition-colors hover:bg-background-elevated"
               >
                 Sign in
               </Link>
@@ -179,22 +186,21 @@ export function MarketingNav() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400" />
                 </span>
-                <p className="text-xs font-bold text-red-400">Emergency?</p>
+                <p className="text-xs font-bold text-red-500 dark:text-red-400">Emergency?</p>
               </div>
-              <p className="mb-3 text-xs text-gray-600">Tradies available right now</p>
+              <p className="mb-3 text-xs text-foreground-muted">Tradies available right now</p>
               <Link
                 href="/emergency"
                 onClick={() => { setOpen(false); }}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 py-3 text-center text-sm font-bold text-white transition-all hover:bg-red-400 active:scale-[0.98]"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 py-3 text-center text-sm font-bold text-white transition-all hover:bg-red-600 active:scale-[0.98] dark:hover:bg-red-400"
               >
                 <Phone size={14} />
                 Dispatch a tradie now
               </Link>
             </div>
 
-            {/* Bottom spacer for mobile safe area */}
             <div className="flex-1" />
-            <p className="text-center text-[10px] text-gray-700">
+            <p className="text-center text-[10px] text-foreground-subtle">
               Available 24/7 across Australia
             </p>
           </div>
