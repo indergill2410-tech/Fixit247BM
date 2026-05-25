@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { ChevronDown } from 'lucide-react';
 
 // ─── Earnings Calculator (client component) ─────────────────────────────────
 
@@ -269,6 +270,8 @@ export default function JoinAsTradiePageWrapper() {
 }
 
 function JoinAsTradiePageInner() {
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
   return (
     <div className="bg-background text-foreground transition-colors duration-300">
       {/* 1. Hero */}
@@ -291,7 +294,7 @@ function JoinAsTradiePageInner() {
               href="/register?role=TRADIE"
               className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 shadow-brand transition-all hover:bg-brand-400 hover:shadow-[0_0_50px_rgba(245,158,11,0.3)]"
             >
-              Start earning today — free
+              Claim $111/mo bonus — sign up free
             </Link>
             <a
               href="#how-it-works"
@@ -300,17 +303,18 @@ function JoinAsTradiePageInner() {
               See how it works
             </a>
           </div>
+          <p className="mt-4 text-sm text-foreground-subtle">No credit card. No lock-in. Cancel anytime.</p>
         </div>
       </section>
 
       {/* 2. Stats bar */}
-      <section className="bg-brand-600/90 py-6">
+      <section className="border-y border-border bg-background-alt py-8">
         <div className="mx-auto max-w-6xl px-4">
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="text-2xl font-extrabold text-white">{stat.value}</p>
-                <p className="mt-0.5 text-sm text-brand-100">{stat.label}</p>
+                <p className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">{stat.value}</p>
+                <p className="mt-0.5 text-sm text-foreground-muted">{stat.label}</p>
               </div>
             ))}
           </div>
@@ -346,7 +350,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 4. How It Works */}
-      <section id="how-it-works" className="bg-background py-20 px-4">
+      <section id="how-it-works" className="border-t border-border bg-background py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
@@ -371,8 +375,50 @@ function JoinAsTradiePageInner() {
         </div>
       </section>
 
-      {/* 5. Subscription Plans */}
-      <section className="bg-background-alt py-20 px-4">
+      {/* 5. Testimonials — proof before pricing */}
+      <section className="border-t border-border bg-background-alt py-20 px-4">
+        <div className="mx-auto max-w-6xl">
+          <div className="mb-12 text-center">
+            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
+              TESTIMONIALS
+            </span>
+            <h2 className="text-3xl font-extrabold">What tradies are saying</h2>
+          </div>
+          <div className="grid gap-6 lg:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-background-elevated p-7">
+                <div className="mb-3 flex gap-0.5">
+                  {Array.from({ length: t.rating }).map((_, i) => (
+                    <span key={i} className="text-brand-500">★</span>
+                  ))}
+                </div>
+                <p className="flex-1 text-sm leading-relaxed text-foreground-muted">&ldquo;{t.quote}&rdquo;</p>
+                <div className="mt-5 border-t border-border pt-4">
+                  <p className="text-sm font-bold text-foreground">{t.name}</p>
+                  <p className="text-xs text-foreground-subtle">{t.trade}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 6. Trust badges */}
+      <section className="border-t border-border bg-background py-10 px-4">
+        <div className="mx-auto max-w-4xl">
+          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+            {TRUST_BADGES.map((badge) => (
+              <div key={badge.label} className="flex flex-col items-center gap-2 text-center">
+                <span className="text-3xl">{badge.icon}</span>
+                <p className="text-sm font-semibold text-foreground-muted">{badge.label}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* 7. Subscription Plans — after proof */}
+      <section className="border-t border-border bg-background-alt py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
@@ -427,50 +473,8 @@ function JoinAsTradiePageInner() {
         </div>
       </section>
 
-      {/* 6. Trust badges */}
-      <section className="bg-background border-y border-border py-10 px-4">
-        <div className="mx-auto max-w-4xl">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {TRUST_BADGES.map((badge) => (
-              <div key={badge.label} className="flex flex-col items-center gap-2 text-center">
-                <span className="text-3xl">{badge.icon}</span>
-                <p className="text-sm font-semibold text-foreground-muted">{badge.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 7. Testimonials */}
-      <section className="bg-background-alt py-20 px-4">
-        <div className="mx-auto max-w-6xl">
-          <div className="mb-12 text-center">
-            <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
-              TESTIMONIALS
-            </span>
-            <h2 className="text-3xl font-extrabold">What tradies are saying</h2>
-          </div>
-          <div className="grid gap-8 lg:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="rounded-2xl bg-background-elevated border border-border p-7 shadow-sm">
-                <div className="mb-3 flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, i) => (
-                    <span key={i} className="text-yellow-500 dark:text-yellow-400">★</span>
-                  ))}
-                </div>
-                <p className="text-sm leading-relaxed text-foreground-muted">&ldquo;{t.quote}&rdquo;</p>
-                <div className="mt-5">
-                  <p className="text-sm font-bold text-foreground">{t.name}</p>
-                  <p className="text-xs text-foreground-subtle">{t.trade}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* 8. FAQ */}
-      <section className="bg-background py-20 px-4">
+      {/* 8. FAQ — accordion */}
+      <section className="border-t border-border bg-background py-20 px-4">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
@@ -478,11 +482,25 @@ function JoinAsTradiePageInner() {
             </span>
             <h2 className="text-3xl font-extrabold">Common questions</h2>
           </div>
-          <div className="space-y-6">
-            {FAQS.map((faq) => (
-              <div key={faq.q} className="rounded-2xl border border-border bg-background-elevated p-6">
-                <h3 className="mb-2 text-base font-bold text-foreground">{faq.q}</h3>
-                <p className="text-sm leading-relaxed text-foreground-muted">{faq.a}</p>
+          <div className="space-y-2">
+            {FAQS.map((faq, i) => (
+              <div key={faq.q} className="overflow-hidden rounded-2xl border border-border bg-background-elevated">
+                <button
+                  type="button"
+                  onClick={() => { setOpenFaq(openFaq === i ? null : i); }}
+                  className="flex w-full items-center justify-between px-6 py-4 text-left"
+                >
+                  <span className="text-sm font-semibold text-foreground pr-4">{faq.q}</span>
+                  <ChevronDown
+                    size={16}
+                    className={`shrink-0 text-foreground-muted transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
+                  />
+                </button>
+                {openFaq === i && (
+                  <div className="border-t border-border px-6 pb-5 pt-4">
+                    <p className="text-sm leading-relaxed text-foreground-muted">{faq.a}</p>
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -490,26 +508,29 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 9. Bottom CTA */}
-      <section className="bg-background-alt border-t border-brand-500/20 py-20 px-4 text-center">
+      <section className="border-t border-brand-500/20 bg-background-alt py-20 px-4 text-center">
         <div className="mx-auto max-w-2xl">
-          <h2 className="text-3xl font-extrabold sm:text-4xl">Ready to grow your trade business?</h2>
+          <h2 className="text-3xl font-extrabold sm:text-4xl">
+            Ready to start earning?
+          </h2>
           <p className="mx-auto mt-4 max-w-lg text-foreground-muted">
-            Join 5,000+ Australian tradies already earning on Fixit 24/7. Free to start, no credit card required.
+            Join 5,000+ Australian tradies already earning on Fixit 24/7. Your first 6 months include $111/month in free job credits — no credit card required.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/register?role=TRADIE"
-              className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg"
+              className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-500/20"
             >
-              Join Free Today
+              Claim your $111/mo bonus — free
             </Link>
             <Link
-              href="/how-it-works"
+              href="/pricing"
               className="rounded-xl border border-border px-8 py-4 text-base font-bold text-foreground hover:bg-background-elevated transition-colors"
             >
-              Learn More
+              See full pricing
             </Link>
           </div>
+          <p className="mt-4 text-xs text-foreground-subtle">No credit card. No lock-in. Cancel anytime.</p>
         </div>
       </section>
     </div>
