@@ -1,6 +1,7 @@
 'use client';
 
-import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState } from 'react';
+import type { ReactNode } from 'react';
 
 type Theme = 'dark' | 'light' | 'system';
 
@@ -35,7 +36,7 @@ function applyTheme(resolved: 'dark' | 'light') {
 }
 
 interface ThemeProviderProps {
-  children: React.ReactNode;
+  children: ReactNode;
   defaultTheme?: Theme;
 }
 
