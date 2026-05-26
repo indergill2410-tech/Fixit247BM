@@ -85,7 +85,7 @@ export function CustomerOnboarding() {
   return (
     <div className="w-full">
       <div className="mb-8 text-center">
-        <h1 className="text-2xl font-bold text-white">Set up your account</h1>
+        <h1 className="text-3xl font-extrabold text-white">Set up your account</h1>
         <p className="mt-1 text-sm text-brand-300">Step {step} of {STEPS.length}</p>
         <div className="mt-4 flex items-center justify-center gap-2">
           {STEPS.map((s) => (
@@ -114,7 +114,7 @@ export function CustomerOnboarding() {
               {step === 1 && (
                 <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-4">
                   <div>
-                    <h2 className="text-lg font-semibold text-white">Your details</h2>
+                    <h2 className="text-xl font-bold text-white">Your details</h2>
                     <p className="text-sm text-brand-300">Tell us a bit about yourself</p>
                   </div>
                   <div className="grid grid-cols-2 gap-3">
@@ -157,7 +157,7 @@ export function CustomerOnboarding() {
               {step === 2 && (
                 <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-4">
                   <div>
-                    <h2 className="text-lg font-semibold text-white">Your location</h2>
+                    <h2 className="text-xl font-bold text-white">Your location</h2>
                     <p className="text-sm text-brand-300">Where do you need services?</p>
                   </div>
                   <div className="flex flex-col gap-1.5">
@@ -207,7 +207,7 @@ export function CustomerOnboarding() {
               {step === 3 && (
                 <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="flex flex-col gap-4">
                   <div>
-                    <h2 className="text-lg font-semibold text-white">Notification preferences</h2>
+                    <h2 className="text-xl font-bold text-white">Notification preferences</h2>
                     <p className="text-sm text-brand-300">How would you like us to keep you updated?</p>
                   </div>
 

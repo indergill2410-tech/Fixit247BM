@@ -44,6 +44,8 @@ interface FormData {
   voiceNoteUrl?: string;
   preferredTime?: string;
   complexity: 'SIMPLE' | 'MEDIUM' | 'COMPLEX';
+  addressId?: string;
+  addressSuburb?: string;
 }
 
 interface AIScopeResult {
@@ -69,6 +71,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
   const [step, setStep] = React.useState(isEmergencyMode ? 0 : 1);
   const [isAnalyzing, setIsAnalyzing] = React.useState(false);
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [submitError, setSubmitError] = React.useState<string | null>(null);
   const [aiResult, setAiResult] = React.useState<AIScopeResult | null>(null);
   const [showAiScope, setShowAiScope] = React.useState(false);
 
@@ -79,6 +82,18 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
     mediaUrls: [],
     complexity: 'MEDIUM',
   });
+
+  // Fetch the customer's saved address so we can send addressId with the job
+  React.useEffect(() => {
+    fetch('/api/customer/address')
+      .then((r) => r.ok ? r.json() : null)
+      .then((data: { address: { id: string; suburb: string } | null } | null) => {
+        if (data?.address) {
+          setFormData((prev) => ({ ...prev, addressId: data.address!.id, addressSuburb: data.address!.suburb }));
+        }
+      })
+      .catch(() => { /* non-fatal — job still posts without addressId */ });
+  }, []);
 
   const updateForm = (updates: Partial<FormData>) => { setFormData((prev) => ({ ...prev, ...updates })); };
 
@@ -124,6 +139,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
 
   const handleSubmit = async () => {
     setIsSubmitting(true);
+    setSubmitError(null);
     try {
       const title = aiResult?.suggestedTitle ?? `${formData.category.replace(/_/g, ' ')} job`;
       const description = aiResult?.professionalSummary ?? formData.description;
@@ -134,28 +150,33 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         body: JSON.stringify({
           title,
           description,
-          category: formData.category,
-          priority: formData.priority,
-          isEmergency: formData.priority === 'EMERGENCY',
-          budgetMin: formData.budgetMin,
-          budgetMax: formData.budgetMax,
-          mediaUrls: formData.mediaUrls,
-          voiceNoteUrl: formData.voiceNoteUrl,
-          preferredTime: formData.preferredTime,
-          complexity: formData.complexity,
-          aiUrgencyScore: aiResult?.urgencyScore,
+          category:         formData.category,
+          priority:         formData.priority,
+          isEmergency:      formData.priority === 'EMERGENCY',
+          budgetMin:        formData.budgetMin,
+          budgetMax:        formData.budgetMax,
+          addressId:        formData.addressId,
+          mediaUrls:        formData.mediaUrls,
+          voiceNoteUrl:     formData.voiceNoteUrl,
+          preferredTime:    formData.preferredTime,
+          complexity:       formData.complexity,
+          aiUrgencyScore:   aiResult?.urgencyScore,
           aiConfidenceScore: aiResult?.confidenceScore,
-          leadPrice: aiResult?.estimatedPriceMin
-            ? Math.ceil(aiResult.estimatedPriceMin * 0.07)
-            : undefined,
+          // leadPrice is intentionally omitted — computed server-side
         }),
       });
 
       if (res.ok) {
-        const { job } = await res.json();
+        const { job } = await res.json() as { job: { id: string } };
         router.push(`/jobs/${job.id}`);
+        return;
       }
+
+      const errData = await res.json().catch(() => ({})) as { error?: string };
+      setSubmitError(errData.error ?? 'Something went wrong. Please try again.');
     } catch {
+      setSubmitError('Network error — please check your connection and try again.');
+    } finally {
       setIsSubmitting(false);
     }
   };
@@ -183,7 +204,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 1: Describe the problem */}
         {step === 1 && !showAiScope && (
           <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">What do you need help with?</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">What do you need help with?</h2>
             <p className="mb-6 text-sm text-gray-500">Describe the problem in your own words — our AI will handle the rest.</p>
 
             <div className="space-y-4">
@@ -230,7 +251,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* AI scope review */}
         {showAiScope && aiResult && (
           <motion.div key="ai-scope" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">AI Scope Review</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">AI Scope Review</h2>
             <p className="mb-6 text-sm text-gray-500">Review what our AI found. You can edit anything before posting.</p>
             <AIScopeDisplay
               result={aiResult}
@@ -243,7 +264,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 2: Category + urgency */}
         {step === 2 && !showAiScope && (
           <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">Trade & urgency</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">Trade & urgency</h2>
             <p className="mb-6 text-sm text-gray-500">Confirm the trade category and how urgently you need help.</p>
 
             <div className="space-y-6">
@@ -316,16 +337,20 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 3: Location + budget + confirm */}
         {step === 3 && !showAiScope && (
           <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">Location & budget</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">Location & budget</h2>
             <p className="mb-6 text-sm text-gray-500">Tell tradies where you are and your rough budget (optional).</p>
 
             <div className="space-y-5">
-              {/* Location (from profile — just show suburb) */}
+              {/* Location — shows real saved suburb */}
               <div className="flex items-center gap-3 rounded-xl border border-white/8 bg-white/4 p-4">
                 <MapPin size={18} className="text-brand-400 shrink-0" />
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-medium text-white">Your location</p>
-                  <p className="text-xs text-gray-500">Using your saved address — change in profile</p>
+                  <p className="text-xs text-gray-500">
+                    {formData.addressSuburb
+                      ? `${formData.addressSuburb} — change in profile`
+                      : 'Using your saved address — change in profile'}
+                  </p>
                 </div>
               </div>
 
@@ -373,6 +398,12 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
                   <p className="text-xs text-gray-500 line-clamp-2">{formData.description}</p>
                 )}
               </div>
+
+              {submitError && (
+                <p className="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+                  {submitError}
+                </p>
+              )}
 
               <div className="flex gap-3">
                 <Button variant="outline" onClick={() => { setStep(2); }} className="flex-1 gap-2">

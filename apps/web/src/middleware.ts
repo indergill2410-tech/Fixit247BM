@@ -14,7 +14,6 @@ const PUBLIC_EXACT: readonly string[] = [
   '/verify-email',
   '/auth/callback',
   '/about',
-  '/pricing',
   '/contact',
   '/unauthorized',
   '/how-it-works',

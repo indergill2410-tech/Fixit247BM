@@ -188,7 +188,7 @@ function Step1Business({ onNext }: { onNext: (d: TradieBusinessValues) => void }
       <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
         <CardContent className="px-6 py-8">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Business details</h2>
+            <h2 className="text-2xl font-bold text-white">Business details</h2>
             <p className="mt-1 text-sm text-brand-300">Tell customers who you are and what you do</p>
           </div>
           <form onSubmit={handleSubmit(onNext)} className="flex flex-col gap-5">
@@ -256,7 +256,7 @@ function Step2Verification({ onBack, onNext }: { onBack: () => void; onNext: (d:
       <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
         <CardContent className="px-6 py-8">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Verification documents</h2>
+            <h2 className="text-2xl font-bold text-white">Verification documents</h2>
             <p className="mt-1 text-sm text-brand-300">Trust is at the heart of Fixit247. Verified tradies get more jobs.</p>
           </div>
 
@@ -358,7 +358,7 @@ function Step3Profile({ onBack, onNext }: { onBack: () => void; onNext: (d: Trad
       <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
         <CardContent className="px-6 py-8">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Professional profile</h2>
+            <h2 className="text-2xl font-bold text-white">Professional profile</h2>
             <p className="mt-1 text-sm text-brand-300">Help customers understand your expertise and rates</p>
           </div>
           <form onSubmit={handleSubmit(onNext)} className="flex flex-col gap-5">
@@ -441,7 +441,7 @@ function Step4Availability({ onBack, onNext }: { onBack: () => void; onNext: (d:
       <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
         <CardContent className="px-6 py-8">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Availability & emergency settings</h2>
+            <h2 className="text-2xl font-bold text-white">Availability & emergency settings</h2>
             <p className="mt-1 text-sm text-brand-300">Set when you work and configure emergency response</p>
           </div>
           <form onSubmit={handleSubmit(onNext)} className="flex flex-col gap-5">
@@ -522,7 +522,7 @@ function Step5Payments({ onBack, onNext }: { onBack: () => void; onNext: (d: Tra
       <Card className="border-white/10 bg-white/5 backdrop-blur-xl">
         <CardContent className="px-6 py-8">
           <div className="mb-6">
-            <h2 className="text-xl font-bold text-white">Set up payments</h2>
+            <h2 className="text-2xl font-bold text-white">Set up payments</h2>
             <p className="mt-1 text-sm text-brand-300">Connect your bank account to receive payouts</p>
           </div>
 

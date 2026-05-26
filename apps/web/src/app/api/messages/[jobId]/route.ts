@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 
@@ -15,8 +15,9 @@ export async function GET(
   req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
+  const session = await requireApiSession();
+  if (session instanceof NextResponse) return session;
   try {
-    const session = await requireSession();
     const { jobId } = await params;
     const cursor = req.nextUrl.searchParams.get('cursor');
     const limit = Math.min(Number(req.nextUrl.searchParams.get('limit') ?? '50'), 100);
@@ -70,8 +71,9 @@ export async function POST(
   req: NextRequest,
   { params }: { params: Promise<{ jobId: string }> }
 ) {
+  const session = await requireApiSession();
+  if (session instanceof NextResponse) return session;
   try {
-    const session = await requireSession();
     const { jobId } = await params;
     const body = await req.json();
     const { content, type, mediaUrl, receiverId } = SendSchema.parse(body);

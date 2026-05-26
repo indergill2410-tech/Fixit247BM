@@ -34,7 +34,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/join-as-tradie`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
     { url: `${SITE_URL}/fixit-plus`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
     { url: `${SITE_URL}/how-it-works`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
-    { url: `${SITE_URL}/pricing`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
     { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.65 },
     { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.65 },
     { url: `${SITE_URL}/refer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
