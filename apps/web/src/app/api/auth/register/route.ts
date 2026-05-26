@@ -3,6 +3,7 @@ import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { registerSchema } from '@/lib/validators/auth';
 import { rateLimit, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 
 export async function POST(request: NextRequest) {
   const rl = rateLimit(request, LIMITS.auth);
@@ -33,6 +34,15 @@ export async function POST(request: NextRequest) {
   if (error) {
     const status = error.message.includes('already registered') ? 409 : 400;
     return NextResponse.json({ error: error.message }, { status });
+  }
+
+  // Write role to app_metadata (service-role only — not user-writable) so it
+  // cannot be changed by a browser-console call to supabase.auth.updateUser().
+  if (data.user?.id) {
+    const admin = createServiceRoleClient();
+    await admin.auth.admin.updateUserById(data.user.id, {
+      app_metadata: { role },
+    });
   }
 
   return NextResponse.json({ userId: data.user?.id, requiresVerification: !data.session }, { status: 201 });

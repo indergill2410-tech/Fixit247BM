@@ -1,20 +1,31 @@
-import { NextResponse } from 'next/server';
+import { type NextRequest, NextResponse } from 'next/server';
 import { db } from '@fixit247/database';
-import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
 import crypto from 'crypto';
+import { getSession } from '@/lib/auth/session';
+
+// eventType whitelist — prevents arbitrary strings from polluting the table.
+const ALLOWED_EVENT_TYPES = [
+  'page_view', 'search', 'job_view', 'tradie_view',
+  'signup_started', 'signup_completed', 'login', 'booking_started',
+  'booking_completed', 'referral_clicked', 'emergency_tapped',
+] as const;
 
 const schema = z.object({
-  eventType: z.string(),
-  page: z.string().optional(),
-  referrer: z.string().optional(),
-  suburb: z.string().optional(),
-  sessionId: z.string().optional(),
+  eventType: z.enum(ALLOWED_EVENT_TYPES),
+  page: z.string().max(500).optional(),
+  referrer: z.string().max(500).optional(),
+  suburb: z.string().max(100).optional(),
+  sessionId: z.string().max(100).optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
+    // Require authentication to prevent bots from polluting analytics.
+    const session = await getSession();
+    if (!session) return NextResponse.json({ ok: false }, { status: 401 });
+
     const body = await req.json();
     const data = schema.parse(body);
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
@@ -22,12 +33,12 @@ export async function POST(req: Request) {
 
     await db.growthEvent.create({
       data: {
-        eventType: data.eventType as any,
+        eventType: data.eventType as never,
         page: data.page,
         referrer: data.referrer,
         suburb: data.suburb,
         sessionId: data.sessionId,
-        metadata: (data.metadata ?? {}) as Prisma.InputJsonValue,
+        metadata: (data.metadata ?? {}) as never,
         ipHash,
       },
     });

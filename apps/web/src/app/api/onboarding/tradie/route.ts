@@ -42,6 +42,14 @@ export async function POST(request: Request) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
 
+  // Only TRADIE-role accounts may submit tradie onboarding data.
+  const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
+  const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const role = (appMeta.role ?? userMeta.role) as string | undefined;
+  if (role !== 'TRADIE') {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
   const body = await request.json() as unknown;
   const parsed = tradieOnboardingPayload.safeParse(body);
   if (!parsed.success) {

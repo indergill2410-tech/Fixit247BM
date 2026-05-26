@@ -12,10 +12,18 @@ import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import { loginSchema, type LoginValues } from '@/lib/validators/auth';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
+// Prevent open-redirect: only allow same-origin relative paths.
+function sanitiseRedirectTo(raw: string | null): string {
+  if (!raw) return '/dashboard';
+  return raw.startsWith('/') && !raw.startsWith('//') ? raw : '/dashboard';
+}
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const redirectTo = sanitiseRedirectTo(searchParams.get('redirectTo'));
+  // Surface OAuth/callback errors passed as ?error= query param
+  const urlError = searchParams.get('error');
   const [showPassword, setShowPassword] = React.useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const [showGoogleRoleSelect, setShowGoogleRoleSelect] = React.useState(false);
@@ -97,6 +105,13 @@ export function LoginForm() {
 
       <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
         <CardContent className="px-6 pb-6 pt-8">
+          {urlError && (
+            <div className="mb-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {urlError === 'auth_callback_failed'
+                ? 'Google sign-in failed. Please try again or use email and password.'
+                : 'An error occurred. Please try again.'}
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="email" className="text-sm font-medium text-white/90">Email address</label>

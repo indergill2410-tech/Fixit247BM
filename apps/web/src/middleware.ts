@@ -96,6 +96,14 @@ function getDashboardPath(role: Role): string {
   return '/dashboard';
 }
 
+// Read role from app_metadata (authoritative, service-role-only writeable).
+// Fall back to user_metadata for accounts created before this change.
+function resolveRole(user: { app_metadata?: Record<string, unknown> | null; user_metadata?: Record<string, unknown> | null }): Role {
+  const appRole = (user.app_metadata as Record<string, unknown> | undefined)?.role;
+  const userRole = (user.user_metadata as Record<string, unknown> | undefined)?.role;
+  return ((appRole ?? userRole) as Role | undefined) ?? 'CUSTOMER';
+}
+
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
@@ -123,8 +131,7 @@ export async function middleware(request: NextRequest) {
 
   if (isPublicRoute(pathname)) {
     if (user && (pathname === '/login' || pathname === '/register')) {
-      const meta = user.user_metadata as Record<string, unknown>;
-      const role = (meta.role as Role | undefined) ?? 'CUSTOMER';
+      const role = resolveRole(user);
       return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
     }
     return response;
@@ -136,9 +143,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const meta = user.user_metadata as Record<string, unknown>;
-  const role = (meta.role as Role | undefined) ?? 'CUSTOMER';
-  const onboardingComplete = (meta.onboardingComplete as boolean | undefined) ?? false;
+  const role = resolveRole(user);
+  const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const onboardingComplete = (userMeta.onboardingComplete as boolean | undefined) ?? false;
 
   const requiredRoles = getRequiredRoles(pathname);
   if (requiredRoles && !requiredRoles.includes(role)) {

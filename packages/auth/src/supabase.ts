@@ -96,18 +96,3 @@ export function createServiceRoleClient(): SupabaseClient {
   });
 }
 
-// ─── Legacy singleton export (browser only) ──────────────────────────────────
-
-/**
- * @deprecated Prefer createBrowserClient() in client components.
- * Kept for backward compatibility.
- */
-export const supabase: SupabaseClient = createBrowserClient();
-
-/**
- * @deprecated Prefer createServiceRoleClient().
- * Kept for backward compatibility.
- */
-export function createServiceClient(): SupabaseClient {
-  return createServiceRoleClient();
-}
