@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { CheckCircle, Shield, Star, Zap, Phone } from 'lucide-react';
-import { FixitPlusFaq } from './fixit-plus-faq';
+import { FaqAccordion } from '@/components/shared/faq-accordion';
 
 export const metadata: Metadata = {
   title: 'Fixit Plus — Homeowner Peace of Mind | Fixit 24/7',
@@ -356,7 +356,7 @@ export default function FixitPlusPage() {
             <p className="section-label mb-3">Common questions</p>
             <h2 className="text-3xl font-bold">Everything you need to know</h2>
           </div>
-          <FixitPlusFaq faqs={PLUS_FAQS} />
+          <FaqAccordion faqs={PLUS_FAQS} namespace="fixit-plus" />
         </div>
       </section>
 

@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { ChevronDown } from 'lucide-react';
+import { FaqAccordion } from '@/components/shared/faq-accordion';
 
 // ─── Earnings Calculator (client component) ─────────────────────────────────
 
@@ -270,8 +270,6 @@ export default function JoinAsTradiePageWrapper() {
 }
 
 function JoinAsTradiePageInner() {
-  const [openFaq, setOpenFaq] = useState<number | null>(null);
-
   return (
     <div className="bg-background text-foreground transition-colors duration-300">
       {/* 1. Hero */}
@@ -388,7 +386,7 @@ function JoinAsTradiePageInner() {
             {TESTIMONIALS.map((t) => (
               <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-background-elevated p-7">
                 <div className="mb-3 flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, i) => (
+                  {Array.from({ length: t.rating }, (_, i) => (
                     <span key={i} className="text-brand-500">★</span>
                   ))}
                 </div>
@@ -482,28 +480,7 @@ function JoinAsTradiePageInner() {
             </span>
             <h2 className="text-3xl font-extrabold">Common questions</h2>
           </div>
-          <div className="space-y-2">
-            {FAQS.map((faq, i) => (
-              <div key={faq.q} className="overflow-hidden rounded-2xl border border-border bg-background-elevated">
-                <button
-                  type="button"
-                  onClick={() => { setOpenFaq(openFaq === i ? null : i); }}
-                  className="flex w-full items-center justify-between px-6 py-4 text-left"
-                >
-                  <span className="text-sm font-semibold text-foreground pr-4">{faq.q}</span>
-                  <ChevronDown
-                    size={16}
-                    className={`shrink-0 text-foreground-muted transition-transform duration-200 ${openFaq === i ? 'rotate-180' : ''}`}
-                  />
-                </button>
-                {openFaq === i && (
-                  <div className="border-t border-border px-6 pb-5 pt-4">
-                    <p className="text-sm leading-relaxed text-foreground-muted">{faq.a}</p>
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
+          <FaqAccordion faqs={FAQS} namespace="join-tradie" />
         </div>
       </section>
 

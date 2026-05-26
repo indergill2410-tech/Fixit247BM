@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { PricingFaqAccordion } from './pricing-faq-accordion';
+import { FaqAccordion } from '@/components/shared/faq-accordion';
 
 export const metadata: Metadata = {
   title: 'Pricing | Fixit 24/7 — Simple, Transparent Pricing',
@@ -335,7 +335,7 @@ export default function PricingPage() {
             </span>
             <h2 className="text-3xl font-extrabold">Pricing questions</h2>
           </div>
-          <PricingFaqAccordion faqs={PRICING_FAQS} />
+          <FaqAccordion faqs={PRICING_FAQS} namespace="pricing" />
         </div>
       </section>
 
