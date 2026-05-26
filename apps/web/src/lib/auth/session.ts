@@ -18,22 +18,28 @@ export async function getSession(): Promise<SessionUser | null> {
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error != null || !user) return null;
 
-  // Role MUST come from the database — never trust user_metadata which the
-  // client can manipulate directly via supabase.auth.updateUser().
-  const dbUser = await db.user.findFirst({ where: { id: user.id } });
-  if (!dbUser) return null;
+  try {
+    // Role MUST come from the database — never trust user_metadata which the
+    // client can manipulate directly via supabase.auth.updateUser().
+    const dbUser = await db.user.findFirst({ where: { id: user.id } });
+    if (!dbUser) return null;
 
-  const meta = user.user_metadata as Record<string, unknown>;
-  return {
-    id: user.id,
-    email: user.email ?? '',
-    role: dbUser.role as unknown as Role,
-    firstName: dbUser.firstName || ((meta.firstName as string | undefined) ?? ''),
-    lastName: dbUser.lastName || ((meta.lastName as string | undefined) ?? ''),
-    avatarUrl: (meta.avatarUrl as string | null | undefined) ?? null,
-    onboardingComplete: dbUser.onboardingComplete,
-    emailVerified: !!user.email_confirmed_at,
-  };
+    const meta = user.user_metadata as Record<string, unknown>;
+    return {
+      id: user.id,
+      email: user.email ?? '',
+      role: dbUser.role as unknown as Role,
+      firstName: dbUser.firstName || ((meta.firstName as string | undefined) ?? ''),
+      lastName: dbUser.lastName || ((meta.lastName as string | undefined) ?? ''),
+      avatarUrl: (meta.avatarUrl as string | null | undefined) ?? null,
+      onboardingComplete: dbUser.onboardingComplete,
+      emailVerified: !!user.email_confirmed_at,
+    };
+  } catch {
+    // DB unreachable — treat as unauthenticated so the caller redirects to
+    // login rather than crashing the page with an error boundary.
+    return null;
+  }
 }
 
 export async function requireSession(): Promise<SessionUser> {

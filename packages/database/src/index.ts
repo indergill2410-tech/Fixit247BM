@@ -47,6 +47,11 @@ function withSoftDeleteExtension(client: PrismaClient) {
 // In development, Next.js reloads the module graph on every HMR cycle.
 // Attaching the instance to `globalThis` prevents exhausting the DB connection
 // pool by re-creating a client on each reload.
+//
+// The client is created lazily on first access so that DATABASE_URL is only
+// required at runtime — not at module import time. This prevents build-time
+// crashes when Next.js statically evaluates server component imports before
+// env vars are available (e.g. during `next build` with turbo).
 
 type ExtendedPrismaClient = ReturnType<typeof withSoftDeleteExtension>;
 
@@ -54,23 +59,29 @@ const globalForPrisma = globalThis as unknown as {
   prisma: ExtendedPrismaClient | undefined;
 };
 
-const databaseUrl = process.env.DATABASE_URL;
-if (!databaseUrl) throw new Error('DATABASE_URL environment variable is not set');
-
-const baseClient = new PrismaClient({
-  adapter: new PrismaPg(databaseUrl),
-  log:
-    process.env.NODE_ENV === 'development'
-      ? ['query', 'error', 'warn']
-      : ['error'],
-});
-
-export const db: ExtendedPrismaClient =
-  globalForPrisma.prisma ?? withSoftDeleteExtension(baseClient);
-
-if (process.env.NODE_ENV !== 'production') {
-  globalForPrisma.prisma = db;
+function createPrismaClient(): ExtendedPrismaClient {
+  const url = process.env.DATABASE_URL;
+  if (!url) throw new Error('DATABASE_URL environment variable is not set');
+  const baseClient = new PrismaClient({
+    adapter: new PrismaPg(url),
+    log:
+      process.env.NODE_ENV === 'development'
+        ? ['query', 'error', 'warn']
+        : ['error'],
+  });
+  return withSoftDeleteExtension(baseClient);
 }
+
+// Lazy proxy — the real client is created on the first property access.
+// This keeps `import { db } from '@fixit247/database'` side-effect-free.
+export const db: ExtendedPrismaClient = new Proxy({} as ExtendedPrismaClient, {
+  get(_, prop: string | symbol) {
+    if (!globalForPrisma.prisma) {
+      globalForPrisma.prisma = createPrismaClient();
+    }
+    return Reflect.get(globalForPrisma.prisma, prop);
+  },
+});
 
 // ─── Prisma type re-exports ────────────────────────────────────────────────────
 
