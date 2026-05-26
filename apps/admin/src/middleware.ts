@@ -2,10 +2,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import type { Role } from '@fixit247/auth';
 
-const PUBLIC_PATHS = ['/_next', '/favicon', '/api/health', '/login'];
+const PUBLIC_PREFIXES = ['/_next', '/favicon', '/api/health'];
+const PUBLIC_EXACT = ['/login'];
 
 function isPublic(pathname: string): boolean {
-  return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+  if (PUBLIC_EXACT.includes(pathname)) return true;
+  return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
 export async function middleware(request: NextRequest) {

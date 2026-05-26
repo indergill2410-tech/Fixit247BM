@@ -105,29 +105,40 @@ export async function POST(request: Request) {
       const tradieProfile = await tx.tradieProfile.findUniqueOrThrow({ where: { userId: user.id } });
 
       if (verification?.hasLicense && verification.licenceNumber) {
-        await tx.licence.create({
-          data: {
-            tradieId: tradieProfile.id,
-            licenceType: verification.licenceType ?? 'TRADE',
-            licenceNumber: verification.licenceNumber,
-            state: verification.licenceState ?? '',
-            status: 'PENDING',
-          },
+        // upsert prevents duplicate rows when the form is resubmitted
+        const existingLicence = await tx.licence.findFirst({
+          where: { tradieId: tradieProfile.id, licenceNumber: verification.licenceNumber },
         });
+        if (!existingLicence) {
+          await tx.licence.create({
+            data: {
+              tradieId: tradieProfile.id,
+              licenceType: verification.licenceType ?? 'TRADE',
+              licenceNumber: verification.licenceNumber,
+              state: verification.licenceState ?? '',
+              status: 'PENDING',
+            },
+          });
+        }
       }
 
       if (verification?.hasInsurance && verification.insurer) {
-        await tx.insurance.create({
-          data: {
-            tradieId: tradieProfile.id,
-            insurer: verification.insurer,
-            policyNumber: verification.policyNumber ?? '',
-            coverType: 'PUBLIC_LIABILITY',
-            coverAmount: 5000000,
-            expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
-            status: 'PENDING',
-          },
+        const existingInsurance = await tx.insurance.findFirst({
+          where: { tradieId: tradieProfile.id, policyNumber: verification.policyNumber ?? '' },
         });
+        if (!existingInsurance) {
+          await tx.insurance.create({
+            data: {
+              tradieId: tradieProfile.id,
+              insurer: verification.insurer,
+              policyNumber: verification.policyNumber ?? '',
+              coverType: 'PUBLIC_LIABILITY',
+              coverAmount: 5000000,
+              expiresAt: new Date(Date.now() + 365 * 24 * 60 * 60 * 1000),
+              status: 'PENDING',
+            },
+          });
+        }
       }
     });
 

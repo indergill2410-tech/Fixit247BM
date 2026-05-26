@@ -13,9 +13,10 @@ import { loginSchema, type LoginValues } from '@/lib/validators/auth';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 // Prevent open-redirect: only allow same-origin relative paths.
+// Rejects // and /\ prefixes — browsers normalise /\ to https:// making it an open redirect.
 function sanitiseRedirectTo(raw: string | null): string {
   if (!raw) return '/dashboard';
-  return raw.startsWith('/') && !raw.startsWith('//') ? raw : '/dashboard';
+  return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
 }
 
 export function LoginForm() {

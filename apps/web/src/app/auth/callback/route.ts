@@ -41,9 +41,10 @@ function safeRole(raw: string | undefined): 'CUSTOMER' | 'TRADIE' {
 }
 
 // Ensure the post-login redirect stays on this origin (no open redirect).
+// Rejects // and /\ prefixes — browsers normalise /\ to https:// making it an open redirect.
 function sanitiseRedirectTo(raw: string | null): string {
   if (!raw) return '/dashboard';
-  return raw.startsWith('/') && !raw.startsWith('//') ? raw : '/dashboard';
+  return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
 }
 
 export async function GET(request: NextRequest) {
@@ -130,11 +131,16 @@ export async function GET(request: NextRequest) {
       const fullName = (meta.full_name as string | undefined) ?? '';
       const [firstName = '', ...rest] = fullName.split(' ');
 
-      // Write role to app_metadata (service-role only, not user-writable)
-      const admin = createServiceRoleClient();
-      await admin.auth.admin.updateUserById(user.id, {
-        app_metadata: { role: metaRole },
-      });
+      // Write role to app_metadata (service-role only, not user-writable).
+      // Wrap in try/catch — failure must not prevent DB user creation or session establishment.
+      try {
+        const admin = createServiceRoleClient();
+        await admin.auth.admin.updateUserById(user.id, {
+          app_metadata: { role: metaRole },
+        });
+      } catch (metaErr) {
+        logger.error('[auth/callback] app_metadata write failed — role will repair on next login', metaErr);
+      }
       // Keep user_metadata in sync for client-side JWT reads
       await supabase.auth.updateUser({
         data: { role: metaRole, onboardingComplete: false, firstName, lastName: rest.join(' ') },

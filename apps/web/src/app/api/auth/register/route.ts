@@ -38,11 +38,18 @@ export async function POST(request: NextRequest) {
 
   // Write role to app_metadata (service-role only — not user-writable) so it
   // cannot be changed by a browser-console call to supabase.auth.updateUser().
+  // Non-fatal: if this fails the user can still log in; role defaults to CUSTOMER
+  // until the next sign-in re-triggers the app_metadata write via auth/callback.
   if (data.user?.id) {
-    const admin = createServiceRoleClient();
-    await admin.auth.admin.updateUserById(data.user.id, {
-      app_metadata: { role },
-    });
+    try {
+      const admin = createServiceRoleClient();
+      await admin.auth.admin.updateUserById(data.user.id, {
+        app_metadata: { role },
+      });
+    } catch (metaErr) {
+      // Log but do not fail the registration — auth/callback will repair on first login
+      console.error('[register] app_metadata write failed', metaErr);
+    }
   }
 
   return NextResponse.json({ userId: data.user?.id, requiresVerification: !data.session }, { status: 201 });

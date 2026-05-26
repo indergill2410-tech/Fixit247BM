@@ -161,14 +161,17 @@ export async function middleware(request: NextRequest) {
 
   if (isPublicRoute(pathname)) {
     if (user && (pathname === '/login' || pathname === '/register')) {
-      // Use cached role if available, otherwise fall back to metadata
+      // Use cached role if available; otherwise read from app_metadata (service-role-only)
+      // with user_metadata as fallback. Never redirect to a privileged path based solely
+      // on user_metadata which the client can write via supabase.auth.updateUser().
       const cached = parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
       let role: Role;
       if (cached && cached.userId === user.id) {
         role = cached.role;
       } else {
-        const meta = user.user_metadata as Record<string, unknown>;
-        role = (meta.role as Role | undefined) ?? 'CUSTOMER';
+        const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
+        const userMeta = user.user_metadata as Record<string, unknown>;
+        role = ((appMeta.role ?? userMeta.role) as Role | undefined) ?? 'CUSTOMER';
       }
       return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
     }
@@ -202,10 +205,11 @@ export async function middleware(request: NextRequest) {
       role = (dbUser.role as Role | undefined) ?? 'CUSTOMER';
       onboardingComplete = Boolean(dbUser.onboarding_complete ?? false);
     } else {
-      // Fallback to JWT metadata if DB lookup fails (e.g. new user not yet synced)
-      const meta = user.user_metadata as Record<string, unknown>;
-      role = (meta.role as Role | undefined) ?? 'CUSTOMER';
-      onboardingComplete = Boolean((meta.onboardingComplete as boolean | undefined) ?? false);
+      // DB lookup returned nothing — deny access rather than trust user-writable metadata.
+      // This covers brand-new users not yet synced; redirect to login to re-auth.
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirectTo', pathname);
+      return NextResponse.redirect(loginUrl);
     }
 
     // Write the cache cookie onto the response

@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const session = await requireApiSession();
   if (session instanceof NextResponse) return session;
 
-  const parsed = schema.safeParse(await req.json());
+  const parsed = schema.safeParse(await req.json() as unknown);
   if (!parsed.success) return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   const { code } = parsed.data;
 
@@ -29,9 +29,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ redeemed: false, reason: 'self_referral' }, { status: 400 });
   }
 
-  await db.referral.update({
-    where: { code },
+  // Atomic check-and-set: only update if status is still PENDING, preventing TOCTOU
+  // race where two concurrent requests both pass the status check above.
+  const updated = await db.referral.updateMany({
+    where: { code, status: 'PENDING' },
     data: { invitedUserId: newUserId, status: 'SIGNED_UP', completedAt: new Date() },
   });
+
+  if (updated.count === 0) {
+    return NextResponse.json({ redeemed: false, reason: 'already_redeemed' });
+  }
   return NextResponse.json({ redeemed: true });
 }
