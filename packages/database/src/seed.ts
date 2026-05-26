@@ -48,9 +48,7 @@ async function seedCreditPackages() {
     { name: 'Pro Pack',     credits: 22, bonusCredits: 2,  priceAud: 99,  isPopular: true,  isActive: true, displayOrder: 2 },
     { name: 'Elite Pack',   credits: 35, bonusCredits: 5,  priceAud: 149, isPopular: false, isActive: true, displayOrder: 3 },
   ];
-
   await db.creditPackage.updateMany({ where: {}, data: { isActive: false } });
-
   for (const pack of packs) {
     const existing = await db.creditPackage.findFirst({ where: { name: pack.name } });
     if (existing) {

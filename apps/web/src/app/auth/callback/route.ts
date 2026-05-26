@@ -37,7 +37,25 @@ export async function GET(request: NextRequest) {
       const userEmail = user.email;
 
       const meta = user.user_metadata as Record<string, unknown>;
-      const metaRole = (meta.role as string | undefined) ?? 'CUSTOMER';
+      let metaRole = (meta.role as string | undefined);
+      // Reject any role that isn't an allowed user-facing role — prevents privilege escalation.
+      if (metaRole && metaRole !== 'CUSTOMER' && metaRole !== 'TRADIE') {
+        metaRole = 'CUSTOMER';
+      }
+
+      // Google OAuth first login — no role in metadata yet.
+      // The login form passes the user's selection as googleRole; persist it now.
+      if (!metaRole) {
+        const rawRole = searchParams.get('googleRole');
+        const googleRole = (rawRole === 'CUSTOMER' || rawRole === 'TRADIE') ? rawRole : 'CUSTOMER';
+        const fullName = (meta.full_name as string | undefined) ?? '';
+        const [firstName = '', ...rest] = fullName.split(' ');
+        const lastName = rest.join(' ');
+        await supabase.auth.updateUser({
+          data: { role: googleRole, onboardingComplete: false, firstName, lastName },
+        });
+        metaRole = googleRole;
+      }
 
       const existing = await db.user.findFirst({ where: { id: user.id } });
       if (!existing) {
@@ -49,7 +67,6 @@ export async function GET(request: NextRequest) {
               data: {
                 id: user.id,
                 email: userEmail,
-                // Defensive: noUncheckedIndexedAccess is off so TS sees string, but DB non-nullable must never get undefined.
                 // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
                 firstName: (meta.firstName as string | undefined) ?? nameParts[0] ?? '',
                 lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' '),
@@ -74,8 +91,6 @@ export async function GET(request: NextRequest) {
           }
         }
 
-        // New users go through onboarding (unique-violation path falls through here too,
-        // sending the duplicate request through onboarding which will detect completion).
         const onboardingDest = metaRole === 'TRADIE' ? '/tradie/onboarding/business' : '/onboarding/customer';
         return NextResponse.redirect(`${origin}${onboardingDest}`);
       }
