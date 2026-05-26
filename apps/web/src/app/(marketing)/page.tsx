@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Clock, MapPin, Phone, Shield, Star, Zap } from 'lucide-react';
 import { RecentActivityFeed } from '@/components/features/growth/recent-activity-feed';
 import { HowItWorksTabs } from '@/components/features/marketing/how-it-works-tabs';
+import { AnimatedEntry } from '@/components/ui/animated-entry';
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fixit247.com.au';
 
@@ -86,11 +87,11 @@ export default function HomePage() {
 
               {/* Platform stats */}
               <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-8">
-                {STATS.map((s) => (
-                  <div key={s.label}>
-                    <div className="text-2xl font-black text-foreground lg:text-3xl">{s.value}</div>
+                {STATS.map((s, i) => (
+                  <AnimatedEntry key={s.label} delay={i * 0.08}>
+                    <div className="text-3xl font-black text-foreground lg:text-4xl">{s.value}</div>
                     <div className="mt-0.5 text-xs text-foreground-subtle">{s.label}</div>
-                  </div>
+                  </AnimatedEntry>
                 ))}
               </div>
             </div>
@@ -108,20 +109,21 @@ export default function HomePage() {
           ══════════════════════════════════════════════════ */}
       <section className="border-t border-border bg-background-alt px-4 py-14 transition-colors duration-300">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-8 text-center">
+          <AnimatedEntry className="mb-8 text-center">
             <p className="section-label mb-2">All trades covered</p>
-            <h2 className="text-2xl font-bold text-foreground">What do you need fixed?</h2>
-          </div>
+            <h2 className="text-3xl font-extrabold text-foreground">What do you need fixed?</h2>
+          </AnimatedEntry>
           <div className="grid grid-cols-4 gap-2.5 sm:grid-cols-8">
-            {TRADE_CATEGORIES.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/emergency/${cat.slug}/sydney-cbd`}
-                className="group flex flex-col items-center gap-2.5 rounded-2xl border border-border bg-card px-3.5 py-3.5 text-center shadow-sm-warm transition-all hover:border-brand-500/30 hover:shadow-card-warm active:scale-[0.97] dark:bg-white/[0.03] dark:shadow-none dark:hover:border-brand-500/30 dark:hover:bg-brand-500/[0.06]"
-              >
-                <span className="text-2xl transition-transform group-hover:scale-110">{cat.emoji}</span>
-                <span className="text-[11px] font-medium text-foreground-muted group-hover:text-foreground">{cat.label}</span>
-              </Link>
+            {TRADE_CATEGORIES.map((cat, i) => (
+              <AnimatedEntry key={cat.slug} delay={i * 0.04}>
+                <Link
+                  href={`/emergency/${cat.slug}/sydney-cbd`}
+                  className="group flex flex-col items-center gap-2.5 rounded-2xl border border-border bg-card px-3.5 py-3.5 text-center shadow-sm-warm transition-all hover:border-brand-500/30 hover:shadow-card-warm active:scale-[0.97] dark:bg-white/[0.03] dark:shadow-none dark:hover:border-brand-500/30 dark:hover:bg-brand-500/[0.06]"
+                >
+                  <span className="text-2xl transition-transform group-hover:scale-110">{cat.emoji}</span>
+                  <span className="text-[11px] font-medium text-foreground-muted group-hover:text-foreground">{cat.label}</span>
+                </Link>
+              </AnimatedEntry>
             ))}
           </div>
         </div>
@@ -133,7 +135,7 @@ export default function HomePage() {
           ══════════════════════════════════════════════════ */}
       <section className="border-t border-border px-4 py-20 transition-colors duration-300">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
+          <AnimatedEntry className="mb-12 text-center">
             <p className="section-label mb-3">Real people, real results</p>
             <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">
               Trusted by 30,000+ Australians
@@ -145,13 +147,14 @@ export default function HomePage() {
               <span className="ml-2 text-sm font-semibold text-foreground">4.8</span>
               <span className="text-sm text-foreground-muted">/ 5 · 3,200+ verified reviews</span>
             </div>
-          </div>
+          </AnimatedEntry>
           <div className="grid gap-4 md:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
+            {TESTIMONIALS.map((t, i) => (
+              <AnimatedEntry key={t.name} delay={i * 0.08}>
+              <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
                 <div className="mb-3 flex gap-0.5">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <Star key={i} size={12} className="fill-brand-500 text-brand-500" />
+                  {Array.from({ length: 5 }, (_, j) => (
+                    <Star key={j} size={12} className="fill-brand-500 text-brand-500" />
                   ))}
                 </div>
                 <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">&ldquo;{t.text}&rdquo;</p>
@@ -168,6 +171,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+              </AnimatedEntry>
             ))}
           </div>
         </div>
