@@ -271,12 +271,6 @@ export default function HowItWorksPage() {
               <p className="mt-1 text-xs text-foreground-subtle">Released only when you confirm job is done.</p>
             </div>
           </div>
-          <p className="mt-6 text-sm text-foreground-subtle">
-            Want full pricing details?{' '}
-            <Link href="/pricing" className="font-semibold text-brand-500 hover:underline">
-              View our pricing page →
-            </Link>
-          </p>
         </div>
       </section>
 

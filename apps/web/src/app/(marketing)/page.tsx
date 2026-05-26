@@ -254,10 +254,10 @@ export default function HomePage() {
                     <ArrowRight size={14} />
                   </Link>
                   <Link
-                    href="/pricing"
+                    href="/join-as-tradie"
                     className="inline-flex items-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated dark:border-white/10 dark:hover:bg-white/[0.06]"
                   >
-                    View pricing
+                    Learn more
                   </Link>
                 </div>
               </div>

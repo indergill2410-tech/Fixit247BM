@@ -1,3 +1,4 @@
+import { NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { db } from '@fixit247/database';
 import type { Role } from '@fixit247/auth';
@@ -45,6 +46,14 @@ export async function requireSession(): Promise<SessionUser> {
   // TypeScript can't infer that redirect() throws, so help it with non-null assertion
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   return session!;
+}
+
+// API-safe variant: returns a 401 JSON response instead of redirecting.
+// Usage: const s = await requireApiSession(); if (s instanceof NextResponse) return s;
+export async function requireApiSession(): Promise<SessionUser | NextResponse> {
+  const session = await getSession();
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  return session;
 }
 
 export async function requireRole(role: Role | Role[]): Promise<SessionUser> {
