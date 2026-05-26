@@ -171,8 +171,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status   = searchParams.get('status');
     const category = searchParams.get('category');
-    const limit    = Math.min(parseInt(searchParams.get('limit') ?? '20'), 50);
-    const offset   = parseInt(searchParams.get('offset') ?? '0');
+    const parsedLimit  = parseInt(searchParams.get('limit') ?? '20', 10);
+    const limit        = isNaN(parsedLimit) ? 20 : Math.min(parsedLimit, 50);
+    const parsedOffset = parseInt(searchParams.get('offset') ?? '0', 10);
+    const offset       = isNaN(parsedOffset) ? 0 : Math.max(0, parsedOffset);
 
     const isTradie   = session.role === 'TRADIE';
     const isCustomer = session.role === 'CUSTOMER';

@@ -38,11 +38,16 @@ export async function GET(request: NextRequest) {
 
       const meta = user.user_metadata as Record<string, unknown>;
       let metaRole = (meta.role as string | undefined);
+      // Reject any role that isn't an allowed user-facing role — prevents privilege escalation.
+      if (metaRole && metaRole !== 'CUSTOMER' && metaRole !== 'TRADIE') {
+        metaRole = 'CUSTOMER';
+      }
 
       // Google OAuth first login — no role in metadata yet.
       // The login form passes the user's selection as googleRole; persist it now.
       if (!metaRole) {
-        const googleRole = searchParams.get('googleRole') ?? 'CUSTOMER';
+        const rawRole = searchParams.get('googleRole');
+        const googleRole = (rawRole === 'CUSTOMER' || rawRole === 'TRADIE') ? rawRole : 'CUSTOMER';
         const fullName = (meta.full_name as string | undefined) ?? '';
         const [firstName = '', ...rest] = fullName.split(' ');
         const lastName = rest.join(' ');

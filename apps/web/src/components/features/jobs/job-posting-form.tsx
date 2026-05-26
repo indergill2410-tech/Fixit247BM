@@ -99,7 +99,8 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
       .then((r) => r.ok ? r.json() : null)
       .then((data: { address: { id: string; suburb: string } | null } | null) => {
         if (data?.address) {
-          setFormData((prev) => ({ ...prev, addressId: data.address!.id, addressSuburb: data.address!.suburb }));
+          const { id, suburb } = data.address;
+          setFormData((prev) => ({ ...prev, addressId: id, addressSuburb: suburb }));
         }
       })
       .catch(() => { /* non-fatal — job still posts without addressId */ });
