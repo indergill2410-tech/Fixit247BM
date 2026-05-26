@@ -1,7 +1,9 @@
+import { redirect } from 'next/navigation';
 import { NextResponse } from 'next/server';
 import { getSupabaseServerClient } from '@/lib/supabase/server';
 import { db } from '@fixit247/database';
 import type { Role } from '@fixit247/auth';
+import { logger } from '@/lib/logger';
 
 export interface SessionUser {
   id: string;
@@ -21,7 +23,13 @@ export async function getSession(): Promise<SessionUser | null> {
 
   // Role MUST come from the database — never trust user_metadata which the
   // client can manipulate directly via supabase.auth.updateUser().
-  const dbUser = await db.user.findFirst({ where: { id: user.id } });
+  let dbUser: Awaited<ReturnType<typeof db.user.findFirst>>;
+  try {
+    dbUser = await db.user.findFirst({ where: { id: user.id } });
+  } catch (dbErr) {
+    logger.error('[getSession] DB lookup failed', dbErr);
+    return null;
+  }
   if (!dbUser) return null;
 
   const meta = user.user_metadata as Record<string, unknown>;
@@ -39,13 +47,8 @@ export async function getSession(): Promise<SessionUser | null> {
 
 export async function requireSession(): Promise<SessionUser> {
   const session = await getSession();
-  if (!session) {
-    const { redirect } = await import('next/navigation');
-    redirect('/login');
-  }
-  // TypeScript can't infer that redirect() throws, so help it with non-null assertion
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  return session!;
+  if (!session) redirect('/login');
+  return session;
 }
 
 // API-safe variant: returns a 401 JSON response instead of redirecting.
@@ -59,17 +62,13 @@ export async function requireApiSession(): Promise<SessionUser | NextResponse> {
 export async function requireRole(role: Role | Role[]): Promise<SessionUser> {
   const session = await requireSession();
   const roles = Array.isArray(role) ? role : [role];
-  if (!roles.includes(session.role)) {
-    const { redirect } = await import('next/navigation');
-    redirect('/unauthorized');
-  }
+  if (!roles.includes(session.role)) redirect('/unauthorized');
   return session;
 }
 
 export async function requireOnboarding(): Promise<SessionUser> {
   const session = await requireSession();
   if (!session.onboardingComplete) {
-    const { redirect } = await import('next/navigation');
     const path = session.role === 'TRADIE' ? '/tradie/onboarding/business' : '/onboarding';
     redirect(path);
   }
