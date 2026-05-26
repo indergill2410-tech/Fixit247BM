@@ -3,110 +3,150 @@ import { type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
+
+async function createDbUser(
+  tx: Parameters<Parameters<typeof db.$transaction>[0]>[0],
+  userId: string,
+  email: string,
+  meta: Record<string, unknown>,
+  metaRole: 'CUSTOMER' | 'TRADIE',
+) {
+  const fullName = (meta.full_name as string | undefined) ?? '';
+  const nameParts = fullName.split(' ');
+  await tx.user.create({
+    data: {
+      id: userId,
+      email,
+      firstName: (meta.firstName as string | undefined) ?? nameParts[0] ?? '',
+      lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' '),
+      role: metaRole,
+      isActive: true,
+      emailVerified: new Date(),
+    },
+  });
+  if (metaRole === 'TRADIE') {
+    await tx.tradieProfile.create({
+      data: { userId, verificationStatus: 'PENDING', onboardingStatus: 'INCOMPLETE', onboardingStep: 0 },
+    });
+  } else {
+    await tx.customerProfile.create({ data: { userId } });
+  }
+}
+
+function safeRole(raw: string | undefined): 'CUSTOMER' | 'TRADIE' {
+  return raw === 'TRADIE' ? 'TRADIE' : 'CUSTOMER';
+}
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
-  const code = searchParams.get('code');
+  const code       = searchParams.get('code');
+  const tokenHash  = searchParams.get('token_hash');
+  const type       = searchParams.get('type');
   const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
 
-  if (code) {
-    const cookieStore = await cookies();
-    const supabase = createServerClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
-      {
-        cookies: {
-          getAll() { return cookieStore.getAll(); },
-          setAll(cookiesToSet: { name: string; value: string; options: Record<string, unknown> }[]) {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          },
+  const cookieStore = await cookies();
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
+    {
+      cookies: {
+        getAll() { return cookieStore.getAll(); },
+        setAll(cookiesToSet: { name: string; value: string; options: Record<string, unknown> }[]) {
+          cookiesToSet.forEach(({ name, value, options }) => cookieStore.set(name, value, options));
         },
       },
-    );
+    },
+  );
 
-    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
-    if (!error) {
-      const { user } = data;
+  // ── Email confirmation / magic-link flow ─────────────────────────────────────
+  if (tokenHash && type) {
+    const { data, error } = await supabase.auth.verifyOtp({
+      token_hash: tokenHash,
+      type: type as 'signup' | 'recovery' | 'email_change' | 'magiclink',
+    });
 
-      // Google OAuth can omit email — reject rather than crash the DB insert.
-      if (!user.email) {
-        return NextResponse.redirect(`${origin}/login?error=email_required`);
-      }
-      const userEmail = user.email;
+    if (error || !data.user) {
+      logger.error('[auth/callback] verifyOtp failed', error);
+      return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+    }
 
-      const meta = user.user_metadata as Record<string, unknown>;
-      let metaRole = (meta.role as string | undefined);
-      // Reject any role that isn't an allowed user-facing role — prevents privilege escalation.
-      if (metaRole && metaRole !== 'CUSTOMER' && metaRole !== 'TRADIE') {
-        metaRole = 'CUSTOMER';
-      }
+    const { user } = data;
+    if (!user.email) return NextResponse.redirect(`${origin}/login?error=email_required`);
 
-      // Google OAuth first login — no role in metadata yet.
-      // The login form passes the user's selection as googleRole; persist it now.
-      if (!metaRole) {
-        const rawRole = searchParams.get('googleRole');
-        const googleRole = (rawRole === 'CUSTOMER' || rawRole === 'TRADIE') ? rawRole : 'CUSTOMER';
-        const fullName = (meta.full_name as string | undefined) ?? '';
-        const [firstName = '', ...rest] = fullName.split(' ');
-        const lastName = rest.join(' ');
-        await supabase.auth.updateUser({
-          data: { role: googleRole, onboardingComplete: false, firstName, lastName },
-        });
-        metaRole = googleRole;
-      }
+    const meta     = user.user_metadata as Record<string, unknown>;
+    const metaRole = safeRole(meta.role as string | undefined);
 
-      const existing = await db.user.findFirst({ where: { id: user.id } });
-      if (!existing) {
-        const fullName = (meta.full_name as string | undefined) ?? '';
-        const nameParts = fullName.split(' ');
-        try {
-          await db.$transaction(async (tx) => {
-            await tx.user.create({
-              data: {
-                id: user.id,
-                email: userEmail,
-                // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
-                firstName: (meta.firstName as string | undefined) ?? nameParts[0] ?? '',
-                lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' '),
-                role: metaRole as never,
-                isActive: true,
-                emailVerified: new Date(),
-              },
-            });
-            if (metaRole === 'TRADIE') {
-              await tx.tradieProfile.create({
-                data: { userId: user.id, verificationStatus: 'PENDING', onboardingStatus: 'INCOMPLETE', onboardingStep: 0 },
-              });
-            } else {
-              await tx.customerProfile.create({ data: { userId: user.id } });
-            }
-          });
-        } catch (dbErr: unknown) {
-          // A concurrent OAuth redirect already created the row — treat as existing user.
-          const isUniqueViolation = dbErr instanceof Error && dbErr.message.includes('Unique constraint');
-          if (!isUniqueViolation) {
-            return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
-          }
+    const existing = await db.user.findFirst({ where: { id: user.id } });
+    if (!existing) {
+      try {
+        await db.$transaction((tx) => createDbUser(tx, user.id, user.email!, meta, metaRole));
+      } catch (dbErr: unknown) {
+        const isUnique = dbErr instanceof Error && dbErr.message.includes('Unique constraint');
+        if (!isUnique) {
+          logger.error('[auth/callback] DB create failed (email)', dbErr);
+          return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
         }
-
-        const onboardingDest = metaRole === 'TRADIE' ? '/tradie/onboarding/business' : '/onboarding/customer';
-        return NextResponse.redirect(`${origin}${onboardingDest}`);
       }
-
-      // Use the DB role — not user_metadata — as the authoritative source.
-      const dbRole = existing.role as string;
-      const dest =
-        redirectTo !== '/dashboard'
-          ? redirectTo
-          : dbRole === 'TRADIE'
-          ? '/tradie/dashboard'
-          : dbRole === 'ADMIN' || dbRole === 'SUPER_ADMIN'
-          ? '/admin'
-          : '/dashboard';
+      const dest = metaRole === 'TRADIE' ? '/tradie/onboarding/business' : '/onboarding';
       return NextResponse.redirect(`${origin}${dest}`);
     }
+
+    // Existing user — password reset or re-verification; send to dashboard
+    const dbRole = existing.role;
+    const dest   = redirectTo !== '/dashboard' ? redirectTo
+      : dbRole === 'TRADIE' ? '/tradie/dashboard'
+      : dbRole === 'ADMIN' || dbRole === 'SUPER_ADMIN' ? '/admin'
+      : '/dashboard';
+    return NextResponse.redirect(`${origin}${dest}`);
+  }
+
+  // ── Google OAuth flow ────────────────────────────────────────────────────────
+  if (code) {
+    const { data, error } = await supabase.auth.exchangeCodeForSession(code);
+    if (error || !data.user) {
+      logger.error('[auth/callback] exchangeCodeForSession failed', error);
+      return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+    }
+
+    const { user } = data;
+    if (!user.email) return NextResponse.redirect(`${origin}/login?error=email_required`);
+
+    const meta = user.user_metadata as Record<string, unknown>;
+    let metaRole = safeRole(meta.role as string | undefined);
+
+    // First Google login — no role persisted yet; pick up the login form's selection.
+    if (!meta.role) {
+      const rawRole = searchParams.get('googleRole');
+      metaRole = safeRole(rawRole ?? undefined);
+      const fullName = (meta.full_name as string | undefined) ?? '';
+      const [firstName = '', ...rest] = fullName.split(' ');
+      await supabase.auth.updateUser({
+        data: { role: metaRole, onboardingComplete: false, firstName, lastName: rest.join(' ') },
+      });
+    }
+
+    const existing = await db.user.findFirst({ where: { id: user.id } });
+    if (!existing) {
+      try {
+        await db.$transaction((tx) => createDbUser(tx, user.id, user.email!, meta, metaRole));
+      } catch (dbErr: unknown) {
+        const isUnique = dbErr instanceof Error && dbErr.message.includes('Unique constraint');
+        if (!isUnique) {
+          logger.error('[auth/callback] DB create failed (OAuth)', dbErr);
+          return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+        }
+      }
+      const dest = metaRole === 'TRADIE' ? '/tradie/onboarding/business' : '/onboarding';
+      return NextResponse.redirect(`${origin}${dest}`);
+    }
+
+    const dbRole = existing.role;
+    const dest   = redirectTo !== '/dashboard' ? redirectTo
+      : dbRole === 'TRADIE'  ? '/tradie/dashboard'
+      : dbRole === 'ADMIN' || dbRole === 'SUPER_ADMIN' ? '/admin'
+      : '/dashboard';
+    return NextResponse.redirect(`${origin}${dest}`);
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
