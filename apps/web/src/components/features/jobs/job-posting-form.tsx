@@ -204,7 +204,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 1: Describe the problem */}
         {step === 1 && !showAiScope && (
           <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">What do you need help with?</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">What do you need help with?</h2>
             <p className="mb-6 text-sm text-gray-500">Describe the problem in your own words — our AI will handle the rest.</p>
 
             <div className="space-y-4">
@@ -251,7 +251,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* AI scope review */}
         {showAiScope && aiResult && (
           <motion.div key="ai-scope" initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -16 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">AI Scope Review</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">AI Scope Review</h2>
             <p className="mb-6 text-sm text-gray-500">Review what our AI found. You can edit anything before posting.</p>
             <AIScopeDisplay
               result={aiResult}
@@ -264,7 +264,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 2: Category + urgency */}
         {step === 2 && !showAiScope && (
           <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">Trade & urgency</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">Trade & urgency</h2>
             <p className="mb-6 text-sm text-gray-500">Confirm the trade category and how urgently you need help.</p>
 
             <div className="space-y-6">
@@ -337,7 +337,7 @@ export function JobPostingForm({ isEmergencyMode = false }: { isEmergencyMode?: 
         {/* Step 3: Location + budget + confirm */}
         {step === 3 && !showAiScope && (
           <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
-            <h2 className="mb-1 text-xl font-bold text-white">Location & budget</h2>
+            <h2 className="mb-1 text-2xl font-bold text-white">Location & budget</h2>
             <p className="mb-6 text-sm text-gray-500">Tell tradies where you are and your rough budget (optional).</p>
 
             <div className="space-y-5">

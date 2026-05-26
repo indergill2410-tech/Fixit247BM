@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { ArrowRight, CheckCircle2, Clock, MapPin, Phone, Shield, Star, Zap } from 'lucide-react';
 import { RecentActivityFeed } from '@/components/features/growth/recent-activity-feed';
 import { HowItWorksTabs } from '@/components/features/marketing/how-it-works-tabs';
+import { AnimatedEntry } from '@/components/ui/animated-entry';
 
 export const metadata: Metadata = {
   title: 'Fixit 24/7 | Emergency Tradies, Verified & Available Now',
@@ -76,11 +77,11 @@ export default function HomePage() {
 
               {/* Platform stats */}
               <div className="mt-10 grid grid-cols-3 gap-4 border-t border-white/[0.06] pt-8 sm:grid-cols-3">
-                {STATS.map((s) => (
-                  <div key={s.label}>
-                    <div className="text-2xl font-black text-white lg:text-3xl">{s.value}</div>
+                {STATS.map((s, i) => (
+                  <AnimatedEntry key={s.label} delay={i * 0.08}>
+                    <div className="text-3xl font-black text-white lg:text-4xl">{s.value}</div>
                     <div className="mt-0.5 text-xs text-gray-600">{s.label}</div>
-                  </div>
+                  </AnimatedEntry>
                 ))}
               </div>
             </div>
@@ -96,20 +97,21 @@ export default function HomePage() {
       {/* ── Trade category grid ── */}
       <section className="border-t border-white/[0.06] bg-[#0d0d0d] px-4 py-14">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-8 text-center">
+          <AnimatedEntry className="mb-8 text-center">
             <p className="mb-2 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-500">All trades covered</p>
-            <h2 className="text-2xl font-bold text-white">What do you need fixed?</h2>
-          </div>
+            <h2 className="text-3xl font-extrabold text-white">What do you need fixed?</h2>
+          </AnimatedEntry>
           <div className="grid grid-cols-4 gap-2.5 sm:grid-cols-8">
-            {TRADE_CATEGORIES.map((cat) => (
-              <Link
-                key={cat.slug}
-                href={`/emergency/${cat.slug}/sydney-cbd`}
-                className="group flex flex-col items-center gap-2.5 rounded-2xl border border-white/[0.07] bg-white/[0.03] p-3.5 text-center transition-all hover:border-brand-500/30 hover:bg-brand-500/[0.06] active:scale-[0.97]"
-              >
-                <span className="text-2xl transition-transform group-hover:scale-110">{cat.emoji}</span>
-                <span className="text-[11px] font-medium text-gray-500 group-hover:text-gray-300">{cat.label}</span>
-              </Link>
+            {TRADE_CATEGORIES.map((cat, i) => (
+              <AnimatedEntry key={cat.slug} delay={i * 0.04}>
+                <Link
+                  href={`/emergency/${cat.slug}/sydney-cbd`}
+                  className="group flex flex-col items-center gap-2.5 rounded-2xl border border-white/[0.07] bg-white/[0.03] p-3.5 text-center transition-all hover:border-brand-500/30 hover:bg-brand-500/[0.06] active:scale-[0.97]"
+                >
+                  <span className="text-2xl transition-transform group-hover:scale-110">{cat.emoji}</span>
+                  <span className="text-[11px] font-medium text-gray-500 group-hover:text-gray-300">{cat.label}</span>
+                </Link>
+              </AnimatedEntry>
             ))}
           </div>
         </div>
@@ -118,13 +120,13 @@ export default function HomePage() {
       {/* ── How it works ── */}
       <section className="border-t border-white/[0.06] px-4 py-20">
         <div className="mx-auto max-w-6xl">
-          <div className="mb-12 text-center">
+          <AnimatedEntry className="mb-12 text-center">
             <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-500">Simple process</p>
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">From post to fixed — fast</h2>
             <p className="mx-auto mt-3 max-w-lg text-gray-500">
               Whether you need a repair sorted today or you&apos;re a tradie looking for steady work.
             </p>
-          </div>
+          </AnimatedEntry>
           <HowItWorksTabs />
         </div>
       </section>
@@ -132,22 +134,21 @@ export default function HomePage() {
       {/* ── Why Fixit 24/7 ── */}
       <section className="border-t border-white/[0.06] bg-[#0d0d0d] px-4 py-20">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
+          <AnimatedEntry className="mb-12 text-center">
             <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-500">Built different</p>
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Why 30,000+ Australians choose us</h2>
-          </div>
+          </AnimatedEntry>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {FEATURES.map((f) => (
-              <div
-                key={f.title}
-                className="group rounded-2xl border border-white/[0.07] bg-white/[0.03] p-6 transition-all hover:border-brand-500/20 hover:bg-brand-500/[0.04]"
-              >
-                <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/12 text-xl transition-transform group-hover:scale-110">
-                  {f.icon}
+            {FEATURES.map((f, i) => (
+              <AnimatedEntry key={f.title} delay={i * 0.07}>
+                <div className="group h-full rounded-2xl border border-white/[0.07] bg-white/[0.03] p-6 transition-all hover:border-brand-500/20 hover:bg-brand-500/[0.04]">
+                  <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/12 text-xl transition-transform group-hover:scale-110">
+                    {f.icon}
+                  </div>
+                  <h3 className="text-sm font-semibold text-white">{f.title}</h3>
+                  <p className="mt-1.5 text-xs leading-relaxed text-gray-500">{f.description}</p>
                 </div>
-                <h3 className="text-sm font-semibold text-white">{f.title}</h3>
-                <p className="mt-1.5 text-xs leading-relaxed text-gray-500">{f.description}</p>
-              </div>
+              </AnimatedEntry>
             ))}
           </div>
         </div>
@@ -214,7 +215,7 @@ export default function HomePage() {
       {/* ── Testimonials ── */}
       <section className="border-t border-white/[0.06] bg-[#0d0d0d] px-4 py-20">
         <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
+          <AnimatedEntry className="mb-12 text-center">
             <p className="mb-3 text-[10px] font-bold uppercase tracking-[0.2em] text-brand-500">Real people, real results</p>
             <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Trusted by thousands of Australians</h2>
             <div className="mt-4 flex items-center justify-center gap-1.5">
@@ -224,13 +225,14 @@ export default function HomePage() {
               <span className="ml-2 text-sm font-semibold text-white">4.8</span>
               <span className="text-sm text-gray-600">/ 5 from 3,200+ reviews</span>
             </div>
-          </div>
+          </AnimatedEntry>
           <div className="grid gap-4 md:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="flex flex-col rounded-2xl border border-white/[0.07] bg-white/[0.03] p-6">
+            {TESTIMONIALS.map((t, i) => (
+              <AnimatedEntry key={t.name} delay={i * 0.08}>
+              <div className="flex h-full flex-col rounded-2xl border border-white/[0.07] bg-white/[0.03] p-6">
                 <div className="mb-3 flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={12} className="fill-brand-400 text-brand-400" />
+                  {[...Array(5)].map((_, j) => (
+                    <Star key={j} size={12} className="fill-brand-400 text-brand-400" />
                   ))}
                 </div>
                 <p className="flex-1 text-sm leading-relaxed text-gray-300">&ldquo;{t.text}&rdquo;</p>
@@ -247,6 +249,7 @@ export default function HomePage() {
                   </div>
                 </div>
               </div>
+              </AnimatedEntry>
             ))}
           </div>
         </div>
