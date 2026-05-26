@@ -10,7 +10,7 @@ async function createDbUser(
   userId: string,
   email: string,
   meta: Record<string, unknown>,
-  metaRole: string,
+  metaRole: 'CUSTOMER' | 'TRADIE',
 ) {
   const fullName = (meta.full_name as string | undefined) ?? '';
   const nameParts = fullName.split(' ');
@@ -20,7 +20,7 @@ async function createDbUser(
       email,
       firstName: (meta.firstName as string | undefined) ?? nameParts[0] ?? '',
       lastName: (meta.lastName as string | undefined) ?? nameParts.slice(1).join(' '),
-      role: metaRole as never,
+      role: metaRole,
       isActive: true,
       emailVerified: new Date(),
     },
@@ -93,9 +93,10 @@ export async function GET(request: NextRequest) {
     }
 
     // Existing user — password reset or re-verification; send to dashboard
-    const dbRole = safeRole(existing.role as string | undefined);
+    const dbRole = existing.role;
     const dest   = redirectTo !== '/dashboard' ? redirectTo
       : dbRole === 'TRADIE' ? '/tradie/dashboard'
+      : dbRole === 'ADMIN' || dbRole === 'SUPER_ADMIN' ? '/admin'
       : '/dashboard';
     return NextResponse.redirect(`${origin}${dest}`);
   }
@@ -140,7 +141,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.redirect(`${origin}${dest}`);
     }
 
-    const dbRole = safeRole(existing.role as string | undefined);
+    const dbRole = existing.role;
     const dest   = redirectTo !== '/dashboard' ? redirectTo
       : dbRole === 'TRADIE'  ? '/tradie/dashboard'
       : dbRole === 'ADMIN' || dbRole === 'SUPER_ADMIN' ? '/admin'
