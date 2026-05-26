@@ -1,10 +1,12 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
+import { FaqAccordion } from '@/components/shared/faq-accordion';
 
 export const metadata: Metadata = {
   title: 'Pricing | Fixit 24/7 — Simple, Transparent Pricing',
   description: 'Free to post jobs as a customer. Flexible plans for tradies starting at $0/mo. See our full pricing breakdown.',
 };
+
 
 const TRADIE_PLANS = [
   {
@@ -324,7 +326,7 @@ export default function PricingPage() {
         </div>
       </section>
 
-      {/* 6. FAQ */}
+      {/* 6. FAQ — accordion */}
       <section className="bg-background-alt py-20 px-4">
         <div className="mx-auto max-w-3xl">
           <div className="mb-12 text-center">
@@ -333,36 +335,30 @@ export default function PricingPage() {
             </span>
             <h2 className="text-3xl font-extrabold">Pricing questions</h2>
           </div>
-          <div className="space-y-5">
-            {PRICING_FAQS.map((faq) => (
-              <div key={faq.q} className="rounded-2xl border border-border bg-background-elevated p-6">
-                <h3 className="mb-2 text-base font-bold text-foreground">{faq.q}</h3>
-                <p className="text-sm leading-relaxed text-foreground-muted">{faq.a}</p>
-              </div>
-            ))}
-          </div>
+          <FaqAccordion faqs={PRICING_FAQS} namespace="pricing" />
         </div>
       </section>
 
       {/* 7. CTA */}
-      <section className="bg-gradient-to-br from-brand-600 to-brand-800 py-20 px-4 text-center">
+      <section className="border-t border-border bg-background py-20 px-4 text-center">
         <div className="mx-auto max-w-2xl">
-          <h2 className="text-3xl font-extrabold text-white sm:text-4xl">Start Free, Upgrade When Ready</h2>
-          <p className="mx-auto mt-4 max-w-lg text-brand-100">
-            No lock-in, no credit card required to get started. Join thousands of Australians already using Fixit 24/7.
+          <p className="section-label mb-4">No lock-in. No hidden fees.</p>
+          <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Start free, upgrade when ready</h2>
+          <p className="mx-auto mt-4 max-w-lg text-foreground-muted">
+            No credit card required to get started. Join thousands of Australians already using Fixit 24/7.
           </p>
           <div className="mt-8 flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
             <Link
               href="/register?role=TRADIE"
-              className="rounded-xl bg-brand-400 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-300 transition-colors shadow-lg"
+              className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-brand-md"
             >
               Join as a Tradie — Free
             </Link>
             <Link
-              href="/emergency"
-              className="rounded-xl border border-white/30 px-8 py-4 text-base font-bold text-white hover:bg-white/10 transition-colors"
+              href="/jobs/new"
+              className="rounded-xl border border-border px-8 py-4 text-base font-bold text-foreground hover:bg-background-elevated transition-colors"
             >
-              Post a Job as Customer
+              Post a job as customer
             </Link>
           </div>
         </div>

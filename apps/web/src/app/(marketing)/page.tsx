@@ -26,13 +26,9 @@ export default function HomePage() {
           HERO
           ══════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
-        {/* Background — dark: grid + glow; light: warm ambient */}
         <div className="pointer-events-none absolute inset-0 grid-pattern opacity-100" />
-        {/* Dark mode glow */}
         <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/[0.08] blur-[120px] dark:bg-brand-500/[0.08]" />
         <div className="pointer-events-none absolute -right-64 top-1/3 h-96 w-96 rounded-full bg-brand-500/[0.05] blur-[80px]" />
-        {/* Light mode: subtle warm radial */}
-        <div className="pointer-events-none absolute inset-0 hero-glow-light opacity-0 dark:opacity-0 [.light_&]:opacity-100" />
 
         <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-14 md:pb-24 md:pt-20 lg:pb-28 lg:pt-24">
           <div className="grid gap-12 lg:grid-cols-[1fr_380px] lg:items-start xl:grid-cols-[1fr_400px]">
@@ -57,7 +53,7 @@ export default function HomePage() {
               </h1>
 
               <p className="mt-6 max-w-lg text-base leading-relaxed text-foreground-muted sm:text-lg lg:text-base xl:text-lg">
-                Plumbing, electrical, lockouts, HVAC. Australia&apos;s largest network of verified, insured tradies — available every hour of every day.
+                Burst pipe, power out, locked out — any trade, any hour. Australia&apos;s largest network of verified, insured tradies on call 24/7.
               </p>
 
               {/* Primary CTA row */}
@@ -89,7 +85,7 @@ export default function HomePage() {
               </div>
 
               {/* Platform stats */}
-              <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-8 sm:grid-cols-3">
+              <div className="mt-10 grid grid-cols-3 gap-4 border-t border-border pt-8">
                 {STATS.map((s) => (
                   <div key={s.label}>
                     <div className="text-2xl font-black text-foreground lg:text-3xl">{s.value}</div>
@@ -132,9 +128,55 @@ export default function HomePage() {
       </section>
 
       {/* ══════════════════════════════════════════════════
-          HOW IT WORKS
+          TESTIMONIALS  — shown early to build trust before
+          users decide whether to keep reading
           ══════════════════════════════════════════════════ */}
       <section className="border-t border-border px-4 py-20 transition-colors duration-300">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-12 text-center">
+            <p className="section-label mb-3">Real people, real results</p>
+            <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">
+              Trusted by 30,000+ Australians
+            </h2>
+            <div className="mt-4 flex items-center justify-center gap-1.5">
+              {Array.from({ length: 5 }, (_, i) => (
+                <Star key={i} size={16} className="fill-brand-500 text-brand-500" />
+              ))}
+              <span className="ml-2 text-sm font-semibold text-foreground">4.8</span>
+              <span className="text-sm text-foreground-muted">/ 5 · 3,200+ verified reviews</span>
+            </div>
+          </div>
+          <div className="grid gap-4 md:grid-cols-3">
+            {TESTIMONIALS.map((t) => (
+              <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
+                <div className="mb-3 flex gap-0.5">
+                  {Array.from({ length: 5 }, (_, i) => (
+                    <Star key={i} size={12} className="fill-brand-500 text-brand-500" />
+                  ))}
+                </div>
+                <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">&ldquo;{t.text}&rdquo;</p>
+                <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-700 dark:text-brand-400">
+                    {t.name[0]}
+                  </div>
+                  <div>
+                    <p className="text-xs font-semibold text-foreground">{t.name}</p>
+                    <p className="flex items-center gap-1 text-[11px] text-foreground-subtle">
+                      <MapPin size={9} />
+                      {t.suburb}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ══════════════════════════════════════════════════
+          HOW IT WORKS
+          ══════════════════════════════════════════════════ */}
+      <section className="border-t border-border bg-background-alt px-4 py-20 transition-colors duration-300">
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <p className="section-label mb-3">Simple process</p>
@@ -150,11 +192,11 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════
           WHY FIXIT 24/7 — FEATURE CARDS
           ══════════════════════════════════════════════════ */}
-      <section className="border-t border-border bg-background-alt px-4 py-20 transition-colors duration-300">
+      <section className="border-t border-border px-4 py-20 transition-colors duration-300">
         <div className="mx-auto max-w-5xl">
           <div className="mb-12 text-center">
             <p className="section-label mb-3">Built different</p>
-            <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Why 30,000+ Australians choose us</h2>
+            <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Why Australians choose Fixit 24/7</h2>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {FEATURES.map((f) => (
@@ -176,17 +218,17 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════════
           TRADIE CTA
           ══════════════════════════════════════════════════ */}
-      <section className="border-t border-border px-4 py-20 transition-colors duration-300">
+      <section className="border-t border-border bg-background-alt px-4 py-20 transition-colors duration-300">
         <div className="mx-auto max-w-5xl">
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-card-warm transition-all md:p-12 dark:border-white/[0.07] dark:bg-background-alt dark:shadow-none">
-            {/* Background accent */}
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-card-warm transition-all md:p-12 dark:border-white/[0.07] dark:bg-background-elevated dark:shadow-none">
             <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-brand-500/[0.08] blur-3xl" />
             <div className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-brand-500/[0.05] blur-2xl" />
 
             <div className="relative grid gap-10 md:grid-cols-2 md:items-center">
               <div>
                 <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-500/25 bg-brand-500/10 px-3 py-1.5 text-xs font-bold text-brand-700 dark:text-brand-400">
-                  👷 For Tradies
+                  <Shield size={11} />
+                  For Tradies
                 </div>
                 <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">
                   Grow your trade business.<br />
@@ -208,7 +250,7 @@ export default function HomePage() {
                     href="/join-as-tradie"
                     className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-6 py-3 text-sm font-bold text-gray-900 transition-all hover:bg-brand-400"
                   >
-                    Start free — 6 months included
+                    Claim $111/mo free credits
                     <ArrowRight size={14} />
                   </Link>
                   <Link
@@ -229,49 +271,6 @@ export default function HomePage() {
                 ))}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ══════════════════════════════════════════════════
-          TESTIMONIALS
-          ══════════════════════════════════════════════════ */}
-      <section className="border-t border-border bg-background-alt px-4 py-20 transition-colors duration-300">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
-            <p className="section-label mb-3">Real people, real results</p>
-            <h2 className="text-3xl font-extrabold text-foreground sm:text-4xl">Trusted by thousands of Australians</h2>
-            <div className="mt-4 flex items-center justify-center gap-1.5">
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} size={16} className="fill-brand-500 text-brand-500" />
-              ))}
-              <span className="ml-2 text-sm font-semibold text-foreground">4.8</span>
-              <span className="text-sm text-foreground-muted">/ 5 from 3,200+ reviews</span>
-            </div>
-          </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {TESTIMONIALS.map((t) => (
-              <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
-                <div className="mb-3 flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={12} className="fill-brand-500 text-brand-500" />
-                  ))}
-                </div>
-                <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">&ldquo;{t.text}&rdquo;</p>
-                <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-700 dark:text-brand-400">
-                    {t.name[0]}
-                  </div>
-                  <div>
-                    <p className="text-xs font-semibold text-foreground">{t.name}</p>
-                    <p className="flex items-center gap-1 text-[11px] text-foreground-subtle">
-                      <MapPin size={9} />
-                      {t.suburb}
-                    </p>
-                  </div>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>
@@ -298,21 +297,26 @@ export default function HomePage() {
                 <p className="mt-4 text-sm leading-relaxed text-foreground-muted">
                   Home or on the road — pipe bursts at 2am, locked out of your car, power failure. One monthly fee covers it all.
                 </p>
+                {/* Price anchoring */}
+                <p className="mt-3 text-xs text-foreground-subtle">
+                  A single emergency call-out averages <span className="font-semibold text-foreground-muted">$180–$300</span>. Fixit Plus Total is <span className="font-semibold text-brand-600 dark:text-brand-400">$49/month</span> for unlimited coverage.
+                </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
-                    href="/fixit-plus"
+                    href="/register?plan=fixit-plus-total"
                     className="inline-flex items-center gap-2 rounded-2xl bg-brand-500 px-6 py-3 text-sm font-bold text-gray-900 transition-all hover:bg-brand-400"
                   >
-                    Learn more
+                    Start 14-day free trial
                     <ArrowRight size={14} />
                   </Link>
                   <Link
-                    href="/register?plan=fixit-plus-total"
+                    href="/fixit-plus"
                     className="inline-flex items-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated dark:border-white/15 dark:hover:bg-white/[0.06]"
                   >
-                    Start free trial
+                    See what&apos;s covered
                   </Link>
                 </div>
+                <p className="mt-3 text-xs text-foreground-subtle">No lock-in. Cancel anytime.</p>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {PLUS_FEATURES.map((f) => (
@@ -338,7 +342,7 @@ export default function HomePage() {
             Need a tradie right now?
           </h2>
           <p className="mx-auto mt-4 max-w-md text-base text-foreground-muted">
-            Post your job free in 60 seconds. Verified tradies respond fast. Secure payments — only pay when you&apos;re satisfied.
+            Post your job free in 60 seconds. Verified tradies respond fast. Secure escrow payments — only pay when you&apos;re satisfied.
           </p>
           <div className="mt-10 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <Link

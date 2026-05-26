@@ -8,10 +8,10 @@ import { ThemeToggle } from '@/components/shared/theme-toggle';
 
 const NAV_LINKS = [
   { href: '/how-it-works', label: 'How it works' },
-  { href: '/fixit-plus', label: '+ Plus' },
+  { href: '/fixit-plus', label: 'Fixit Plus' },
   { href: '/join-as-tradie', label: 'For Tradies' },
+  { href: '/pricing', label: 'Pricing' },
   { href: '/about', label: 'About' },
-  { href: '/blog', label: 'Blog' },
 ] as const;
 
 export function MarketingNav() {
@@ -91,10 +91,10 @@ export function MarketingNav() {
               Sign in
             </Link>
             <Link
-              href="/register"
+              href="/jobs/new"
               className="hidden rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-gray-900 transition-all hover:bg-brand-400 sm:inline-block"
             >
-              Get started
+              Post a job free
             </Link>
             <button
               onClick={() => { setOpen((v) => !v); }}
@@ -171,11 +171,11 @@ export function MarketingNav() {
                 Sign in
               </Link>
               <Link
-                href="/register"
+                href="/jobs/new"
                 onClick={() => { setOpen(false); }}
                 className="w-full rounded-xl bg-brand-500 py-3 text-center text-sm font-bold text-gray-900 transition-colors hover:bg-brand-400"
               >
-                Create account
+                Post a job — free
               </Link>
             </div>
 

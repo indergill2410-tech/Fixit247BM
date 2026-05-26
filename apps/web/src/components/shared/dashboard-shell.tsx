@@ -116,9 +116,9 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
                 className={cn(
                   'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                   isActive
-                    ? 'bg-brand-500/15 text-brand-400'
+                    ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400'
                     : item.highlight
-                    ? 'text-brand-400 hover:bg-brand-500/10'
+                    ? 'text-red-500 hover:bg-red-500/10 dark:text-red-400'
                     : 'text-foreground-muted hover:bg-background-alt hover:text-foreground',
                 )}
               >
