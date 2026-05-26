@@ -30,8 +30,8 @@ async function ensureAuthUser(
 
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
   const { data: listData } = await admin.auth.admin.listUsers({ perPage: 1000 });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const existing = listData?.users?.find((u: { email: string }) => u.email === email) as { id: string } | undefined;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-condition
+  const existing = (listData as { users?: { id: string; email?: string | null }[] } | null)?.users?.find((u) => u.email === email);
   if (existing) {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
     await admin.auth.admin.updateUserById(existing.id, { password });
