@@ -61,7 +61,7 @@ export function ThemeProvider({ children, defaultTheme = 'dark' }: ThemeProvider
       }
     };
     mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
+    return () => { mediaQuery.removeEventListener('change', handleChange); };
   }, [theme, mounted]);
 
   const setTheme = useCallback((newTheme: Theme) => {

@@ -139,7 +139,7 @@ export default function HomePage() {
               Trusted by 30,000+ Australians
             </h2>
             <div className="mt-4 flex items-center justify-center gap-1.5">
-              {[...Array(5)].map((_, i) => (
+              {Array.from({ length: 5 }, (_, i) => (
                 <Star key={i} size={16} className="fill-brand-500 text-brand-500" />
               ))}
               <span className="ml-2 text-sm font-semibold text-foreground">4.8</span>
@@ -150,7 +150,7 @@ export default function HomePage() {
             {TESTIMONIALS.map((t) => (
               <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
                 <div className="mb-3 flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
+                  {Array.from({ length: 5 }, (_, i) => (
                     <Star key={i} size={12} className="fill-brand-500 text-brand-500" />
                   ))}
                 </div>
