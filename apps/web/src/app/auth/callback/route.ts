@@ -28,7 +28,21 @@ export async function GET(request: NextRequest) {
     const { data, error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error && data.user) {
       const meta = data.user.user_metadata as Record<string, unknown>;
-      const role = (meta.role as string | undefined) ?? 'CUSTOMER';
+      let role = meta.role as string | undefined;
+
+      // Google OAuth users have no role metadata on first sign-in.
+      // The login form passes the user's selection as googleRole; persist it.
+      if (!role) {
+        const googleRole = searchParams.get('googleRole') ?? 'CUSTOMER';
+        const fullName = (meta.full_name as string | undefined) ?? '';
+        const [firstName = '', ...rest] = fullName.split(' ');
+        const lastName = rest.join(' ');
+        await supabase.auth.updateUser({
+          data: { role: googleRole, onboardingComplete: false, firstName, lastName },
+        });
+        role = googleRole;
+      }
+
       const dest =
         redirectTo !== '/dashboard'
           ? redirectTo

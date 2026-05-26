@@ -1,11 +1,12 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
 export async function GET(req: NextRequest) {
+  const session = await requireApiSession();
+  if (session instanceof NextResponse) return session;
   try {
-    const session = await requireSession();
     const unreadOnly = req.nextUrl.searchParams.get('unread') === 'true';
     const limit = Math.min(Number(req.nextUrl.searchParams.get('limit') ?? '30'), 100);
     const cursor = req.nextUrl.searchParams.get('cursor');

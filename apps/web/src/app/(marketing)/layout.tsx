@@ -32,7 +32,6 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               <p className="mb-3 text-xs font-semibold uppercase tracking-widest text-gray-500">Company</p>
               <div className="space-y-2 text-sm text-gray-600">
                 <Link href="/how-it-works" className="block hover:text-gray-300 transition-colors">How It Works</Link>
-                <Link href="/pricing" className="block hover:text-gray-300 transition-colors">Pricing</Link>
                 <Link href="/join-as-tradie" className="block hover:text-gray-300 transition-colors">Join as Tradie</Link>
                 <Link href="/blog" className="block hover:text-gray-300 transition-colors">Blog</Link>
               </div>
