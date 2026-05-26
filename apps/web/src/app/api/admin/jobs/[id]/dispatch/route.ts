@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   reason: z.string().optional(),
@@ -20,7 +21,7 @@ export async function POST(
     }
 
     const { id: jobId } = await params;
-    const body = await req.json().catch(() => ({}));
+    const body = await (req.json() as Promise<unknown>).catch(() => ({}) as unknown);
     const { reason, batchSize } = Schema.parse(body);
 
     const job = await db.job.findUnique({
@@ -38,7 +39,7 @@ export async function POST(
       data: { status: 'EXPIRED' },
     });
 
-    const newBatch = (job.matchingBatchNo ?? 0) + 1;
+    const newBatch = (job.matchingBatchNo || 0) + 1;
 
     await db.$transaction([
       db.job.update({ where: { id: jobId }, data: { status: 'OPEN' as const, matchingBatchNo: newBatch } }),
@@ -54,7 +55,7 @@ export async function POST(
     return NextResponse.json({ success: true, newBatch, message: `Re-dispatched as batch #${newBatch}` });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/admin/jobs/:id/dispatch]', err);
+    logger.error('[POST /api/admin/jobs/:id/dispatch]', err);
     return NextResponse.json({ error: 'Failed to re-dispatch' }, { status: 500 });
   }
 }

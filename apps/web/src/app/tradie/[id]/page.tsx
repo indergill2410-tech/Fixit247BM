@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { db } from '@fixit247/database';
 import { ChevronLeft, Star, Shield, Clock, MapPin, CheckCircle, Zap } from 'lucide-react';
 
+export const revalidate = 1800; // Re-generate tradie profiles at most every 30 minutes
+
 export async function generateMetadata({ params }: { params: Promise<{ id: string }> }): Promise<Metadata> {
   const { id } = await params;
   const tradie = await db.tradieProfile.findUnique({
@@ -15,7 +17,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   const name = `${tradie.user.firstName} ${tradie.user.lastName}`;
   const trade = tradie.trades[0]?.replace(/_/g, ' ') ?? 'Tradie';
   const suburb = 'Australia';
-  const rating = tradie.avgRating ? `${Number(tradie.avgRating).toFixed(1)}★ ` : '';
+  const rating = tradie.avgRating != null ? `${Number(tradie.avgRating).toFixed(1)}★ ` : '';
 
   const title = `${name} — ${rating}Verified ${trade} in ${suburb} | Fixit 24/7`;
   const description = `Book ${name}, a verified and licensed ${trade.toLowerCase()} in ${suburb}. ${rating ? `Rated ${rating}by customers. ` : ''}Fast response, upfront pricing, background checked.`;
@@ -30,7 +32,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
   };
 }
 
-const TRADE_MAP: Record<string, string> = {
+const TRADE_MAP: Partial<Record<string, string>> = {
   PLUMBING: 'Plumber', ELECTRICAL: 'Electrician', HVAC: 'HVAC Technician',
   CARPENTRY: 'Carpenter', PAINTING: 'Painter', ROOFING: 'Roofer',
   TILING: 'Tiler', PEST_CONTROL: 'Pest Controller', LOCKSMITH: 'Locksmith',
@@ -62,7 +64,7 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
   const trades = tradie.trades.map((t) => TRADE_MAP[t] ?? t.replace(/_/g, ' '));
   const primaryTrade = trades[0] ?? 'Tradie';
   const suburb = 'Australia';
-  const rating = tradie.avgRating ? Number(tradie.avgRating) : null;
+  const rating = tradie.avgRating != null ? Number(tradie.avgRating) : null;
   const isVerified = tradie.verificationStatus === 'VERIFIED';
 
   // JSON-LD Person schema
@@ -77,7 +79,7 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
       aggregateRating: {
         '@type': 'AggregateRating',
         ratingValue: rating.toFixed(1),
-        reviewCount: tradie.totalReviews ?? 1,
+        reviewCount: tradie.totalReviews || 1,
         bestRating: 5,
         worstRating: 1,
       },
@@ -135,7 +137,7 @@ export default async function TradieProfilePage({ params }: { params: Promise<{ 
                       ))}
                     </div>
                     <span className="text-sm font-semibold text-gray-300">{rating.toFixed(1)}</span>
-                    <span className="text-sm text-gray-400">({tradie.totalReviews ?? 0} reviews)</span>
+                    <span className="text-sm text-gray-400">({tradie.totalReviews || 0} reviews)</span>
                   </div>
                 )}
 

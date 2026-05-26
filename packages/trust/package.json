@@ -6,5 +6,5 @@
   "types": "./src/index.ts",
   "scripts": { "build": "tsc --noEmit", "type-check": "tsc --noEmit" },
   "dependencies": { "@fixit247/database": "workspace:*", "zod": "^3.23.8" },
-  "devDependencies": { "@types/node": "^20.14.0", "typescript": "^5.4.5" }
+  "devDependencies": { "@types/node": "^22.0.0", "typescript": "^5.9.0" }
 }

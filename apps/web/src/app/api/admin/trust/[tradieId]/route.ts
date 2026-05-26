@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const OverrideSchema = z.object({
   score: z.number().int().min(0).max(100),
@@ -34,7 +35,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ tra
     if (!profile) return NextResponse.json({ error: 'Tradie not found' }, { status: 404 });
     return NextResponse.json({ profile, history });
   } catch (err) {
-    console.error('[GET /api/admin/trust/:tradieId]', err);
+    logger.error('[GET /api/admin/trust/:tradieId]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -62,7 +63,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ tr
     return NextResponse.json({ success: true, newScore: score });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/admin/trust/:tradieId]', err);
+    logger.error('[PATCH /api/admin/trust/:tradieId]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

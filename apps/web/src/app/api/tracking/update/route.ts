@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   jobId: z.string().uuid(),
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Only tradies can post location updates' }, { status: 403 });
     }
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { jobId, lat, lng, accuracy, heading, speed } = Schema.parse(body);
 
     const tradieProfile = await db.tradieProfile.findUnique({
@@ -51,7 +52,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/tracking/update]', err);
+    logger.error('[POST /api/tracking/update]', err);
     return NextResponse.json({ error: 'Failed to store location' }, { status: 500 });
   }
 }

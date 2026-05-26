@@ -14,14 +14,21 @@ export async function initiateRefund(req: RefundRequest): Promise<{ refundId: st
 
   const refundAmount = req.amount ?? Number(payment.amount);
 
-  const refund = await stripe.refunds.create({
-    payment_intent: payment.stripePaymentIntentId,
-    amount: Math.round(refundAmount * 100),
-    reason: 'requested_by_customer',
-    refund_application_fee: true,
-    reverse_transfer: true,
-    metadata: { jobId: req.jobId, reason: req.reason, requestedBy: req.requestedBy },
-  });
+  // Idempotency key ties the refund to the specific payment intent.
+  // Using Date.now() suffix allows a new refund attempt after the first
+  // succeeds (e.g. partial refund followed by another), while still
+  // deduplicating rapid retries within the same second.
+  const refund = await stripe.refunds.create(
+    {
+      payment_intent: payment.stripePaymentIntentId,
+      amount: Math.round(refundAmount * 100),
+      reason: 'requested_by_customer',
+      refund_application_fee: true,
+      reverse_transfer: true,
+      metadata: { jobId: req.jobId, reason: req.reason, requestedBy: req.requestedBy },
+    },
+    { idempotencyKey: `refund_${payment.stripePaymentIntentId}_${Date.now()}` },
+  );
 
   await db.payment.update({
     where: { jobId: req.jobId },

@@ -113,15 +113,15 @@ export function AIScopeDisplay({ result, onAccept, onEdit, className }: AIScopeD
       </div>
 
       {/* Price estimate */}
-      {(result.estimatedPriceMin || result.estimatedPriceMax) && (
+      {(result.estimatedPriceMin != null || result.estimatedPriceMax != null) && (
         <div className="mb-4 rounded-xl bg-gray-50 p-3">
           <p className="text-xs text-gray-500">Estimated cost range</p>
           <p className="text-lg font-bold text-gray-900">
-            {result.estimatedPriceMin && result.estimatedPriceMax
+            {result.estimatedPriceMin != null && result.estimatedPriceMax != null
               ? `$${result.estimatedPriceMin.toLocaleString()} – $${result.estimatedPriceMax.toLocaleString()} AUD`
-              : result.estimatedPriceMin
+              : result.estimatedPriceMin != null
               ? `From $${result.estimatedPriceMin.toLocaleString()} AUD`
-              : `Up to $${result.estimatedPriceMax!.toLocaleString()} AUD`}
+              : `Up to $${(result.estimatedPriceMax ?? 0).toLocaleString()} AUD`}
           </p>
           <p className="mt-0.5 text-xs text-gray-400">AI estimate only — actual quote from tradie</p>
         </div>

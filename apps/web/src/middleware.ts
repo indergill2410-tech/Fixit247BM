@@ -2,6 +2,34 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import type { Role } from '@fixit247/auth';
 
+// ─── Role cache cookie ────────────────────────────────────────────────────────
+// We cache the DB-verified role in a short-lived signed-ish cookie to avoid a
+// Supabase REST round-trip on every single middleware invocation.
+const ROLE_CACHE_COOKIE = '__fixit_role_cache';
+const ROLE_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+interface RoleCachePayload {
+  role: Role;
+  onboardingComplete: boolean;
+  userId: string;
+  expiresAt: number; // Unix ms
+}
+
+function parseRoleCache(raw: string | undefined): RoleCachePayload | null {
+  if (!raw) return null;
+  try {
+    const payload = JSON.parse(raw) as RoleCachePayload;
+    if (payload.expiresAt > Date.now()) return payload;
+    return null; // expired
+  } catch {
+    return null;
+  }
+}
+
+function serializeRoleCache(payload: RoleCachePayload): string {
+  return JSON.stringify(payload);
+}
+
 // ─── Route Configuration ──────────────────────────────────────────────────────
 
 // Exact-match public routes
@@ -96,18 +124,20 @@ function getDashboardPath(role: Role): string {
   return '/dashboard';
 }
 
-// Read role from app_metadata (authoritative, service-role-only writeable).
-// Fall back to user_metadata for accounts created before this change.
-function resolveRole(user: { app_metadata?: Record<string, unknown> | null; user_metadata?: Record<string, unknown> | null }): Role {
-  const appRole = (user.app_metadata as Record<string, unknown> | undefined)?.role;
-  const userRole = (user.user_metadata as Record<string, unknown> | undefined)?.role;
-  return ((appRole ?? userRole) as Role | undefined) ?? 'CUSTOMER';
-}
-
 // ─── Middleware ───────────────────────────────────────────────────────────────
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+
+  // Supabase OAuth sends the `code` to the Site URL when the redirectTo URL is
+  // not in the allowed list. Catch any misdirected callback and forward it to
+  // the correct handler so the session exchange still works.
+  if (pathname === '/' && request.nextUrl.searchParams.has('code')) {
+    const callbackUrl = new URL('/auth/callback', request.url);
+    callbackUrl.search = request.nextUrl.search;
+    return NextResponse.redirect(callbackUrl);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -131,7 +161,15 @@ export async function middleware(request: NextRequest) {
 
   if (isPublicRoute(pathname)) {
     if (user && (pathname === '/login' || pathname === '/register')) {
-      const role = resolveRole(user);
+      // Use cached role if available, otherwise fall back to metadata
+      const cached = parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
+      let role: Role;
+      if (cached && cached.userId === user.id) {
+        role = cached.role;
+      } else {
+        const meta = user.user_metadata as Record<string, unknown>;
+        role = (meta.role as Role | undefined) ?? 'CUSTOMER';
+      }
       return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
     }
     return response;
@@ -143,9 +181,48 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const role = resolveRole(user);
-  const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
-  const onboardingComplete = (userMeta.onboardingComplete as boolean | undefined) ?? false;
+  // ── DB-verified role lookup (with 5-minute cookie cache) ──────────────────
+  let role: Role;
+  let onboardingComplete: boolean;
+
+  const cached = parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
+  if (cached && cached.userId === user.id) {
+    // Cache hit — use the DB-verified values
+    role = cached.role;
+    onboardingComplete = cached.onboardingComplete;
+  } else {
+    // Cache miss — query the users table via Supabase REST (Edge-compatible)
+    const { data: dbUser } = await supabase
+      .from('users')
+      .select('role, onboarding_complete')
+      .eq('id', user.id)
+      .single();
+
+    if (dbUser) {
+      role = (dbUser.role as Role | undefined) ?? 'CUSTOMER';
+      onboardingComplete = Boolean(dbUser.onboarding_complete ?? false);
+    } else {
+      // Fallback to JWT metadata if DB lookup fails (e.g. new user not yet synced)
+      const meta = user.user_metadata as Record<string, unknown>;
+      role = (meta.role as Role | undefined) ?? 'CUSTOMER';
+      onboardingComplete = Boolean((meta.onboardingComplete as boolean | undefined) ?? false);
+    }
+
+    // Write the cache cookie onto the response
+    const cachePayload: RoleCachePayload = {
+      role,
+      onboardingComplete,
+      userId: user.id,
+      expiresAt: Date.now() + ROLE_CACHE_TTL_MS,
+    };
+    response.cookies.set(ROLE_CACHE_COOKIE, serializeRoleCache(cachePayload), {
+      httpOnly: true,
+      sameSite: 'lax',
+      secure: process.env.NODE_ENV === 'production',
+      maxAge: Math.floor(ROLE_CACHE_TTL_MS / 1000),
+      path: '/',
+    });
+  }
 
   const requiredRoles = getRequiredRoles(pathname);
   if (requiredRoles && !requiredRoles.includes(role)) {

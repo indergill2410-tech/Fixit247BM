@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { db } from '@fixit247/database';
 import { generateJobSummary } from '@fixit247/voice';
-import type { ConversationContext } from '@fixit247/voice';
+import type { ConversationContext, ConversationTurn } from '@fixit247/voice';
 import { z } from 'zod';
 import { toLocalFormat } from '@/lib/utils/phone';
 
@@ -21,6 +21,12 @@ const schema = z.object({
 });
 
 export async function POST(req: Request) {
+  const apiKey = req.headers.get('x-internal-api-key');
+  const expectedKey = process.env.INTERNAL_API_KEY;
+  if (!expectedKey || apiKey !== expectedKey) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const body = schema.safeParse(await req.json());
   if (!body.success) return NextResponse.json({ error: 'Invalid' }, { status: 400 });
   const { callId, conversationId, jobData } = body.data;
@@ -53,9 +59,11 @@ export async function POST(req: Request) {
   }
 
   // Generate AI summary
-  const messages = convo ? (convo.messages as any[]) : [];
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const messages = convo ? (convo.messages as unknown as ConversationTurn[]) : [];
   const context: ConversationContext = {
     sessionId: `call_${callId}`,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     messages,
     extractedData: {},
     turnCount: messages.length,
@@ -94,7 +102,7 @@ export async function POST(req: Request) {
     data: {
       title: `${jobData.isEmergency ? 'EMERGENCY: ' : ''}${category.replace(/_/g, ' ')} — Voice Booking`,
       description,
-      category: category as any,
+      category: category as never,
       status: 'OPEN',
       priority: jobData.isEmergency ? 'EMERGENCY' : 'URGENT',
       isEmergency: jobData.isEmergency ?? false,
@@ -127,7 +135,7 @@ export async function POST(req: Request) {
 
   // Log job created event
   await db.voiceEvent.create({
-    data: { callId, eventType: 'JOB_CREATED', payload: { jobId: job.id } as any },
+    data: { callId, eventType: 'JOB_CREATED', payload: { jobId: job.id } as never },
   });
 
   return NextResponse.json({ job, success: true });

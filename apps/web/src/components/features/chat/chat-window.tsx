@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence } from 'framer-motion';
-import { Send, Loader2, Image as ImageIcon, X } from 'lucide-react';
+import { Send, Loader2 } from 'lucide-react';
 import { Button } from '@fixit247/ui';
 import { toast } from 'sonner';
 import { MessageBubble } from './message-bubble';
@@ -31,7 +31,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
     fetch(`/api/messages/${jobId}`)
       .then((r) => r.json())
       .then((data: { messages: MessagePayload[] }) => {
-        setMessages(data.messages ?? []);
+        setMessages(data.messages);
       })
       .catch(() => toast.error('Could not load messages'))
       .finally(() => { setLoading(false); });
@@ -74,7 +74,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
         body: JSON.stringify({ content, type: 'TEXT' }),
       });
       if (!res.ok) throw new Error('Send failed');
-      const { message } = await res.json();
+      const { message } = await res.json() as { message: MessagePayload };
       // Replace optimistic with real message
       setMessages((prev) => prev.map((m) => m.id === optimistic.id ? message : m));
     } catch {
@@ -89,7 +89,7 @@ export function ChatWindow({ jobId, currentUserId, currentUserName, participantN
   useEffect(() => {
     const unread = messages.filter((m) => m.senderId !== currentUserId);
     if (unread.length > 0) {
-      fetch(`/api/messages/${jobId}/read`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
+      void fetch(`/api/messages/${jobId}/read`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({}) });
     }
   }, [messages, jobId, currentUserId]);
 

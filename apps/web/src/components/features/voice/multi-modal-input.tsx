@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef } from 'react';
-import { Camera, Mic, MicOff, Upload, X, Loader2, AlertTriangle } from 'lucide-react';
+import { Camera, Mic, MicOff, X, Loader2, AlertTriangle } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface Props {
@@ -47,10 +47,11 @@ export function MultiModalInput({ onComplete }: Props) {
           const formData = new FormData();
           formData.append('audio', blob, 'audio.webm');
           const res = await fetch('/api/voice/transcribe', { method: 'POST', body: formData });
-          const data = await res.json();
+          const data = await res.json() as { transcript?: string; emergency?: { score: number } };
           if (data.transcript) {
-            setTranscript(data.transcript);
-            setDescription((prev) => prev ? `${prev} ${data.transcript}` : data.transcript);
+            const transcript = data.transcript;
+            setTranscript(transcript);
+            setDescription((prev) => prev ? `${prev} ${transcript}` : transcript);
             setEmergencyScore(data.emergency?.score ?? 0);
           }
         } catch { toast.error('Transcription failed'); }

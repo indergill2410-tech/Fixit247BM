@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { getCreditHistory } from '@fixit247/payments';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -17,7 +18,7 @@ export async function GET(req: NextRequest) {
     const result = await getCreditHistory(tradieProfile.id, limit, offset);
     return NextResponse.json(result);
   } catch (err) {
-    console.error('[GET /api/credits/history]', err);
+    logger.error('[GET /api/credits/history]', err);
     return NextResponse.json({ error: 'Failed to fetch history' }, { status: 500 });
   }
 }

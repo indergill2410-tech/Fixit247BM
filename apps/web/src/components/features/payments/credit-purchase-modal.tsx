@@ -74,7 +74,6 @@ export function CreditPurchaseModal({ open, onClose, packages }: CreditPurchaseM
                   <p className="mb-4 text-sm text-gray-500">Choose a credit bundle. Credits are used to claim jobs.</p>
                   <div className="space-y-3">
                     {packages.map((pkg) => {
-                      const total = pkg.credits + pkg.bonusCredits;
                       const isSelected = selected === pkg.id;
                       return (
                         <button
@@ -117,7 +116,7 @@ export function CreditPurchaseModal({ open, onClose, packages }: CreditPurchaseM
                   </div>
 
                   <button
-                    onClick={() => selected && setStep('confirm')}
+                    onClick={() => { if (selected) setStep('confirm'); }}
                     disabled={!selected}
                     className={cn(
                       'mt-5 w-full rounded-2xl py-3.5 text-sm font-semibold text-white transition-all',

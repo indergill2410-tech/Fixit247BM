@@ -11,7 +11,7 @@ export function useSocket() {
   React.useEffect(() => {
     if (!user) return;
 
-    const socket = connectSocket(user.id, user.role ?? 'CUSTOMER');
+    const socket = connectSocket(user.id, user.role);
 
     socket.on('connect', () => { setConnected(true); });
     socket.on('disconnect', () => { setConnected(false); });

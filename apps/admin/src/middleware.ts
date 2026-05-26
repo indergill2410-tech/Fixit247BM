@@ -1,27 +1,24 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import type { Role } from '@fixit247/auth';
 
-const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
+const PUBLIC_PATHS = ['/_next', '/favicon', '/api/health', '/login'];
+
+function isPublic(pathname: string): boolean {
+  return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+}
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
+  let response = NextResponse.next({ request });
 
-  // Allow the login page and Next.js internals through unconditionally
-  if (
-    pathname === '/login' ||
-    pathname.startsWith('/_next') ||
-    pathname.startsWith('/favicon')
-  ) {
-    return NextResponse.next();
-  }
+  if (isPublic(pathname)) return response;
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   if (!supabaseUrl || !supabaseKey) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return NextResponse.json({ error: 'Server misconfigured' }, { status: 503 });
   }
-
-  let response = NextResponse.next({ request });
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
@@ -42,12 +39,12 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Role from app_metadata (service-role-only, tamper-proof) with fallback
+  // Role from app_metadata (service-role-only, tamper-proof) with user_metadata fallback
   const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
   const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
-  const role = (appMeta.role ?? userMeta.role) as string | undefined;
+  const role = ((appMeta.role ?? userMeta.role) as Role | undefined) ?? 'CUSTOMER';
 
-  if (!role || !ADMIN_ROLES.includes(role)) {
+  if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
     return NextResponse.redirect(new URL('/login?error=access_denied', request.url));
   }
 

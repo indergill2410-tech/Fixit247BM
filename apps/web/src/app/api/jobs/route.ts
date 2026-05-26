@@ -3,8 +3,9 @@ import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
-import { rankTradies } from '@fixit247/matching';
-import type { TradieCandidate, JobRequirements } from '@fixit247/matching';
+import { rateLimit, rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
+import { matchAndDispatch } from '@fixit247/matching';
+import { logger } from '@/lib/logger';
 
 // ── Lead price by trade (server-side authoritative) ───────────────────────────
 const LEAD_PRICE: Record<string, number> = {
@@ -44,6 +45,8 @@ const CreateJobSchema = z.object({
   aiConfidenceScore: z.number().int().min(0).max(100).optional(),
   complexity: z.enum(['SIMPLE', 'MEDIUM', 'COMPLEX']).default('MEDIUM'),
   // leadPrice is NOT accepted from the client — computed server-side
+  // Optional promo/coupon code applied at booking time
+  promoCode: z.string().min(1).max(50).optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -51,7 +54,15 @@ export async function POST(req: NextRequest) {
   if (session instanceof NextResponse) return session;
 
   try {
-    const body = await req.json();
+    // IP-level guard (before heavy logic) to stop flood
+    const ipRl = await rateLimit(req, LIMITS.api);
+    if (!ipRl.success) return rateLimitResponse(ipRl);
+
+    // Per-user rate limit: 10 job creations per hour
+    const userRl = rateLimitByUser(session.id, LIMITS.jobsCreate);
+    if (!userRl.success) return rateLimitResponse(userRl);
+
+    const body = await req.json() as unknown;
     const data = CreateJobSchema.parse(body);
 
     // Compute lead price server-side — never trust the browser value
@@ -62,6 +73,30 @@ export async function POST(req: NextRequest) {
     });
     if (!customerProfile) {
       return NextResponse.json({ error: 'Customer profile not found' }, { status: 404 });
+    }
+
+    // Validate optional promo code (static lookup — no DB round-trip)
+    const PROMO_CODES: Partial<Record<string, { discountPercent: number; description: string }>> = {
+      'FIRST20':     { discountPercent: 20, description: '20% off your first job' },
+      'WELCOME10':   { discountPercent: 10, description: '10% off for new customers' },
+      'EMERGENCY15': { discountPercent: 15, description: '15% off emergency callouts' },
+    };
+
+    let promoDiscount: { discountPercent: number; description: string } | null = null;
+    if (data.promoCode) {
+      const normalised = data.promoCode.trim().toUpperCase();
+      promoDiscount = PROMO_CODES[normalised] ?? null;
+      if (!promoDiscount) {
+        return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 400 });
+      }
+    }
+
+    // Verify the submitted address belongs to this user before linking it to the job.
+    if (data.addressId) {
+      const addr = await db.address.findFirst({ where: { id: data.addressId, userId: session.id } });
+      if (!addr) {
+        return NextResponse.json({ error: 'Address not found' }, { status: 404 });
+      }
     }
 
     const job = await db.$transaction(async (tx) => {
@@ -104,134 +139,29 @@ export async function POST(req: NextRequest) {
       return newJob;
     });
 
-    // ── Matching (non-fatal: never fails job creation) ──────────────────────
-    try {
-      await runMatching(job, customerProfile.id);
-    } catch (matchErr) {
-      console.error('[POST /api/jobs] matching failed (non-fatal):', matchErr);
-    }
+    // Fire-and-forget: trigger matching engine — never blocks job creation
+    void matchAndDispatch(job).catch((err: unknown) => {
+      logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
+    });
 
-    return NextResponse.json({ job }, { status: 201 });
+    return NextResponse.json({
+      job,
+      ...(promoDiscount && {
+        promoApplied: {
+          discountPercent: promoDiscount.discountPercent,
+          description: promoDiscount.description,
+        },
+      }),
+    }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid job data', details: err.errors }, { status: 400 });
     }
-    console.error('[POST /api/jobs]', err);
+    logger.error('[POST /api/jobs]', err);
     return NextResponse.json({ error: 'Failed to create job' }, { status: 500 });
   }
 }
 
-async function runMatching(
-  job: { id: string; category: string; isEmergency: boolean; priority: string; budgetMin: unknown; budgetMax: unknown; scheduledFor: Date | null; addressId: string | null },
-  customerId: string,
-): Promise<void> {
-  if (!job.addressId) return; // No location → can't match
-
-  const address = await db.address.findUnique({ where: { id: job.addressId } });
-  if (!address?.latitude || !address?.longitude) return;
-
-  // Candidate query — all verified available tradies
-  const tradieProfiles = await db.tradieProfile.findMany({
-    where: { verificationStatus: 'VERIFIED', isAvailable: true },
-    select: {
-      id: true,
-      userId: true,
-      trades: true,
-      serviceRadiusKm: true,
-      isEmergencyAvailable: true,
-      trustScore: true,
-      avgRating: true,
-      totalReviews: true,
-      completionRate: true,
-      cancellationRate: true,
-      responseTimeMinutes: true,
-    },
-  });
-
-  const tradieIds = tradieProfiles.map((t) => t.id);
-  const realtimeRows = await db.tradieRealtimeStatus.findMany({
-    where: { tradieId: { in: tradieIds } },
-    select: {
-      tradieId: true,
-      onlineStatus: true,
-      activeJobCount: true,
-      currentLatitude: true,
-      currentLongitude: true,
-    },
-  });
-
-  const realtimeMap = new Map(realtimeRows.map((r) => [r.tradieId, r]));
-
-  const candidates: TradieCandidate[] = [];
-  for (const tp of tradieProfiles) {
-    const rt = realtimeMap.get(tp.id);
-    if (!rt?.currentLatitude || !rt?.currentLongitude) continue;
-    candidates.push({
-      tradieId:             tp.id,
-      userId:               tp.userId,
-      trades:               tp.trades as string[],
-      latitude:             Number(rt.currentLatitude),
-      longitude:            Number(rt.currentLongitude),
-      trustScore:           Number(tp.trustScore),
-      avgRating:            Number(tp.avgRating),
-      totalReviews:         tp.totalReviews,
-      completionRate:       Number(tp.completionRate),
-      cancellationRate:     Number(tp.cancellationRate),
-      responseTimeMinutes:  tp.responseTimeMinutes ?? 30,
-      activeJobCount:       rt.activeJobCount,
-      isEmergencyAvailable: tp.isEmergencyAvailable,
-      isOnline:             rt.onlineStatus !== 'OFFLINE',
-      onlineStatus:         rt.onlineStatus as string,
-      serviceRadiusKm:      tp.serviceRadiusKm,
-      verificationStatus:   'VERIFIED',
-    });
-  }
-
-  const jobReqs: JobRequirements = {
-    jobId:      job.id,
-    category:   job.category,
-    isEmergency: job.isEmergency,
-    priority:   job.priority as 'STANDARD' | 'URGENT' | 'EMERGENCY',
-    location:   { latitude: Number(address.latitude), longitude: Number(address.longitude) },
-    suburb:     address.suburb,
-    state:      address.state,
-    budgetMin:  job.budgetMin != null ? Number(job.budgetMin) : undefined,
-    budgetMax:  job.budgetMax != null ? Number(job.budgetMax) : undefined,
-    scheduledFor: job.scheduledFor ?? undefined,
-    customerId,
-  };
-
-  const { ranked } = rankTradies(jobReqs, candidates);
-  const top3 = ranked.slice(0, 3);
-  if (top3.length === 0) return;
-
-  const expiresAt = new Date();
-  expiresAt.setMinutes(expiresAt.getMinutes() + (job.isEmergency ? 3 : 10));
-
-  await db.$transaction([
-    ...top3.map((r) =>
-      db.jobMatchingQueue.create({
-        data: {
-          jobId:       job.id,
-          tradieId:    r.tradieId,
-          batchNumber: 1,
-          matchScore:  r.scoreBreakdown.totalScore,
-          distanceKm:  r.scoreBreakdown.distanceKm,
-          status:      'PENDING',
-          sentAt:      new Date(),
-          expiresAt,
-        },
-      }),
-    ),
-    db.jobEvent.create({
-      data: {
-        jobId:    job.id,
-        type:     'OFFER_SENT',
-        metadata: { matchedTradies: top3.map((r) => r.tradieId), batchNumber: 1 },
-      },
-    }),
-  ]);
-}
 
 export async function GET(req: NextRequest) {
   const session = await requireApiSession();
@@ -241,8 +171,10 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const status   = searchParams.get('status');
     const category = searchParams.get('category');
-    const limit    = Math.min(parseInt(searchParams.get('limit') ?? '20'), 50);
-    const offset   = parseInt(searchParams.get('offset') ?? '0');
+    const parsedLimit  = parseInt(searchParams.get('limit') ?? '20', 10);
+    const limit        = isNaN(parsedLimit) ? 20 : Math.min(parsedLimit, 50);
+    const parsedOffset = parseInt(searchParams.get('offset') ?? '0', 10);
+    const offset       = isNaN(parsedOffset) ? 0 : Math.max(0, parsedOffset);
 
     const isTradie   = session.role === 'TRADIE';
     const isCustomer = session.role === 'CUSTOMER';
@@ -277,7 +209,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ jobs, total, limit, offset });
   } catch (err) {
-    console.error('[GET /api/jobs]', err);
+    logger.error('[GET /api/jobs]', err);
     return NextResponse.json({ error: 'Failed to fetch jobs' }, { status: 500 });
   }
 }

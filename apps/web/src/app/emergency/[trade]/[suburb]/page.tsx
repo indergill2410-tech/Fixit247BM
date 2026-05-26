@@ -5,7 +5,7 @@ import { db } from '@fixit247/database';
 import { ChevronRight, Phone, Clock, Shield, Star, MapPin, Zap } from 'lucide-react';
 
 // Trade display names
-const TRADE_MAP: Record<string, { name: string; singular: string; emoji: string }> = {
+const TRADE_MAP: Partial<Record<string, { name: string; singular: string; emoji: string }>> = {
   plumbing: { name: 'Plumbing', singular: 'Plumber', emoji: '🔧' },
   electrical: { name: 'Electrical', singular: 'Electrician', emoji: '⚡' },
   hvac: { name: 'HVAC', singular: 'HVAC Technician', emoji: '❄️' },
@@ -84,7 +84,7 @@ export default async function EmergencyTradePage({ params }: { params: Promise<{
   // Fetch real local tradies from DB
   const localTradies = await db.tradieProfile.findMany({
     where: {
-      trades: { has: tradeCategoryKey as any },
+      trades: { has: tradeCategoryKey as never },
       verificationStatus: 'VERIFIED',
     },
     include: { user: { select: { firstName: true, lastName: true, avatarUrl: true } } },

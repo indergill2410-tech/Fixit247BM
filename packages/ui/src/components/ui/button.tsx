@@ -10,29 +10,40 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
+        /* Primary brand — Emergency Gold */
         default:
-          'bg-brand-500 text-gray-900 hover:bg-brand-400 shadow-[0_0_20px_rgba(245,158,11,0.15)] hover:shadow-[0_0_40px_rgba(245,158,11,0.25)]',
+          'bg-brand-500 text-gray-900 hover:bg-brand-400 shadow-brand-sm hover:shadow-brand-md',
+        /* Danger/Destructive */
         destructive:
           'bg-red-600 text-white hover:bg-red-500 shadow-sm',
+        /* Outline — theme-aware */
         outline:
-          'border border-white/12 bg-transparent text-white hover:border-white/20 hover:bg-white/[0.04]',
+          'border border-border bg-transparent text-foreground hover:border-border-strong hover:bg-background-elevated dark:border-white/12 dark:text-white dark:hover:border-white/20 dark:hover:bg-white/[0.04]',
+        /* Secondary — subtle fill */
         secondary:
-          'bg-white/[0.06] text-white hover:bg-white/[0.10] border border-white/[0.07]',
+          'bg-background-elevated text-foreground hover:bg-background-alt border border-border dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.10] dark:border-white/[0.07]',
+        /* Ghost */
         ghost:
-          'text-gray-400 hover:bg-white/[0.05] hover:text-white',
+          'text-foreground-muted hover:bg-background-elevated hover:text-foreground dark:hover:bg-white/[0.05] dark:hover:text-white',
+        /* Link style */
         link:
-          'text-brand-400 underline-offset-4 hover:underline p-0 h-auto font-medium',
+          'text-brand-600 underline-offset-4 hover:underline p-0 h-auto font-medium dark:text-brand-400',
+        /* Emergency red */
         emergency:
-          'bg-red-600 text-white hover:bg-red-500 shadow-[0_0_24px_rgba(239,68,68,0.25)] hover:shadow-[0_0_40px_rgba(239,68,68,0.35)]',
+          'bg-red-600 text-white hover:bg-red-500 shadow-emergency-md hover:shadow-[0_0_40px_rgba(239,68,68,0.35)]',
+        /* Brand emphasis (bold) */
         brand:
-          'bg-brand-500 text-gray-900 hover:bg-brand-400 font-extrabold',
+          'bg-brand-500 text-gray-900 hover:bg-brand-400 font-extrabold shadow-brand-sm hover:shadow-brand-md',
+        /* Muted/glass */
+        muted:
+          'bg-muted text-muted-foreground hover:bg-background-elevated border border-border',
       },
       size: {
-        sm: 'h-8 px-3.5 text-xs rounded-lg',
+        sm:      'h-8 px-3.5 text-xs rounded-lg',
         default: 'h-10 px-5 py-2',
-        lg: 'h-12 px-7 text-base rounded-xl',
-        xl: 'h-14 px-9 text-base rounded-2xl',
-        icon: 'h-10 w-10',
+        lg:      'h-12 px-7 text-base rounded-xl',
+        xl:      'h-14 px-9 text-base rounded-2xl',
+        icon:    'h-10 w-10',
         'icon-sm': 'h-8 w-8',
       },
     },

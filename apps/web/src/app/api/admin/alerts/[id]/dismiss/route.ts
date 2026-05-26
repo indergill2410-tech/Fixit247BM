@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
@@ -16,7 +17,7 @@ export async function PATCH(_req: NextRequest, { params }: { params: Promise<{ i
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[PATCH /api/admin/alerts/:id/dismiss]', err);
+    logger.error('[PATCH /api/admin/alerts/:id/dismiss]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

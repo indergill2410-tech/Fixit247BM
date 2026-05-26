@@ -14,7 +14,7 @@ export function PostJobReferralPrompt({ referralCode, referralLink, onDismiss }:
   const [copied, setCopied] = useState(false);
 
   function copyLink() {
-    navigator.clipboard.writeText(referralLink);
+    void navigator.clipboard.writeText(referralLink);
     setCopied(true);
     toast.success('Link copied!');
     setTimeout(() => { setCopied(false); }, 2000);

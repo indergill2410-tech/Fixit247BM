@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
     const session = await getSession();
     if (!session) return NextResponse.json({ ok: false }, { status: 401 });
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = schema.parse(body);
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
     const ipHash = crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);

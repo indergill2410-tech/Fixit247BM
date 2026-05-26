@@ -3,3 +3,4 @@ export * from './scorer';
 export * from './engine';
 export * from './availability';
 export * from './queue';
+export * from './dispatch';

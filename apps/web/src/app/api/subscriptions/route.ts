@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { z } from 'zod';
 import { createSubscription, getCurrentSubscription, SUBSCRIPTION_PLANS } from '@fixit247/payments';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -11,7 +12,7 @@ export async function GET() {
     const plans = SUBSCRIPTION_PLANS;
     return NextResponse.json({ subscription, plans });
   } catch (err) {
-    console.error('[GET /api/subscriptions]', err);
+    logger.error('[GET /api/subscriptions]', err);
     return NextResponse.json({ error: 'Failed to fetch subscription' }, { status: 500 });
   }
 }
@@ -24,7 +25,7 @@ const CreateSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { tier, stripeCustomerId } = CreateSchema.parse(body);
 
     const result = await createSubscription({
@@ -36,7 +37,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Invalid data', details: err.errors }, { status: 400 });
-    console.error('[POST /api/subscriptions]', err);
+    logger.error('[POST /api/subscriptions]', err);
     return NextResponse.json({ error: 'Failed to create subscription' }, { status: 500 });
   }
 }

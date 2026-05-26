@@ -86,7 +86,7 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${redirectTo}&googleRole=${role}`,
+        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}&googleRole=${role}`,
         queryParams: { access_type: 'offline', prompt: 'consent' },
       },
     });
@@ -99,11 +99,11 @@ export function LoginForm() {
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-white">Welcome back</h1>
-        <p className="mt-2 text-brand-200">Log in to your Fixit247 account</p>
+        <h1 className="text-3xl font-bold text-foreground">Welcome back</h1>
+        <p className="mt-2 text-foreground-muted">Log in to your Fixit247 account</p>
       </div>
 
-      <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
+      <Card className="border-border bg-background-elevated shadow-card-warm dark:shadow-glass">
         <CardContent className="px-6 pb-6 pt-8">
           {urlError && (
             <div className="mb-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
@@ -112,85 +112,25 @@ export function LoginForm() {
                 : 'An error occurred. Please try again.'}
             </div>
           )}
-          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
-            <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-white/90">Email address</label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  autoComplete="email"
-                  className="border-white/20 bg-white/10 pl-10 text-white placeholder:text-white/30 focus-visible:ring-white/40"
-                  error={errors.email?.message}
-                  {...register('email')}
-                />
-              </div>
-            </div>
 
-            <div className="flex flex-col gap-1.5">
-              <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-white/90">Password</label>
-                <Link href="/forgot-password" className="text-xs text-brand-300 transition-colors hover:text-white">
-                  Forgot password?
-                </Link>
-              </div>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
-                <Input
-                  id="password"
-                  type={showPassword ? 'text' : 'password'}
-                  placeholder="••••••••"
-                  autoComplete="current-password"
-                  className="border-white/20 bg-white/10 pl-10 pr-10 text-white placeholder:text-white/30 focus-visible:ring-white/40"
-                  error={errors.password?.message}
-                  {...register('password')}
-                />
-                <button
-                  type="button"
-                  onClick={() => { setShowPassword(!showPassword); }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80"
-                  aria-label={showPassword ? 'Hide password' : 'Show password'}
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              loading={isSubmitting}
-              size="lg"
-              className="mt-1 w-full bg-white font-semibold text-brand-700 shadow-lg hover:bg-white/90"
-            >
-              Log in
-            </Button>
-          </form>
-
-          <div className="my-5 flex items-center gap-3">
-            <div className="flex-1 border-t border-white/10" />
-            <span className="text-xs text-white/40">or continue with</span>
-            <div className="flex-1 border-t border-white/10" />
-          </div>
-
+          {/* Google SSO first — reduces friction */}
           {showGoogleRoleSelect ? (
-            <div className="rounded-2xl border border-white/15 bg-white/8 p-4">
-              <p className="mb-3 text-center text-sm font-semibold text-white">
+            <div className="rounded-2xl border border-border bg-background-alt p-4">
+              <p className="mb-3 text-center text-sm font-semibold text-foreground">
                 Are you signing in as a customer or a tradie?
               </p>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => void handleGoogleOAuth('CUSTOMER')}
-                  className="flex-1 rounded-xl border border-white/20 bg-white/5 py-3 text-sm font-semibold text-white transition-all hover:bg-white/10"
+                  className="flex-1 rounded-xl border border-border bg-background py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-alt"
                 >
                   Customer
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleGoogleOAuth('TRADIE')}
-                  className="flex-1 rounded-xl border border-brand-500/40 bg-brand-500/15 py-3 text-sm font-semibold text-brand-300 transition-all hover:bg-brand-500/25"
+                  className="flex-1 rounded-xl border border-brand-500/40 bg-brand-500/10 py-3 text-sm font-semibold text-brand-700 transition-all hover:bg-brand-500/20 dark:text-brand-400"
                 >
                   Tradie
                 </button>
@@ -198,7 +138,7 @@ export function LoginForm() {
               <button
                 type="button"
                 onClick={() => { setShowGoogleRoleSelect(false); }}
-                className="mt-2 w-full text-center text-xs text-white/40 hover:text-white/60"
+                className="mt-2 w-full text-center text-xs text-foreground-subtle hover:text-foreground-muted"
               >
                 Cancel
               </button>
@@ -210,7 +150,7 @@ export function LoginForm() {
               size="lg"
               loading={isGoogleLoading}
               onClick={handleGoogleLogin}
-              className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10"
+              className="w-full border-border bg-background text-foreground hover:bg-background-alt"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -221,12 +161,78 @@ export function LoginForm() {
               Continue with Google
             </Button>
           )}
+
+          <div className="my-5 flex items-center gap-3">
+            <div className="flex-1 border-t border-border" />
+            <span className="text-xs text-foreground-subtle">or sign in with email</span>
+            <div className="flex-1 border-t border-border" />
+          </div>
+
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="email" className="text-sm font-medium text-foreground">Email address</label>
+              <div className="relative">
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-subtle" />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  autoComplete="email"
+                  className="border-border bg-background pl-10 text-foreground placeholder:text-foreground-subtle focus-visible:ring-brand-500/40"
+                  error={errors.email?.message}
+                  {...register('email')}
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <div className="flex items-center justify-between">
+                <label htmlFor="password" className="text-sm font-medium text-foreground">Password</label>
+                <Link href="/forgot-password" className="text-xs text-brand-600 transition-colors hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300">
+                  Forgot password?
+                </Link>
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-subtle" />
+                <Input
+                  id="password"
+                  type={showPassword ? 'text' : 'password'}
+                  placeholder="••••••••"
+                  autoComplete="current-password"
+                  className="border-border bg-background pl-10 pr-10 text-foreground placeholder:text-foreground-subtle focus-visible:ring-brand-500/40"
+                  error={errors.password?.message}
+                  {...register('password')}
+                />
+                <button
+                  type="button"
+                  onClick={() => { setShowPassword(!showPassword); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-subtle hover:text-foreground"
+                  aria-label={showPassword ? 'Hide password' : 'Show password'}
+                >
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
+            </div>
+
+            <Button
+              type="submit"
+              loading={isSubmitting}
+              size="lg"
+              className="mt-1 w-full bg-brand-500 font-semibold text-gray-900 shadow-brand-md hover:bg-brand-400"
+            >
+              Log in
+            </Button>
+          </form>
+
+          <p className="mt-4 text-center text-xs text-foreground-subtle">
+            Trusted by 30,000+ Australians. No spam, ever.
+          </p>
         </CardContent>
       </Card>
 
-      <p className="mt-6 text-center text-sm text-brand-200">
+      <p className="mt-6 text-center text-sm text-foreground-muted">
         Don&apos;t have an account?{' '}
-        <Link href="/register" className="font-semibold text-white hover:underline">
+        <Link href="/register" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
           Sign up free
         </Link>
       </p>

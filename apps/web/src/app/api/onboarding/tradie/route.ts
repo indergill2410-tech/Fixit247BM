@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 import { db } from '@fixit247/database';
 import type { TradeCategory } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const tradieOnboardingPayload = z.object({
   business: z.object({
@@ -34,8 +35,8 @@ const tradieOnboardingPayload = z.object({
 export async function POST(request: Request) {
   const cookieStore = await cookies();
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL ?? '',
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? '',
     { cookies: { getAll() { return cookieStore.getAll(); }, setAll(c: { name: string; value: string; options: Record<string, unknown> }[]) { c.forEach(({ name, value, options }) => cookieStore.set(name, value, options)); } } },
   );
 
@@ -64,9 +65,9 @@ export async function POST(request: Request) {
         where: { id: user.id },
         create: {
           id: user.id,
-          email: user.email!,
-          firstName: (user.user_metadata as Record<string, unknown>).firstName as string ?? '',
-          lastName: (user.user_metadata as Record<string, unknown>).lastName as string ?? '',
+          email: user.email ?? '',
+          firstName: ((user.user_metadata as Record<string, unknown>).firstName as string | undefined) ?? '',
+          lastName: ((user.user_metadata as Record<string, unknown>).lastName as string | undefined) ?? '',
           role: 'TRADIE',
           phone: business?.phone,
         },
@@ -130,10 +131,17 @@ export async function POST(request: Request) {
       }
     });
 
+    // Award 10 free credits to the tradie on first onboarding completion
+    await db.creditsWallet.upsert({
+      where: { userId: user.id },
+      create: { userId: user.id, balance: 10, lifetimeEarned: 10, lifetimeSpent: 0 },
+      update: {}, // do not overwrite an existing wallet balance
+    });
+
     await supabase.auth.updateUser({ data: { onboardingComplete: true } });
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, freeCreditsAwarded: 10 });
   } catch (err) {
-    console.error('Tradie onboarding error:', err);
+    logger.error('Tradie onboarding error:', err);
     return NextResponse.json({ error: 'Failed to save profile' }, { status: 500 });
   }
 }

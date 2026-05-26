@@ -58,7 +58,7 @@ export async function POST(req: Request) {
     failed: 'FAILED',
     canceled: 'ABANDONED',
   };
-  const dbStatus = statusMap[callStatus ?? ''];
+  const dbStatus = statusMap[callStatus || ''];
 
   try {
     const call = await db.voiceCall.findUnique({ where: { twilioCallSid: callSid } });

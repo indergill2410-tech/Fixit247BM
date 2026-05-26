@@ -2,7 +2,9 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { notify } from '@fixit247/notifications';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   status: z.enum(['EN_ROUTE', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
@@ -26,12 +28,19 @@ export async function PATCH(
   try {
     const session = await requireSession();
     const { id: jobId } = await params;
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { status: newStatus, etaMinutes, metadata } = Schema.parse(body);
 
     const job = await db.job.findUnique({
       where: { id: jobId },
-      select: { status: true, tradieId: true, customerId: true },
+      select: {
+        status: true,
+        title: true,
+        tradieId: true,
+        customerId: true,
+        customer: { select: { userId: true } },
+        tradie: { select: { businessName: true, user: { select: { firstName: true } } } },
+      },
     });
     if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
 
@@ -73,10 +82,30 @@ export async function PATCH(
       return updated;
     });
 
+    const customerUserId = job.customer.userId;
+    const tradieName = job.tradie?.businessName ?? job.tradie?.user.firstName ?? 'Your tradie';
+    const jobTitle = job.title;
+
+    const STATUS_TO_NOTIF: Record<string, string> = {
+      EN_ROUTE: 'TRADIE_EN_ROUTE',
+      ARRIVED: 'TRADIE_ARRIVED',
+      IN_PROGRESS: 'JOB_STARTED',
+      COMPLETED: 'JOB_COMPLETED',
+    };
+    const notifType = STATUS_TO_NOTIF[newStatus];
+    if (notifType) {
+      void notify({
+        userId: customerUserId,
+        jobId,
+        type: notifType,
+        data: { tradieName, jobTitle, etaMinutes: etaMinutes ?? 0 },
+      });
+    }
+
     return NextResponse.json({ job: updatedJob });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/jobs/:id/status]', err);
+    logger.error('[PATCH /api/jobs/:id/status]', err);
     return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
   }
 }

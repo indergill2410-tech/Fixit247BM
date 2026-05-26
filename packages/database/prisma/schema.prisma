@@ -4,14 +4,12 @@
 generator client {
   provider        = "prisma-client-js"
   output          = "../src/generated/client"
-  previewFeatures = ["fullTextSearch", "postgresqlExtensions"]
+  previewFeatures = ["postgresqlExtensions", "fullTextSearchPostgres"]
 }
 
 datasource db {
-  provider          = "postgresql"
-  url               = env("DATABASE_URL")
-  directUrl         = env("DIRECT_URL")
-  extensions        = [postgis, uuid_ossp(map: "uuid-ossp"), pg_trgm]
+  provider   = "postgresql"
+  extensions = [postgis, uuid_ossp(map: "uuid-ossp"), pg_trgm]
 }
 
 // ─── Enums ────────────────────────────────────────────────────────────────────
@@ -148,6 +146,7 @@ enum SubscriptionStatus {
   CANCELLED
   PAUSED
   EXPIRED
+  PAST_DUE
 }
 
 enum TransactionType {
@@ -526,9 +525,11 @@ model Job {
   @@index([createdAt])
   // Composite indexes for common filtered queries
   @@index([status, category])
+  @@index([status, category, createdAt])
   @@index([status, isEmergency])
   @@index([tradieId, status])
   @@index([customerId, status])
+  @@index([status, createdAt])
   @@map("jobs")
 }
 
@@ -665,6 +666,7 @@ model Notification {
   // Composite for "unread notifications for user" — most common notification query
   @@index([userId, readAt])
   @@index([userId, createdAt])
+  @@index([userId, readAt, createdAt])
   @@map("notifications")
 }
 
@@ -692,12 +694,13 @@ model Payment {
   createdAt             DateTime      @default(now())
   updatedAt             DateTime      @updatedAt
 
-  job Job @relation(fields: [jobId], references: [id])
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([tradieId])
   @@index([status])
   @@index([createdAt])
+  @@index([status, createdAt])
   @@map("payments")
 }
 
@@ -886,6 +889,7 @@ model JobMatchingQueue {
   @@index([status])
   @@index([batchNumber])
   @@index([expiresAt])
+  @@index([jobId, status])
   @@map("job_matching_queue")
 }
 
@@ -1324,12 +1328,13 @@ model Dispute {
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
 
-  job Job @relation(fields: [jobId], references: [id])
+  job Job @relation(fields: [jobId], references: [id], onDelete: Cascade)
 
   @@index([customerId])
   @@index([tradieId])
   @@index([status])
   @@index([createdAt])
+  @@index([status, createdAt])
   @@map("disputes")
 }
 
@@ -1745,6 +1750,7 @@ model VoiceCall {
   @@index([customerId])
   @@index([status])
   @@index([startedAt])
+  @@index([status, startedAt])
   @@index([twilioCallSid])
   @@map("voice_calls")
 }
@@ -1813,4 +1819,17 @@ model AIConversation {
   @@index([status])
   @@index([isEmergency])
   @@map("ai_conversations")
+}
+
+// ─── Stripe Webhook Idempotency ───────────────────────────────────────────────
+// Tracks processed Stripe event IDs so duplicate deliveries are safely skipped.
+// Works across multiple server instances and process restarts.
+
+model StripeProcessedEvent {
+  eventId     String   @id
+  processedAt DateTime @default(now())
+  eventType   String
+
+  @@index([processedAt])
+  @@map("stripe_processed_events")
 }

@@ -2,11 +2,66 @@ import type { Metadata } from 'next';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { StatCard } from '@/components/shared/stat-card';
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@fixit247/ui';
+import { db } from '@fixit247/database';
 import Link from 'next/link';
 
 export const metadata: Metadata = { title: 'Admin Overview' };
+export const dynamic = 'force-dynamic';
 
-export default function AdminDashboardPage() {
+function timeAgo(date: Date): string {
+  const diff = Date.now() - date.getTime();
+  const h = Math.floor(diff / 3600000);
+  const d = Math.floor(diff / 86400000);
+  if (h < 1) return 'just now';
+  if (h < 24) return `${h}h ago`;
+  return `${d}d ago`;
+}
+
+function fmtAud(n: number) {
+  return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 }).format(n);
+}
+
+export default async function AdminDashboardPage() {
+  const now = new Date();
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+
+  const [
+    totalUsers,
+    activeJobs,
+    emergencyJobs,
+    pendingVerifications,
+    revenueResult,
+    verificationQueue,
+    openDisputes,
+  ] = await Promise.all([
+    db.user.count(),
+    db.job.count({ where: { status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] } } }),
+    db.job.count({ where: { isEmergency: true, status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] } } }),
+    db.tradieProfile.count({ where: { verificationStatus: 'PENDING' } }),
+    db.payment.aggregate({
+      where: { status: 'RELEASED', createdAt: { gte: startOfMonth } },
+      _sum: { platformFee: true },
+    }),
+    db.tradieProfile.findMany({
+      where: { verificationStatus: 'PENDING' },
+      take: 4,
+      orderBy: { createdAt: 'asc' },
+      include: {
+        user: { select: { firstName: true, lastName: true, email: true } },
+        licences: { select: { licenceType: true, status: true }, take: 3 },
+        insurances: { select: { status: true }, take: 1 },
+      },
+    }),
+    db.dispute.findMany({
+      where: { status: { in: ['OPEN', 'UNDER_REVIEW'] } },
+      take: 4,
+      orderBy: { createdAt: 'desc' },
+      include: { job: { select: { title: true, id: true } } },
+    }),
+  ]);
+
+  const revenueMtd = Number(revenueResult._sum.platformFee ?? 0);
+
   return (
     <AdminShell>
       <div className="mb-8">
@@ -15,10 +70,10 @@ export default function AdminDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Users" value="1,284" delta="+48 this week" trend="up" icon="👥" />
-        <StatCard title="Active Jobs" value="127" delta="32 emergency" icon="🔧" />
-        <StatCard title="Revenue (MTD)" value="$92,400" delta="+18% vs last month" trend="up" icon="💰" />
-        <StatCard title="Pending Verifications" value="14" delta="Avg 22h wait" icon="🔒" highlight />
+        <StatCard title="Total Users" value={totalUsers.toLocaleString()} icon="👥" />
+        <StatCard title="Active Jobs" value={activeJobs.toString()} delta={`${emergencyJobs} emergency`} icon="🔧" />
+        <StatCard title="Revenue (MTD)" value={fmtAud(revenueMtd)} icon="💰" trend="up" />
+        <StatCard title="Pending Verifications" value={pendingVerifications.toString()} delta="Needs review" icon="🔒" highlight={pendingVerifications > 0} />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -26,63 +81,70 @@ export default function AdminDashboardPage() {
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Verification queue</CardTitle>
-            <Badge variant="warning">14 pending</Badge>
+            <Badge variant="warning">{pendingVerifications} pending</Badge>
           </CardHeader>
           <CardContent>
-            <div className="divide-y">
-              {MOCK_VERIFICATIONS.map((v) => (
-                <div key={v.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="font-medium text-gray-900">{v.name}</p>
-                    <p className="text-xs text-gray-500">{v.trade} · submitted {v.submitted}</p>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant={v.risk === 'HIGH' ? 'destructive' : 'default'}>{v.risk}</Badge>
-                    <Button size="sm" asChild><Link href={`/verifications/${v.id}`}>Review</Link></Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Link href="/verifications" className="mt-2 block text-center text-sm text-brand-600 hover:underline">View all →</Link>
+            {verificationQueue.length === 0 ? (
+              <p className="py-4 text-center text-sm text-gray-400">No pending verifications</p>
+            ) : (
+              <div className="divide-y">
+                {verificationQueue.map((v) => {
+                  const docCount = v.licences.length + v.insurances.length;
+                  return (
+                    <div key={v.id} className="flex items-center justify-between py-3">
+                      <div>
+                        <p className="font-medium text-gray-900">{v.user.firstName} {v.user.lastName}</p>
+                        <p className="text-xs text-gray-500">
+                          {v.trades[0] ?? 'Trade'} · {docCount} doc{docCount !== 1 ? 's' : ''} · {timeAgo(v.createdAt)}
+                        </p>
+                      </div>
+                      <Button size="sm" asChild>
+                        <Link href={`/verifications/${v.id}`}>Review</Link>
+                      </Button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+            <Link href="/verifications" className="mt-2 block text-center text-sm text-brand-600 hover:underline">
+              View all →
+            </Link>
           </CardContent>
         </Card>
 
-        {/* Recent disputes */}
+        {/* Active disputes */}
         <Card>
           <CardHeader className="flex flex-row items-center justify-between">
             <CardTitle>Active disputes</CardTitle>
-            <Badge variant="destructive">3 open</Badge>
+            <Badge variant="destructive">{openDisputes.length} open</Badge>
           </CardHeader>
           <CardContent>
-            <div className="divide-y">
-              {MOCK_DISPUTES.map((d) => (
-                <div key={d.id} className="flex items-center justify-between py-3">
-                  <div>
-                    <p className="font-medium text-gray-900">{d.title}</p>
-                    <p className="text-xs text-gray-500">${d.amount} · {d.date}</p>
+            {openDisputes.length === 0 ? (
+              <p className="py-4 text-center text-sm text-gray-400">No open disputes</p>
+            ) : (
+              <div className="divide-y">
+                {openDisputes.map((d) => (
+                  <div key={d.id} className="flex items-center justify-between py-3">
+                    <div>
+                      <p className="font-medium text-gray-900">{d.job?.title ?? `Job dispute`}</p>
+                      <p className="text-xs text-gray-500">{timeAgo(d.createdAt)}</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="warning">{d.status}</Badge>
+                      <Button size="sm" variant="outline" asChild>
+                        <Link href={`/disputes/${d.id}`}>View</Link>
+                      </Button>
+                    </div>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Badge variant="warning">{d.status}</Badge>
-                    <Button size="sm" variant="outline" asChild><Link href={`/disputes/${d.id}`}>View</Link></Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-            <Link href="/disputes" className="mt-2 block text-center text-sm text-brand-600 hover:underline">View all →</Link>
+                ))}
+              </div>
+            )}
+            <Link href="/disputes" className="mt-2 block text-center text-sm text-brand-600 hover:underline">
+              View all →
+            </Link>
           </CardContent>
         </Card>
       </div>
     </AdminShell>
   );
 }
-
-const MOCK_VERIFICATIONS = [
-  { id: '1', name: 'James Robertson', trade: 'Electrician', submitted: '2h ago', risk: 'LOW' },
-  { id: '2', name: 'Sarah Chen', trade: 'Plumber', submitted: '5h ago', risk: 'LOW' },
-  { id: '3', name: 'Mike Patel', trade: 'HVAC', submitted: '8h ago', risk: 'HIGH' },
-];
-
-const MOCK_DISPUTES = [
-  { id: '1', title: 'Job #2847 — incomplete work', amount: '1,200', date: 'May 14', status: 'OPEN' },
-  { id: '2', title: 'Job #2891 — no-show', amount: '350', date: 'May 15', status: 'UNDER_REVIEW' },
-];

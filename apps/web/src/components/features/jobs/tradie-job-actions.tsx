@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { useRouter } from 'next/navigation';
-import { Loader2, CheckCircle, XCircle, Truck, Wrench } from 'lucide-react';
+import { Loader2, CheckCircle, XCircle, Wrench } from 'lucide-react';
 import { Button } from '@fixit247/ui';
 import { cn } from '@fixit247/ui/src/lib/utils';
 
