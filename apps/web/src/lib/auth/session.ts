@@ -32,7 +32,23 @@ export async function getSession(): Promise<SessionUser | null> {
     logger.error('[getSession] DB lookup failed', dbErr);
     return null;
   }
-  if (!dbUser) return null;
+  if (!dbUser) {
+    // User authenticated in Supabase but no DB row yet (auth callback may not have run).
+    // Return a provisional session so we don't loop between /login ↔ /dashboard.
+    // onboardingComplete=false routes them to onboarding where the DB user gets created.
+    const meta = user.user_metadata as Record<string, unknown>;
+    const role = (meta.role === 'TRADIE' ? 'TRADIE' : 'CUSTOMER') as Role;
+    return {
+      id: user.id,
+      email: user.email ?? '',
+      role,
+      firstName: (meta.firstName as string | undefined) ?? '',
+      lastName: (meta.lastName as string | undefined) ?? '',
+      avatarUrl: null,
+      onboardingComplete: false,
+      emailVerified: !!user.email_confirmed_at,
+    };
+  }
 
   const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
   return {
