@@ -61,7 +61,7 @@ export async function POST(request: Request) {
     });
 
     await supabase.auth.updateUser({ data: { firstName, lastName, onboardingComplete: true } });
-    void sendWelcomeEmail(user.id);
+    await sendWelcomeEmail(user.id);
     return NextResponse.json({ success: true, freeCreditsAwarded: 5 });
   } catch (err) {
     logger.error('Customer onboarding error:', err);

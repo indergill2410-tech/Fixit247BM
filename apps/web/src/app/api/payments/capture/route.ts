@@ -46,12 +46,14 @@ export async function POST(req: NextRequest) {
     const tradieName = jobDetail?.tradie?.user
       ? `${jobDetail.tradie.user.firstName} ${jobDetail.tradie.user.lastName}`.trim()
       : 'the tradie';
-    if (jobDetail?.customer?.userId) {
-      void notify({ userId: jobDetail.customer.userId, jobId, type: 'PAYMENT_RELEASED', data: { amount, tradieName } });
-    }
-    if (jobDetail?.tradie?.user?.id) {
-      void notify({ userId: jobDetail.tradie.user.id, jobId, type: 'PAYMENT_RELEASED', data: { amount, tradieName } });
-    }
+    await Promise.all([
+      jobDetail?.customer?.userId
+        ? notify({ userId: jobDetail.customer.userId, jobId, type: 'PAYMENT_RELEASED', data: { amount, tradieName } })
+        : Promise.resolve(),
+      jobDetail?.tradie?.user?.id
+        ? notify({ userId: jobDetail.tradie.user.id, jobId, type: 'PAYMENT_RELEASED', data: { amount, tradieName } })
+        : Promise.resolve(),
+    ]);
 
     return NextResponse.json({ success: true, payoutId: result.payoutId });
   } catch (err) {

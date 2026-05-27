@@ -135,7 +135,7 @@ export async function POST(
 
     // Notify customer that their job has been accepted
     const tradieName = (tradieProfile.businessName ?? session.firstName) || 'Your tradie';
-    void notify({
+    await notify({
       userId: job.customer.userId,
       jobId,
       type: 'JOB_ACCEPTED',

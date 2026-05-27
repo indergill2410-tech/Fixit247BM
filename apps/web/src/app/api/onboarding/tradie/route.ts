@@ -132,7 +132,7 @@ export async function POST(request: Request) {
     });
 
     await supabase.auth.updateUser({ data: { onboardingComplete: true } });
-    void sendWelcomeTradieEmail(user.id);
+    await sendWelcomeTradieEmail(user.id);
     return NextResponse.json({ success: true, freeCreditsAwarded: 10 });
   } catch (err) {
     logger.error('Tradie onboarding error:', err);

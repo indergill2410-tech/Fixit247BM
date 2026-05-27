@@ -93,18 +93,19 @@ export async function PATCH(
       COMPLETED: 'JOB_COMPLETED',
     };
     const notifType = STATUS_TO_NOTIF[newStatus];
+    const notifPromises: Promise<void>[] = [];
     if (notifType) {
-      void notify({
+      notifPromises.push(notify({
         userId: customerUserId,
         jobId,
         type: notifType,
         data: { tradieName, jobTitle, etaMinutes: etaMinutes ?? 0 },
-      });
+      }));
     }
     if (newStatus === 'COMPLETED') {
-      void sendReviewRequest(jobId);
-      void sendReferralPrompt(customerUserId);
+      notifPromises.push(sendReviewRequest(jobId), sendReferralPrompt(customerUserId));
     }
+    await Promise.all(notifPromises);
 
     return NextResponse.json({ job: updatedJob });
   } catch (err) {
