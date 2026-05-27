@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { db } from '@fixit247/database';
 import { customerOnboardingSchema } from '@/lib/validators/onboarding';
+import { sendWelcomeEmail } from '@fixit247/notifications';
 import { logger } from '@/lib/logger';
 
 export async function POST(request: Request) {
@@ -68,6 +69,7 @@ export async function POST(request: Request) {
     });
 
     await supabase.auth.updateUser({ data: { firstName, lastName, onboardingComplete: true } });
+    await sendWelcomeEmail(user.id);
     return NextResponse.json({ success: true, freeCreditsAwarded: 5 });
   } catch (err) {
     logger.error('Customer onboarding error:', err);

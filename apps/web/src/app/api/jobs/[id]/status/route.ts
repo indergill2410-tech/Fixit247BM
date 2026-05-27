@@ -2,7 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
-import { notify } from '@fixit247/notifications';
+import { notify, sendReviewRequest, sendReferralPrompt } from '@fixit247/notifications';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -93,14 +93,19 @@ export async function PATCH(
       COMPLETED: 'JOB_COMPLETED',
     };
     const notifType = STATUS_TO_NOTIF[newStatus];
+    const notifPromises: Promise<void>[] = [];
     if (notifType) {
-      void notify({
+      notifPromises.push(notify({
         userId: customerUserId,
         jobId,
         type: notifType,
         data: { tradieName, jobTitle, etaMinutes: etaMinutes ?? 0 },
-      });
+      }));
     }
+    if (newStatus === 'COMPLETED') {
+      notifPromises.push(sendReviewRequest(jobId), sendReferralPrompt(customerUserId));
+    }
+    await Promise.all(notifPromises);
 
     return NextResponse.json({ job: updatedJob });
   } catch (err) {
