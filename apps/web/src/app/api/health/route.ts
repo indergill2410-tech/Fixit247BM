@@ -26,7 +26,7 @@ function checkEnv(): ServiceStatus {
 
   const missingCritical = critical.filter((k) => !process.env[k]);
   if (missingCritical.length > 0) {
-    return { status: 'degraded', error: `Missing env vars: ${missingCritical.join(', ')}` };
+    return { status: 'down', error: `Missing env vars: ${missingCritical.join(', ')}` };
   }
 
   const missingOptional = optional.filter((k) => !process.env[k]);

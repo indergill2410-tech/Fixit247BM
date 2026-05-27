@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { MultiModalInput } from './multi-modal-input';
 
 interface JobData {
@@ -9,6 +10,22 @@ interface JobData {
   images: File[];
   audioTranscript?: string;
   emergencyScore?: number;
+}
+
+async function uploadImages(files: File[]): Promise<string[]> {
+  if (files.length === 0) return [];
+  const supabase = getSupabaseBrowserClient();
+  const urls: string[] = [];
+  await Promise.all(
+    files.map(async (file) => {
+      const path = `job-media/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const { error } = await supabase.storage.from('job-media').upload(path, file, { upsert: false });
+      if (error) throw new Error(`Image upload failed: ${error.message}`);
+      const { data } = supabase.storage.from('job-media').getPublicUrl(path);
+      urls.push(data.publicUrl);
+    }),
+  );
+  return urls;
 }
 
 export function MultiModalBookingClient() {
@@ -20,7 +37,8 @@ export function MultiModalBookingClient() {
     setIsSubmitting(true);
     setError(null);
     try {
-      const isEmergency = (data.emergencyScore ?? 0) >= 70;
+      const isEmergency = (data.emergencyScore ?? 0) >= 60;
+      const mediaUrls = await uploadImages(data.images);
       const res = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -29,9 +47,10 @@ export function MultiModalBookingClient() {
           description: data.audioTranscript
             ? `${data.description}\n\nVoice note: ${data.audioTranscript}`
             : data.description,
-          category: 'GENERAL',
+          category: 'OTHER',
           isEmergency,
           priority: isEmergency ? 'EMERGENCY' : 'STANDARD',
+          mediaUrls,
         }),
       });
 
@@ -43,8 +62,8 @@ export function MultiModalBookingClient() {
 
       const errData = await res.json().catch(() => ({})) as { error?: string };
       setError(errData.error ?? 'Something went wrong. Please try again.');
-    } catch {
-      setError('Network error — please check your connection and try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error — please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -57,14 +76,15 @@ export function MultiModalBookingClient() {
           {error}
         </div>
       )}
-      {isSubmitting ? (
+      {isSubmitting && (
         <div className="flex items-center justify-center py-12 gap-3 text-gray-400">
           <div className="h-5 w-5 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
           <span className="text-sm">Creating your job…</span>
         </div>
-      ) : (
-        <MultiModalInput onComplete={(d) => { void handleComplete(d); }} />
       )}
+      <div className={isSubmitting ? 'hidden' : ''}>
+        <MultiModalInput onComplete={(d) => { void handleComplete(d); }} />
+      </div>
     </div>
   );
 }
