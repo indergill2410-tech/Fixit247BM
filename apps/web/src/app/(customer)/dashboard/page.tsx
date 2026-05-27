@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { requireOnboarding } from '@/lib/auth/session';
+import { db } from '@fixit247/database';
 import { DashboardShell, PageHeader, StatsGrid } from '@/components/shared/dashboard-shell';
 import { StatCard } from '@/components/shared/stat-card';
 import { Button } from '@fixit247/ui';
@@ -11,6 +12,36 @@ export const metadata: Metadata = { title: 'Dashboard' };
 
 export default async function CustomerDashboardPage() {
   const session = await requireOnboarding();
+
+  const customerProfile = await db.customerProfile.findUnique({
+    where: { userId: session.id },
+    select: {
+      id: true,
+      totalSpent: true,
+    },
+  });
+
+  const [activeCount, completedCount, reviewsGiven] = await Promise.all([
+    customerProfile
+      ? db.job.count({
+          where: {
+            customerId: customerProfile.id,
+            status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] },
+          },
+        })
+      : Promise.resolve(0),
+    customerProfile
+      ? db.job.count({
+          where: { customerId: customerProfile.id, status: 'COMPLETED' },
+        })
+      : Promise.resolve(0),
+    db.review.count({ where: { reviewerId: session.id } }),
+  ]);
+
+  const totalSpent = customerProfile?.totalSpent
+    ? `$${Number(customerProfile.totalSpent).toLocaleString('en-AU', { maximumFractionDigits: 0 })}`
+    : '$0';
+
   return (
     <DashboardShell role="CUSTOMER">
       {/* Emergency banner */}
@@ -33,10 +64,15 @@ export default async function CustomerDashboardPage() {
       />
 
       <StatsGrid cols={4}>
-        <StatCard title="Active Jobs" value="2" delta="+1 this week" trend="up" icon="🔧" />
-        <StatCard title="Completed" value="14" delta="+3 this month" trend="up" icon="✅" />
-        <StatCard title="Total Spent" value="$4,280" delta="AUD lifetime" icon="💳" />
-        <StatCard title="Avg Rating Given" value="4.8 ★" delta="Based on 14 reviews" icon="⭐" />
+        <StatCard title="Active Jobs" value={activeCount} icon="🔧" />
+        <StatCard title="Completed" value={completedCount} icon="✅" />
+        <StatCard title="Total Spent" value={totalSpent} delta="AUD lifetime" icon="💳" />
+        <StatCard
+          title="Reviews Given"
+          value={reviewsGiven > 0 ? reviewsGiven : '—'}
+          delta={reviewsGiven > 0 ? `${reviewsGiven} review${reviewsGiven === 1 ? '' : 's'}` : 'No reviews yet'}
+          icon="⭐"
+        />
       </StatsGrid>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">

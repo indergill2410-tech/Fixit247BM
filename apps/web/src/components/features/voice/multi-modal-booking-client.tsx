@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import { Loader2 } from 'lucide-react';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 import { MultiModalInput } from './multi-modal-input';
 
@@ -31,26 +32,39 @@ async function uploadImages(files: File[]): Promise<string[]> {
 export function MultiModalBookingClient() {
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
-  const handleComplete = async (data: JobData) => {
+  async function handleComplete(data: JobData) {
     setIsSubmitting(true);
-    setError(null);
+    setSubmitError(null);
     try {
-      const isEmergency = (data.emergencyScore ?? 0) >= 60;
+      const emergencyScore = data.emergencyScore ?? 0;
+      const isEmergency = emergencyScore >= 60;
+      const priority = isEmergency ? 'EMERGENCY' : emergencyScore >= 30 ? 'URGENT' : 'STANDARD';
+
+      const rawTitle = data.description.split(/[.\n]/)[0]?.trim() ?? data.description;
+      const title = rawTitle.length < 5
+        ? data.description.slice(0, 80).trim()
+        : rawTitle.slice(0, 80);
+
+      const fullDescription = data.audioTranscript
+        ? `${data.description}\n\n[Voice note]: ${data.audioTranscript}`
+        : data.description;
+
       const mediaUrls = await uploadImages(data.images);
+
       const res = await fetch('/api/jobs', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          title: data.description.slice(0, 80) || 'New job',
-          description: data.audioTranscript
-            ? `${data.description}\n\nVoice note: ${data.audioTranscript}`
-            : data.description,
-          category: 'OTHER',
+          title,
+          description: fullDescription,
+          category: 'GENERAL_MAINTENANCE',
           isEmergency,
-          priority: isEmergency ? 'EMERGENCY' : 'STANDARD',
+          priority,
+          complexity: 'MEDIUM',
           mediaUrls,
+          aiUrgencyScore: emergencyScore || undefined,
         }),
       });
 
@@ -61,25 +75,25 @@ export function MultiModalBookingClient() {
       }
 
       const errData = await res.json().catch(() => ({})) as { error?: string };
-      setError(errData.error ?? 'Something went wrong. Please try again.');
+      setSubmitError(errData.error ?? 'Something went wrong. Please try again.');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Network error — please check your connection and try again.');
+      setSubmitError(err instanceof Error ? err.message : 'Network error — please check your connection and try again.');
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }
 
   return (
     <div className="rounded-2xl border border-white/8 bg-white/4 p-5">
-      {error && (
-        <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
-          {error}
+      {isSubmitting && (
+        <div className="flex items-center gap-2 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3 mb-4">
+          <Loader2 size={16} className="animate-spin text-brand-400" />
+          <p className="text-sm font-medium text-brand-300">Posting your job…</p>
         </div>
       )}
-      {isSubmitting && (
-        <div className="flex items-center justify-center py-12 gap-3 text-gray-400">
-          <div className="h-5 w-5 animate-spin rounded-full border-2 border-amber-500 border-t-transparent" />
-          <span className="text-sm">Creating your job…</span>
+      {submitError && (
+        <div className="mb-4 rounded-lg border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-400">
+          {submitError}
         </div>
       )}
       <div className={isSubmitting ? 'hidden' : ''}>

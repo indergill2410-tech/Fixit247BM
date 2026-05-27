@@ -2,6 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { requireApiSession } from '@/lib/auth/session';
+import { rateLimit, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
 import { db } from '@fixit247/database';
 import { rateLimit, rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
 import { matchAndDispatch } from '@fixit247/matching';
@@ -50,6 +51,9 @@ const CreateJobSchema = z.object({
 });
 
 export async function POST(req: NextRequest) {
+  const rl = rateLimit(req, LIMITS.api);
+  if (!rl.success) return rateLimitResponse(rl);
+
   const session = await requireApiSession();
   if (session instanceof NextResponse) return session;
 
