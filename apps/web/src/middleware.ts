@@ -66,6 +66,7 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/api/auth',
   '/api/voice/twilio', // Twilio webhooks — must be publicly reachable, no session
   '/api/twilio',       // Compatibility path (Twilio console may use either prefix)
+  '/api/growth/events', // has its own mixed anon/auth logic
   '/_next',
   '/favicon',
 ];
@@ -179,6 +180,10 @@ export async function middleware(request: NextRequest) {
   }
 
   if (!user) {
+    // API routes expect JSON — never redirect them to the login page.
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('redirectTo', pathname);
     return NextResponse.redirect(loginUrl);
@@ -207,6 +212,9 @@ export async function middleware(request: NextRequest) {
     } else {
       // DB lookup returned nothing — deny access rather than trust user-writable metadata.
       // This covers brand-new users not yet synced; redirect to login to re-auth.
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      }
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirectTo', pathname);
       return NextResponse.redirect(loginUrl);
@@ -230,6 +238,9 @@ export async function middleware(request: NextRequest) {
 
   const requiredRoles = getRequiredRoles(pathname);
   if (requiredRoles && !requiredRoles.includes(role)) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    }
     return NextResponse.redirect(new URL('/unauthorized', request.url));
   }
 
