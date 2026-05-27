@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function GET() {
   try {
@@ -42,7 +43,7 @@ export async function GET() {
       openDisputeCount: disputeCount,
     });
   } catch (err) {
-    console.error('[GET /api/admin/revenue]', err);
+    logger.error('[GET /api/admin/revenue]', err);
     return NextResponse.json({ error: 'Failed to fetch revenue data' }, { status: 500 });
   }
 }

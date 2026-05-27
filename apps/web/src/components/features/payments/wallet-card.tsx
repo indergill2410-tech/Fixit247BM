@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { motion } from 'framer-motion';
-import { Zap, TrendingUp, ShoppingCart, Loader2 } from 'lucide-react';
+import { Zap, ShoppingCart } from 'lucide-react';
 import { cn } from '@fixit247/ui/src/lib/utils';
 
 interface WalletCardProps {

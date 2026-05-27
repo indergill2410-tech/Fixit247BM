@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { requireOnboarding } from '@/lib/auth/session';
-import { DashboardShell, PageHeader } from '@/components/shared/dashboard-shell';
+import { DashboardShell } from '@/components/shared/dashboard-shell';
 import { JobStatusTracker } from '@/components/features/jobs/job-status-tracker';
 import { db } from '@fixit247/database';
 import { notFound } from 'next/navigation';
@@ -34,10 +34,10 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
 
   if (!job) notFound();
 
-  const acceptedClaim = job.claims[0];
+  const acceptedClaim = job.claims.at(0);
   const tradieUser = acceptedClaim?.tradie.user;
 
-  const PRIORITY_BADGE: Record<string, 'emergency' | 'warning' | 'default'> = {
+  const PRIORITY_BADGE: Record<string, 'emergency' | 'warning' | 'default' | undefined> = {
     EMERGENCY: 'emergency',
     URGENT: 'warning',
     STANDARD: 'default',
@@ -70,7 +70,7 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               lastName: tradieUser.lastName,
               avatarUrl: tradieUser.avatarUrl ?? undefined,
               phone: tradieUser.phone ?? undefined,
-              avgRating: acceptedClaim?.tradie.avgRating ? Number(acceptedClaim.tradie.avgRating) : undefined,
+              avgRating: acceptedClaim.tradie.avgRating != null ? Number(acceptedClaim.tradie.avgRating) : undefined,
             } : null}
           />
 
@@ -96,8 +96,8 @@ export default async function JobDetailPage({ params }: { params: Promise<{ id: 
               <div className="mt-3 border-t border-white/8 pt-3">
                 <p className="text-xs text-gray-500">Budget</p>
                 <p className="text-sm font-medium text-white">
-                  ${job.budgetMin.toLocaleString()}
-                  {job.budgetMax && ` – $${Number(job.budgetMax).toLocaleString()}`} AUD
+                  ${Number(job.budgetMin).toLocaleString()}
+                  {job.budgetMax != null && ` – $${Number(job.budgetMax).toLocaleString()}`} AUD
                 </p>
               </div>
             )}

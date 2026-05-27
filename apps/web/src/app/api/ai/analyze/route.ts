@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const AnalyzeSchema = z.object({
   textDescription: z.string().min(5).max(2000).optional(),
@@ -16,11 +17,11 @@ const AnalyzeSchema = z.object({
 export async function POST(req: NextRequest) {
   try {
     const { rateLimit, rateLimitResponse, LIMITS } = await import('@/lib/api/rate-limit');
-    const rl = rateLimit(req, LIMITS.ai);
+    const rl = await rateLimit(req, LIMITS.ai);
     if (!rl.success) return rateLimitResponse(rl);
 
     await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = AnalyzeSchema.parse(body);
 
     if (!data.textDescription && !data.voiceTranscript && data.imageUrls.length === 0) {
@@ -82,7 +83,7 @@ export async function POST(req: NextRequest) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid input', details: err.errors }, { status: 400 });
     }
-    console.error('[POST /api/ai/analyze]', err);
+    logger.error('[POST /api/ai/analyze]', err);
     return NextResponse.json({ error: 'AI analysis failed' }, { status: 500 });
   }
 }

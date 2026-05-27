@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
 interface LogEntry {
@@ -21,15 +22,23 @@ function redact(obj: Record<string, unknown>): Record<string, unknown> {
   );
 }
 
-function log(level: LogLevel, message: string, meta?: Record<string, unknown>): void {
+function normalizeMeta(meta: unknown): Record<string, unknown> | undefined {
+  if (meta === undefined || meta === null) return undefined;
+  if (meta instanceof Error) return { message: meta.message, stack: meta.stack, name: meta.name };
+  if (typeof meta === 'object') return meta as Record<string, unknown>;
+  return { value: meta };
+}
+
+function log(level: LogLevel, message: string, meta?: unknown): void {
   if (process.env.NODE_ENV === 'test') return;
 
+  const normalized = normalizeMeta(meta);
   const isDev = process.env.NODE_ENV !== 'production';
   const entry: LogEntry = {
     level,
     message,
     timestamp: new Date().toISOString(),
-    ...(meta ? redact(meta) : {}),
+    ...(normalized ? redact(normalized) : {}),
   };
 
   if (isDev) {
@@ -44,8 +53,8 @@ function log(level: LogLevel, message: string, meta?: Record<string, unknown>): 
 }
 
 export const logger = {
-  debug: (msg: string, meta?: Record<string, unknown>) => { log('debug', msg, meta); },
-  info: (msg: string, meta?: Record<string, unknown>) => { log('info', msg, meta); },
-  warn: (msg: string, meta?: Record<string, unknown>) => { log('warn', msg, meta); },
-  error: (msg: string, meta?: Record<string, unknown>) => { log('error', msg, meta); },
+  debug: (msg: string, meta?: unknown) => { log('debug', msg, meta); },
+  info: (msg: string, meta?: unknown) => { log('info', msg, meta); },
+  warn: (msg: string, meta?: unknown) => { log('warn', msg, meta); },
+  error: (msg: string, meta?: unknown) => { log('error', msg, meta); },
 };

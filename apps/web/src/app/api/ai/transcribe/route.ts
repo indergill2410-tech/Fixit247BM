@@ -1,11 +1,12 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
+import { logger } from '@/lib/logger';
 
 export async function POST(req: NextRequest) {
   try {
     const { rateLimit, rateLimitResponse, LIMITS } = await import('@/lib/api/rate-limit');
-    const rl = rateLimit(req, LIMITS.ai);
+    const rl = await rateLimit(req, LIMITS.ai);
     if (!rl.success) return rateLimitResponse(rl);
 
     await requireSession();
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       duration: result.duration,
     });
   } catch (err) {
-    console.error('[POST /api/ai/transcribe]', err);
+    logger.error('[POST /api/ai/transcribe]', err);
     return NextResponse.json({ error: 'Transcription failed' }, { status: 500 });
   }
 }

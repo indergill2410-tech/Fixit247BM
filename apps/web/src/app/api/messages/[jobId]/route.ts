@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const SendSchema = z.object({
   content: z.string().min(1).max(2000),
@@ -62,7 +63,7 @@ export async function GET(
       nextCursor: messages.length === limit ? messages[0]?.createdAt.toISOString() : null,
     });
   } catch (err) {
-    console.error('[GET /api/messages/:jobId]', err);
+    logger.error('[GET /api/messages/:jobId]', err);
     return NextResponse.json({ error: 'Failed to fetch messages' }, { status: 500 });
   }
 }
@@ -75,7 +76,7 @@ export async function POST(
   if (session instanceof NextResponse) return session;
   try {
     const { jobId } = await params;
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { content, type, mediaUrl, receiverId } = SendSchema.parse(body);
 
     // Rate limit: max 30 messages per minute per user per job
@@ -116,7 +117,7 @@ export async function POST(
     return NextResponse.json({ message }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/messages/:jobId]', err);
+    logger.error('[POST /api/messages/:jobId]', err);
     return NextResponse.json({ error: 'Failed to send message' }, { status: 500 });
   }
 }

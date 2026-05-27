@@ -4,9 +4,9 @@ import type { NotifData } from '../templates';
 const FROM = process.env['EMAIL_FROM'] ?? 'noreply@fixit247.com.au';
 const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247.com.au';
 
-let _resend: Resend | null = null;
+let _resend: Resend | undefined;
 function getResend(): Resend {
-  if (!_resend) _resend = new Resend(process.env['RESEND_API_KEY']);
+  _resend ??= new Resend(process.env['RESEND_API_KEY'] ?? '');
   return _resend;
 }
 

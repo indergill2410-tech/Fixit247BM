@@ -40,48 +40,48 @@ export function RecentActivityFeed() {
   }, []);
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/[0.08] bg-white/[0.03] shadow-glass">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-card-warm transition-colors dark:border-white/[0.08] dark:bg-white/[0.03] dark:shadow-glass">
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/[0.06] px-4 py-3">
+      <div className="flex items-center justify-between border-b border-border bg-background-alt px-4 py-3 dark:border-white/[0.06] dark:bg-transparent">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-60" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-400" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-60 dark:bg-emerald-400" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
           </span>
-          <p className="text-xs font-semibold uppercase tracking-widest text-gray-400">Live Activity</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-foreground-muted">Live Activity</p>
         </div>
-        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-400">
+        <span className="rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:text-emerald-400">
           LIVE
         </span>
       </div>
 
       {/* Items */}
-      <div className="divide-y divide-white/[0.04]">
+      <div className="divide-y divide-border dark:divide-white/[0.04]">
         {items.map((item, i) => {
           const elapsed = Math.floor((Date.now() - item.addedAt) / 1000);
           const isCompleted = item.action === 'completed';
           return (
-            <div key={i} className="flex items-center gap-3 px-4 py-3.5 transition-colors">
-              <span className="text-base shrink-0">{item.emoji}</span>
+            <div key={i} className="flex items-center gap-3 px-4 py-3.5 transition-colors hover:bg-background-alt dark:hover:bg-white/[0.02]">
+              <span className="shrink-0 text-base">{item.emoji}</span>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm text-white">
+                <p className="truncate text-sm text-foreground">
                   <span className="font-semibold">{item.trade}</span>
                   {' '}
-                  <span className={`text-xs ${isCompleted ? 'text-emerald-500' : 'text-brand-500'}`}>
+                  <span className={`text-xs ${isCompleted ? 'text-emerald-600 dark:text-emerald-500' : 'text-brand-600 dark:text-brand-500'}`}>
                     {isCompleted ? 'completed job' : 'on the way'}
                   </span>
                 </p>
-                <p className="text-[11px] text-gray-600">{item.suburb}</p>
+                <p className="text-[11px] text-foreground-subtle">{item.suburb}</p>
               </div>
-              <span className="shrink-0 text-[11px] text-gray-700">{timeAgo(elapsed)}</span>
+              <span className="shrink-0 text-[11px] text-foreground-subtle">{timeAgo(elapsed)}</span>
             </div>
           );
         })}
       </div>
 
       {/* Footer */}
-      <div className="border-t border-white/[0.05] px-4 py-2.5 text-center">
-        <p className="text-[10px] text-gray-700">Showing live job activity across Australia</p>
+      <div className="border-t border-border bg-background-alt px-4 py-2.5 text-center dark:border-white/[0.05] dark:bg-transparent">
+        <p className="text-[10px] text-foreground-subtle">Showing live job activity across Australia</p>
       </div>
     </div>
   );

@@ -335,7 +335,7 @@ export async function POST(req: Request) {
 
   const params = Object.fromEntries(new URLSearchParams(body));
   const callSid = params.CallSid;
-  const speechResult = (params.SpeechResult ?? '').trim();
+  const speechResult = (params.SpeechResult || '').trim();
   const webhookBase = APP_BASE;
 
   logger.info('[gather] Speech received', {
@@ -381,7 +381,7 @@ export async function POST(req: Request) {
       call = await db.voiceCall.create({
         data: {
           twilioCallSid: callSid,
-          phoneNumber: params.From ?? 'unknown',
+          phoneNumber: params.From || 'unknown',
           direction: 'INBOUND',
           status: 'AI_HANDLING',
           answeredAt: new Date(),
@@ -417,7 +417,7 @@ export async function POST(req: Request) {
   const context: ConversationContext = {
     sessionId,
     messages: existingMessages,
-    extractedData: (conversation?.extractedEntities as Record<string, unknown>) ?? {},
+    extractedData: ((conversation?.extractedEntities as unknown) ?? {}) as Record<string, unknown>,
     turnCount: existingMessages.filter((m) => m.role === 'user').length,
     isComplete: false,
     isEmergency: conversation?.isEmergency ?? false,
@@ -464,14 +464,14 @@ export async function POST(req: Request) {
           callId: call.id,
           sessionId,
           messages: newMessages as never,
-          extractedEntities: (aiResponse.extractedJobData as never) ?? {},
+          extractedEntities: (aiResponse.extractedJobData ?? {}) as never,
           isEmergency: aiResponse.emergencyDetected,
           urgencyScore: aiResponse.emergencyScore,
           turnCount: 1,
         },
         update: {
           messages: newMessages as never,
-          extractedEntities: (aiResponse.extractedJobData as never) ?? {},
+          extractedEntities: (aiResponse.extractedJobData ?? {}) as never,
           isEmergency: aiResponse.emergencyDetected,
           urgencyScore: aiResponse.emergencyScore,
           turnCount: { increment: 1 },

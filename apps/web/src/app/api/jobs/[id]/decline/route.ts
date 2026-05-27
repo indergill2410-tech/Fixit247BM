@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function POST(
   req: NextRequest,
@@ -14,7 +15,8 @@ export async function POST(
     }
 
     const { id: jobId } = await params;
-    const body = await req.json().catch(() => ({}));
+    const raw = await (req.json() as Promise<unknown>).catch(() => ({}) as unknown);
+    const body = (typeof raw === 'object' && raw !== null) ? raw as Record<string, unknown> : {};
     const reason = typeof body.reason === 'string' ? body.reason : undefined;
 
     const tradieProfile = await db.tradieProfile.findUnique({ where: { userId: session.id } });
@@ -22,7 +24,7 @@ export async function POST(
 
     await db.$transaction([
       db.jobMatchingQueue.updateMany({
-        where: { jobId, tradieId: tradieProfile.id, status: 'SENT' },
+        where: { jobId, tradieId: tradieProfile.id, status: { in: ['PENDING', 'SENT'] } },
         data: { status: 'DECLINED', respondedAt: new Date(), declineReason: reason },
       }),
       db.jobEvent.create({
@@ -38,7 +40,7 @@ export async function POST(
 
     return NextResponse.json({ success: true });
   } catch (err) {
-    console.error('[POST /api/jobs/[id]/decline]', err);
+    logger.error('[POST /api/jobs/[id]/decline]', err);
     return NextResponse.json({ error: 'Failed to decline job' }, { status: 500 });
   }
 }

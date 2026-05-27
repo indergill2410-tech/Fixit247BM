@@ -77,7 +77,7 @@ export function MediaUpload({ onImagesChange, onVoiceTranscript, maxImages = 4, 
       formData.append('audio', blob, 'voice-note.webm');
       const res = await fetch('/api/ai/transcribe', { method: 'POST', body: formData });
       if (res.ok) {
-        const { transcript } = await res.json();
+        const { transcript } = await res.json() as { transcript: string };
         onVoiceTranscript(transcript);
       }
     } catch {

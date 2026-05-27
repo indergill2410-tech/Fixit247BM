@@ -7,22 +7,22 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <div className="bg-[#0a0a0a] text-white">
+    <div className="bg-background text-foreground transition-colors duration-300">
       <div className="mx-auto max-w-3xl px-4 py-20">
         <h1 className="text-4xl font-extrabold mb-2">Privacy Policy</h1>
-        <p className="text-gray-500 mb-10">Last updated: May 2026</p>
+        <p className="text-foreground-subtle mb-10">Last updated: May 2026</p>
 
-        <div className="space-y-10 text-gray-400 leading-relaxed">
+        <div className="space-y-10 text-foreground-muted leading-relaxed">
           {SECTIONS.map((s) => (
             <section key={s.title}>
-              <h2 className="text-xl font-bold text-white mb-3">{s.title}</h2>
+              <h2 className="text-xl font-bold text-foreground mb-3">{s.title}</h2>
               <p>{s.content}</p>
             </section>
           ))}
         </div>
 
-        <div className="mt-12 rounded-2xl border border-white/8 bg-white/4 p-6 text-sm text-gray-500">
-          Questions? Email <a href="mailto:privacy@fixit247.com.au" className="text-brand-400 hover:underline">privacy@fixit247.com.au</a>
+        <div className="mt-12 rounded-2xl border border-border bg-background-elevated p-6 text-sm text-foreground-subtle">
+          Questions? Email <a href="mailto:privacy@fixit247.com.au" className="text-brand-500 hover:underline">privacy@fixit247.com.au</a>
         </div>
       </div>
     </div>

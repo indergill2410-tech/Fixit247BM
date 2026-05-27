@@ -2,8 +2,9 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
-import { z } from 'zod';
 import { notify, sendReviewRequest, sendReferralPrompt } from '@fixit247/notifications';
+import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({
   status: z.enum(['EN_ROUTE', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
@@ -27,12 +28,19 @@ export async function PATCH(
   try {
     const session = await requireSession();
     const { id: jobId } = await params;
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { status: newStatus, etaMinutes, metadata } = Schema.parse(body);
 
     const job = await db.job.findUnique({
       where: { id: jobId },
-      select: { status: true, tradieId: true, customerId: true },
+      select: {
+        status: true,
+        title: true,
+        tradieId: true,
+        customerId: true,
+        customer: { select: { userId: true } },
+        tradie: { select: { businessName: true, user: { select: { firstName: true } } } },
+      },
     });
     if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
 
@@ -74,38 +82,34 @@ export async function PATCH(
       return updated;
     });
 
-    // Fire notifications based on new status
-    const jobDetail = await db.job.findUnique({
-      where: { id: jobId },
-      select: {
-        title: true,
-        customer: { select: { userId: true } },
-        tradie: { select: { user: { select: { id: true, firstName: true, lastName: true } } } },
-      },
-    });
-    const customerUserId = jobDetail?.customer?.userId;
-    const tradieUser = jobDetail?.tradie?.user;
-    const tradieName = tradieUser ? `${tradieUser.firstName} ${tradieUser.lastName}`.trim() : 'Your tradie';
-    const jobTitle = jobDetail?.title ?? 'your job';
+    const customerUserId = job.customer.userId;
+    const tradieName = job.tradie?.businessName ?? job.tradie?.user.firstName ?? 'Your tradie';
+    const jobTitle = job.title;
 
-    if (customerUserId) {
-      if (newStatus === 'EN_ROUTE') {
-        void notify({ userId: customerUserId, jobId, type: 'TRADIE_EN_ROUTE', data: { tradieName, etaMinutes: String(etaMinutes ?? 30) } });
-      } else if (newStatus === 'ARRIVED') {
-        void notify({ userId: customerUserId, jobId, type: 'TRADIE_ARRIVED', data: { tradieName } });
-      } else if (newStatus === 'IN_PROGRESS') {
-        void notify({ userId: customerUserId, jobId, type: 'JOB_STARTED', data: { tradieName, jobTitle } });
-      } else if (newStatus === 'COMPLETED') {
-        void notify({ userId: customerUserId, jobId, type: 'JOB_COMPLETED', data: { tradieName, jobTitle } });
-        void sendReviewRequest(jobId);
-        void sendReferralPrompt(customerUserId);
-      }
+    const STATUS_TO_NOTIF: Record<string, string> = {
+      EN_ROUTE: 'TRADIE_EN_ROUTE',
+      ARRIVED: 'TRADIE_ARRIVED',
+      IN_PROGRESS: 'JOB_STARTED',
+      COMPLETED: 'JOB_COMPLETED',
+    };
+    const notifType = STATUS_TO_NOTIF[newStatus];
+    if (notifType) {
+      void notify({
+        userId: customerUserId,
+        jobId,
+        type: notifType,
+        data: { tradieName, jobTitle, etaMinutes: etaMinutes ?? 0 },
+      });
+    }
+    if (newStatus === 'COMPLETED') {
+      void sendReviewRequest(jobId);
+      void sendReferralPrompt(customerUserId);
     }
 
     return NextResponse.json({ job: updatedJob });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/jobs/:id/status]', err);
+    logger.error('[PATCH /api/jobs/:id/status]', err);
     return NextResponse.json({ error: 'Failed to update status' }, { status: 500 });
   }
 }

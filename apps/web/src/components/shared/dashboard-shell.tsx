@@ -27,7 +27,8 @@ const NAV_CONFIG: Record<string, { label: string; href: string; icon: React.Elem
   ],
   TRADIE: [
     { label: 'Dashboard', href: '/tradie/dashboard', icon: LayoutDashboard },
-    { label: 'New Jobs', href: '/tradie/jobs', icon: Wrench },
+    { label: 'Offers', href: '/tradie/offers', icon: Zap, highlight: true },
+    { label: 'My Jobs', href: '/tradie/jobs', icon: Wrench },
     { label: 'Availability', href: '/tradie/availability', icon: Calendar },
     { label: 'Earnings', href: '/tradie/earnings', icon: DollarSign },
     { label: 'Documents', href: '/tradie/documents', icon: FileText },
@@ -62,7 +63,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
   const navItems = NAV_CONFIG[role] ?? [];
 
   return (
-    <div className="flex h-screen overflow-hidden bg-[#0d0d0d]">
+    <div className="flex h-screen overflow-hidden bg-background transition-colors duration-300">
       <AnimatePresence>
         {mobileOpen && (
           <motion.div
@@ -77,7 +78,7 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
         animate={{ width: collapsed ? 72 : 256 }}
         transition={{ duration: 0.2, ease: 'easeInOut' }}
         className={cn(
-          'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-white/8 bg-[#111111] transition-transform',
+          'fixed inset-y-0 left-0 z-40 flex flex-col border-r border-border bg-background-elevated transition-transform',
           'lg:relative lg:translate-x-0',
           mobileOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0',
         )}
@@ -88,18 +89,18 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
             {!collapsed && (
               <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex items-center gap-2">
                 <span className="text-brand-400 text-lg">🔑</span>
-                <span className="text-sm font-extrabold text-white">Fixit <span className="text-brand-400">24/7</span></span>
+                <span className="text-sm font-extrabold text-foreground">Fixit <span className="text-brand-400">24/7</span></span>
               </motion.div>
             )}
           </AnimatePresence>
           <button
             onClick={() => { setCollapsed(!collapsed); }}
-            className="hidden rounded-lg p-1.5 text-gray-500 hover:bg-white/6 hover:text-white lg:flex"
+            className="hidden rounded-lg p-1.5 text-foreground-muted hover:bg-background-alt hover:text-foreground lg:flex"
             aria-label="Toggle sidebar"
           >
             {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
           </button>
-          <button onClick={() => { setMobileOpen(false); }} className="rounded-lg p-1.5 text-gray-500 hover:bg-white/6 hover:text-white lg:hidden">
+          <button onClick={() => { setMobileOpen(false); }} className="rounded-lg p-1.5 text-foreground-muted hover:bg-background-alt hover:text-foreground lg:hidden">
             <X size={16} />
           </button>
         </div>
@@ -115,10 +116,10 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
                 className={cn(
                   'group flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-all',
                   isActive
-                    ? 'bg-brand-500/15 text-brand-400'
+                    ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400'
                     : item.highlight
-                    ? 'text-brand-400 hover:bg-brand-500/10'
-                    : 'text-gray-500 hover:bg-white/6 hover:text-white',
+                    ? 'text-red-500 hover:bg-red-500/10 dark:text-red-400'
+                    : 'text-foreground-muted hover:bg-background-alt hover:text-foreground',
                 )}
               >
                 <Icon size={18} className="shrink-0" />
@@ -146,25 +147,25 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
         </nav>
 
         {/* User footer */}
-        <div className={cn('border-t border-white/8 p-3', collapsed && 'flex justify-center')}>
+        <div className={cn('border-t border-border p-3', collapsed && 'flex justify-center')}>
           {!collapsed ? (
             <div className="flex items-center gap-3 rounded-xl p-2">
               <Avatar className="h-8 w-8 shrink-0">
                 <AvatarImage src={user?.avatarUrl ?? undefined} />
                 <AvatarFallback className="bg-brand-500/20 text-brand-400 text-xs">
-                  {(user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')}
+                  {(user?.firstName[0] ?? '') + (user?.lastName[0] ?? '')}
                 </AvatarFallback>
               </Avatar>
               <div className="min-w-0 flex-1">
-                <p className="truncate text-xs font-semibold text-white">{user?.firstName} {user?.lastName}</p>
-                <p className="truncate text-xs text-gray-500">{user?.email}</p>
+                <p className="truncate text-xs font-semibold text-foreground">{user?.firstName} {user?.lastName}</p>
+                <p className="truncate text-xs text-foreground-subtle">{user?.email}</p>
               </div>
-              <button onClick={signOut} className="shrink-0 rounded-lg p-1 text-gray-500 hover:bg-white/6 hover:text-white" aria-label="Sign out">
+              <button onClick={signOut} className="shrink-0 rounded-lg p-1 text-foreground-muted hover:bg-background-alt hover:text-foreground" aria-label="Sign out">
                 <LogOut size={14} />
               </button>
             </div>
           ) : (
-            <button onClick={signOut} className="rounded-lg p-2 text-gray-500 hover:bg-white/6 hover:text-white">
+            <button onClick={signOut} className="rounded-lg p-2 text-foreground-muted hover:bg-background-alt hover:text-foreground">
               <LogOut size={16} />
             </button>
           )}
@@ -173,24 +174,24 @@ export function DashboardShell({ children, role }: { children: React.ReactNode; 
 
       {/* Main content */}
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden">
-        <header className="flex h-16 shrink-0 items-center gap-4 border-b border-white/8 bg-[#111111] px-4 lg:px-6">
-          <button onClick={() => { setMobileOpen(true); }} className="rounded-lg p-2 text-gray-500 hover:bg-white/6 hover:text-white lg:hidden">
+        <header className="flex h-16 shrink-0 items-center gap-4 border-b border-border bg-background-elevated px-4 lg:px-6">
+          <button onClick={() => { setMobileOpen(true); }} className="rounded-lg p-2 text-foreground-muted hover:bg-background-alt hover:text-foreground lg:hidden">
             <Menu size={20} />
           </button>
           <div className="flex flex-1 items-center justify-end gap-2">
-            <button className="relative rounded-lg p-2 text-gray-500 hover:bg-white/6 hover:text-white" aria-label="Notifications">
+            <button className="relative rounded-lg p-2 text-foreground-muted hover:bg-background-alt hover:text-foreground" aria-label="Notifications">
               <Bell size={18} />
               <span className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full bg-brand-400" />
             </button>
             <Avatar className="h-8 w-8 cursor-pointer">
               <AvatarImage src={user?.avatarUrl ?? undefined} />
               <AvatarFallback className="bg-brand-500/20 text-brand-400 text-xs">
-                {(user?.firstName?.[0] ?? '') + (user?.lastName?.[0] ?? '')}
+                {(user?.firstName[0] ?? '') + (user?.lastName[0] ?? '')}
               </AvatarFallback>
             </Avatar>
           </div>
         </header>
-        <main className="flex-1 overflow-y-auto bg-[#0d0d0d]">
+        <main className="flex-1 overflow-y-auto bg-background">
           <div className="mx-auto max-w-7xl p-4 lg:p-8">{children}</div>
         </main>
       </div>
@@ -208,10 +209,10 @@ export function PageHeader({ title, description, actions, badge }: {
     <div className="mb-8 flex items-start justify-between gap-4">
       <div>
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold tracking-tight text-white lg:text-3xl">{title}</h1>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-3xl">{title}</h1>
           {badge && <Badge variant={badge.variant ?? 'default'}>{badge.label}</Badge>}
         </div>
-        {description && <p className="mt-1.5 text-sm text-gray-500">{description}</p>}
+        {description && <p className="mt-1.5 text-sm text-foreground-subtle">{description}</p>}
       </div>
       {actions && <div className="flex shrink-0 items-center gap-2">{actions}</div>}
     </div>

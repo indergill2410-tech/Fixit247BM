@@ -17,7 +17,7 @@ export function SubscriptionPageClient({ userId }: { userId: string }) {
 
   React.useEffect(() => {
     void fetch('/api/subscriptions').then(async (r) => {
-      if (r.ok) setData(await r.json());
+      if (r.ok) setData(await r.json() as SubData);
       setIsLoading(false);
     });
   }, [userId]);
@@ -36,7 +36,7 @@ export function SubscriptionPageClient({ userId }: { userId: string }) {
     try {
       const res = await fetch('/api/subscriptions/portal', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}' });
       if (res.ok) {
-        const { url } = await res.json();
+        const { url } = await res.json() as { url?: string };
         if (url) window.location.href = url;
       }
     } finally {
@@ -45,7 +45,7 @@ export function SubscriptionPageClient({ userId }: { userId: string }) {
   };
 
   if (isLoading) {
-    return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[...Array(4)].map((_, i) => <div key={i} className="h-64 animate-pulse rounded-3xl bg-gray-100" />)}</div>;
+    return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-64 animate-pulse rounded-3xl bg-gray-100" />)}</div>;
   }
 
   const plans = Object.entries(data?.plans ?? {}).map(([tier, plan]) => ({ tier, ...plan }));

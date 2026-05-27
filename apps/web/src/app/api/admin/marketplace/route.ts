@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const UpdateSchema = z.object({ updates: z.record(z.string(), z.string()) });
 
@@ -30,7 +31,7 @@ export async function GET() {
 
     return NextResponse.json({ config, defaults: MARKETPLACE_DEFAULTS });
   } catch (err) {
-    console.error('[GET /api/admin/marketplace]', err);
+    logger.error('[GET /api/admin/marketplace]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -54,7 +55,7 @@ export async function PATCH(req: NextRequest) {
     return NextResponse.json({ success: true, updated: Object.keys(updates).length });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[PATCH /api/admin/marketplace]', err);
+    logger.error('[PATCH /api/admin/marketplace]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

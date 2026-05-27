@@ -2,6 +2,7 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
@@ -32,7 +33,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ tradies, total: tradies.length, distribution });
   } catch (err) {
-    console.error('[GET /api/admin/trust]', err);
+    logger.error('[GET /api/admin/trust]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

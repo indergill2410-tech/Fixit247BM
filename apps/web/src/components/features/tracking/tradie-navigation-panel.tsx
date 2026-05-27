@@ -22,10 +22,6 @@ export function TradieNavigationPanel({ jobId, jobAddress, jobLatitude, jobLongi
   useLocationBroadcast(jobId, sharingLocation);
 
   function toggleSharing() {
-    if (!sharingLocation && !navigator.geolocation) {
-      toast.error('Location not available on this device');
-      return;
-    }
     setSharingLocation((v) => !v);
     toast.success(sharingLocation ? 'Location sharing stopped' : 'Sharing live location with customer');
   }
@@ -65,7 +61,7 @@ export function TradieNavigationPanel({ jobId, jobAddress, jobLatitude, jobLongi
         <div>
           <p className="text-xs text-gray-400">Job address</p>
           <p className="text-sm font-medium text-gray-900">{jobAddress}</p>
-          {etaMinutes && <p className="mt-0.5 text-xs text-green-600">~{etaMinutes} min from current location</p>}
+          {etaMinutes != null && <p className="mt-0.5 text-xs text-green-600">~{etaMinutes} min from current location</p>}
         </div>
       </div>
 

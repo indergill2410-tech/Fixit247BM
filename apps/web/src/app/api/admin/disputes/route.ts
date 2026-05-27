@@ -2,7 +2,9 @@ import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
+import { notify } from '@fixit247/notifications';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const CreateSchema = z.object({
   jobId: z.string().uuid(),
@@ -34,7 +36,7 @@ export async function GET(req: NextRequest) {
     const counts = await db.dispute.groupBy({ by: ['status'], _count: { id: true } });
     return NextResponse.json({ disputes, counts });
   } catch (err) {
-    console.error('[GET /api/admin/disputes]', err);
+    logger.error('[GET /api/admin/disputes]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }
@@ -57,10 +59,23 @@ export async function POST(req: NextRequest) {
       data: { adminId: session.id, action: 'DISPUTE_CREATED', entity: 'Dispute', entityId: dispute.id, metadata: { reason: data.reason } as never },
     });
 
+    // Notify both parties about the dispute
+    const job = await db.job.findUnique({
+      where: { id: data.jobId },
+      select: { title: true, customer: { select: { userId: true } }, tradie: { select: { userId: true } } },
+    });
+    if (job) {
+      const notifData = { jobTitle: job.title };
+      void notify({ userId: job.customer.userId, jobId: data.jobId, type: 'DISPUTE_OPENED', data: notifData });
+      if (job.tradie?.userId) {
+        void notify({ userId: job.tradie.userId, jobId: data.jobId, type: 'DISPUTE_OPENED', data: notifData });
+      }
+    }
+
     return NextResponse.json({ dispute }, { status: 201 });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Validation failed', details: err.errors }, { status: 400 });
-    console.error('[POST /api/admin/disputes]', err);
+    logger.error('[POST /api/admin/disputes]', err);
     return NextResponse.json({ error: 'Failed' }, { status: 500 });
   }
 }

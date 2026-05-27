@@ -982,6 +982,12 @@ exports.Prisma.AIConversationScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.StripeProcessedEventScalarFieldEnum = {
+  eventId: 'eventId',
+  processedAt: 'processedAt',
+  eventType: 'eventType'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1488,6 +1494,11 @@ exports.Prisma.AIConversationOrderByRelevanceFieldEnum = {
   aiSummary: 'aiSummary',
   tradeCategory: 'tradeCategory'
 };
+
+exports.Prisma.StripeProcessedEventOrderByRelevanceFieldEnum = {
+  eventId: 'eventId',
+  eventType: 'eventType'
+};
 exports.Role = exports.$Enums.Role = {
   CUSTOMER: 'CUSTOMER',
   TRADIE: 'TRADIE',
@@ -1655,7 +1666,8 @@ exports.SubscriptionStatus = exports.$Enums.SubscriptionStatus = {
   ACTIVE: 'ACTIVE',
   CANCELLED: 'CANCELLED',
   PAUSED: 'PAUSED',
-  EXPIRED: 'EXPIRED'
+  EXPIRED: 'EXPIRED',
+  PAST_DUE: 'PAST_DUE'
 };
 
 exports.TransactionType = exports.$Enums.TransactionType = {
@@ -2026,7 +2038,8 @@ exports.Prisma.ModelName = {
   VoiceCall: 'VoiceCall',
   VoiceEvent: 'VoiceEvent',
   EmergencyAssessment: 'EmergencyAssessment',
-  AIConversation: 'AIConversation'
+  AIConversation: 'AIConversation',
+  StripeProcessedEvent: 'StripeProcessedEvent'
 };
 
 /**

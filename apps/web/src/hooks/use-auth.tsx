@@ -46,14 +46,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const refreshUser = React.useCallback(async () => {
     const supabase = getSupabaseBrowserClient();
-    if (!supabase) return;
     const { data: { user: supabaseUser } } = await supabase.auth.getUser();
     setUser(supabaseUser ? mapUser(supabaseUser) : null);
   }, []);
 
   React.useEffect(() => {
     const supabase = getSupabaseBrowserClient();
-    if (!supabase) { setIsLoading(false); return; }
 
     void supabase.auth.getUser().then(({ data: { user: u } }) => {
       setUser(u ? mapUser(u) : null);
@@ -70,7 +68,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = React.useCallback(async () => {
     const supabase = getSupabaseBrowserClient();
-    if (supabase) await supabase.auth.signOut();
+    await supabase.auth.signOut();
     window.location.href = '/login';
   }, []);
 

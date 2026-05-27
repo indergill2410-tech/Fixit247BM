@@ -9,7 +9,7 @@ export function Skeleton({ className, ...props }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-md bg-gray-200',
+        'animate-pulse rounded-md bg-foreground/[0.08]',
         className,
       )}
       {...props}
@@ -59,7 +59,7 @@ export function SkeletonCard({ className }: { className?: string }) {
   return (
     <div
       className={cn(
-        'rounded-2xl border border-gray-100 bg-white p-5 shadow-sm space-y-4',
+        'rounded-2xl border border-border bg-card p-5 shadow-sm space-y-4',
         className,
       )}
     >

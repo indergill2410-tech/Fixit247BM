@@ -15,14 +15,14 @@ const schema = z.object({
 
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = schema.parse(body);
     const ip = req.headers.get('x-forwarded-for')?.split(',')[0] ?? 'unknown';
     const ipHash = crypto.createHash('sha256').update(ip).digest('hex').slice(0, 16);
 
     await db.growthEvent.create({
       data: {
-        eventType: data.eventType as any,
+        eventType: data.eventType as never,
         page: data.page,
         referrer: data.referrer,
         suburb: data.suburb,

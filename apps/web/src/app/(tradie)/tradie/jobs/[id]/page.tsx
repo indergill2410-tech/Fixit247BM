@@ -1,9 +1,9 @@
 import type { Metadata } from 'next';
 import { requireRole } from '@/lib/auth/session';
-import { DashboardShell, PageHeader } from '@/components/shared/dashboard-shell';
+import { DashboardShell } from '@/components/shared/dashboard-shell';
 import { db } from '@fixit247/database';
 import { notFound } from 'next/navigation';
-import { Badge, Button } from '@fixit247/ui';
+import { Badge } from '@fixit247/ui';
 import Link from 'next/link';
 import { ChevronLeft, MapPin, Clock, DollarSign } from 'lucide-react';
 import { TradieJobActions } from '@/components/features/jobs/tradie-job-actions';
@@ -11,7 +11,7 @@ import { TradieJobActions } from '@/components/features/jobs/tradie-job-actions'
 export const metadata: Metadata = { title: 'Job Details' };
 
 export default async function TradieJobDetailPage({ params }: { params: Promise<{ id: string }> }) {
-  const session = await requireRole('TRADIE');
+  await requireRole('TRADIE');
   const { id } = await params;
 
   const job = await db.job.findUnique({
@@ -27,7 +27,6 @@ export default async function TradieJobDetailPage({ params }: { params: Promise<
   if (!job) notFound();
 
   const hasAccepted = job.claims.length > 0;
-  const claimedByMe = job.claims[0] !== undefined;
 
   return (
     <DashboardShell role="TRADIE">

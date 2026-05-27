@@ -5,13 +5,14 @@ import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { releaseJobPayment } from '@fixit247/payments';
 import { notify } from '@fixit247/notifications';
+import { logger } from '@/lib/logger';
 
 const Schema = z.object({ jobId: z.string().uuid() });
 
 export async function POST(req: NextRequest) {
   try {
     const session = await requireSession();
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const { jobId } = Schema.parse(body);
 
     const job = await db.job.findUnique({ where: { id: jobId } });
@@ -55,7 +56,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, payoutId: result.payoutId });
   } catch (err) {
     if (err instanceof z.ZodError) return NextResponse.json({ error: 'Invalid data' }, { status: 400 });
-    console.error('[POST /api/payments/capture]', err);
+    logger.error('[POST /api/payments/capture]', err);
     return NextResponse.json({ error: 'Failed to release payment' }, { status: 500 });
   }
 }

@@ -4,8 +4,8 @@ import { requireSession } from '@/lib/auth/session';
 
 export async function POST(req: Request) {
   try {
-    const session = await requireSession();
-    const { jobId } = await req.json();
+    await requireSession();
+    const { jobId } = await req.json() as { jobId: string };
 
     const job = await db.job.findUnique({
       where: { id: jobId },

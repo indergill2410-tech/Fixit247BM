@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { motion } from 'framer-motion';
 import { Zap, Power } from 'lucide-react';
 import { cn } from '@fixit247/ui/src/lib/utils';
 

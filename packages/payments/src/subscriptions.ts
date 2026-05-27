@@ -55,13 +55,18 @@ export const SUBSCRIPTION_PLANS: Record<SubscriptionTier, {
   },
 };
 
+export const TRIAL_DAYS = 14;
+
 export async function createSubscription(opts: {
   userId: string;
   stripeCustomerId: string;
   tier: SubscriptionTier;
+  withTrial?: boolean;
 }): Promise<{ subscriptionId: string; clientSecret: string | null }> {
   const plan = SUBSCRIPTION_PLANS[opts.tier];
   if (!plan.stripePriceId) throw new Error('Free tier has no Stripe price');
+
+  const trialDays = opts.withTrial !== false ? TRIAL_DAYS : 0;
 
   const stripeSubscription = await stripe.subscriptions.create({
     customer: opts.stripeCustomerId,
@@ -70,6 +75,7 @@ export async function createSubscription(opts: {
     payment_settings: { save_default_payment_method: 'on_subscription' },
     expand: ['latest_invoice.payment_intent'],
     metadata: { userId: opts.userId, tier: opts.tier },
+    ...(trialDays > 0 && { trial_period_days: trialDays }),
   });
 
   const invoice = stripeSubscription.latest_invoice as { payment_intent?: { client_secret?: string } } | null;

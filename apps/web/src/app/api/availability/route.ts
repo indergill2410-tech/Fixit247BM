@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { logger } from '@/lib/logger';
 
 const AvailabilitySchema = z.object({
   onlineStatus: z.enum(['ONLINE', 'OFFLINE', 'BUSY', 'EMERGENCY_ONLY', 'AWAY']),
@@ -22,14 +23,14 @@ export async function PATCH(req: NextRequest) {
     const tradieProfile = await db.tradieProfile.findUnique({ where: { userId: session.id } });
     if (!tradieProfile) return NextResponse.json({ error: 'Profile not found' }, { status: 404 });
 
-    const body = await req.json();
+    const body = await req.json() as unknown;
     const data = AvailabilitySchema.parse(body);
 
     const status = await db.tradieRealtimeStatus.upsert({
       where: { tradieId: tradieProfile.id },
       create: {
         tradieId: tradieProfile.id,
-        onlineStatus: data.onlineStatus as any,
+        onlineStatus: data.onlineStatus as never,
         lastHeartbeatAt: new Date(),
         currentLatitude: data.currentLatitude,
         currentLongitude: data.currentLongitude,
@@ -37,7 +38,7 @@ export async function PATCH(req: NextRequest) {
         isAutoAccept: data.isAutoAccept ?? false,
       },
       update: {
-        onlineStatus: data.onlineStatus as any,
+        onlineStatus: data.onlineStatus as never,
         lastHeartbeatAt: new Date(),
         currentLatitude: data.currentLatitude,
         currentLongitude: data.currentLongitude,
@@ -60,12 +61,12 @@ export async function PATCH(req: NextRequest) {
     if (err instanceof z.ZodError) {
       return NextResponse.json({ error: 'Invalid data', details: err.errors }, { status: 400 });
     }
-    console.error('[PATCH /api/availability]', err);
+    logger.error('[PATCH /api/availability]', err);
     return NextResponse.json({ error: 'Failed to update availability' }, { status: 500 });
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET(_req: NextRequest) {
   try {
     const session = await requireSession();
     if (session.role !== 'TRADIE') {
@@ -81,7 +82,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({ status });
   } catch (err) {
-    console.error('[GET /api/availability]', err);
+    logger.error('[GET /api/availability]', err);
     return NextResponse.json({ error: 'Failed to fetch availability' }, { status: 500 });
   }
 }

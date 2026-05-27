@@ -87,3 +87,16 @@ export async function handleConnectedAccountUpdated(event: Stripe.Account): Prom
     });
   }
 }
+
+export async function handleInvoicePaymentFailed(event: Stripe.Invoice): Promise<void> {
+  const subscriptionId = typeof event.subscription === 'string'
+    ? event.subscription
+    : event.subscription?.id;
+
+  if (!subscriptionId) return;
+
+  await db.subscription.updateMany({
+    where: { stripeSubscriptionId: subscriptionId },
+    data: { status: 'PAST_DUE' as never },
+  });
+}

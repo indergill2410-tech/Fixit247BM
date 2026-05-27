@@ -3,7 +3,7 @@ import { requireOnboarding } from '@/lib/auth/session';
 import { DashboardShell } from '@/components/shared/dashboard-shell';
 import { ConversationalBooking } from '@/components/features/voice/conversational-booking';
 import { MultiModalInput } from '@/components/features/voice/multi-modal-input';
-import { Mic, Camera, MessageSquare } from 'lucide-react';
+import { Camera, MessageSquare } from 'lucide-react';
 
 export const metadata: Metadata = { title: 'Book a Tradie' };
 
@@ -34,10 +34,9 @@ export default async function BookPage() {
             <h2 className="font-semibold text-white">Describe + Upload Photos</h2>
           </div>
           <div className="rounded-2xl border border-white/8 bg-white/4 p-5">
-            <MultiModalInput onComplete={(data) => {
+            <MultiModalInput onComplete={(_data) => {
               // Client-side redirect would happen here — this is a server component
               // The MultiModalInput handles its own submission
-              console.log('Job data:', data);
             }} />
           </div>
         </div>

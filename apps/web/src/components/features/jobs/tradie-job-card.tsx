@@ -3,7 +3,6 @@
 import * as React from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, Clock, Zap, DollarSign, ChevronRight } from 'lucide-react';
-import { Badge } from '@fixit247/ui';
 import { cn } from '@fixit247/ui/src/lib/utils';
 import Link from 'next/link';
 
@@ -116,12 +115,12 @@ export function TradieJobCard({
             <Clock size={12} />
             {postedAgo}
           </span>
-          {(job.budgetMin || job.budgetMax) && (
+          {(job.budgetMin != null || job.budgetMax != null) && (
             <span className="flex items-center gap-1">
               <DollarSign size={12} />
-              {job.budgetMin && job.budgetMax
+              {job.budgetMin != null && job.budgetMax != null
                 ? `$${job.budgetMin}–$${job.budgetMax}`
-                : job.budgetMax
+                : job.budgetMax != null
                 ? `Up to $${job.budgetMax}`
                 : `From $${job.budgetMin}`}
             </span>

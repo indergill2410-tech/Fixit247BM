@@ -22,7 +22,6 @@ const HOMEOWNER_STEPS = [
     icon: '✅',
     title: 'Choose who suits you',
     desc: 'Review profiles, ratings, and quotes. Message directly before committing. You stay in control.',
-    highlighted: false,
   },
   {
     n: '04',
@@ -52,7 +51,6 @@ const TRADIE_STEPS = [
     icon: '🤝',
     title: 'Quote & connect',
     desc: 'Send your quote, chat with the customer, and agree on timing — all in the app.',
-    highlighted: false,
   },
   {
     n: '04',
@@ -72,13 +70,13 @@ export function HowItWorksTabs() {
     <div>
       {/* Toggle */}
       <div className="mb-10 flex justify-center">
-        <div className="flex rounded-2xl border border-white/10 bg-white/4 p-1">
+        <div className="flex rounded-2xl border border-border bg-background-alt p-1 dark:border-white/10 dark:bg-white/[0.04]">
           <button
             onClick={() => { setTab('homeowner'); }}
             className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
               tab === 'homeowner'
-                ? 'bg-brand-400 text-gray-900 shadow-sm'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-brand-500 text-gray-900 shadow-sm'
+                : 'text-foreground-muted hover:text-foreground'
             }`}
           >
             <Home size={15} />
@@ -88,8 +86,8 @@ export function HowItWorksTabs() {
             onClick={() => { setTab('tradie'); }}
             className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
               tab === 'tradie'
-                ? 'bg-brand-400 text-gray-900 shadow-sm'
-                : 'text-gray-400 hover:text-white'
+                ? 'bg-brand-500 text-gray-900 shadow-sm'
+                : 'text-foreground-muted hover:text-foreground'
             }`}
           >
             <HardHat size={15} />
@@ -105,27 +103,29 @@ export function HowItWorksTabs() {
             key={step.n}
             className={`relative flex flex-col rounded-2xl border p-6 transition-all ${
               step.highlighted
-                ? 'border-brand-500/40 bg-brand-500/10'
-                : 'border-white/8 bg-white/4'
+                ? 'border-brand-500/40 bg-brand-500/10 shadow-brand-sm dark:bg-brand-500/10'
+                : 'border-border bg-card shadow-card-warm dark:border-white/[0.08] dark:bg-white/[0.04] dark:shadow-none'
             }`}
           >
             {/* Step number */}
-            <span className="absolute right-5 top-5 text-3xl font-extrabold text-white/8">
+            <span className="absolute right-5 top-5 text-3xl font-extrabold text-foreground/[0.07] dark:text-white/[0.08]">
               {step.n}
             </span>
 
             {/* Icon */}
             <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl text-xl ${
-              step.highlighted ? 'bg-brand-500/20' : 'bg-white/8'
+              step.highlighted
+                ? 'bg-brand-500/20'
+                : 'bg-background-elevated dark:bg-white/[0.08]'
             }`}>
               {step.icon}
             </div>
 
-            <h3 className="mb-2 text-sm font-bold text-white">{step.title}</h3>
-            <p className="flex-1 text-xs leading-relaxed text-gray-500">{step.desc}</p>
+            <h3 className="mb-2 text-sm font-bold text-foreground">{step.title}</h3>
+            <p className="flex-1 text-xs leading-relaxed text-foreground-muted">{step.desc}</p>
 
             {step.badge && (
-              <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-brand-400">
+              <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-brand-700 dark:text-brand-400">
                 <CheckCircle size={13} />
                 {step.badge}
               </div>
@@ -138,14 +138,14 @@ export function HowItWorksTabs() {
       <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
         <Link
           href={tab === 'homeowner' ? '/jobs/new' : '/join-as-tradie'}
-          className="flex items-center gap-2 rounded-xl bg-brand-400 px-7 py-3.5 text-sm font-bold text-gray-900 hover:bg-brand-300 transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-brand-500 px-7 py-3.5 text-sm font-bold text-gray-900 transition-colors hover:bg-brand-400"
         >
-          {tab === 'homeowner' ? 'Post your first job — it\'s free' : 'Join as a tradie — it\'s free'}
+          {tab === 'homeowner' ? "Post your first job — it's free" : "Join as a tradie — it's free"}
           <span>›</span>
         </Link>
         <Link
           href="/how-it-works"
-          className="flex items-center gap-2 rounded-xl border border-white/15 px-7 py-3.5 text-sm font-bold text-white hover:bg-white/8 transition-colors"
+          className="flex items-center gap-2 rounded-xl border border-border px-7 py-3.5 text-sm font-bold text-foreground transition-colors hover:bg-background-elevated dark:border-white/15 dark:hover:bg-white/[0.08]"
         >
           See the full process
           <span>›</span>
