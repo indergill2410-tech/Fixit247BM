@@ -4,12 +4,6 @@ import type { NotifData } from '../templates';
 const FROM = process.env['EMAIL_FROM'] ?? 'noreply@fixit247.com.au';
 const APP_URL = process.env['NEXT_PUBLIC_APP_URL'] ?? 'https://fixit247.com.au';
 
-let _resend: Resend | undefined;
-function getResend(): Resend {
-  _resend ??= new Resend(process.env['RESEND_API_KEY'] ?? '');
-  return _resend;
-}
-
 export async function sendEmailNotification(opts: {
   to: string;
   title: string;
@@ -18,7 +12,11 @@ export async function sendEmailNotification(opts: {
   type: string;
   data: NotifData;
 }): Promise<void> {
-  await getResend().emails.send({
+  const key = process.env['RESEND_API_KEY'];
+  if (!key) return;
+
+  const resend = new Resend(key);
+  await resend.emails.send({
     from: FROM,
     to: opts.to,
     subject: opts.subject ?? opts.title,
