@@ -12,33 +12,48 @@ function getSupabaseAdmin() {
   return createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
 }
 
-// ─── Coordinates for Australian suburbs ──────────────────────────────────────
-
-const SUBURBS = [
-  { suburb: 'Surry Hills',      state: 'NSW', postcode: '2010', lat: -33.8890, lng: 151.2113 },
-  { suburb: 'Fitzroy',          state: 'VIC', postcode: '3065', lat: -37.7997, lng: 144.9789 },
-  { suburb: 'Fortitude Valley', state: 'QLD', postcode: '4006', lat: -27.4562, lng: 153.0321 },
-  { suburb: 'Fremantle',        state: 'WA',  postcode: '6160', lat: -32.0569, lng: 115.7439 },
-  { suburb: 'Glenelg',          state: 'SA',  postcode: '5045', lat: -34.9834, lng: 138.5167 },
-];
-
-// Tradie coordinates — slightly offset from customer suburbs to simulate realistic distances
-const TRADIE_COORDS = [
-  { lat: -33.8750, lng: 151.2050 }, // ~1.6km from Surry Hills
-  { lat: -33.8700, lng: 151.2200 },
-  { lat: -37.8100, lng: 144.9600 }, // ~2km from Fitzroy
-  { lat: -37.8050, lng: 144.9900 },
-  { lat: -27.4700, lng: 153.0200 }, // ~2km from Fortitude Valley
-  { lat: -27.4450, lng: 153.0400 },
-  { lat: -32.0650, lng: 115.7300 }, // ~2km from Fremantle
-  { lat: -32.0450, lng: 115.7550 },
-  { lat: -34.9700, lng: 138.5050 }, // ~2km from Glenelg
-  { lat: -34.9900, lng: 138.5300 },
-];
-
 // ─── Test credentials ─────────────────────────────────────────────────────────
 
 const TEST_PASSWORD = process.env.SEED_TEST_PASSWORD ?? 'Fixit247!Test';
+const DEMO_PASSWORD = 'Demo1234!';
+
+// ─── Ensure Supabase auth user exists ────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function ensureAuthUser(
+  admin: ReturnType<typeof getSupabaseAdmin>,
+  email: string,
+  meta: Record<string, unknown>,
+  password: string = TEST_PASSWORD,
+): Promise<string | null> {
+  if (!admin) return null;
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const { data: listData } = await admin.auth.admin.listUsers({ perPage: 1000 });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unnecessary-condition
+  const existing = (listData as { users?: { id: string; email?: string | null }[] } | null)?.users?.find((u) => u.email === email);
+  if (existing) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+    await admin.auth.admin.updateUserById(existing.id, { password });
+    return existing.id;
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
+  const { data, error } = await admin.auth.admin.createUser({
+    email,
+    password,
+    email_confirm: true,
+    user_metadata: meta,
+  });
+
+  if (error) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+    console.warn(`  ⚠ Could not create auth user for ${email}: ${(error as { message: string }).message}`);
+    return null;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+  return (data as { user?: { id: string } }).user?.id ?? null;
+}
 
 // ─── Credit Packages ──────────────────────────────────────────────────────────
 
@@ -60,44 +75,268 @@ async function seedCreditPackages() {
   console.log('✅ Credit packages seeded');
 }
 
-// ─── Ensure Supabase auth user exists ────────────────────────────────────────
+// ─── Demo Users (admin dashboard showcase data) ───────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-async function ensureAuthUser(
-  admin: any,
-  email: string,
-  meta: Record<string, unknown>,
-): Promise<string | null> {
-  if (!admin) return null;
+const DEMO_SUBURBS = {
+  bondi:       { suburb: 'Bondi Beach',  state: 'NSW', postcode: '2026', lat: -33.8915, lng: 151.2767 },
+  surryHills:  { suburb: 'Surry Hills',  state: 'NSW', postcode: '2010', lat: -33.8855, lng: 151.2094 },
+  manly:       { suburb: 'Manly',        state: 'NSW', postcode: '2095', lat: -33.7974, lng: 151.2836 },
+  newtown:     { suburb: 'Newtown',      state: 'NSW', postcode: '2042', lat: -33.8978, lng: 151.1787 },
+  parramatta:  { suburb: 'Parramatta',   state: 'NSW', postcode: '2150', lat: -33.8150, lng: 151.0041 },
+  chatswood:   { suburb: 'Chatswood',    state: 'NSW', postcode: '2067', lat: -33.7964, lng: 151.1825 },
+  cbd:         { suburb: 'Sydney CBD',   state: 'NSW', postcode: '2000', lat: -33.8688, lng: 151.2093 },
+  liverpool:   { suburb: 'Liverpool',    state: 'NSW', postcode: '2170', lat: -33.9200, lng: 150.9237 },
+  hornsby:     { suburb: 'Hornsby',      state: 'NSW', postcode: '2077', lat: -33.7040, lng: 151.0990 },
+};
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const { data: listData } = await admin.auth.admin.listUsers({ perPage: 1000 });
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const existing = listData?.users?.find((u: { email: string }) => u.email === email) as { id: string } | undefined;
-  if (existing) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-    await admin.auth.admin.updateUserById(existing.id, { password: TEST_PASSWORD });
-    return existing.id;
+async function seedDemoUsers() {
+  const admin = getSupabaseAdmin();
+
+  const customerDefs = [
+    { email: 'emma.williams@demo.fixit247.com',   firstName: 'Emma',    lastName: 'Williams', ...DEMO_SUBURBS.bondi },
+    { email: 'liam.chen@demo.fixit247.com',       firstName: 'Liam',    lastName: 'Chen',     ...DEMO_SUBURBS.surryHills },
+    { email: 'olivia.johnson@demo.fixit247.com',  firstName: 'Olivia',  lastName: 'Johnson',  ...DEMO_SUBURBS.manly },
+    { email: 'noah.smith@demo.fixit247.com',      firstName: 'Noah',    lastName: 'Smith',    ...DEMO_SUBURBS.newtown },
+    { email: 'ava.brown@demo.fixit247.com',       firstName: 'Ava',     lastName: 'Brown',    ...DEMO_SUBURBS.parramatta },
+    { email: 'william.davis@demo.fixit247.com',   firstName: 'William', lastName: 'Davis',    ...DEMO_SUBURBS.chatswood },
+  ];
+
+  const customerProfileIds: string[] = [];
+  const customerAddressIds: string[] = [];
+
+  for (const c of customerDefs) {
+    const authId = await ensureAuthUser(admin, c.email, {
+      firstName: c.firstName, lastName: c.lastName, role: 'CUSTOMER', onboardingComplete: true,
+    }, DEMO_PASSWORD);
+
+    const user = await db.user.upsert({
+      where: { email: c.email },
+      create: {
+        ...(authId ? { id: authId } : {}),
+        email: c.email, firstName: c.firstName, lastName: c.lastName,
+        role: 'CUSTOMER', isActive: true, emailVerified: new Date(), onboardingComplete: true,
+      },
+      update: { isActive: true, onboardingComplete: true },
+    });
+
+    let profile = await db.customerProfile.findUnique({ where: { userId: user.id } });
+    if (!profile) {
+      profile = await db.customerProfile.create({
+        data: { userId: user.id, suburb: c.suburb, state: c.state, postcode: c.postcode },
+      });
+    }
+    customerProfileIds.push(profile.id);
+
+    let addr = await db.address.findFirst({ where: { userId: user.id, isDefault: true } });
+    if (!addr) {
+      addr = await db.address.create({
+        data: {
+          userId: user.id,
+          customerProfileId: profile.id,
+          label: 'Home',
+          street: '1 Demo Street',
+          suburb: c.suburb,
+          city: c.suburb,
+          state: c.state,
+          postcode: c.postcode,
+          country: 'AU',
+          latitude: c.lat,
+          longitude: c.lng,
+          isDefault: true,
+        },
+      });
+      await db.customerProfile.update({ where: { id: profile.id }, data: { defaultAddressId: addr.id } });
+    }
+    customerAddressIds.push(addr.id);
+  }
+  console.log(`✅ ${customerDefs.length} demo customers seeded`);
+
+  const tradieDefs = [
+    {
+      email: 'mike.torres@demo.fixit247.com', firstName: 'Mike',  lastName: 'Torres',
+      businessName: 'Torres Plumbing & HVAC', trades: ['PLUMBING', 'HVAC'],
+      ...DEMO_SUBURBS.bondi, serviceRadiusKm: 20, isEmergency: true,
+      trustScore: 88, avgRating: 4.9, totalReviews: 47, responseTime: 18,
+    },
+    {
+      email: 'sarah.electric@demo.fixit247.com', firstName: 'Sarah', lastName: 'Electric',
+      businessName: 'Electric Sarah Pty Ltd', trades: ['ELECTRICAL', 'APPLIANCE_REPAIR'],
+      ...DEMO_SUBURBS.surryHills, serviceRadiusKm: 25, isEmergency: true,
+      trustScore: 92, avgRating: 4.8, totalReviews: 63, responseTime: 22,
+    },
+    {
+      email: 'tom.locks@demo.fixit247.com', firstName: 'Tom', lastName: 'Locks',
+      businessName: 'CBD Locksmith Solutions', trades: ['LOCKSMITH'],
+      ...DEMO_SUBURBS.cbd, serviceRadiusKm: 30, isEmergency: true,
+      trustScore: 85, avgRating: 4.7, totalReviews: 31, responseTime: 15,
+    },
+    {
+      email: 'jake.roofer@demo.fixit247.com', firstName: 'Jake', lastName: 'Roofer',
+      businessName: 'Northern Beaches Roofing', trades: ['ROOFING', 'CARPENTRY'],
+      ...DEMO_SUBURBS.manly, serviceRadiusKm: 20, isEmergency: false,
+      trustScore: 79, avgRating: 4.6, totalReviews: 24, responseTime: 45,
+    },
+    {
+      email: 'amy.cool@demo.fixit247.com', firstName: 'Amy', lastName: 'Cool',
+      businessName: 'Cool Comfort HVAC', trades: ['HVAC'],
+      ...DEMO_SUBURBS.chatswood, serviceRadiusKm: 30, isEmergency: true,
+      trustScore: 83, avgRating: 4.8, totalReviews: 38, responseTime: 25,
+    },
+    {
+      email: 'dan.pipes@demo.fixit247.com', firstName: 'Dan', lastName: 'Pipes',
+      businessName: 'Westside Plumbing', trades: ['PLUMBING'],
+      ...DEMO_SUBURBS.parramatta, serviceRadiusKm: 25, isEmergency: true,
+      trustScore: 76, avgRating: 4.5, totalReviews: 19, responseTime: 30,
+    },
+    {
+      email: 'lisa.sparks@demo.fixit247.com', firstName: 'Lisa', lastName: 'Sparks',
+      businessName: 'Inner West Electrical', trades: ['ELECTRICAL'],
+      ...DEMO_SUBURBS.newtown, serviceRadiusKm: 20, isEmergency: false,
+      trustScore: 90, avgRating: 5.0, totalReviews: 12, responseTime: 60,
+    },
+    {
+      email: 'chris.glass@demo.fixit247.com', firstName: 'Chris', lastName: 'Glass',
+      businessName: 'Precision Glazing', trades: ['GLAZING'],
+      ...DEMO_SUBURBS.cbd, serviceRadiusKm: 35, isEmergency: true,
+      trustScore: 82, avgRating: 4.7, totalReviews: 28, responseTime: 20,
+    },
+    {
+      email: 'paul.pest@demo.fixit247.com', firstName: 'Paul', lastName: 'Pest',
+      businessName: 'SW Pest Solutions', trades: ['PEST_CONTROL'],
+      ...DEMO_SUBURBS.liverpool, serviceRadiusKm: 40, isEmergency: false,
+      trustScore: 74, avgRating: 4.4, totalReviews: 16, responseTime: 90,
+    },
+    {
+      email: 'anna.fix@demo.fixit247.com', firstName: 'Anna', lastName: 'Fix',
+      businessName: 'Fix-It Anna', trades: ['GENERAL_MAINTENANCE', 'CARPENTRY'],
+      ...DEMO_SUBURBS.hornsby, serviceRadiusKm: 30, isEmergency: false,
+      trustScore: 80, avgRating: 4.6, totalReviews: 22, responseTime: 55,
+    },
+  ];
+
+  const tradieProfileIds: string[] = [];
+
+  for (const t of tradieDefs) {
+    const authId = await ensureAuthUser(admin, t.email, {
+      firstName: t.firstName, lastName: t.lastName, role: 'TRADIE', onboardingComplete: true,
+    }, DEMO_PASSWORD);
+
+    const user = await db.user.upsert({
+      where: { email: t.email },
+      create: {
+        ...(authId ? { id: authId } : {}),
+        email: t.email, firstName: t.firstName, lastName: t.lastName,
+        role: 'TRADIE', isActive: true, emailVerified: new Date(), onboardingComplete: true,
+      },
+      update: { isActive: true, onboardingComplete: true },
+    });
+
+    let profile = await db.tradieProfile.findUnique({ where: { userId: user.id } });
+    if (!profile) {
+      profile = await db.tradieProfile.create({
+        data: {
+          userId: user.id,
+          businessName: t.businessName,
+          trades: t.trades as never,
+          serviceRadiusKm: t.serviceRadiusKm,
+          isAvailable: true,
+          isEmergencyAvailable: t.isEmergency,
+          acceptsSameDay: true,
+          verificationStatus: 'VERIFIED',
+          onboardingStatus: 'APPROVED',
+          avgRating: t.avgRating,
+          totalReviews: t.totalReviews,
+          trustScore: t.trustScore,
+          completionRate: 95,
+          cancellationRate: 2,
+          responseTimeMinutes: t.responseTime,
+          isVisible: true,
+        },
+      });
+    }
+    tradieProfileIds.push(profile.id);
+
+    // Realtime status with coordinates (required for matching engine)
+    const rtExists = await db.tradieRealtimeStatus.findUnique({ where: { tradieId: profile.id } });
+    if (!rtExists) {
+      await db.tradieRealtimeStatus.create({
+        data: {
+          tradieId: profile.id,
+          onlineStatus: 'ONLINE',
+          lastHeartbeatAt: new Date(),
+          activeJobCount: 0,
+          currentLatitude: t.lat,
+          currentLongitude: t.lng,
+        },
+      });
+    }
+  }
+  console.log(`✅ ${tradieDefs.length} demo tradies seeded`);
+
+  // Demo jobs
+  interface JobDef { customerId: string; addressId: string; title: string; description: string; category: string; status: string; priority: string; isEmergency: boolean }
+
+  function jobFor(profileIdx: number, addrIdx: number, rest: Omit<JobDef, 'customerId' | 'addressId'>): JobDef {
+    return { customerId: customerProfileIds[profileIdx] ?? '', addressId: customerAddressIds[addrIdx] ?? '', ...rest };
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call
-  const { data, error } = await admin.auth.admin.createUser({
-    email,
-    password: TEST_PASSWORD,
-    email_confirm: true,
-    user_metadata: meta,
-  });
+  const jobDefs: JobDef[] = [
+    jobFor(0, 0, { title: 'Burst pipe under kitchen sink — flooding', description: 'Water is gushing from under the kitchen sink. The cabinet is flooding. Need someone urgently.', category: 'PLUMBING', status: 'OPEN', priority: 'EMERGENCY', isEmergency: true }),
+    jobFor(1, 1, { title: 'Tripping circuit breaker in bedroom', description: 'The bedroom circuit keeps tripping every few hours. Think it might be overloaded.', category: 'ELECTRICAL', status: 'OPEN', priority: 'STANDARD', isEmergency: false }),
+    jobFor(2, 2, { title: 'Locked out of house — keys inside', description: 'Locked myself out. Keys are on the kitchen bench. Need a locksmith today.', category: 'LOCKSMITH', status: 'CLAIMED', priority: 'URGENT', isEmergency: false }),
+    jobFor(3, 3, { title: 'Storm damage — roof tiles displaced', description: "After last night's storm, several tiles on the back section of the roof have slipped. Need repair.", category: 'ROOFING', status: 'COMPLETED', priority: 'STANDARD', isEmergency: false }),
+    jobFor(4, 4, { title: 'AC not cooling — possible refrigerant leak', description: 'Split system AC running but blowing warm air. Suspect refrigerant issue.', category: 'HVAC', status: 'OPEN', priority: 'EMERGENCY', isEmergency: true }),
+  ];
 
-  if (error) {
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-    console.warn(`  ⚠ Could not create auth user for ${email}: ${(error as { message: string }).message}`);
-    return null;
+  for (const j of jobDefs) {
+    const exists = await db.job.findFirst({ where: { title: j.title, customerId: j.customerId } });
+    if (exists) {
+      console.log(`  ↩  Job "${j.title.slice(0, 40)}…" already exists — skipping`);
+      continue;
+    }
+    await db.job.create({
+      data: {
+        customerId:  j.customerId,
+        addressId:   j.addressId,
+        title:       j.title,
+        description: j.description,
+        category:    j.category as never,
+        status:      j.status as never,
+        priority:    j.priority as never,
+        isEmergency: j.isEmergency,
+        leadPrice:   j.category === 'PLUMBING' ? 15 : j.category === 'ELECTRICAL' ? 20 : j.category === 'LOCKSMITH' ? 10 : j.category === 'ROOFING' ? 30 : 25,
+      },
+    });
   }
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  return (data as { user?: { id: string } }).user?.id ?? null;
+  console.log(`✅ ${jobDefs.length} demo jobs seeded`);
+  console.log(`   Demo password: ${DEMO_PASSWORD}`);
+  console.log('   Customers: emma.williams@demo.fixit247.com … william.davis@demo.fixit247.com');
+  console.log('   Tradies:   mike.torres@demo.fixit247.com … anna.fix@demo.fixit247.com');
 }
 
 // ─── Test Users ───────────────────────────────────────────────────────────────
+
+const TEST_SUBURBS = [
+  { suburb: 'Surry Hills',      state: 'NSW', postcode: '2010', lat: -33.8890, lng: 151.2113 },
+  { suburb: 'Fitzroy',          state: 'VIC', postcode: '3065', lat: -37.7997, lng: 144.9789 },
+  { suburb: 'Fortitude Valley', state: 'QLD', postcode: '4006', lat: -27.4562, lng: 153.0321 },
+  { suburb: 'Fremantle',        state: 'WA',  postcode: '6160', lat: -32.0569, lng: 115.7439 },
+  { suburb: 'Glenelg',          state: 'SA',  postcode: '5045', lat: -34.9834, lng: 138.5167 },
+];
+
+// Tradie coordinates — slightly offset from customer suburbs to simulate realistic distances
+const TRADIE_COORDS = [
+  { lat: -33.8750, lng: 151.2050 }, // ~1.6km from Surry Hills
+  { lat: -33.8700, lng: 151.2200 },
+  { lat: -37.8100, lng: 144.9600 }, // ~2km from Fitzroy
+  { lat: -37.8050, lng: 144.9900 },
+  { lat: -27.4700, lng: 153.0200 }, // ~2km from Fortitude Valley
+  { lat: -27.4450, lng: 153.0400 },
+  { lat: -32.0650, lng: 115.7300 }, // ~2km from Fremantle
+  { lat: -32.0450, lng: 115.7550 },
+  { lat: -34.9700, lng: 138.5050 }, // ~2km from Glenelg
+  { lat: -34.9900, lng: 138.5300 },
+];
 
 async function seedTestUsers() {
   const admin = getSupabaseAdmin();
@@ -126,8 +365,8 @@ async function seedTestUsers() {
       update: { isActive: true, firstName: c.firstName, lastName: c.lastName },
     });
 
-    const suburb = SUBURBS[i % SUBURBS.length];
-    if (!suburb) throw new Error(`SUBURBS has no entry at index ${i % SUBURBS.length}`);
+    const suburb = TEST_SUBURBS[i % TEST_SUBURBS.length];
+    if (!suburb) throw new Error(`TEST_SUBURBS has no entry at index ${i % TEST_SUBURBS.length}`);
 
     const existingAddress = await db.address.findFirst({ where: { userId: user.id } });
     const address = existingAddress
@@ -344,6 +583,7 @@ async function main() {
   await seedCreditPackages();
 
   if (process.env.NODE_ENV !== 'production') {
+    await seedDemoUsers();
     const { customerProfiles, tradieProfiles } = await seedTestUsers();
     await seedTestJobs(customerProfiles, tradieProfiles);
   }

@@ -10,7 +10,6 @@ import { motion } from 'framer-motion';
 import { Eye, EyeOff, User, Mail, Lock, Wrench, ShieldCheck } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import { registerSchema, type RegisterValues } from '@/lib/validators/auth';
-import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 type RoleOption = 'CUSTOMER' | 'TRADIE';
 
@@ -30,36 +29,30 @@ export function RegisterForm() {
   }
 
   async function onSubmit(values: RegisterValues) {
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.signUp({
-      email: values.email,
-      password: values.password,
-      options: {
-        data: {
-          firstName: values.firstName,
-          lastName: values.lastName,
-          role: values.role,
-          onboardingComplete: false,
-        },
-        emailRedirectTo: `${window.location.origin}/auth/callback`,
-      },
+    // Route through the API so the server can write role to app_metadata
+    // (service-role-only) rather than user-writable user_metadata.
+    const res = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(values),
     });
 
-    if (error) {
-      if (error.message.includes('already registered')) {
+    const json = await res.json() as { error?: string; userId?: string; requiresVerification?: boolean };
+
+    if (!res.ok) {
+      if (res.status === 409) {
         toast.error('An account with this email already exists', {
           action: { label: 'Log in', onClick: () => { router.push('/login'); } },
         });
       } else {
-        toast.error(error.message);
+        toast.error('Registration failed. Please try again.');
       }
       return;
     }
 
-    toast.success("Account created! Check your email to verify your address.", {
-      duration: 6000,
-    });
+    toast.success('Account created! Check your email to verify your address.', { duration: 6000 });
     router.push('/verify-email?email=' + encodeURIComponent(values.email));
+    void json;
   }
 
   return (

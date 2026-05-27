@@ -2,10 +2,12 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import type { Role } from '@fixit247/auth';
 
-const PUBLIC_PATHS = ['/_next', '/favicon', '/api/health'];
+const PUBLIC_PREFIXES = ['/_next', '/favicon', '/api/health'];
+const PUBLIC_EXACT = ['/login'];
 
 function isPublic(pathname: string): boolean {
-  return PUBLIC_PATHS.some((p) => pathname.startsWith(p));
+  if (PUBLIC_EXACT.includes(pathname)) return true;
+  return PUBLIC_PREFIXES.some((p) => pathname.startsWith(p));
 }
 
 export async function middleware(request: NextRequest) {
@@ -36,20 +38,16 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    const loginUrl = new URL(
-      process.env.NEXT_PUBLIC_APP_URL
-        ? `${process.env.NEXT_PUBLIC_APP_URL}/login`
-        : '/login',
-    );
-    loginUrl.searchParams.set('redirectTo', request.url);
-    return NextResponse.redirect(loginUrl);
+    return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  const meta = user.user_metadata as Record<string, unknown>;
-  const role = (meta.role as Role | undefined) ?? 'CUSTOMER';
+  // Role from app_metadata (service-role-only, tamper-proof) with user_metadata fallback
+  const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
+  const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const role = ((appMeta.role ?? userMeta.role) as Role | undefined) ?? 'CUSTOMER';
 
   if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
-    return new NextResponse('Forbidden', { status: 403 });
+    return NextResponse.redirect(new URL('/login?error=access_denied', request.url));
   }
 
   return response;

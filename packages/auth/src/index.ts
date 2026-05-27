@@ -9,9 +9,6 @@ export {
   createBrowserClient,
   createServerClient,
   createServiceRoleClient,
-  // Legacy aliases kept for backward compatibility
-  supabase,
-  createServiceClient,
 } from './supabase';
 export type { CookieStore } from './supabase';
 

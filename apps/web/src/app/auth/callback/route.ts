@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { createServiceRoleClient } from '@/lib/supabase/server';
 import { db } from '@fixit247/database';
 import { logger } from '@/lib/logger';
 
@@ -34,16 +35,34 @@ async function createDbUser(
   }
 }
 
+// Only CUSTOMER and TRADIE may self-register. Any other value is clamped to CUSTOMER.
 function safeRole(raw: string | undefined): 'CUSTOMER' | 'TRADIE' {
   return raw === 'TRADIE' ? 'TRADIE' : 'CUSTOMER';
 }
 
+// Ensure the post-login redirect stays on this origin (no open redirect).
+// Rejects // and /\ prefixes — browsers normalise /\ to https:// making it an open redirect.
+function sanitiseRedirectTo(raw: string | null): string {
+  if (!raw) return '/dashboard';
+  return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
+}
+
 export async function GET(request: NextRequest) {
+  try {
+    return await handleCallback(request);
+  } catch (err) {
+    logger.error('[auth/callback] unhandled error', err);
+    const origin = new URL(request.url).origin;
+    return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  }
+}
+
+async function handleCallback(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code       = searchParams.get('code');
   const tokenHash  = searchParams.get('token_hash');
   const type       = searchParams.get('type');
-  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const redirectTo = sanitiseRedirectTo(searchParams.get('redirectTo'));
 
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -121,9 +140,18 @@ export async function GET(request: NextRequest) {
       metaRole = safeRole(rawRole ?? undefined);
       const fullName = (meta.full_name as string | undefined) ?? '';
       const [firstName = '', ...rest] = fullName.split(' ');
-      await supabase.auth.updateUser({
-        data: { role: metaRole, onboardingComplete: false, firstName, lastName: rest.join(' ') },
-      });
+
+      // Single admin call writes both app_metadata (tamper-proof) and user_metadata
+      // (client-readable JWT) in one round-trip, eliminating partial-failure states.
+      try {
+        const admin = createServiceRoleClient();
+        await admin.auth.admin.updateUserById(user.id, {
+          app_metadata: { role: metaRole },
+          user_metadata: { ...meta, role: metaRole, onboardingComplete: false, firstName, lastName: rest.join(' ') },
+        });
+      } catch (metaErr) {
+        logger.error('[auth/callback] app_metadata write failed — role will repair on next login', metaErr);
+      }
     }
 
     const existing = await db.user.findFirst({ where: { id: user.id } });
@@ -150,4 +178,4 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
-}
+} // end handleCallback

@@ -12,10 +12,19 @@ import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import { loginSchema, type LoginValues } from '@/lib/validators/auth';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
+// Prevent open-redirect: only allow same-origin relative paths.
+// Rejects // and /\ prefixes — browsers normalise /\ to https:// making it an open redirect.
+function sanitiseRedirectTo(raw: string | null): string {
+  if (!raw) return '/dashboard';
+  return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
+}
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const redirectTo = sanitiseRedirectTo(searchParams.get('redirectTo'));
+  // Surface OAuth/callback errors passed as ?error= query param
+  const urlError = searchParams.get('error');
   const [showPassword, setShowPassword] = React.useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const [showGoogleRoleSelect, setShowGoogleRoleSelect] = React.useState(false);
@@ -97,6 +106,14 @@ export function LoginForm() {
 
       <Card className="border-border bg-background-elevated shadow-card-warm dark:shadow-glass">
         <CardContent className="px-6 pb-6 pt-8">
+          {urlError && (
+            <div className="mb-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {urlError === 'auth_callback_failed'
+                ? 'Google sign-in failed. Please try again or use email and password.'
+                : 'An error occurred. Please try again.'}
+            </div>
+          )}
+
           {/* Google SSO first — reduces friction */}
           {showGoogleRoleSelect ? (
             <div className="rounded-2xl border border-border bg-background-alt p-4">

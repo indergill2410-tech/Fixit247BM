@@ -26,18 +26,22 @@ export class AuthorizationError extends Error {
 
 /**
  * Map a raw Supabase user object to our AuthUser shape.
- * The full profile is stored in user_metadata by the auth trigger.
+ * Role is sourced from app_metadata (service-role-only writeable) with a
+ * fallback to user_metadata for accounts pre-dating this change.
  */
 function mapSupabaseUser(raw: {
   id: string;
   email?: string;
   email_confirmed_at?: string | null;
   phone?: string | null;
+  app_metadata?: Record<string, unknown>;
   user_metadata?: Record<string, unknown>;
   created_at: string;
   updated_at?: string;
 }): AuthUser {
-  const meta = (raw.user_metadata ?? {});
+  const appMeta = raw.app_metadata ?? {};
+  const meta = raw.user_metadata ?? {};
+  const role = ((appMeta.role ?? meta.role) as Role | undefined) ?? 'CUSTOMER';
 
   return {
     id: raw.id,
@@ -47,12 +51,12 @@ function mapSupabaseUser(raw: {
       : null,
     phone: raw.phone ?? null,
     phoneVerified: Boolean(meta.phone_verified ?? false),
-    role: (meta.role as Role) ?? 'CUSTOMER',
-    firstName: String(meta.first_name ?? ''),
-    lastName: String(meta.last_name ?? ''),
+    role,
+    firstName: String(meta.first_name ?? meta.firstName ?? ''),
+    lastName: String(meta.last_name ?? meta.lastName ?? ''),
     avatarUrl: meta.avatar_url ? String(meta.avatar_url) : null,
     isActive: Boolean(meta.is_active ?? true),
-    onboardingComplete: Boolean(meta.onboarding_complete ?? false),
+    onboardingComplete: Boolean(meta.onboarding_complete ?? meta.onboardingComplete ?? false),
     lastLoginAt: meta.last_login_at
       ? new Date(String(meta.last_login_at))
       : null,
@@ -77,20 +81,20 @@ export async function getServerSession(
 ): Promise<AuthSession | null> {
   const supabase = createServerClient(cookieStore);
 
-  const {
-    data: { session },
-    error,
-  } = await supabase.auth.getSession();
+  // getUser() makes a network request to verify the JWT with the Auth server,
+  // catching revoked sessions that getSession() (local-only) would miss.
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) return null;
 
-  if (error || !session?.user) {
-    return null;
-  }
+  // Still need access/refresh tokens — getSession() is fine for token retrieval
+  // now that we've already verified the user above.
+  const { data: { session } } = await supabase.auth.getSession();
 
   return {
-    user: mapSupabaseUser(session.user),
-    accessToken: session.access_token,
-    refreshToken: session.refresh_token ?? '',
-    expiresAt: session.expires_at ?? 0,
+    user: mapSupabaseUser(user),
+    accessToken: session?.access_token ?? '',
+    refreshToken: session?.refresh_token ?? '',
+    expiresAt: session?.expires_at ?? 0,
   };
 }
 

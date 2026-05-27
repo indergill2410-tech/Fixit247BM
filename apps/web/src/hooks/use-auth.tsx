@@ -27,11 +27,14 @@ interface AuthContextValue {
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
 function mapUser(supabaseUser: User): AuthUser {
-  const meta = supabaseUser.user_metadata as Record<string, unknown>;
+  // app_metadata is authoritative (service-role-only writeable).
+  // user_metadata is kept as a fallback for pre-existing accounts.
+  const appMeta = (supabaseUser.app_metadata ?? {}) as Record<string, unknown>;
+  const meta = (supabaseUser.user_metadata ?? {}) as Record<string, unknown>;
   return {
     id: supabaseUser.id,
     email: supabaseUser.email ?? '',
-    role: (meta.role as Role | undefined) ?? 'CUSTOMER',
+    role: ((appMeta.role ?? meta.role) as Role | undefined) ?? 'CUSTOMER',
     firstName: (meta.firstName as string | undefined) ?? '',
     lastName: (meta.lastName as string | undefined) ?? '',
     avatarUrl: (meta.avatarUrl as string | null | undefined) ?? null,

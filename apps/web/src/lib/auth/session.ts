@@ -18,6 +18,8 @@ export interface SessionUser {
 
 export async function getSession(): Promise<SessionUser | null> {
   const supabase = await getSupabaseServerClient();
+  // Use getUser() (server-verified) rather than getSession() (local-only JWT read)
+  // so revoked tokens are caught immediately.
   const { data: { user }, error } = await supabase.auth.getUser();
   if (error != null || !user) return null;
 
@@ -32,7 +34,7 @@ export async function getSession(): Promise<SessionUser | null> {
   }
   if (!dbUser) return null;
 
-  const meta = user.user_metadata as Record<string, unknown>;
+  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
   return {
     id: user.id,
     email: user.email ?? '',
