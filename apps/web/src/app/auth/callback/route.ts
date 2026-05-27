@@ -48,6 +48,16 @@ function sanitiseRedirectTo(raw: string | null): string {
 }
 
 export async function GET(request: NextRequest) {
+  try {
+    return await handleCallback(request);
+  } catch (err) {
+    logger.error('[auth/callback] unhandled error', err);
+    const origin = new URL(request.url).origin;
+    return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+  }
+}
+
+async function handleCallback(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code       = searchParams.get('code');
   const tokenHash  = searchParams.get('token_hash');
@@ -168,4 +178,4 @@ export async function GET(request: NextRequest) {
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
-}
+} // end handleCallback
