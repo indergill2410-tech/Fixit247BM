@@ -16,10 +16,10 @@ export default function NotFound() {
           Go home
         </Link>
         <Link
-          href="/post-job"
+          href="/jobs/new"
           className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
         >
-          Post a job
+          Post a Job
         </Link>
       </div>
     </div>

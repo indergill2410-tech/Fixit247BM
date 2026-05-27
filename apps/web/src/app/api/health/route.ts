@@ -21,16 +21,19 @@ async function checkDatabase(): Promise<ServiceStatus> {
 }
 
 function checkEnv(): ServiceStatus {
-  const required = [
-    'NEXT_PUBLIC_SUPABASE_URL',
-    'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-    'DATABASE_URL',
-    'STRIPE_SECRET_KEY',
-  ];
-  const missing = required.filter((k) => !process.env[k]);
-  if (missing.length > 0) {
-    return { status: 'degraded', error: `Missing env vars: ${missing.join(', ')}` };
+  const critical = ['NEXT_PUBLIC_SUPABASE_URL', 'NEXT_PUBLIC_SUPABASE_ANON_KEY', 'DATABASE_URL'];
+  const optional = ['STRIPE_SECRET_KEY', 'STRIPE_WEBHOOK_SECRET'];
+
+  const missingCritical = critical.filter((k) => !process.env[k]);
+  if (missingCritical.length > 0) {
+    return { status: 'down', error: `Missing env vars: ${missingCritical.join(', ')}` };
   }
+
+  const missingOptional = optional.filter((k) => !process.env[k]);
+  if (missingOptional.length > 0) {
+    return { status: 'degraded', error: `Payments degraded — missing: ${missingOptional.join(', ')}` };
+  }
+
   return { status: 'ok' };
 }
 
