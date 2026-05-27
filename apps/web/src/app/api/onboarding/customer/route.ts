@@ -69,6 +69,7 @@ export async function POST(request: Request) {
     });
 
     await supabase.auth.updateUser({ data: { firstName, lastName, onboardingComplete: true } });
+    await db.user.update({ where: { id: user.id }, data: { onboardingComplete: true } });
     await sendWelcomeEmail(user.id);
     return NextResponse.json({ success: true, freeCreditsAwarded: 5 });
   } catch (err) {
