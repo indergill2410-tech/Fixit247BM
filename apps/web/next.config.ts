@@ -15,7 +15,7 @@ const csp = [
   // Images: supabase storage + github avatars + google user content
   "img-src 'self' data: blob: https://*.supabase.co https://avatars.githubusercontent.com https://*.googleusercontent.com https://maps.gstatic.com https://maps.googleapis.com",
   // API calls: supabase, stripe, google maps, socket.io
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://maps.googleapis.com https://*.upstash.io https://*.sentry.io" +
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.stripe.com https://maps.googleapis.com https://*.upstash.io https://*.sentry.io https://*.i.posthog.com" +
     (isProd ? '' : ' ws://localhost:* http://localhost:*'),
   // Stripe hosted iframes for payment elements
   "frame-src https://js.stripe.com https://hooks.stripe.com https://www.google.com",

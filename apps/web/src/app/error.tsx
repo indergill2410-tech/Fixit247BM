@@ -4,7 +4,7 @@ import { useEffect } from 'react';
 import Link from 'next/link';
 import * as Sentry from '@sentry/nextjs';
 
-export default function GlobalError({
+export default function Error({
   error,
   reset,
 }: {
@@ -16,27 +16,36 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center gap-6 p-8 text-center">
-      <h1 className="text-3xl font-bold">Something went wrong</h1>
-      <p className="max-w-md text-muted-foreground">
-        An unexpected error occurred. Our team has been notified and will investigate.
-      </p>
-      {error.digest && (
-        <p className="font-mono text-xs text-muted-foreground">Error ID: {error.digest}</p>
-      )}
-      <div className="flex gap-4">
-        <button
-          onClick={reset}
-          className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90"
-        >
-          Try again
-        </button>
-        <Link
-          href="/"
-          className="rounded-md border px-4 py-2 text-sm font-medium hover:bg-accent"
-        >
-          Go home
-        </Link>
+    <div className="flex min-h-[60vh] items-center justify-center p-4">
+      <div className="w-full max-w-md text-center">
+        <div className="mb-6 flex justify-center">
+          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-500/10 text-3xl ring-1 ring-red-500/30">
+            ⚠️
+          </div>
+        </div>
+        <h1 className="text-2xl font-bold text-white">Something went wrong</h1>
+        <p className="mt-3 text-sm text-gray-400">
+          An unexpected error occurred. Please try again.
+          {error.digest && (
+            <span className="mt-1 block text-xs text-gray-600">
+              Error ID: {error.digest}
+            </span>
+          )}
+        </p>
+        <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-center">
+          <button
+            onClick={reset}
+            className="rounded-xl bg-brand-600 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-500 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand-400 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0F1E]"
+          >
+            Try again
+          </button>
+          <Link
+            href="/"
+            className="rounded-xl border border-white/15 px-6 py-3 text-sm font-semibold text-gray-300 transition-colors hover:border-white/30 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 focus-visible:ring-offset-2 focus-visible:ring-offset-[#0A0F1E]"
+          >
+            Go home
+          </Link>
+        </div>
       </div>
     </div>
   );
