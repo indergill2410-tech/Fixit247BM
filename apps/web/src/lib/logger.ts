@@ -1,6 +1,11 @@
 /* eslint-disable no-console */
 type LogLevel = 'debug' | 'info' | 'warn' | 'error';
 
+type OtelEmitter = (level: LogLevel, message: string, attrs?: Record<string, unknown>) => void;
+let _otelEmit: OtelEmitter | null = null;
+/** Called once from instrumentation.ts on the Node.js runtime to wire in PostHog OTel logs. */
+export function setOtelEmitter(fn: OtelEmitter): void { _otelEmit = fn; }
+
 interface LogEntry {
   level: LogLevel;
   message: string;
@@ -49,6 +54,7 @@ function log(level: LogLevel, message: string, meta?: unknown): void {
     // Structured JSON for log aggregators (Datadog, CloudWatch, Render logs)
     const method = level === 'error' ? console.error : level === 'warn' ? console.warn : console.log;
     method(JSON.stringify(entry));
+    _otelEmit?.(level, message, normalized);
   }
 }
 
