@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { notify, sendReviewRequest, sendReferralPrompt } from '@fixit247/notifications';
 
 const Schema = z.object({
   status: z.enum(['EN_ROUTE', 'ARRIVED', 'IN_PROGRESS', 'COMPLETED', 'CANCELLED']),
@@ -72,6 +73,34 @@ export async function PATCH(
 
       return updated;
     });
+
+    // Fire notifications based on new status
+    const jobDetail = await db.job.findUnique({
+      where: { id: jobId },
+      select: {
+        title: true,
+        customer: { select: { userId: true } },
+        tradie: { select: { user: { select: { id: true, firstName: true, lastName: true } } } },
+      },
+    });
+    const customerUserId = jobDetail?.customer?.userId;
+    const tradieUser = jobDetail?.tradie?.user;
+    const tradieName = tradieUser ? `${tradieUser.firstName} ${tradieUser.lastName}`.trim() : 'Your tradie';
+    const jobTitle = jobDetail?.title ?? 'your job';
+
+    if (customerUserId) {
+      if (newStatus === 'EN_ROUTE') {
+        void notify({ userId: customerUserId, jobId, type: 'TRADIE_EN_ROUTE', data: { tradieName, etaMinutes: String(etaMinutes ?? 30) } });
+      } else if (newStatus === 'ARRIVED') {
+        void notify({ userId: customerUserId, jobId, type: 'TRADIE_ARRIVED', data: { tradieName } });
+      } else if (newStatus === 'IN_PROGRESS') {
+        void notify({ userId: customerUserId, jobId, type: 'JOB_STARTED', data: { tradieName, jobTitle } });
+      } else if (newStatus === 'COMPLETED') {
+        void notify({ userId: customerUserId, jobId, type: 'JOB_COMPLETED', data: { tradieName, jobTitle } });
+        void sendReviewRequest(jobId);
+        void sendReferralPrompt(customerUserId);
+      }
+    }
 
     return NextResponse.json({ job: updatedJob });
   } catch (err) {

@@ -15,6 +15,7 @@
     "@fixit247/ai": "workspace:*",
     "@fixit247/auth": "workspace:*",
     "@fixit247/database": "workspace:*",
+    "@fixit247/notifications": "workspace:*",
     "@fixit247/matching": "workspace:*",
     "@fixit247/payments": "workspace:*",
     "@fixit247/realtime": "workspace:*",

@@ -4,6 +4,7 @@ import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { releaseJobPayment } from '@fixit247/payments';
+import { notify } from '@fixit247/notifications';
 
 const Schema = z.object({ jobId: z.string().uuid() });
 
@@ -30,6 +31,26 @@ export async function POST(req: NextRequest) {
     }
 
     const result = await releaseJobPayment(jobId);
+
+    // Notify both parties after payment release
+    const jobDetail = await db.job.findUnique({
+      where: { id: jobId },
+      select: {
+        agreedPrice: true,
+        customer: { select: { userId: true } },
+        tradie: { select: { user: { select: { id: true, firstName: true, lastName: true } } } },
+      },
+    });
+    const amount = String(jobDetail?.agreedPrice ?? '');
+    const tradieName = jobDetail?.tradie?.user
+      ? `${jobDetail.tradie.user.firstName} ${jobDetail.tradie.user.lastName}`.trim()
+      : 'the tradie';
+    if (jobDetail?.customer?.userId) {
+      void notify({ userId: jobDetail.customer.userId, jobId, type: 'PAYMENT_RELEASED', data: { amount, tradieName } });
+    }
+    if (jobDetail?.tradie?.user?.id) {
+      void notify({ userId: jobDetail.tradie.user.id, jobId, type: 'PAYMENT_RELEASED', data: { amount, tradieName } });
+    }
 
     return NextResponse.json({ success: true, payoutId: result.payoutId });
   } catch (err) {

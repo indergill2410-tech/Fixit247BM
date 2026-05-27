@@ -18,7 +18,7 @@ export interface NotifyOptions {
 
 export async function notify(opts: NotifyOptions): Promise<void> {
   const { userId, jobId, type, data = {}, io } = opts;
-  const { title, body } = renderTemplate(type, data);
+  const { title, subject, body } = renderTemplate(type, data);
   const resolvedTitle = opts.title ?? title;
   const resolvedBody = opts.body ?? body;
 
@@ -42,7 +42,7 @@ export async function notify(opts: NotifyOptions): Promise<void> {
   const user = await db.user.findUnique({ where: { id: userId }, select: { email: true } });
 
   if (user?.email && shouldSendChannel(prefs, type, 'email')) {
-    notificationQueue.enqueue(() => sendEmailNotification({ to: user.email!, title: resolvedTitle, body: resolvedBody, type, data }));
+    notificationQueue.enqueue(() => sendEmailNotification({ to: user.email!, title: resolvedTitle, ...(subject ? { subject } : {}), body: resolvedBody, type, data }));
   }
   if (shouldSendChannel(prefs, type, 'push')) {
     notificationQueue.enqueue(() => sendPushNotification({ userId, title: resolvedTitle, body: resolvedBody, data }));

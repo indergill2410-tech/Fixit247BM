@@ -117,6 +117,9 @@ importers:
       '@fixit247/matching':
         specifier: workspace:*
         version: link:../../packages/matching
+      '@fixit247/notifications':
+        specifier: workspace:*
+        version: link:../../packages/notifications
       '@fixit247/payments':
         specifier: workspace:*
         version: link:../../packages/payments

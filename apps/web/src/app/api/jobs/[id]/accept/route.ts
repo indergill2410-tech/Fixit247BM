@@ -3,6 +3,7 @@ import { NextResponse } from 'next/server';
 import { requireSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
+import { notify } from '@fixit247/notifications';
 
 const AcceptSchema = z.object({
   quotedPrice: z.number().positive(),
@@ -81,6 +82,21 @@ export async function POST(
 
       return { claim, job: updatedJob };
     });
+
+    // Notify customer that their job has been accepted
+    const jobWithCustomer = await db.job.findUnique({
+      where: { id: jobId },
+      select: { title: true, customer: { select: { userId: true } } },
+    });
+    if (jobWithCustomer?.customer?.userId) {
+      const tradieName = `${session.firstName ?? ''} ${session.lastName ?? ''}`.trim() || 'Your tradie';
+      void notify({
+        userId: jobWithCustomer.customer.userId,
+        jobId,
+        type: 'JOB_ACCEPTED',
+        data: { tradieName, jobTitle: jobWithCustomer.title ?? 'your job' },
+      });
+    }
 
     return NextResponse.json({ success: true, ...result });
   } catch (err) {

@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { createServerClient } from '@supabase/ssr';
 import { db } from '@fixit247/database';
 import type { TradeCategory } from '@fixit247/database';
+import { sendWelcomeTradieEmail } from '@fixit247/notifications';
 import { z } from 'zod';
 
 const tradieOnboardingPayload = z.object({
@@ -123,6 +124,7 @@ export async function POST(request: Request) {
     });
 
     await supabase.auth.updateUser({ data: { onboardingComplete: true } });
+    void sendWelcomeTradieEmail(user.id);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error('Tradie onboarding error:', err);
