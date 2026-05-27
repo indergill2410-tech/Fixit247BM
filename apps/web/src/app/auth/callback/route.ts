@@ -131,20 +131,17 @@ export async function GET(request: NextRequest) {
       const fullName = (meta.full_name as string | undefined) ?? '';
       const [firstName = '', ...rest] = fullName.split(' ');
 
-      // Write role to app_metadata (service-role only, not user-writable).
-      // Wrap in try/catch — failure must not prevent DB user creation or session establishment.
+      // Single admin call writes both app_metadata (tamper-proof) and user_metadata
+      // (client-readable JWT) in one round-trip, eliminating partial-failure states.
       try {
         const admin = createServiceRoleClient();
         await admin.auth.admin.updateUserById(user.id, {
           app_metadata: { role: metaRole },
+          user_metadata: { ...meta, role: metaRole, onboardingComplete: false, firstName, lastName: rest.join(' ') },
         });
       } catch (metaErr) {
         logger.error('[auth/callback] app_metadata write failed — role will repair on next login', metaErr);
       }
-      // Keep user_metadata in sync for client-side JWT reads
-      await supabase.auth.updateUser({
-        data: { role: metaRole, onboardingComplete: false, firstName, lastName: rest.join(' ') },
-      });
     }
 
     const existing = await db.user.findFirst({ where: { id: user.id } });

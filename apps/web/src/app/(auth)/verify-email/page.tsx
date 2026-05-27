@@ -18,8 +18,12 @@ function VerifyEmailContent() {
     if (!email || loading) return;
     setLoading(true);
     const supabase = getSupabaseBrowserClient();
-    await supabase.auth.resend({ type: 'signup', email });
-    setResent(true);
+    const { error } = await supabase.auth.resend({ type: 'signup', email });
+    if (error) {
+      console.error('Failed to resend verification email:', error.message);
+    } else {
+      setResent(true);
+    }
     setLoading(false);
   }
 

@@ -36,10 +36,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: error.message }, { status });
   }
 
-  // Write role to app_metadata (service-role only — not user-writable) so it
-  // cannot be changed by a browser-console call to supabase.auth.updateUser().
-  // Non-fatal: if this fails the user can still log in; role defaults to CUSTOMER
-  // until the next sign-in re-triggers the app_metadata write via auth/callback.
+  // Write role to app_metadata (service-role only — not user-writable).
+  // If this fails we roll back by deleting the orphaned auth user so the
+  // email address is freed and the user can retry registration cleanly.
   if (data.user?.id) {
     try {
       const admin = createServiceRoleClient();
@@ -47,8 +46,12 @@ export async function POST(request: NextRequest) {
         app_metadata: { role },
       });
     } catch (metaErr) {
-      // Log but do not fail the registration — auth/callback will repair on first login
-      console.error('[register] app_metadata write failed', metaErr);
+      console.error('[register] app_metadata write failed — rolling back user', metaErr);
+      const admin = createServiceRoleClient();
+      await admin.auth.admin.deleteUser(data.user.id).catch((delErr) => {
+        console.error('[register] rollback deleteUser failed', delErr);
+      });
+      return NextResponse.json({ error: 'Registration failed during profile setup. Please try again.' }, { status: 500 });
     }
   }
 
