@@ -48,7 +48,7 @@ export async function POST(request: NextRequest) {
     } catch (metaErr) {
       console.error('[register] app_metadata write failed — rolling back user', metaErr);
       const admin = createServiceRoleClient();
-      await admin.auth.admin.deleteUser(data.user.id).catch((delErr) => {
+      await admin.auth.admin.deleteUser(data.user.id).catch((delErr: unknown) => {
         console.error('[register] rollback deleteUser failed', delErr);
       });
       return NextResponse.json({ error: 'Registration failed during profile setup. Please try again.' }, { status: 500 });
