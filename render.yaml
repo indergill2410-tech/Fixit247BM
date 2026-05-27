@@ -10,6 +10,7 @@ services:
       npm install -g pnpm@9 &&
       pnpm install --frozen-lockfile &&
       pnpm --filter @fixit247/database run db:generate &&
+      pnpm --filter @fixit247/database exec prisma migrate deploy &&
       pnpm --filter @fixit247/web build
     startCommand: >
       cp -r apps/web/.next/static apps/web/.next/standalone/apps/web/.next/static &&
