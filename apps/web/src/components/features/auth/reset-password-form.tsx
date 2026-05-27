@@ -1,7 +1,7 @@
 'use client';
 
 import * as React from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
@@ -13,6 +13,7 @@ import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
 export function ResetPasswordForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [showPassword, setShowPassword] = React.useState(false);
   const [showConfirm, setShowConfirm] = React.useState(false);
   const [ready, setReady] = React.useState(false);
@@ -26,6 +27,14 @@ export function ResetPasswordForm() {
   // onAuthStateChange fires with event=PASSWORD_RECOVERY when the page loads
   // with that token, giving us an authenticated session to call updateUser().
   React.useEffect(() => {
+    // ?dev=1 skips the Supabase session check so you can test the form UI without
+    // a real password-reset email. The form is safe to show — updateUser() still
+    // requires a valid recovery session to succeed.
+    if (searchParams.get('dev') === '1') {
+      setReady(true);
+      return;
+    }
+
     const supabase = getSupabaseBrowserClient();
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
@@ -39,7 +48,7 @@ export function ResetPasswordForm() {
     });
 
     return () => { subscription.unsubscribe(); };
-  }, []);
+  }, [searchParams]);
 
   async function onSubmit(values: ResetPasswordValues) {
     const supabase = getSupabaseBrowserClient();
