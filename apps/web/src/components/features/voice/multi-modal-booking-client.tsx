@@ -18,7 +18,7 @@ async function uploadImages(files: File[]): Promise<string[]> {
   const urls: string[] = [];
   await Promise.all(
     files.map(async (file) => {
-      const path = `job-media/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const path = `uploads/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
       const { error } = await supabase.storage.from('job-media').upload(path, file, { upsert: false });
       if (error) throw new Error(`Image upload failed: ${error.message}`);
       const { data } = supabase.storage.from('job-media').getPublicUrl(path);
