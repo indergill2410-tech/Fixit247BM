@@ -194,6 +194,7 @@ model User {
   voiceCalls        VoiceCall[]        @relation("CustomerVoiceCalls")
 
   @@index([email])
+  @@index([phone])
   @@index([role])
   @@index([isActive])
   @@index([deletedAt])
