@@ -34,8 +34,8 @@ export function LoginForm() {
   });
 
   function fillDemo(email: string, password: string) {
-    setValue('email', email, { shouldValidate: false });
-    setValue('password', password, { shouldValidate: false });
+    setValue('email', email, { shouldValidate: true });
+    setValue('password', password, { shouldValidate: true });
   }
 
   async function onSubmit(values: LoginValues) {
