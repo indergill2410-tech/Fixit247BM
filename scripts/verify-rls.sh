@@ -74,19 +74,17 @@ echo ""
 # ─── Helper: count rows in a JSON array response ─────────────────────────────
 # Returns 0 on parse error (e.g. error response object instead of array)
 count_rows() {
-  local response="$1"
-  printf '%s\n' "$response" | python3 -c "
-import json, sys
+  RESPONSE="$1" python3 -c "
+import json, os
 try:
-    data = json.load(sys.stdin)
+    data = json.loads(os.environ.get('RESPONSE', ''))
     if isinstance(data, list):
         print(len(data))
     else:
-        # PostgREST error object — not an array
-        print(0)
+        print(-1)
 except Exception:
-    print(0)
-" 2>/dev/null || echo "0"
+    print(-1)
+" 2>/dev/null || echo "-1"
 }
 
 # ─── Helper: HTTP GET via curl ────────────────────────────────────────────────
