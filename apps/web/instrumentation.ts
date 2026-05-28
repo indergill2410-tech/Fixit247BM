@@ -2,6 +2,13 @@ import * as Sentry from '@sentry/nextjs';
 
 export async function register() {
   if (process.env.NEXT_RUNTIME === 'nodejs') {
+    // Validate required env vars before any request is handled — exits on failure.
+    // Skip validation during the build phase to prevent CI build failures when production secrets are missing.
+    if (process.env.NEXT_PHASE !== 'phase-production-build') {
+      const { validateEnv } = await import('./src/lib/validate-env');
+      validateEnv();
+    }
+
     // PostHog server analytics + OTel log forwarding
     const { getPostHogServer } = await import('./src/lib/posthog/server');
     getPostHogServer();
