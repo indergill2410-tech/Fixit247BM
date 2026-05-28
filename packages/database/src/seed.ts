@@ -309,9 +309,26 @@ async function seedDemoUsers() {
     });
   }
   console.log(`✅ ${jobDefs.length} demo jobs seeded`);
+
+  // ── Admin demo account ────────────────────────────────────────────────────
+  const adminAuthId = await ensureAuthUser(admin, 'admin@demo.fixit247.com.au', {
+    firstName: 'Admin', lastName: 'Demo', role: 'ADMIN', onboardingComplete: true,
+  }, DEMO_PASSWORD);
+  await db.user.upsert({
+    where: { email: 'admin@demo.fixit247.com.au' },
+    create: {
+      ...(adminAuthId ? { id: adminAuthId } : {}),
+      email: 'admin@demo.fixit247.com.au', firstName: 'Admin', lastName: 'Demo',
+      role: 'ADMIN', isActive: true, emailVerified: new Date(), onboardingComplete: true,
+    },
+    update: { isActive: true, role: 'ADMIN', onboardingComplete: true },
+  });
+  console.log('✅ Admin demo account seeded');
+
   console.log(`   Demo password: ${DEMO_PASSWORD}`);
   console.log('   Customers: emma.williams@demo.fixit247.com … william.davis@demo.fixit247.com');
   console.log('   Tradies:   mike.torres@demo.fixit247.com … anna.fix@demo.fixit247.com');
+  console.log('   Admin:     admin@demo.fixit247.com.au');
 }
 
 // ─── Test Users ───────────────────────────────────────────────────────────────
