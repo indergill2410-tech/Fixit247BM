@@ -265,8 +265,11 @@ export async function middleware(request: NextRequest) {
       // onboarding where the DB user gets created.
       const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
       const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
-      role = ((appMeta.role ?? userMeta.role) as Role | undefined) ?? 'CUSTOMER';
-      onboardingComplete = false;
+      const rawRole = (appMeta.role ?? userMeta.role) as Role | undefined;
+      role = rawRole === 'ADMIN' || rawRole === 'SUPER_ADMIN'
+        ? ((appMeta.role as Role | undefined) ?? 'CUSTOMER')
+        : (rawRole ?? 'CUSTOMER');
+      onboardingComplete = role === 'ADMIN' || role === 'SUPER_ADMIN';
     }
 
     // Write the HMAC-signed cache cookie onto the response.
