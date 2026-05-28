@@ -7,5 +7,6 @@ const ROLE_LABELS: Record<string, string> = {
 
 export function getRoleLabel(role: string | undefined | null): string {
   if (!role) return 'User';
-  return ROLE_LABELS[role] ?? role;
+  const normalizedRole = role.toUpperCase();
+  return ROLE_LABELS[normalizedRole] ?? role;
 }
