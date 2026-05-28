@@ -29,9 +29,14 @@ export function LoginForm() {
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const [showGoogleRoleSelect, setShowGoogleRoleSelect] = React.useState(false);
 
-  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginValues>({
+  const { register, handleSubmit, setValue, formState: { errors, isSubmitting } } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
   });
+
+  function fillDemo(email: string, password: string) {
+    setValue('email', email, { shouldValidate: true });
+    setValue('password', password, { shouldValidate: true });
+  }
 
   async function onSubmit(values: LoginValues) {
     const supabase = getSupabaseBrowserClient();
@@ -237,6 +242,31 @@ export function LoginForm() {
           Sign up free
         </Link>
       </p>
+
+      {/* Demo accounts */}
+      <div className="mt-8 rounded-2xl border border-white/8 bg-white/[0.03] p-5">
+        <div className="mb-4 flex items-center gap-2">
+          <p className="text-xs font-semibold uppercase tracking-widest text-gray-500">Try a demo account</p>
+          <span className="rounded-full bg-white/8 px-2 py-0.5 text-[10px] font-bold text-gray-500">DEMO</span>
+        </div>
+        <div className="flex flex-col gap-2 sm:flex-row">
+          {[
+            { label: 'Login as Homeowner', email: 'emma.williams@demo.fixit247.com',    password: 'Demo1234!' },
+            { label: 'Login as Tradie',    email: 'mike.torres@demo.fixit247.com',      password: 'Demo1234!' },
+            { label: 'Login as Admin',     email: 'admin@demo.fixit247.com.au',         password: 'Demo1234!' },
+          ].map(({ label, email, password }) => (
+            <button
+              key={email}
+              type="button"
+              onClick={() => { fillDemo(email, password); }}
+              className="flex-1 rounded-xl border border-white/10 bg-white/[0.03] px-3 py-2.5 text-xs font-semibold text-gray-400 transition-all hover:border-white/20 hover:bg-white/[0.07] hover:text-white"
+            >
+              {label}
+            </button>
+          ))}
+        </div>
+        <p className="mt-3 text-center text-[11px] text-gray-600">Pre-fills credentials only — you still click Log in</p>
+      </div>
     </motion.div>
   );
 }
