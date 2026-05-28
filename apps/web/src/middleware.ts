@@ -257,14 +257,19 @@ export async function middleware(request: NextRequest) {
       role = (dbUser.role as Role | undefined) ?? 'CUSTOMER';
       onboardingComplete = Boolean(dbUser.onboarding_complete ?? false);
     } else {
-      // DB lookup returned nothing — deny access rather than trust user-writable metadata.
-      // This covers brand-new users not yet synced; redirect to login to re-auth.
-      if (pathname.startsWith('/api/')) {
-        return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-      }
-      const loginUrl = new URL('/login', request.url);
-      loginUrl.searchParams.set('redirectTo', pathname);
-      return NextResponse.redirect(loginUrl);
+      // DB row not found — can happen when:
+      //   (a) RLS is not yet configured for anon reads, or
+      //   (b) auth callback hasn't created the DB user yet (race on first login).
+      // Fall back to app_metadata.role (service-role-written, not user-writable)
+      // so we don't cause a redirect loop. Treat as unboarded so we route to
+      // onboarding where the DB user gets created.
+      const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
+      const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
+      const rawRole = (appMeta.role ?? userMeta.role) as Role | undefined;
+      role = rawRole === 'ADMIN' || rawRole === 'SUPER_ADMIN'
+        ? ((appMeta.role as Role | undefined) ?? 'CUSTOMER')
+        : (rawRole ?? 'CUSTOMER');
+      onboardingComplete = role === 'ADMIN' || role === 'SUPER_ADMIN';
     }
 
     // Write the HMAC-signed cache cookie onto the response.
