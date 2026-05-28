@@ -22,7 +22,7 @@ function b64urlEncode(bytes: Uint8Array): string {
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-function b64urlDecode(str: string): Uint8Array<ArrayBuffer> {
+function b64urlDecode(str: string): Uint8Array {
   const padded = str.replace(/-/g, '+').replace(/_/g, '/') +
     '='.repeat((4 - (str.length % 4)) % 4);
   return new Uint8Array(Array.from(atob(padded), c => c.charCodeAt(0)));
