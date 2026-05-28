@@ -95,13 +95,13 @@ except Exception:
 rest_get() {
   local url="$1"
   local auth_header="$2"
-  curl -sf \
+  curl -s \
     -H "apikey: ${SUPABASE_ANON_KEY}" \
     -H "Authorization: Bearer ${auth_header}" \
     -H "Accept: application/json" \
     -H "Prefer: count=none" \
     --max-time 10 \
-    "$url" 2>/dev/null || echo "[]"
+    "$url"
 }
 
 
