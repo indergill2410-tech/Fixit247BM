@@ -48,7 +48,11 @@ info()  { echo -e "${CYAN}  ----${NC}  $1"; }
 # ─── Environment validation ───────────────────────────────────────────────────
 MISSING_VARS=()
 for var in SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
-  [[ -z "${!var:-}" ]] && MISSING_VARS+=("$var")
+  case "$var" in
+    SUPABASE_URL) [[ -z "${SUPABASE_URL:-}" ]] && MISSING_VARS+=("$var") ;;
+    SUPABASE_ANON_KEY) [[ -z "${SUPABASE_ANON_KEY:-}" ]] && MISSING_VARS+=("$var") ;;
+    SUPABASE_SERVICE_ROLE_KEY) [[ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]] && MISSING_VARS+=("$var") ;;
+  esac
 done
 
 if [[ ${#MISSING_VARS[@]} -gt 0 ]]; then
