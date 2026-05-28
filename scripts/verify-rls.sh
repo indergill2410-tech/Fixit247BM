@@ -75,7 +75,7 @@ echo ""
 # Returns 0 on parse error (e.g. error response object instead of array)
 count_rows() {
   local response="$1"
-  printf "%s\n" "$response" | python3 -c "
+  printf '%s\n' "$response" | python3 -c "
 import json, sys
 try:
     data = json.load(sys.stdin)
