@@ -22,10 +22,14 @@ function b64urlEncode(bytes: Uint8Array): string {
     .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 }
 
-function b64urlDecode(str: string): Uint8Array {
+function b64urlDecode(str: string): Uint8Array<ArrayBuffer> {
   const padded = str.replace(/-/g, '+').replace(/_/g, '/') +
     '='.repeat((4 - (str.length % 4)) % 4);
-  return new Uint8Array(Array.from(atob(padded), c => c.charCodeAt(0)));
+  const raw = atob(padded);
+  const buf = new ArrayBuffer(raw.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < raw.length; i++) view[i] = raw.charCodeAt(i);
+  return view;
 }
 
 function getHmacSecret(): string | undefined {
