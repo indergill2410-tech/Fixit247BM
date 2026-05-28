@@ -3,8 +3,10 @@ import { createServerClient } from '@supabase/ssr';
 import type { Role } from '@fixit247/auth';
 
 // ─── Role cache cookie ────────────────────────────────────────────────────────
-// We cache the DB-verified role in a short-lived signed-ish cookie to avoid a
+// We cache the DB-verified role in a short-lived HMAC-signed cookie to avoid a
 // Supabase REST round-trip on every single middleware invocation.
+// Format: <base64url(utf8-json)>.<base64url(hmac-sha256)>
+// Verified with crypto.subtle (constant-time) before any payload is trusted.
 const ROLE_CACHE_COOKIE = '__fixit_role_cache';
 const ROLE_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
 
@@ -15,19 +17,64 @@ interface RoleCachePayload {
   expiresAt: number; // Unix ms
 }
 
-function parseRoleCache(raw: string | undefined): RoleCachePayload | null {
+function b64urlEncode(bytes: Uint8Array): string {
+  return btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+}
+
+function b64urlDecode(str: string): Uint8Array<ArrayBuffer> {
+  const padded = str.replace(/-/g, '+').replace(/_/g, '/') +
+    '='.repeat((4 - (str.length % 4)) % 4);
+  const raw = atob(padded);
+  const buf = new ArrayBuffer(raw.length);
+  const view = new Uint8Array(buf);
+  for (let i = 0; i < raw.length; i++) view[i] = raw.charCodeAt(i);
+  return view;
+}
+
+function getHmacSecret(): string | undefined {
+  // SUPABASE_JWT_SECRET is server-only (no NEXT_PUBLIC_ prefix) and already required
+  // for Supabase JWT verification, making it a safe key material source here.
+  return process.env.SUPABASE_JWT_SECRET;
+}
+
+async function importHmacKey(secret: string): Promise<CryptoKey> {
+  return crypto.subtle.importKey(
+    'raw',
+    new TextEncoder().encode(secret),
+    { name: 'HMAC', hash: 'SHA-256' },
+    false,
+    ['sign', 'verify'],
+  );
+}
+
+async function serializeRoleCache(payload: RoleCachePayload): Promise<string | null> {
+  const secret = getHmacSecret();
+  if (!secret) return null;
+  const payloadBytes = new TextEncoder().encode(JSON.stringify(payload));
+  const key = await importHmacKey(secret);
+  const sig = new Uint8Array(await crypto.subtle.sign('HMAC', key, payloadBytes));
+  return `${b64urlEncode(payloadBytes)}.${b64urlEncode(sig)}`;
+}
+
+async function parseRoleCache(raw: string | undefined): Promise<RoleCachePayload | null> {
   if (!raw) return null;
+  const secret = getHmacSecret();
+  if (!secret) return null;
+  const dot = raw.lastIndexOf('.');
+  if (dot === -1) return null;
   try {
-    const payload = JSON.parse(raw) as RoleCachePayload;
-    if (payload.expiresAt > Date.now()) return payload;
-    return null; // expired
+    const payloadBytes = b64urlDecode(raw.slice(0, dot));
+    const sigBytes = b64urlDecode(raw.slice(dot + 1));
+    const key = await importHmacKey(secret);
+    // crypto.subtle.verify uses constant-time comparison internally
+    const valid = await crypto.subtle.verify('HMAC', key, sigBytes, payloadBytes);
+    if (!valid) return null;
+    const payload = JSON.parse(new TextDecoder().decode(payloadBytes)) as RoleCachePayload;
+    return payload.expiresAt > Date.now() ? payload : null;
   } catch {
     return null;
   }
-}
-
-function serializeRoleCache(payload: RoleCachePayload): string {
-  return JSON.stringify(payload);
 }
 
 // ─── Route Configuration ──────────────────────────────────────────────────────
@@ -165,7 +212,7 @@ export async function middleware(request: NextRequest) {
       // Use cached role if available; otherwise read from app_metadata (service-role-only)
       // with user_metadata as fallback. Never redirect to a privileged path based solely
       // on user_metadata which the client can write via supabase.auth.updateUser().
-      const cached = parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
+      const cached = await parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
       let role: Role;
       if (cached && cached.userId === user.id) {
         role = cached.role;
@@ -193,7 +240,7 @@ export async function middleware(request: NextRequest) {
   let role: Role;
   let onboardingComplete: boolean;
 
-  const cached = parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
+  const cached = await parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
   if (cached && cached.userId === user.id) {
     // Cache hit — use the DB-verified values
     role = cached.role;
@@ -220,20 +267,25 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl);
     }
 
-    // Write the cache cookie onto the response
+    // Write the HMAC-signed cache cookie onto the response.
+    // If the secret is absent (misconfigured deploy), skip caching — the fresh
+    // DB lookup above already populated role/onboardingComplete.
     const cachePayload: RoleCachePayload = {
       role,
       onboardingComplete,
       userId: user.id,
       expiresAt: Date.now() + ROLE_CACHE_TTL_MS,
     };
-    response.cookies.set(ROLE_CACHE_COOKIE, serializeRoleCache(cachePayload), {
-      httpOnly: true,
-      sameSite: 'lax',
-      secure: process.env.NODE_ENV === 'production',
-      maxAge: Math.floor(ROLE_CACHE_TTL_MS / 1000),
-      path: '/',
-    });
+    const signedCookie = await serializeRoleCache(cachePayload);
+    if (signedCookie) {
+      response.cookies.set(ROLE_CACHE_COOKIE, signedCookie, {
+        httpOnly: true,
+        sameSite: 'lax',
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: Math.floor(ROLE_CACHE_TTL_MS / 1000),
+        path: '/',
+      });
+    }
   }
 
   const requiredRoles = getRequiredRoles(pathname);

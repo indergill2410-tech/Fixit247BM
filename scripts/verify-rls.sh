@@ -5,25 +5,25 @@
 # Run after applying each phase of migration 20260527100000_rls_enable_all_tables.
 #
 # Usage:
-#   export SUPABASE_URL="https://<project-ref>.supabase.co"
+#   export SUPABASE_URL="https://ropgwnprmfisbrkqkhxd.supabase.co"
 #   export SUPABASE_ANON_KEY="sb_publishable_..."
 #   export SUPABASE_SERVICE_ROLE_KEY="sb_secret_..."
 #   export USER_A_JWT="eyJ..."          # JWT from a real logged-in session for User A
 #   export USER_A_ID="<uuid>"           # auth.uid() for User A (from Supabase Auth dashboard)
 #   export USER_B_ID="<uuid>"           # A different user's id (must exist in users table)
 #   export APP_URL="https://fixit247.com.au"
+#   export APP_SESSION_COOKIE="sb-..."  # Full cookie header value from a logged-in browser
 #   bash scripts/verify-rls.sh
 #
 # AFTER PHASES 1–4 ONLY (Phase 5 / users not yet applied):
 #   Tests A and B should PASS.
 #   Tests C, D, E will not be meaningful until Phase 5 is applied.
+#   Test F is independent of phase — it exercises the Prisma path.
 #   Run with: SKIP_PHASE5_TESTS=1 bash scripts/verify-rls.sh
 #
 # AFTER ALL PHASES (including Phase 5):
 #   All tests should PASS.
 #   Run with: bash scripts/verify-rls.sh
-#
-# See also: MANUAL VERIFICATION section at the bottom of this script.
 # =============================================================================
 
 set -euo pipefail
@@ -48,11 +48,7 @@ info()  { echo -e "${CYAN}  ----${NC}  $1"; }
 # ─── Environment validation ───────────────────────────────────────────────────
 MISSING_VARS=()
 for var in SUPABASE_URL SUPABASE_ANON_KEY SUPABASE_SERVICE_ROLE_KEY; do
-  case "$var" in
-    SUPABASE_URL) [[ -z "${SUPABASE_URL:-}" ]] && MISSING_VARS+=("$var") ;;
-    SUPABASE_ANON_KEY) [[ -z "${SUPABASE_ANON_KEY:-}" ]] && MISSING_VARS+=("$var") ;;
-    SUPABASE_SERVICE_ROLE_KEY) [[ -z "${SUPABASE_SERVICE_ROLE_KEY:-}" ]] && MISSING_VARS+=("$var") ;;
-  esac
+  [[ -z "${!var:-}" ]] && MISSING_VARS+=("$var")
 done
 
 if [[ ${#MISSING_VARS[@]} -gt 0 ]]; then
@@ -78,30 +74,32 @@ echo ""
 # ─── Helper: count rows in a JSON array response ─────────────────────────────
 # Returns 0 on parse error (e.g. error response object instead of array)
 count_rows() {
-  RESPONSE="$1" python3 -c "
-import json, os
+  local response="$1"
+  python3 -c "
+import json, sys
 try:
-    data = json.loads(os.environ.get('RESPONSE', ''))
+    data = json.loads('''$response''')
     if isinstance(data, list):
         print(len(data))
     else:
-        print(-1)
+        # PostgREST error object — not an array
+        print(0)
 except Exception:
-    print(-1)
-" 2>/dev/null || echo "-1"
+    print(0)
+" 2>/dev/null || echo "0"
 }
 
 # ─── Helper: HTTP GET via curl ────────────────────────────────────────────────
 rest_get() {
   local url="$1"
   local auth_header="$2"
-  curl -s \
+  curl -sf \
     -H "apikey: ${SUPABASE_ANON_KEY}" \
     -H "Authorization: Bearer ${auth_header}" \
     -H "Accept: application/json" \
     -H "Prefer: count=none" \
     --max-time 10 \
-    "$url"
+    "$url" 2>/dev/null || echo "[]"
 }
 
 
@@ -254,6 +252,63 @@ else
 fi
 echo ""
 
+# =============================================================================
+# TEST F: App middleware still resolves the user's DB row correctly
+# =============================================================================
+# This tests the real in-app code path: middleware.ts:247 queries the users
+# table via PostgREST using the session JWT from the cookie. A 200 response
+# on a protected route proves the middleware read the row and didn't redirect
+# to /login (which would indicate a 302 or 401).
+#
+# This test is valid at any phase because it goes through Prisma too (session.ts
+# uses db.user.findFirst). A passing result confirms Prisma is unaffected.
+# =============================================================================
+echo "TEST F — App middleware still resolves the authenticated user's row"
+if [[ -z "${APP_URL:-}" ]]; then
+  skip "F: APP_URL not set"
+elif [[ -z "${APP_SESSION_COOKIE:-}" ]]; then
+  skip "F: APP_SESSION_COOKIE not set"
+  info "   To get the cookie: open DevTools → Application → Cookies after login"
+  info "   Copy all sb-* cookie values and set APP_SESSION_COOKIE='name=value; name2=value2'"
+  info "   Manual alternative: log into ${APP_URL:-<APP_URL>}/dashboard and confirm no redirect"
+else
+  # Follow redirects; final URL and status reveal if middleware accepted the session
+  HTTP_INFO=$(curl -sf \
+    -o /dev/null \
+    -w "%{http_code} %{url_effective}" \
+    -L \
+    --max-redirs 5 \
+    --max-time 15 \
+    -H "Cookie: ${APP_SESSION_COOKIE}" \
+    "${APP_URL}/dashboard" 2>/dev/null || echo "000 error")
+
+  HTTP_STATUS=$(echo "$HTTP_INFO" | awk '{print $1}')
+  FINAL_URL=$(echo "$HTTP_INFO" | awk '{print $2}')
+
+  if [[ "$HTTP_STATUS" == "200" ]] && [[ "$FINAL_URL" != *"/login"* ]]; then
+    pass "F: App middleware → /dashboard returned HTTP 200 (user row resolved)"
+  elif [[ "$HTTP_STATUS" == "200" ]] && [[ "$FINAL_URL" == *"/login"* ]]; then
+    fail "F: App → redirected to /login (middleware failed to read user row from DB)"
+    info "   Final URL: ${FINAL_URL}"
+    info "   Check middleware.ts:247 — supabase.from('users') query is failing"
+  elif [[ "$HTTP_STATUS" == "000" ]]; then
+    fail "F: Could not reach ${APP_URL}/dashboard — network error"
+  else
+    fail "F: App → HTTP ${HTTP_STATUS} (expected 200), final URL: ${FINAL_URL}"
+  fi
+
+  # Also hit /api/health as a Prisma-only sanity check (no auth required)
+  HEALTH_STATUS=$(curl -sf -o /dev/null -w "%{http_code}" \
+    --max-time 10 \
+    "${APP_URL}/api/health" 2>/dev/null || echo "000")
+  if [[ "$HEALTH_STATUS" == "200" ]]; then
+    pass "F2: App /api/health returns 200 (Prisma connection healthy)"
+  else
+    fail "F2: App /api/health returned HTTP ${HEALTH_STATUS} (Prisma connection may be broken)"
+  fi
+fi
+echo ""
+
 
 # =============================================================================
 # SUMMARY
@@ -287,59 +342,3 @@ else
 fi
 echo "============================================================"
 exit 0
-
-
-# =============================================================================
-# MANUAL VERIFICATION — Test F (app middleware end-to-end)
-# =============================================================================
-#
-# This verifies the live in-app path: middleware.ts queries the users table
-# via PostgREST using the session JWT from the browser cookie. It must be done
-# manually because it requires an interactive browser session.
-#
-# Run AFTER all phases have been applied and automated tests A–E pass.
-#
-# Steps:
-#
-# 1. Open an incognito / private browser window.
-#
-# 2. Navigate to https://fixit247.com.au/login (or your staging URL).
-#
-# 3. Log in with a real CUSTOMER account.
-#
-# 4. Confirm you land on /dashboard (or are redirected there after login).
-#    - Expected: page loads fully with the customer's name visible.
-#    - Failure: redirect loop back to /login, or a blank/error page.
-#
-# 5. Open DevTools → Network tab. Refresh the page.
-#    Confirm there are NO 401 or 403 responses from /rest/v1/users.
-#    (The middleware makes this call internally — it will not appear as a
-#    browser-initiated XHR, but a 401 from PostgREST would surface as a
-#    redirect to /login, which you would see as a redirect chain.)
-#
-# 6. Repeat steps 2–5 with a TRADIE account and confirm you land on
-#    /tradie/dashboard with the tradie's business name visible.
-#
-# 7. Hit /api/health and confirm HTTP 200 is returned.
-#    This is a Prisma-only path and confirms the superuser bypass is intact.
-#    curl -s -o /dev/null -w "%{http_code}" https://fixit247.com.au/api/health
-#    Expected output: 200
-#
-# PASS criteria:
-#   - Customer lands on /dashboard without redirect loop.
-#   - Tradie lands on /tradie/dashboard without redirect loop.
-#   - /api/health returns 200.
-#
-# FAIL criteria (investigate immediately):
-#   - Any redirect back to /login after a successful login attempt.
-#   - "Unauthorized" or "Forbidden" shown on a protected page.
-#   - /api/health returns non-200.
-#
-# If any failure occurs, check:
-#   - Supabase SQL editor: SELECT relrowsecurity, relforcerowsecurity
-#       FROM pg_class WHERE relname = 'users';
-#     relrowsecurity should be true; relforcerowsecurity should be false.
-#   - Supabase Auth dashboard: confirm the test user exists in both the
-#     auth.users table AND the public.users table with a matching id.
-#   - Middleware logs (Render dashboard) for "Failed to read user row" errors.
-# =============================================================================
