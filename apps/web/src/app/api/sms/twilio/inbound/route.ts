@@ -97,24 +97,31 @@ export async function POST(req: Request) {
 
   logger.info('[sms-inbound] SMS received', { messageSid, from, to, body: messageBody });
 
-  // Persist as a Notification so it appears in the admin dashboard
+  // Persist as a Notification — if no matching user, skip the userId entirely
   try {
-    // Try to find a user with this phone number to link the notification
     const user = await db.user.findFirst({
       where: { phone: from },
       select: { id: true },
     });
 
-    await db.notification.create({
-      data: {
-        userId: user?.id ?? null,
-        type: 'SMS_INBOUND',
-        title: `SMS from ${from}`,
-        message: messageBody,
-        metadata: { messageSid, from, to },
-        read: false,
-      },
-    });
+    const notificationData = user?.id
+      ? {
+          userId: user.id,
+          type: 'SMS_INBOUND',
+          title: `SMS from ${from}`,
+          message: messageBody,
+          metadata: { messageSid, from, to },
+          read: false,
+        }
+      : {
+          type: 'SMS_INBOUND',
+          title: `SMS from ${from}`,
+          message: messageBody,
+          metadata: { messageSid, from, to },
+          read: false,
+        };
+
+    await db.notification.create({ data: notificationData });
     logger.info('[sms-inbound] Notification persisted', { messageSid });
   } catch (err) {
     // Non-fatal — always reply to Twilio
@@ -124,7 +131,6 @@ export async function POST(req: Request) {
     });
   }
 
-  // Auto-reply so the sender gets immediate confirmation
   const autoReply =
     `Thanks for contacting Fixit 24/7! ` +
     `We've received your message and will get back to you shortly. ` +
