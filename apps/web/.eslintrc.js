@@ -1,5 +1,7 @@
 /** @type {import('eslint').Linter.Config} */
 module.exports = {
+  root: true,
+  extends: ['next/core-web-vitals'],
   rules: {
     // Unsafe-* rules produce too many false positives with Prisma/Supabase/Google Maps types.
     // Downgrade to warn so CI passes while still surfacing the issues.
@@ -40,7 +42,7 @@ module.exports = {
     '@typescript-eslint/require-await': 'warn',
     '@typescript-eslint/await-thenable': 'warn',
 
-    // @next/next plugin not loaded in the shared ESLint config; disable this rule.
-    '@next/next/no-img-element': 'off',
+    // Allow <img> where Next.js Image optimisation isn't needed (e.g. dynamic external URLs).
+    '@next/next/no-img-element': 'warn',
   },
 };
