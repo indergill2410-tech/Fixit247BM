@@ -21,7 +21,7 @@ function sanitiseRedirectTo(raw: string | null): string {
 // Use NEXT_PUBLIC_SITE_URL so OAuth callbacks work correctly behind reverse proxies
 // (window.location.origin resolves to the container's internal address, not the public URL)
 function getSiteOrigin(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? window.location.origin;
+  return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || window.location.origin;
 }
 
 const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
