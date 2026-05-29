@@ -12,13 +12,54 @@ import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import { loginSchema, type LoginValues } from '@/lib/validators/auth';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
 
+// Prevent open-redirect: only allow same-origin relative paths.
+function sanitiseRedirectTo(raw: string | null): string {
+  if (!raw) return '/dashboard';
+  return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
+}
+
+const DEMO_ACCOUNTS = [
+  {
+    email: 'emma.williams@demo.fixit247.com',
+    password: 'Demo1234!',
+    dest: '/dashboard',
+    label: 'Homeowner',
+    description: 'Post jobs, hire tradies, track progress',
+    icon: '🏠',
+    badge: 'Customer view',
+    badgeColor: 'bg-blue-500/15 text-blue-400',
+  },
+  {
+    email: 'mike.torres@demo.fixit247.com',
+    password: 'Demo1234!',
+    dest: '/tradie/dashboard',
+    label: 'Tradie',
+    description: 'Browse leads, manage jobs & earnings',
+    icon: '🔧',
+    badge: 'Tradie view',
+    badgeColor: 'bg-brand-500/15 text-brand-400',
+  },
+  {
+    email: 'admin@demo.fixit247.com.au',
+    password: 'Demo1234!',
+    dest: '/admin',
+    label: 'Admin',
+    description: 'Platform dashboard & user management',
+    icon: '⚙️',
+    badge: 'Admin view',
+    badgeColor: 'bg-purple-500/15 text-purple-400',
+  },
+] as const;
+
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const redirectTo = sanitiseRedirectTo(searchParams.get('redirectTo'));
+  const urlError = searchParams.get('error');
   const [showPassword, setShowPassword] = React.useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const [showGoogleRoleSelect, setShowGoogleRoleSelect] = React.useState(false);
+  const [demoLoading, setDemoLoading] = React.useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -44,7 +85,6 @@ export function LoginForm() {
       return;
     }
 
-    // Track login stats — fire and forget (non-blocking)
     void supabase.rpc('increment_login_stats', { user_id: data.user.id });
 
     const role = (data.user.user_metadata as Record<string, unknown>).role;
@@ -68,6 +108,26 @@ export function LoginForm() {
     toast.success('Verification email sent');
   }
 
+  async function loginAsDemo(email: string, password: string, dest: string) {
+    if (demoLoading || isSubmitting || isGoogleLoading) return;
+    setDemoLoading(email);
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error('Demo login failed — account may not be seeded yet');
+        setDemoLoading(null);
+        return;
+      }
+      toast.success('Signed in as demo user');
+      router.push(dest);
+      router.refresh();
+    } catch (err) {
+      toast.error('An unexpected error occurred during demo login');
+      setDemoLoading(null);
+    }
+  }
+
   function handleGoogleLogin() {
     setShowGoogleRoleSelect(true);
   }
@@ -79,7 +139,7 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${redirectTo}&googleRole=${role}`,
+        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}&googleRole=${role}`,
         queryParams: { access_type: 'offline', prompt: 'consent' },
       },
     });
@@ -98,6 +158,14 @@ export function LoginForm() {
 
       <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
         <CardContent className="px-6 pb-6 pt-8">
+          {urlError && (
+            <div className="mb-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+              {urlError === 'auth_callback_failed'
+                ? 'Google sign-in failed. Please try again or use email and password.'
+                : 'An error occurred. Please try again.'}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="email" className="text-sm font-medium text-white/90">Email address</label>
@@ -216,6 +284,57 @@ export function LoginForm() {
           Sign up free
         </Link>
       </p>
+
+      {/* Demo accounts — one-click instant login */}
+      {process.env.NODE_ENV !== 'production' && (
+        <div className="mt-8 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03]">
+          <div className="flex items-center gap-2 border-b border-white/6 px-5 py-3">
+            <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">Try a demo account</span>
+            <span className="rounded-full bg-brand-500/20 px-2 py-0.5 text-[10px] font-bold text-brand-400">LIVE DEMO</span>
+          </div>
+          <div className="divide-y divide-white/6">
+            {DEMO_ACCOUNTS.map(({ email, password, dest, label, description, icon, badge, badgeColor }) => {
+              const isLoading = demoLoading === email;
+              const isDisabled = demoLoading !== null || isSubmitting || isGoogleLoading;
+              return (
+                <button
+                  key={email}
+                  type="button"
+                  disabled={isDisabled}
+                  onClick={() => void loginAsDemo(email, password, dest)}
+                  className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.05] text-lg group-hover:bg-white/[0.08]">
+                    {icon}
+                  </span>
+                  <span className="min-w-0 flex-1">
+                    <span className="flex items-center gap-2">
+                      <span className="text-sm font-semibold text-gray-200">{label}</span>
+                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${badgeColor}`}>{badge}</span>
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-gray-500">{description}</span>
+                  </span>
+                  <span className="shrink-0">
+                    {isLoading ? (
+                      <svg className="h-4 w-4 animate-spin text-brand-400" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                    ) : (
+                      <svg className="h-4 w-4 text-gray-600 transition-colors group-hover:text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                      </svg>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+          <div className="border-t border-white/6 px-5 py-3 text-center text-[11px] text-gray-600">
+            One click — instantly signed in, no password needed
+          </div>
+        </div>
+      )}
     </motion.div>
   );
 }
