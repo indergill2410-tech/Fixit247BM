@@ -1,4 +1,3 @@
-import path from 'path';
 import type { NextConfig } from 'next';
 import { withSentryConfig } from '@sentry/nextjs';
 
@@ -27,15 +26,13 @@ const csp = [
   .join('; ');
 
 const nextConfig: NextConfig = {
-  output: 'standalone',
-  outputFileTracingRoot: path.resolve(__dirname, '../../'),
   transpilePackages: [
     '@fixit247/ui',
     '@fixit247/auth',
     '@fixit247/database',
     '@fixit247/payments',
     '@fixit247/ai',
-    '@fixit247/voice',      // ← was missing: used in /api/voice/twilio/* routes
+    '@fixit247/voice',
     '@fixit247/matching',
     '@fixit247/realtime',
     '@fixit247/notifications',
@@ -80,12 +77,10 @@ const nextConfig: NextConfig = {
             : []),
         ],
       },
-      // Cache static assets aggressively
       {
         source: '/_next/static/(.*)',
         headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
       },
-      // No caching for API responses
       {
         source: '/api/(.*)',
         headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' }],
