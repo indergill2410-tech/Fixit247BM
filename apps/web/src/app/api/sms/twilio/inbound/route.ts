@@ -97,32 +97,28 @@ export async function POST(req: Request) {
 
   logger.info('[sms-inbound] SMS received', { messageSid, from, to, body: messageBody });
 
-  // Persist as a Notification — if no matching user, skip the userId entirely
+  // Persist notification — only if we can resolve a userId (required by schema)
   try {
     const user = await db.user.findFirst({
       where: { phone: from },
       select: { id: true },
     });
 
-    const notificationData = user?.id
-      ? {
+    if (user?.id) {
+      await db.notification.create({
+        data: {
           userId: user.id,
-          type: 'SMS_INBOUND',
+          type: 'SYSTEM_ALERT',
           title: `SMS from ${from}`,
-          message: messageBody,
-          metadata: { messageSid, from, to },
-          read: false,
-        }
-      : {
-          type: 'SMS_INBOUND',
-          title: `SMS from ${from}`,
-          message: messageBody,
-          metadata: { messageSid, from, to },
-          read: false,
-        };
-
-    await db.notification.create({ data: notificationData });
-    logger.info('[sms-inbound] Notification persisted', { messageSid });
+          body: messageBody,
+          channel: 'IN_APP',
+          data: { messageSid, from, to },
+        },
+      });
+      logger.info('[sms-inbound] Notification persisted', { messageSid, userId: user.id });
+    } else {
+      logger.info('[sms-inbound] No matching user for phone — skipping notification', { from });
+    }
   } catch (err) {
     // Non-fatal — always reply to Twilio
     logger.error('[sms-inbound] DB write failed', {
