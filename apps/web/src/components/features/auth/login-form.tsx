@@ -109,18 +109,23 @@ export function LoginForm() {
   }
 
   async function loginAsDemo(email: string, password: string, dest: string) {
-    if (demoLoading) return;
+    if (demoLoading || isSubmitting || isGoogleLoading) return;
     setDemoLoading(email);
-    const supabase = getSupabaseBrowserClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) {
-      toast.error('Demo login failed — account may not be seeded yet');
+    try {
+      const supabase = getSupabaseBrowserClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      if (error) {
+        toast.error('Demo login failed — account may not be seeded yet');
+        setDemoLoading(null);
+        return;
+      }
+      toast.success('Signed in as demo user');
+      router.push(dest);
+      router.refresh();
+    } catch (err) {
+      toast.error('An unexpected error occurred during demo login');
       setDemoLoading(null);
-      return;
     }
-    toast.success('Signed in as demo user');
-    router.push(dest);
-    router.refresh();
   }
 
   function handleGoogleLogin() {
