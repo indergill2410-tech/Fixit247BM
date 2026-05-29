@@ -2,6 +2,14 @@
 module.exports = {
   root: true,
   extends: ['next/core-web-vitals'],
+  plugins: ['@typescript-eslint'],
+  parser: '@typescript-eslint/parser',
+  parserOptions: {
+    project: true,
+    ecmaVersion: 2022,
+    sourceType: 'module',
+    ecmaFeatures: { jsx: true },
+  },
   rules: {
     // Unsafe-* rules produce too many false positives with Prisma/Supabase/Google Maps types.
     // Downgrade to warn so CI passes while still surfacing the issues.

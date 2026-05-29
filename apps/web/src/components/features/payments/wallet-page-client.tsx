@@ -1,6 +1,7 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { WalletCard } from './wallet-card';
 import { CreditPurchaseModal } from './credit-purchase-modal';
 import { TransactionHistory } from './transaction-history';
@@ -73,12 +74,12 @@ export function WalletPageClient({ userId }: { userId: string }) {
             >
               Buy credits
             </button>
-            <a
+            <Link
               href="/tradie/subscription"
               className="rounded-lg border border-yellow-400 px-4 py-2 text-sm font-semibold text-yellow-800 hover:bg-yellow-100 transition-colors"
             >
               Upgrade plan
-            </a>
+            </Link>
           </div>
         </div>
       )}
