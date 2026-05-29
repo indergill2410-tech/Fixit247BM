@@ -18,6 +18,14 @@ function sanitiseRedirectTo(raw: string | null): string {
   return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
 }
 
+// Use NEXT_PUBLIC_SITE_URL so OAuth callbacks work correctly behind reverse proxies
+// (window.location.origin resolves to the container's internal address, not the public URL)
+function getSiteOrigin(): string {
+  return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? window.location.origin;
+}
+
+const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+
 const DEMO_ACCOUNTS = [
   {
     email: 'emma.williams@demo.fixit247.com',
@@ -122,7 +130,7 @@ export function LoginForm() {
       toast.success('Signed in as demo user');
       router.push(dest);
       router.refresh();
-    } catch (err) {
+    } catch {
       toast.error('An unexpected error occurred during demo login');
       setDemoLoading(null);
     }
@@ -139,7 +147,7 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}&googleRole=${role}`,
+        redirectTo: `${getSiteOrigin()}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}&googleRole=${role}`,
         queryParams: { access_type: 'offline', prompt: 'consent' },
       },
     });
@@ -275,6 +283,60 @@ export function LoginForm() {
               Continue with Google
             </Button>
           )}
+
+          {/* Demo accounts — one-click instant login, shown when NEXT_PUBLIC_DEMO_MODE=true */}
+          {SHOW_DEMO && (
+            <>
+              <div className="my-5 flex items-center gap-3">
+                <div className="flex-1 border-t border-white/10" />
+                <span className="text-xs text-white/40">or try a demo account</span>
+                <div className="flex-1 border-t border-white/10" />
+              </div>
+              <div className="overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03]">
+                <div className="divide-y divide-white/6">
+                  {DEMO_ACCOUNTS.map(({ email, password, dest, label, description, icon, badge, badgeColor }) => {
+                    const isLoading = demoLoading === email;
+                    const isDisabled = demoLoading !== null || isSubmitting || isGoogleLoading;
+                    return (
+                      <button
+                        key={email}
+                        type="button"
+                        disabled={isDisabled}
+                        onClick={() => void loginAsDemo(email, password, dest)}
+                        className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
+                      >
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.05] text-lg group-hover:bg-white/[0.08]">
+                          {icon}
+                        </span>
+                        <span className="min-w-0 flex-1">
+                          <span className="flex items-center gap-2">
+                            <span className="text-sm font-semibold text-gray-200">{label}</span>
+                            <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${badgeColor}`}>{badge}</span>
+                          </span>
+                          <span className="mt-0.5 block truncate text-xs text-gray-500">{description}</span>
+                        </span>
+                        <span className="shrink-0">
+                          {isLoading ? (
+                            <svg className="h-4 w-4 animate-spin text-brand-400" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                            </svg>
+                          ) : (
+                            <svg className="h-4 w-4 text-gray-600 transition-colors group-hover:text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                            </svg>
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+                <div className="border-t border-white/6 px-5 py-2.5 text-center text-[11px] text-gray-600">
+                  One click — instantly signed in, no password needed
+                </div>
+              </div>
+            </>
+          )}
         </CardContent>
       </Card>
 
@@ -284,57 +346,6 @@ export function LoginForm() {
           Sign up free
         </Link>
       </p>
-
-      {/* Demo accounts — one-click instant login */}
-      {process.env.NODE_ENV !== 'production' && (
-        <div className="mt-8 overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03]">
-          <div className="flex items-center gap-2 border-b border-white/6 px-5 py-3">
-            <span className="text-xs font-semibold uppercase tracking-widest text-gray-500">Try a demo account</span>
-            <span className="rounded-full bg-brand-500/20 px-2 py-0.5 text-[10px] font-bold text-brand-400">LIVE DEMO</span>
-          </div>
-          <div className="divide-y divide-white/6">
-            {DEMO_ACCOUNTS.map(({ email, password, dest, label, description, icon, badge, badgeColor }) => {
-              const isLoading = demoLoading === email;
-              const isDisabled = demoLoading !== null || isSubmitting || isGoogleLoading;
-              return (
-                <button
-                  key={email}
-                  type="button"
-                  disabled={isDisabled}
-                  onClick={() => void loginAsDemo(email, password, dest)}
-                  className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.05] text-lg group-hover:bg-white/[0.08]">
-                    {icon}
-                  </span>
-                  <span className="min-w-0 flex-1">
-                    <span className="flex items-center gap-2">
-                      <span className="text-sm font-semibold text-gray-200">{label}</span>
-                      <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${badgeColor}`}>{badge}</span>
-                    </span>
-                    <span className="mt-0.5 block truncate text-xs text-gray-500">{description}</span>
-                  </span>
-                  <span className="shrink-0">
-                    {isLoading ? (
-                      <svg className="h-4 w-4 animate-spin text-brand-400" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                      </svg>
-                    ) : (
-                      <svg className="h-4 w-4 text-gray-600 transition-colors group-hover:text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                      </svg>
-                    )}
-                  </span>
-                </button>
-              );
-            })}
-          </div>
-          <div className="border-t border-white/6 px-5 py-3 text-center text-[11px] text-gray-600">
-            One click — instantly signed in, no password needed
-          </div>
-        </div>
-      )}
     </motion.div>
   );
 }
