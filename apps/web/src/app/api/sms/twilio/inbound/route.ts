@@ -97,7 +97,7 @@ export async function POST(req: Request) {
 
   logger.info('[sms-inbound] SMS received', { messageSid, from, to, body: messageBody });
 
-  // Persist notification — only if we can resolve a userId (required by schema)
+  // Persist notification — match by phone if possible, otherwise notify all admins
   try {
     const user = await db.user.findFirst({
       where: { phone: from },
@@ -115,9 +115,29 @@ export async function POST(req: Request) {
           data: { messageSid, from, to },
         },
       });
-      logger.info('[sms-inbound] Notification persisted', { messageSid, userId: user.id });
+      logger.info('[sms-inbound] Notification persisted for matched user', { messageSid, userId: user.id });
     } else {
-      logger.info('[sms-inbound] No matching user for phone — skipping notification', { from });
+      // No user matched by phone — notify all admins so no inbound SMS is silently lost
+      const admins = await db.user.findMany({
+        where: { role: { in: ['ADMIN', 'SUPER_ADMIN'] }, isActive: true },
+        select: { id: true },
+      });
+
+      if (admins.length > 0) {
+        await db.notification.createMany({
+          data: admins.map((admin) => ({
+            userId: admin.id,
+            type: 'SYSTEM_ALERT' as const,
+            title: `Unmatched inbound SMS from ${from}`,
+            body: messageBody || '(empty message)',
+            channel: 'IN_APP' as const,
+            data: { messageSid, from, to, unmatched: true },
+          })),
+        });
+        logger.info('[sms-inbound] Unmatched SMS — notified admins', { messageSid, from, adminCount: admins.length });
+      } else {
+        logger.warn('[sms-inbound] Unmatched SMS and no active admins found — SMS not persisted', { messageSid, from });
+      }
     }
   } catch (err) {
     // Non-fatal — always reply to Twilio
