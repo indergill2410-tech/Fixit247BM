@@ -57,8 +57,23 @@ export async function GET(request: NextRequest) {
   }
 }
 
+// Use NEXT_PUBLIC_SITE_URL so redirects work correctly behind Render's reverse proxy.
+// request.url can contain the internal container address (e.g. http://0.0.0.0:PORT)
+// when the proxy doesn't rewrite the Host header before the route handler sees it.
+function getOrigin(request: NextRequest): string {
+  if (process.env.NEXT_PUBLIC_SITE_URL) {
+    return process.env.NEXT_PUBLIC_SITE_URL.replace(/\/$/, '');
+  }
+  // Fallback: reconstruct from forwarded headers (standard reverse-proxy headers)
+  const proto = request.headers.get('x-forwarded-proto') ?? 'https';
+  const host = request.headers.get('x-forwarded-host') ?? request.headers.get('host');
+  if (host) return `${proto}://${host}`;
+  return new URL(request.url).origin;
+}
+
 async function handleCallback(request: NextRequest) {
-  const { searchParams, origin } = new URL(request.url);
+  const { searchParams } = new URL(request.url);
+  const origin = getOrigin(request);
   const code       = searchParams.get('code');
   const tokenHash  = searchParams.get('token_hash');
   const type       = searchParams.get('type');
