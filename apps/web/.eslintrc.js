@@ -42,7 +42,7 @@ module.exports = {
     '@typescript-eslint/require-await': 'warn',
     '@typescript-eslint/await-thenable': 'warn',
 
-    // Allow <img> where Next.js Image optimisation isn't needed (e.g. dynamic external URLs).
+    // Warn on <img> elements to encourage using Next.js <Image> component where possible.
     '@next/next/no-img-element': 'warn',
   },
 };
