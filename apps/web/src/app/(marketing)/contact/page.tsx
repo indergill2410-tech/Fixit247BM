@@ -12,7 +12,7 @@ const CONTACT_OPTIONS = [
     icon: <Phone size={20} />,
     title: 'Emergency dispatch',
     detail: '1800-FIXIT-247',
-    href: 'tel:1800348498',
+    href: 'tel:1800349482',
     note: 'Available 24 hours a day',
   },
   {
