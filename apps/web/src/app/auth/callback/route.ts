@@ -2,11 +2,12 @@ import { NextResponse } from 'next/server';
 import { type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
+import { getDashboardTarget, normalizeRedirectTarget, toRedirectUrl } from '@/lib/auth/redirects';
 
 export async function GET(request: NextRequest) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get('code');
-  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
+  const redirectTo = normalizeRedirectTarget(searchParams.get('redirectTo'), origin);
 
   if (code) {
     const cookieStore = await cookies();
@@ -46,12 +47,8 @@ export async function GET(request: NextRequest) {
       const dest =
         redirectTo !== '/dashboard'
           ? redirectTo
-          : role === 'TRADIE'
-          ? '/tradie/dashboard'
-          : role === 'ADMIN'
-          ? '/admin'
-          : '/dashboard';
-      return NextResponse.redirect(`${origin}${dest}`);
+          : getDashboardTarget(role);
+      return NextResponse.redirect(toRedirectUrl(dest, origin));
     }
   }
 

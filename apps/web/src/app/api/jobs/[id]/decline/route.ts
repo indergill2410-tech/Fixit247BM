@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
 export async function POST(
@@ -8,7 +8,8 @@ export async function POST(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     if (session.role !== 'TRADIE') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }

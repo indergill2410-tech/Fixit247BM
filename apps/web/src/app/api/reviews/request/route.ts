@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
 import { db } from '@fixit247/database';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 
 export async function POST(req: Request) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const { jobId } = await req.json();
 
     const job = await db.job.findUnique({

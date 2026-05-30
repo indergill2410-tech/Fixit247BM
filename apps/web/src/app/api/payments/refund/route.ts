@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { z } from 'zod';
 import { initiateRefund } from '@fixit247/payments';
 
@@ -12,7 +12,8 @@ const Schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const body = await req.json();
     const data = Schema.parse(body);
 

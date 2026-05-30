@@ -1,6 +1,8 @@
 import type { NextConfig } from 'next';
+import path from 'node:path';
 
 const isProd = process.env['NODE_ENV'] === 'production';
+const monorepoRoot = path.join(process.cwd(), '../..');
 
 // Content Security Policy — tightened per environment
 const csp = [
@@ -25,8 +27,9 @@ const csp = [
   .join('; ');
 
 const nextConfig: NextConfig = {
-  typescript: { ignoreBuildErrors: true },
-  eslint: { ignoreDuringBuilds: true },
+  outputFileTracingRoot: monorepoRoot,
+  typescript: { ignoreBuildErrors: false },
+  eslint: { ignoreDuringBuilds: false },
   transpilePackages: [
     '@fixit247/ui',
     '@fixit247/auth',
@@ -57,8 +60,6 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
-      { source: '/find-a-tradie', destination: '/emergency', permanent: true },
-      { source: '/find-a-tradie/:path*', destination: '/emergency/:path*', permanent: true },
       { source: '/auth/login', destination: '/login', permanent: true },
       { source: '/auth/register', destination: '/register', permanent: true },
     ];

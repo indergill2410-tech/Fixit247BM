@@ -1,9 +1,10 @@
 import { db } from '@fixit247/database';
+import type { GrowthEventType, Prisma } from '@fixit247/database';
 
 export type GrowthEventPayload = {
   userId?: string;
   sessionId?: string;
-  eventType: string;
+  eventType: GrowthEventType;
   page?: string;
   referrer?: string;
   suburb?: string;
@@ -11,32 +12,27 @@ export type GrowthEventPayload = {
   ipHash?: string;
 };
 
+function toGrowthEventInput(event: GrowthEventPayload): Prisma.GrowthEventCreateManyInput {
+  return {
+    userId: event.userId ?? null,
+    sessionId: event.sessionId ?? null,
+    eventType: event.eventType,
+    page: event.page ?? null,
+    referrer: event.referrer ?? null,
+    suburb: event.suburb ?? null,
+    metadata: (event.metadata ?? {}) as Prisma.InputJsonObject,
+    ipHash: event.ipHash ?? null,
+  };
+}
+
 export async function trackEvent(payload: GrowthEventPayload): Promise<void> {
   await db.growthEvent.create({
-    data: {
-      userId: payload.userId,
-      sessionId: payload.sessionId,
-      eventType: payload.eventType as any,
-      page: payload.page,
-      referrer: payload.referrer,
-      suburb: payload.suburb,
-      metadata: payload.metadata ?? {},
-      ipHash: payload.ipHash,
-    },
+    data: toGrowthEventInput(payload),
   });
 }
 
 export async function trackBatch(events: GrowthEventPayload[]): Promise<void> {
   await db.growthEvent.createMany({
-    data: events.map((e) => ({
-      userId: e.userId,
-      sessionId: e.sessionId,
-      eventType: e.eventType as any,
-      page: e.page,
-      referrer: e.referrer,
-      suburb: e.suburb,
-      metadata: e.metadata ?? {},
-      ipHash: e.ipHash,
-    })),
+    data: events.map(toGrowthEventInput),
   });
 }

@@ -1,12 +1,12 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await requireSession();
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+    if (session instanceof NextResponse) return session;
 
     const days = Number(req.nextUrl.searchParams.get('days') ?? '30');
     const since = new Date(Date.now() - days * 86_400_000);

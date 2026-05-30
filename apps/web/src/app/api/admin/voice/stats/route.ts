@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
 export async function GET() {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
 
   const since24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
   const since7d = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);

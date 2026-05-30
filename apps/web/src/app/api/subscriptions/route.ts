@@ -1,12 +1,13 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { z } from 'zod';
 import { createSubscription, getCurrentSubscription, SUBSCRIPTION_PLANS } from '@fixit247/payments';
 
 export async function GET() {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const subscription = await getCurrentSubscription(session.id);
     const plans = SUBSCRIPTION_PLANS;
     return NextResponse.json({ subscription, plans });
@@ -23,7 +24,8 @@ const CreateSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const body = await req.json();
     const { tier, stripeCustomerId } = CreateSchema.parse(body);
 

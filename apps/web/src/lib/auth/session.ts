@@ -48,6 +48,18 @@ export async function requireApiSession(): Promise<SessionUser | NextResponse> {
   return session;
 }
 
+export async function requireApiRole(role: Role | Role[]): Promise<SessionUser | NextResponse> {
+  const session = await requireApiSession();
+  if (session instanceof NextResponse) return session;
+
+  const roles = Array.isArray(role) ? role : [role];
+  if (!roles.includes(session.role)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+
+  return session;
+}
+
 export async function requireRole(role: Role | Role[]): Promise<SessionUser> {
   const session = await requireSession();
   const roles = Array.isArray(role) ? role : [role];

@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import type { Role } from '@fixit247/auth';
+import { getDashboardTarget, toRedirectUrl } from '@/lib/auth/redirects';
 
 // ─── Route Configuration ──────────────────────────────────────────────────────
 
@@ -15,10 +16,12 @@ const PUBLIC_EXACT: readonly string[] = [
   '/auth/callback',
   '/about',
   '/contact',
+  '/find-a-tradie',
   '/unauthorized',
   '/how-it-works',
   '/fixit-plus',
   '/join-as-tradie',
+  '/post-job',
   '/refer',
   '/terms',
   '/privacy',
@@ -26,6 +29,9 @@ const PUBLIC_EXACT: readonly string[] = [
   '/emergency',
   '/voice',
   '/api/health', // Render health checks + public status endpoint
+  '/api/readiness',
+  '/api/payments/webhook',
+  '/api/sms/twilio/inbound',
 ];
 
 // Prefix-match public routes (handles dynamic segments)
@@ -34,7 +40,6 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/emergency/',
   '/suburb/',
   '/trade/',
-  '/tradie/',   // public tradie profiles (/tradie/[id])
   '/api/auth',
   '/api/voice/twilio', // Twilio webhooks — must be publicly reachable, no session
   '/api/twilio',       // Compatibility path (Twilio console may use either prefix)
@@ -42,7 +47,12 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/favicon',
 ];
 
+const PUBLIC_PATTERNS: readonly RegExp[] = [
+  /^\/tradie\/(?!dashboard$|jobs(?:\/|$)|messages$|profile$|earnings$|wallet$|subscription$|availability$|documents$|onboarding(?:\/|$))[^/]+$/,
+];
+
 const ROUTE_ROLES: { pattern: RegExp; roles: Role[] }[] = [
+  { pattern: /^\/api\/admin(?:\/|$)/, roles: ['ADMIN', 'SUPER_ADMIN'] },
   { pattern: /^\/admin/, roles: ['ADMIN', 'SUPER_ADMIN'] },
   { pattern: /^\/tradie\/dashboard/, roles: ['TRADIE'] },
   { pattern: /^\/tradie\/jobs/, roles: ['TRADIE'] },
@@ -70,12 +80,14 @@ const ONBOARDING_EXEMPT = [
   '/tradie/onboarding',
   '/api/onboarding',
   '/api/auth',
+  '/api/admin',
   '/auth/callback',
 ];
 
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_EXACT.includes(pathname)) return true;
   if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return true;
+  if (PUBLIC_PATTERNS.some((pattern) => pattern.test(pathname))) return true;
   return false;
 }
 
@@ -90,10 +102,25 @@ function isOnboardingExempt(pathname: string): boolean {
   return ONBOARDING_EXEMPT.some((p) => pathname.startsWith(p));
 }
 
-function getDashboardPath(role: Role): string {
-  if (role === 'TRADIE') return '/tradie/dashboard';
-  if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/admin';
-  return '/dashboard';
+function isApiRoute(pathname: string): boolean {
+  return pathname.startsWith('/api/');
+}
+
+function unauthorized(request: NextRequest): NextResponse {
+  const { pathname } = request.nextUrl;
+  if (isApiRoute(pathname)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+  const loginUrl = new URL('/login', request.url);
+  loginUrl.searchParams.set('redirectTo', `${pathname}${request.nextUrl.search}`);
+  return NextResponse.redirect(loginUrl);
+}
+
+function forbidden(request: NextRequest): NextResponse {
+  if (isApiRoute(request.nextUrl.pathname)) {
+    return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+  }
+  return NextResponse.redirect(new URL('/unauthorized', request.url));
 }
 
 // ─── Middleware ───────────────────────────────────────────────────────────────
@@ -104,7 +131,13 @@ export async function middleware(request: NextRequest) {
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  if (!supabaseUrl || !supabaseKey) return response;
+  if (!supabaseUrl || !supabaseKey) {
+    if (isPublicRoute(pathname)) return response;
+    if (isApiRoute(pathname)) {
+      return NextResponse.json({ error: 'Auth configuration missing' }, { status: 503 });
+    }
+    return NextResponse.redirect(new URL('/login?error=auth_config', request.url));
+  }
 
   const supabase = createServerClient(supabaseUrl, supabaseKey, {
     cookies: {
@@ -125,15 +158,14 @@ export async function middleware(request: NextRequest) {
     if (user && (pathname === '/login' || pathname === '/register')) {
       const meta = user.user_metadata as Record<string, unknown>;
       const role = (meta.role as Role | undefined) ?? 'CUSTOMER';
-      return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
+      const target = getDashboardTarget(role);
+      return NextResponse.redirect(toRedirectUrl(target, request.nextUrl.origin));
     }
     return response;
   }
 
   if (!user) {
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirectTo', pathname);
-    return NextResponse.redirect(loginUrl);
+    return unauthorized(request);
   }
 
   const meta = user.user_metadata as Record<string, unknown>;
@@ -142,7 +174,7 @@ export async function middleware(request: NextRequest) {
 
   const requiredRoles = getRequiredRoles(pathname);
   if (requiredRoles && !requiredRoles.includes(role)) {
-    return NextResponse.redirect(new URL('/unauthorized', request.url));
+    return forbidden(request);
   }
 
   if (!onboardingComplete && !isOnboardingExempt(pathname)) {

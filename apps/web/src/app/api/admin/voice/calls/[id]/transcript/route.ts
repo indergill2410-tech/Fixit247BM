@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
   const { id } = await params;
 
   const call = await db.voiceCall.findUnique({

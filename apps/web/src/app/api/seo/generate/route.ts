@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { generateSuburbContent } from '@fixit247/ai';
 import { z } from 'zod';
@@ -21,7 +21,9 @@ const TRADE_NAMES: Record<string, string> = {
 };
 
 export async function POST(req: Request) {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
+
   const body = schema.parse(await req.json());
 
   const tradeName = TRADE_NAMES[body.trade.toUpperCase()] ?? body.trade;

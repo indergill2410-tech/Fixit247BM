@@ -11,6 +11,7 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import { loginSchema, type LoginValues } from '@/lib/validators/auth';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
+import { getDashboardTarget, normalizeRedirectTarget } from '@/lib/auth/redirects';
 
 export function LoginForm() {
   const router = useRouter();
@@ -44,19 +45,20 @@ export function LoginForm() {
       return;
     }
 
-    const role = (data.user.user_metadata as Record<string, unknown>).role;
+    const role = (data.user.user_metadata as Record<string, unknown>).role as string | undefined;
+    const safeRedirect = normalizeRedirectTarget(redirectTo, window.location.origin);
     const dest =
-      redirectTo !== '/dashboard'
-        ? redirectTo
-        : role === 'TRADIE'
-        ? '/tradie/dashboard'
-        : role === 'ADMIN' || role === 'SUPER_ADMIN'
-        ? '/admin'
-        : '/dashboard';
+      safeRedirect !== '/dashboard'
+        ? safeRedirect
+        : getDashboardTarget(role);
 
     toast.success('Welcome back!');
-    router.push(dest);
-    router.refresh();
+    if (dest.startsWith('http')) {
+      window.location.assign(dest);
+    } else {
+      router.push(dest);
+      router.refresh();
+    }
   }
 
   async function handleResendVerification(email: string) {
@@ -75,10 +77,13 @@ export function LoginForm() {
     setShowGoogleRoleSelect(false);
     setIsGoogleLoading(true);
     const supabase = getSupabaseBrowserClient();
+    const callbackUrl = new URL('/auth/callback', window.location.origin);
+    callbackUrl.searchParams.set('redirectTo', normalizeRedirectTarget(redirectTo, window.location.origin));
+    callbackUrl.searchParams.set('googleRole', role);
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${window.location.origin}/auth/callback?redirectTo=${redirectTo}&googleRole=${role}`,
+        redirectTo: callbackUrl.toString(),
         queryParams: { access_type: 'offline', prompt: 'consent' },
       },
     });

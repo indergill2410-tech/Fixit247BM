@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
 export async function GET(req: Request) {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
   const { searchParams } = new URL(req.url);
   const days = parseInt(searchParams.get('days') ?? '30');
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000);

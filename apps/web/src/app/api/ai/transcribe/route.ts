@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 
 export async function POST(req: NextRequest) {
   try {
@@ -8,7 +8,8 @@ export async function POST(req: NextRequest) {
     const rl = rateLimit(req, LIMITS.ai);
     if (!rl.success) return rateLimitResponse(rl);
 
-    await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
 
     const formData = await req.formData();
     const audioFile = formData.get('audio');

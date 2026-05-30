@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 
@@ -16,7 +16,8 @@ const UpdateSchema = z.object({
 
 export async function GET() {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const prefs = await db.notificationPreference.findUnique({ where: { userId: session.id } });
     return NextResponse.json({
       preferences: prefs ?? {
@@ -37,7 +38,8 @@ export async function GET() {
 
 export async function PATCH(req: NextRequest) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const body = await req.json();
     const data = UpdateSchema.parse(body);
 
