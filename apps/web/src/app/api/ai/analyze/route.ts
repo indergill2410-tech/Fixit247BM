@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { z } from 'zod';
 
 const AnalyzeSchema = z.object({
@@ -19,7 +19,8 @@ export async function POST(req: NextRequest) {
     const rl = rateLimit(req, LIMITS.ai);
     if (!rl.success) return rateLimitResponse(rl);
 
-    await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const body = await req.json();
     const data = AnalyzeSchema.parse(body);
 

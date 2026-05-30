@@ -13,26 +13,24 @@ function validateTwilioSignature(req: Request, body: string): boolean {
   const authToken = process.env.TWILIO_AUTH_TOKEN;
 
   if (!authToken) {
-    logger.warn('[sms-inbound] TWILIO_AUTH_TOKEN not set — skipping signature validation');
-    return true;
+    logger.error('[sms-inbound] TWILIO_AUTH_TOKEN not set — rejecting inbound webhook');
+    return false;
   }
 
   if (!twilioSignature) {
-    if (process.env.NODE_ENV === 'production') {
-      logger.warn('[sms-inbound] No x-twilio-signature header — rejecting');
-      return false;
-    }
-    return true;
+    logger.warn('[sms-inbound] No x-twilio-signature header — rejecting');
+    return false;
   }
 
-  let pathname: string;
+  let webhookPath: string;
   try {
-    pathname = new URL(req.url).pathname;
+    const url = new URL(req.url);
+    webhookPath = `${url.pathname}${url.search}`;
   } catch {
-    pathname = req.url.split('?')[0] ?? '/api/sms/twilio/inbound';
+    webhookPath = req.url || '/api/sms/twilio/inbound';
   }
 
-  const url = `${APP_BASE}${pathname}`;
+  const url = `${APP_BASE}${webhookPath}`;
   const params = Object.fromEntries(new URLSearchParams(body));
   const sortedKeys = Object.keys(params).sort();
   const data = url + sortedKeys.map((k) => `${k}${params[k] ?? ''}`).join('');
@@ -89,11 +87,11 @@ export async function POST(req: Request) {
     return new NextResponse('Forbidden', { status: 403 });
   }
 
-  const params = Object.fromEntries(new URLSearchParams(body));
-  const from: string = params.From ?? 'unknown';
-  const to: string = params.To ?? process.env.TWILIO_PHONE_NUMBER ?? 'unknown';
-  const messageBody: string = params.Body ?? '';
-  const messageSid: string = params.MessageSid ?? 'unknown';
+  const params = new URLSearchParams(body);
+  const from = params.get('From') ?? 'unknown';
+  const to = params.get('To') ?? process.env.TWILIO_PHONE_NUMBER ?? 'unknown';
+  const messageBody = params.get('Body') ?? '';
+  const messageSid = params.get('MessageSid') ?? 'unknown';
 
   logger.info('[sms-inbound] SMS received', { messageSid, from, to, body: messageBody });
 
@@ -105,17 +103,31 @@ export async function POST(req: Request) {
       select: { id: true },
     });
 
-    await db.notification.create({
-      data: {
-        userId: user?.id ?? null,
-        type: 'SMS_INBOUND',
-        title: `SMS from ${from}`,
-        message: messageBody,
-        metadata: { messageSid, from, to },
-        read: false,
-      },
-    });
-    logger.info('[sms-inbound] Notification persisted', { messageSid });
+    if (user) {
+      await db.notification.create({
+        data: {
+          userId: user.id,
+          type: 'SYSTEM_ALERT',
+          title: `SMS from ${from}`,
+          body: messageBody,
+          data: { messageSid, from, to },
+          channel: 'SMS',
+          status: 'PENDING',
+        },
+      });
+      logger.info('[sms-inbound] User notification persisted', { messageSid, userId: user.id });
+    } else {
+      await db.platformAlert.create({
+        data: {
+          type: 'SYSTEM_ERROR',
+          severity: 'INFO',
+          title: `Inbound SMS from ${from}`,
+          message: messageBody || 'Inbound SMS received without message body.',
+          data: { messageSid, from, to },
+        },
+      });
+      logger.info('[sms-inbound] Platform alert persisted', { messageSid });
+    }
   } catch (err) {
     // Non-fatal — always reply to Twilio
     logger.error('[sms-inbound] DB write failed', {

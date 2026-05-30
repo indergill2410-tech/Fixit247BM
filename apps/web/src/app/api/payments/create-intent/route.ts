@@ -1,24 +1,32 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { stripe, calculateJobPricing } from '@fixit247/payments';
 
 const Schema = z.object({
   jobId: z.string().uuid(),
-  agreedPrice: z.number().positive(),
 });
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     if (session.role !== 'CUSTOMER') {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
 
     const body = await req.json();
-    const { jobId, agreedPrice } = Schema.parse(body);
+    const { jobId } = Schema.parse(body);
+
+    const customerProfile = await db.customerProfile.findUnique({
+      where: { userId: session.id },
+      select: { id: true },
+    });
+    if (!customerProfile) {
+      return NextResponse.json({ error: 'Customer profile not found' }, { status: 404 });
+    }
 
     const job = await db.job.findUnique({
       where: { id: jobId },
@@ -29,11 +37,13 @@ export async function POST(req: NextRequest) {
     });
 
     if (!job) return NextResponse.json({ error: 'Job not found' }, { status: 404 });
+    if (job.customerId !== customerProfile.id) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     if (job.status !== 'CLAIMED') return NextResponse.json({ error: 'Job is not in CLAIMED state' }, { status: 409 });
-    if (!job.tradie?.stripeAccountId) return NextResponse.json({ error: 'Tradie not set up for payments' }, { status: 422 });
+    if (!job.tradieId || !job.tradie?.stripeAccountId) return NextResponse.json({ error: 'Tradie not set up for payments' }, { status: 422 });
+    if (!job.agreedPrice) return NextResponse.json({ error: 'Job has no agreed price' }, { status: 409 });
 
     const pricing = calculateJobPricing({
-      baseAmount: agreedPrice,
+      baseAmount: Number(job.agreedPrice),
       complexity: (job.complexity as 'SIMPLE' | 'MEDIUM' | 'COMPLEX') ?? 'MEDIUM',
       priority: (job.priority as 'STANDARD' | 'URGENT' | 'EMERGENCY'),
     });
@@ -60,7 +70,7 @@ export async function POST(req: NextRequest) {
       metadata: {
         jobId,
         customerId: job.customerId,
-        tradieId: job.tradieId ?? '',
+        tradieId: job.tradieId,
         platform: 'fixit247',
       },
     });
@@ -71,7 +81,7 @@ export async function POST(req: NextRequest) {
       create: {
         jobId,
         customerId: job.customerId,
-        tradieId: job.tradieId!,
+        tradieId: job.tradieId,
         amount: pricing.totalCustomerPayment,
         platformFee: pricing.platformFee,
         tradieAmount: pricing.tradieAmount,

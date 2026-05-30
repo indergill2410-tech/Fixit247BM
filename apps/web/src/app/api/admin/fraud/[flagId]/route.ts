@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
@@ -13,8 +13,8 @@ const ResolveSchema = z.object({
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ flagId: string }> }) {
   try {
-    const session = await requireSession();
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+    if (session instanceof NextResponse) return session;
     const { flagId } = await params;
 
     const flag = await db.fraudFlag.findUnique({
@@ -30,8 +30,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ fla
 
 export async function PATCH(req: NextRequest, { params }: { params: Promise<{ flagId: string }> }) {
   try {
-    const session = await requireSession();
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+    if (session instanceof NextResponse) return session;
     const { flagId } = await params;
     const { resolution, notes, suspendUser } = ResolveSchema.parse(await req.json());
 

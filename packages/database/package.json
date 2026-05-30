@@ -13,7 +13,7 @@
     "db:studio": "prisma studio",
     "db:seed": "tsx src/seed.ts",
     "db:reset": "prisma migrate reset",
-    "build": "tsc --noEmit",
+    "build": "prisma generate && tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit"
   },

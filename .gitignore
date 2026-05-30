@@ -20,6 +20,7 @@ build/
 
 # Generated files
 packages/database/prisma/generated/
+packages/database/src/generated/client/
 
 # Testing
 coverage/
