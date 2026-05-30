@@ -85,23 +85,30 @@ CREATE POLICY "Service role full access addresses"
 DROP POLICY IF EXISTS "Users can read relevant jobs" ON public.jobs;
 CREATE POLICY "Users can read relevant jobs"
   ON public.jobs FOR SELECT
+  TO authenticated
   USING (
-    "customerId" = (SELECT auth.uid())
-    OR "tradieId" = (SELECT auth.uid())
+    "customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+    OR "tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
     OR status IN ('OPEN', 'CLAIMED')
   );
 
 DROP POLICY IF EXISTS "Customers create jobs" ON public.jobs;
 CREATE POLICY "Customers create jobs"
   ON public.jobs FOR INSERT
-  WITH CHECK ("customerId" = (SELECT auth.uid()));
+  TO authenticated
+  WITH CHECK ("customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid())));
 
 DROP POLICY IF EXISTS "Owners update own jobs" ON public.jobs;
 CREATE POLICY "Owners update own jobs"
   ON public.jobs FOR UPDATE
+  TO authenticated
   USING (
-    "customerId" = (SELECT auth.uid())
-    OR "tradieId" = (SELECT auth.uid())
+    "customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+    OR "tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
+  )
+  WITH CHECK (
+    "customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+    OR "tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
   );
 
 DROP POLICY IF EXISTS "Service role full access jobs" ON public.jobs;
@@ -137,8 +144,8 @@ DROP POLICY IF EXISTS "Users read own payments" ON public.payments;
 CREATE POLICY "Users read own payments"
   ON public.payments FOR SELECT
   USING (
-    "customerId" = (SELECT auth.uid())
-    OR "tradieId" = (SELECT auth.uid())
+    "customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+    OR "tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
   );
 
 DROP POLICY IF EXISTS "Service role full access payments" ON public.payments;
@@ -198,14 +205,14 @@ CREATE POLICY "Service role full access credits_wallets"
 -- ─────────────────────────────────────────
 -- CREDIT TRANSACTIONS
 -- ─────────────────────────────────────────
-DROP POLICY IF EXISTS "Users read own credit transactions" ON public.credit_transactions;
+DROP POLICY IF EXISTS "Users read own credit transactions" ON public.transactions;
 CREATE POLICY "Users read own credit transactions"
-  ON public.credit_transactions FOR SELECT
-  USING ("userId" = (SELECT auth.uid()));
+  ON public.transactions FOR SELECT
+  USING ("walletId" IN (SELECT id FROM public.credits_wallets WHERE "userId" = (SELECT auth.uid())));
 
-DROP POLICY IF EXISTS "Service role full access credit_transactions" ON public.credit_transactions;
-CREATE POLICY "Service role full access credit_transactions"
-  ON public.credit_transactions FOR ALL
+DROP POLICY IF EXISTS "Service role full access transactions" ON public.transactions;
+CREATE POLICY "Service role full access transactions"
+  ON public.transactions FOR ALL
   USING (auth.role() = 'service_role');
 
 -- ─────────────────────────────────────────
@@ -232,7 +239,7 @@ CREATE POLICY "Public read availability"
 DROP POLICY IF EXISTS "Tradies manage own availability" ON public.availability;
 CREATE POLICY "Tradies manage own availability"
   ON public.availability FOR ALL
-  USING ("tradieId" = (SELECT auth.uid()));
+  USING ("tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid())));
 
 DROP POLICY IF EXISTS "Service role full access availability" ON public.availability;
 CREATE POLICY "Service role full access availability"
@@ -250,7 +257,7 @@ CREATE POLICY "Public read portfolios"
 DROP POLICY IF EXISTS "Tradies manage own portfolios" ON public.tradie_portfolios;
 CREATE POLICY "Tradies manage own portfolios"
   ON public.tradie_portfolios FOR ALL
-  USING ("tradieId" = (SELECT auth.uid()));
+  USING ("tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid())));
 
 DROP POLICY IF EXISTS "Service role full access tradie_portfolios" ON public.tradie_portfolios;
 CREATE POLICY "Service role full access tradie_portfolios"
@@ -264,14 +271,17 @@ DROP POLICY IF EXISTS "Participants read own disputes" ON public.disputes;
 CREATE POLICY "Participants read own disputes"
   ON public.disputes FOR SELECT
   USING (
-    "raisedById" = (SELECT auth.uid())
-    OR "againstId" = (SELECT auth.uid())
+    "customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+    OR "tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
   );
 
 DROP POLICY IF EXISTS "Users raise disputes" ON public.disputes;
 CREATE POLICY "Users raise disputes"
   ON public.disputes FOR INSERT
-  WITH CHECK ("raisedById" = (SELECT auth.uid()));
+  WITH CHECK (
+    "customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+    OR "tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
+  );
 
 DROP POLICY IF EXISTS "Service role full access disputes" ON public.disputes;
 CREATE POLICY "Service role full access disputes"
@@ -285,7 +295,7 @@ DROP POLICY IF EXISTS "Users read own referrals" ON public.referrals;
 CREATE POLICY "Users read own referrals"
   ON public.referrals FOR SELECT
   USING (
-    "referrerId" = (SELECT auth.uid())
+    "inviterId" = (SELECT auth.uid())
     OR "invitedUserId" = (SELECT auth.uid())
   );
 
@@ -317,7 +327,10 @@ CREATE POLICY "Participants read job events"
     EXISTS (
       SELECT 1 FROM public.jobs j
       WHERE j.id = "jobId"
-      AND (j."customerId" = (SELECT auth.uid()) OR j."tradieId" = (SELECT auth.uid()))
+      AND (
+        j."customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+        OR j."tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
+      )
     )
   );
 
@@ -333,8 +346,8 @@ DROP POLICY IF EXISTS "Participants read own voice calls" ON public.voice_calls;
 CREATE POLICY "Participants read own voice calls"
   ON public.voice_calls FOR SELECT
   USING (
-    "callerId" = (SELECT auth.uid())
-    OR "receiverId" = (SELECT auth.uid())
+    "customerId" = (SELECT auth.uid())
+    OR "assignedAgentId" = (SELECT auth.uid())
   );
 
 DROP POLICY IF EXISTS "Service role full access voice_calls" ON public.voice_calls;
@@ -348,7 +361,21 @@ CREATE POLICY "Service role full access voice_calls"
 DROP POLICY IF EXISTS "Users read own ai conversations" ON public.ai_conversations;
 CREATE POLICY "Users read own ai conversations"
   ON public.ai_conversations FOR SELECT
-  USING ("userId" = (SELECT auth.uid()));
+  USING (
+    EXISTS (
+      SELECT 1 FROM public.jobs j
+      WHERE j.id = "jobId"
+      AND (
+        j."customerId" IN (SELECT id FROM public.customer_profiles WHERE "userId" = (SELECT auth.uid()))
+        OR j."tradieId" IN (SELECT id FROM public.tradie_profiles WHERE "userId" = (SELECT auth.uid()))
+      )
+    )
+    OR EXISTS (
+      SELECT 1 FROM public.voice_calls vc
+      WHERE vc.id = "callId"
+      AND vc."customerId" = (SELECT auth.uid())
+    )
+  );
 
 DROP POLICY IF EXISTS "Service role full access ai_conversations" ON public.ai_conversations;
 CREATE POLICY "Service role full access ai_conversations"
