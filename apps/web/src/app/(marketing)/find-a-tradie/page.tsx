@@ -84,7 +84,7 @@ export default function FindATradiePage() {
               <Link
                 key={trade.slug}
                 href={`/trade/${trade.slug}/sydney-cbd`}
-                className="rounded-2xl border border-white/8 bg-white/4 p-5 transition-colors hover:border-brand-400/40 hover:bg-white/6"
+                className="rounded-2xl border border-white/[0.08] bg-white/[0.04] p-5 transition-colors hover:border-brand-400/40 hover:bg-white/[0.06]"
               >
                 <h3 className="font-bold">{trade.name}</h3>
                 <p className="mt-2 min-h-10 text-sm leading-relaxed text-gray-500">{trade.desc}</p>
