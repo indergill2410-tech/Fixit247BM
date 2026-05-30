@@ -63,7 +63,7 @@ export default function ContactPage() {
         </div>
       </section>
 
-      <section className="border-t border-white/8 bg-[#0f0f0f] px-4 py-16">
+      <section className="border-t border-white/[0.08] bg-[#0f0f0f] px-4 py-16">
         <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
           <div className="flex gap-4">
             <Clock className="mt-1 h-5 w-5 shrink-0 text-brand-400" />
