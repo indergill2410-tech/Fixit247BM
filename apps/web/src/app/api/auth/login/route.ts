@@ -54,6 +54,8 @@ export async function POST(request: NextRequest) {
   // Increment login counter — fire-and-forget, never block the auth response
   void supabase.rpc('increment_login_count', { user_id: data.user.id });
 
-  const role = (data.user.user_metadata as { role?: string }).role ?? 'CUSTOMER';
+  const appMeta = (data.user.app_metadata ?? {}) as { role?: string };
+  const userMeta = (data.user.user_metadata ?? {}) as { role?: string };
+  const role = appMeta.role ?? userMeta.role ?? 'CUSTOMER';
   return NextResponse.json({ role });
 }

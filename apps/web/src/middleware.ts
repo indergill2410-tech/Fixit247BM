@@ -172,6 +172,12 @@ function getDashboardPath(role: Role): string {
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  if (pathname === '/Dashboard' || pathname.startsWith('/Dashboard/')) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace('/Dashboard', '/dashboard');
+    return NextResponse.redirect(url);
+  }
+
   if (pathname === '/' && request.nextUrl.searchParams.has('code')) {
     const callbackUrl = new URL('/auth/callback', request.url);
     callbackUrl.search = request.nextUrl.search;
@@ -275,7 +281,7 @@ export async function middleware(request: NextRequest) {
     if (pathname.startsWith('/api/')) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
-    return NextResponse.redirect(new URL('/unauthorized', request.url));
+    return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
   }
 
   if ((role === 'ADMIN' || role === 'SUPER_ADMIN') && (pathname === '/admin' || pathname.startsWith('/admin/'))) {

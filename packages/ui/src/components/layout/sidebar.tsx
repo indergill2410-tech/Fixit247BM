@@ -1,7 +1,6 @@
 'use client';
 
 import * as React from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '../../lib/utils';
 
 interface SidebarProps {
@@ -12,16 +11,15 @@ interface SidebarProps {
 
 export function Sidebar({ children, collapsed = false, className }: SidebarProps) {
   return (
-    <motion.aside
-      animate={{ width: collapsed ? 72 : 256 }}
-      transition={{ duration: 0.2, ease: 'easeInOut' }}
+    <aside
+      style={{ width: collapsed ? 72 : 256 }}
       className={cn(
-        'flex h-full flex-col border-r border-border bg-card overflow-hidden',
+        'flex h-full flex-col overflow-hidden border-r border-border bg-card transition-[width] duration-150',
         className,
       )}
     >
       {children}
-    </motion.aside>
+    </aside>
   );
 }
 
@@ -53,18 +51,7 @@ export function SidebarNavItem({
       )}
     >
       <span className="flex h-5 w-5 shrink-0 items-center justify-center">{icon}</span>
-      <AnimatePresence>
-        {!collapsed && (
-          <motion.span
-            initial={{ opacity: 0, width: 0 }}
-            animate={{ opacity: 1, width: 'auto' }}
-            exit={{ opacity: 0, width: 0 }}
-            className="overflow-hidden whitespace-nowrap"
-          >
-            {label}
-          </motion.span>
-        )}
-      </AnimatePresence>
+      {!collapsed && <span className="overflow-hidden whitespace-nowrap">{label}</span>}
       {badge !== undefined && !collapsed && (
         <span className="ml-auto flex h-5 min-w-5 items-center justify-center rounded-full bg-brand-600 px-1.5 text-xs text-white">
           {badge}

@@ -28,7 +28,7 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-AU">
+    <html lang="en-AU" className="light" style={{ colorScheme: 'light' }}>
       <body className={`${GeistSans.variable} ${GeistMono.variable} font-sans antialiased`}>
         <Providers>
           {children}

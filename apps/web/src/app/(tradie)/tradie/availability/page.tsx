@@ -282,14 +282,14 @@ export default function TradieAvailabilityPage() {
                       type="time"
                       value={h.startTime}
                       onChange={(e) => { updateHours(idx, 'startTime', e.target.value); }}
-                      className="rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:dark]"
+                      className="rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:light]"
                     />
                     <span className="text-xs text-gray-500">to</span>
                     <input
                       type="time"
                       value={h.endTime}
                       onChange={(e) => { updateHours(idx, 'endTime', e.target.value); }}
-                      className="rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:dark]"
+                      className="rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:light]"
                     />
                   </div>
                 ) : (

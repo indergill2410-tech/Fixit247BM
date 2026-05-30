@@ -88,7 +88,7 @@ export function LoginForm() {
       return;
     }
 
-    void supabase.rpc('increment_login_stats', { user_id: data.user.id });
+    void supabase.rpc('increment_login_count', { user_id: data.user.id });
 
     const appMeta = (data.user.app_metadata ?? {}) as Record<string, unknown>;
     const userMeta = data.user.user_metadata as Record<string, unknown>;
@@ -125,6 +125,7 @@ export function LoginForm() {
         setDemoLoading(null);
         return;
       }
+      void supabase.rpc('increment_login_count', { user_id: data.user.id });
       const dest = getDashboardTarget(role);
       toast.success('Signed in as demo user');
       if (dest.startsWith('http')) {

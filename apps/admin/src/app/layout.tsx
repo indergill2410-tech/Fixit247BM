@@ -13,7 +13,7 @@ export const metadata: Metadata = {
 
 export default function AdminRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en-AU" suppressHydrationWarning>
+    <html lang="en-AU" className="light" style={{ colorScheme: 'light' }}>
       <body className={`${geist.variable} font-sans antialiased`}>
         {children}
         <Toaster richColors position="top-right" />

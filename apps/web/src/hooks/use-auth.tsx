@@ -63,7 +63,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setIsLoading(false);
       return;
     }
-    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+    const { data: { session } } = await supabase.auth.getSession();
+    const supabaseUser = session?.user ?? null;
     setUser(supabaseUser ? mapUser(supabaseUser) : null);
   }, []);
 
@@ -74,8 +75,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return undefined;
     }
 
-    void supabase.auth.getUser().then(({ data: { user: u } }) => {
-      setUser(u ? mapUser(u) : null);
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ? mapUser(session.user) : null);
       setIsLoading(false);
     });
 
