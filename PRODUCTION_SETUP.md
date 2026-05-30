@@ -6,7 +6,12 @@ Follow these steps in order before deploying to Render.
 
 ## 1. Supabase Project
 
-1. Create a new project at https://supabase.com — region: **ap-southeast-1 (Singapore)**
+1. Use the existing Fixit247BM Supabase production project:
+   - Project ref: `ropgwnprmfisbrkqkhxd`
+   - Project URL: `https://ropgwnprmfisbrkqkhxd.supabase.co`
+   - Region: **ap-south-1 (Mumbai)**
+   - Repository link: `indergill2410-tech/Fixit247BM`
+   - Do not reuse Supabase project refs from Carelink or any other product.
 2. Go to **Project Settings → API** and copy:
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon / public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
