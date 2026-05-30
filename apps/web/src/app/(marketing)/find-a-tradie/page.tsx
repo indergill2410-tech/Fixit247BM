@@ -108,7 +108,7 @@ export default function FindATradiePage() {
               <Link
                 key={area.href}
                 href={area.href}
-                className="flex items-center justify-between rounded-xl border border-white/8 bg-white/4 px-5 py-4 transition-colors hover:border-brand-400/40 hover:bg-white/6"
+                className="flex items-center justify-between rounded-xl border border-white/[0.08] bg-white/[0.04] px-5 py-4 transition-colors hover:border-brand-400/40 hover:bg-white/[0.06]"
               >
                 <span className="inline-flex items-center gap-2 font-semibold">
                   <MapPin size={16} className="text-brand-400" />
