@@ -1,14 +1,14 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await requireSession();
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+    if (session instanceof NextResponse) return session;
     const { id } = await params;
 
     const [ticket, messages] = await Promise.all([
@@ -26,8 +26,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
 
 export async function POST(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const session = await requireSession();
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+    if (session instanceof NextResponse) return session;
     const { id } = await params;
     const { content } = z.object({ content: z.string().min(1) }).parse(await req.json());
 

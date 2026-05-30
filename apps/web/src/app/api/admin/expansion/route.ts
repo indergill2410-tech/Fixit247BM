@@ -1,10 +1,11 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 
 export async function GET(req: Request) {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
   const { searchParams } = new URL(req.url);
   const filter = searchParams.get('filter') ?? 'all';
   const limit = Math.min(parseInt(searchParams.get('limit') ?? '50'), 100);
@@ -29,7 +30,8 @@ export async function GET(req: Request) {
 }
 
 export async function PATCH(req: Request) {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
   const body = z
     .object({
       suburb: z.string(),

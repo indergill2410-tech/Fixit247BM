@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { notify, sendReviewRequest, sendReferralPrompt } from '@fixit247/notifications';
 import { z } from 'zod';
@@ -26,7 +26,8 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const { id: jobId } = await params;
     const body = await req.json() as unknown;
     const { status: newStatus, etaMinutes, metadata } = Schema.parse(body);

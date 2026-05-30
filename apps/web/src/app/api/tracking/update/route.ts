@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
@@ -16,7 +16,8 @@ const Schema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     if (session.role !== 'TRADIE') {
       return NextResponse.json({ error: 'Only tradies can post location updates' }, { status: 403 });
     }

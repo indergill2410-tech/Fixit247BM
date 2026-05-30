@@ -7,7 +7,7 @@ export async function createReferralCode(inviterId: string, targetEmail?: string
   await db.referral.create({
     data: {
       inviterId,
-      invitedEmail: targetEmail,
+      invitedEmail: targetEmail ?? null,
       code,
       rewardType: 'CREDITS',
       rewardValue: 20,
