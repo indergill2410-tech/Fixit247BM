@@ -6,6 +6,10 @@ import { createBrowserClient } from '@supabase/ssr';
 import { Suspense } from 'react';
 
 const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
+const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+const DEMO_EMAIL = 'admin@demo.fixit247.com.au';
+const DEMO_PASSWORD = 'Demo1234!';
+type LoadingMode = 'form' | 'demo' | null;
 
 function LoginForm() {
   const router = useRouter();
@@ -17,23 +21,25 @@ function LoginForm() {
   const [error, setError] = React.useState<string | null>(
     accessDenied ? 'Your account does not have admin access.' : null
   );
-  const [loading, setLoading] = React.useState(false);
+  const [loading, setLoading] = React.useState<LoadingMode>(null);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
+  async function signIn(emailValue: string, passwordValue: string, mode: Exclude<LoadingMode, null>) {
     setError(null);
-    setLoading(true);
+    setLoading(mode);
 
     const supabase = createBrowserClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,
       process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     );
 
-    const { data, error: authError } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error: authError } = await supabase.auth.signInWithPassword({
+      email: emailValue,
+      password: passwordValue,
+    });
 
     if (authError || !data.user) {
       setError('Invalid email or password.');
-      setLoading(false);
+      setLoading(null);
       return;
     }
 
@@ -44,12 +50,23 @@ function LoginForm() {
     if (!role || !ADMIN_ROLES.includes(role)) {
       await supabase.auth.signOut();
       setError('Your account does not have admin access.');
-      setLoading(false);
+      setLoading(null);
       return;
     }
 
     router.push('/dashboard');
     router.refresh();
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    await signIn(email, password, 'form');
+  }
+
+  async function handleDemoLogin() {
+    setEmail(DEMO_EMAIL);
+    setPassword(DEMO_PASSWORD);
+    await signIn(DEMO_EMAIL, DEMO_PASSWORD, 'demo');
   }
 
   return (
@@ -104,12 +121,28 @@ function LoginForm() {
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading !== null}
             className="mt-2 w-full rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            {loading ? 'Signing in…' : 'Sign in'}
+            {loading === 'form' ? 'Signing in…' : 'Sign in'}
           </button>
         </form>
+
+        {SHOW_DEMO && (
+          <div className="mt-6 border-t border-gray-200 pt-5">
+            <button
+              type="button"
+              disabled={loading !== null}
+              onClick={() => void handleDemoLogin()}
+              className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition-colors hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading === 'demo' ? 'Opening demo dashboard…' : 'Open super admin demo'}
+            </button>
+            <p className="mt-2 text-center text-xs text-gray-500">
+              Uses {DEMO_EMAIL}
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

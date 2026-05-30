@@ -61,7 +61,7 @@ export default function EmergencyHubPage() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75" />
               <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-emerald-400" />
             </span>
-            <span className="text-sm font-bold uppercase tracking-widest text-emerald-500 dark:text-emerald-400">Live · Tradies available right now</span>
+            <span className="text-sm font-bold uppercase tracking-widest text-emerald-500">Live · Tradies available right now</span>
           </div>
 
           <h1 className="text-[2.75rem] font-black leading-[1.06] tracking-tighter md:text-[4rem] lg:text-[5rem]">

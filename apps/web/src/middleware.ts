@@ -97,7 +97,6 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/emergency/',
   '/suburb/',
   '/trade/',
-  '/tradie/',
   '/api/auth',
   '/api/voice/twilio',
   '/api/twilio',
@@ -106,7 +105,14 @@ const PUBLIC_PREFIXES: readonly string[] = [
   '/favicon',
 ];
 
+const PUBLIC_PATTERNS: readonly RegExp[] = [
+  /^\/tradie\/[^/]+$/,
+  /^\/tradie\/[^/]+\/opengraph-image$/,
+];
+
 const ROUTE_ROLES: { pattern: RegExp; roles: Role[] }[] = [
+  { pattern: /^\/api\/admin(?:\/|$)/, roles: ['ADMIN', 'SUPER_ADMIN'] },
+  { pattern: /^\/api\/tradie(?:\/|$)/, roles: ['TRADIE'] },
   { pattern: /^\/admin/, roles: ['ADMIN', 'SUPER_ADMIN'] },
   { pattern: /^\/tradie\/dashboard/, roles: ['TRADIE'] },
   { pattern: /^\/tradie\/jobs/, roles: ['TRADIE'] },
@@ -140,6 +146,7 @@ const ONBOARDING_EXEMPT = [
 function isPublicRoute(pathname: string): boolean {
   if (PUBLIC_EXACT.includes(pathname)) return true;
   if (PUBLIC_PREFIXES.some((p) => pathname.startsWith(p))) return true;
+  if (PUBLIC_PATTERNS.some((pattern) => pattern.test(pathname))) return true;
   return false;
 }
 
@@ -156,7 +163,9 @@ function isOnboardingExempt(pathname: string): boolean {
 
 function getDashboardPath(role: Role): string {
   if (role === 'TRADIE') return '/tradie/dashboard';
-  if (role === 'ADMIN' || role === 'SUPER_ADMIN') return '/admin';
+  if (role === 'ADMIN' || role === 'SUPER_ADMIN') {
+    return (process.env.NEXT_PUBLIC_ADMIN_URL ?? 'https://admin.fixit247.com.au').replace(/\/$/, '');
+  }
   return '/dashboard';
 }
 
@@ -267,6 +276,11 @@ export async function middleware(request: NextRequest) {
       return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
     }
     return NextResponse.redirect(new URL('/unauthorized', request.url));
+  }
+
+  if ((role === 'ADMIN' || role === 'SUPER_ADMIN') && (pathname === '/admin' || pathname.startsWith('/admin/'))) {
+    const adminBase = getDashboardPath(role);
+    return NextResponse.redirect(`${adminBase}${pathname.slice('/admin'.length)}`);
   }
 
   if (!onboardingComplete && !isOnboardingExempt(pathname)) {

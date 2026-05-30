@@ -3,6 +3,7 @@ import { type NextRequest } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import { cookies } from 'next/headers';
 import { createServiceRoleClient } from '@/lib/supabase/server';
+import { getDashboardTarget, normalizeRedirectTarget } from '@/lib/auth/redirects';
 import { db } from '@fixit247/database';
 import { logger } from '@/lib/logger';
 
@@ -40,11 +41,8 @@ function safeRole(raw: string | undefined): 'CUSTOMER' | 'TRADIE' {
   return raw === 'TRADIE' ? 'TRADIE' : 'CUSTOMER';
 }
 
-// Ensure the post-login redirect stays on this origin (no open redirect).
-// Rejects // and /\ prefixes — browsers normalise /\ to https:// making it an open redirect.
-function sanitiseRedirectTo(raw: string | null): string {
-  if (!raw) return '/dashboard';
-  return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
+function redirectToTarget(origin: string, target: string): NextResponse {
+  return NextResponse.redirect(target.startsWith('http') ? target : `${origin}${target}`);
 }
 
 export async function GET(request: NextRequest) {
@@ -78,7 +76,7 @@ async function handleCallback(request: NextRequest) {
   const code       = searchParams.get('code');
   const tokenHash  = searchParams.get('token_hash');
   const type       = searchParams.get('type');
-  const redirectTo = sanitiseRedirectTo(searchParams.get('redirectTo'));
+  const redirectTo = normalizeRedirectTarget(searchParams.get('redirectTo'), origin);
 
   const cookieStore = await cookies();
   const supabase = createServerClient(
@@ -130,10 +128,8 @@ async function handleCallback(request: NextRequest) {
     // Existing user — password reset or re-verification; send to dashboard
     const dbRole = existing.role;
     const dest   = redirectTo !== '/dashboard' ? redirectTo
-      : dbRole === 'TRADIE' ? '/tradie/dashboard'
-      : dbRole === 'ADMIN' || dbRole === 'SUPER_ADMIN' ? '/admin'
-      : '/dashboard';
-    return NextResponse.redirect(`${origin}${dest}`);
+      : getDashboardTarget(dbRole);
+    return redirectToTarget(origin, dest);
   }
 
   // ── Google OAuth flow ────────────────────────────────────────────────────────
@@ -187,10 +183,8 @@ async function handleCallback(request: NextRequest) {
 
     const dbRole = existing.role;
     const dest   = redirectTo !== '/dashboard' ? redirectTo
-      : dbRole === 'TRADIE'  ? '/tradie/dashboard'
-      : dbRole === 'ADMIN' || dbRole === 'SUPER_ADMIN' ? '/admin'
-      : '/dashboard';
-    return NextResponse.redirect(`${origin}${dest}`);
+      : getDashboardTarget(dbRole);
+    return redirectToTarget(origin, dest);
   }
 
   return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);

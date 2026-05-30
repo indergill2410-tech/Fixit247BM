@@ -17,6 +17,8 @@ export default async function CustomerDashboardPage() {
     where: { userId: session.id },
     select: {
       id: true,
+      creditBalance: true,
+      jobsPosted: true,
       totalSpent: true,
     },
   });
@@ -41,13 +43,16 @@ export default async function CustomerDashboardPage() {
   const totalSpent = customerProfile?.totalSpent
     ? `$${Number(customerProfile.totalSpent).toLocaleString('en-AU', { maximumFractionDigits: 0 })}`
     : '$0';
+  const creditBalance = customerProfile?.creditBalance
+    ? `$${Number(customerProfile.creditBalance).toLocaleString('en-AU', { maximumFractionDigits: 0 })}`
+    : '$0';
 
   return (
     <DashboardShell role="CUSTOMER">
       {/* Emergency banner */}
       <div className="mb-6 flex items-center justify-between rounded-2xl border border-brand-500/30 bg-brand-500/10 p-5">
         <div>
-          <p className="text-sm font-medium text-brand-600 dark:text-brand-300">Need urgent help right now?</p>
+          <p className="text-sm font-medium text-brand-600">Need urgent help right now?</p>
           <p className="mt-0.5 text-xl font-bold text-foreground">Emergency tradie dispatch — available 24/7</p>
         </div>
         <Button asChild variant="emergency" size="lg" className="shrink-0">
@@ -61,6 +66,11 @@ export default async function CustomerDashboardPage() {
       <PageHeader
         title={`Welcome back, ${session.firstName}`}
         description="Track your jobs and manage your home services"
+        actions={
+          <Button asChild size="sm">
+            <Link href="/jobs/new">Post a job</Link>
+          </Button>
+        }
       />
 
       <StatsGrid cols={4}>
@@ -80,12 +90,13 @@ export default async function CustomerDashboardPage() {
           <RecentJobsList />
         </div>
         <div className="space-y-4">
-          <div className="rounded-2xl border border-border bg-background-elevated p-5">
+          <div className="rounded-2xl border border-border bg-background-elevated p-5 shadow-sm-warm">
             <h3 className="font-semibold text-foreground">Quick actions</h3>
             <div className="mt-3 space-y-1">
               {[
                 { label: '🔧 Post a new job', href: '/jobs/new' },
                 { label: '⚡ Emergency request', href: '/jobs/emergency' },
+                { label: '🎙️ AI booking concierge', href: '/voice' },
                 { label: '❤️ Saved tradies', href: '/saved-tradies' },
                 { label: '💳 Invoices', href: '/invoices' },
               ].map((action) => (
@@ -98,6 +109,23 @@ export default async function CustomerDashboardPage() {
                   <span className="text-foreground-subtle">→</span>
                 </Link>
               ))}
+            </div>
+          </div>
+          <div className="rounded-2xl border border-border bg-background-elevated p-5 shadow-sm-warm">
+            <h3 className="font-semibold text-foreground">Home ops snapshot</h3>
+            <div className="mt-4 space-y-3 text-sm">
+              <div className="flex items-center justify-between">
+                <span className="text-foreground-muted">Jobs posted</span>
+                <span className="font-semibold text-foreground">{customerProfile?.jobsPosted ?? activeCount + completedCount}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-foreground-muted">Fixit credits</span>
+                <span className="font-semibold text-foreground">{creditBalance}</span>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-foreground-muted">Lifetime spend</span>
+                <span className="font-semibold text-foreground">{totalSpent}</span>
+              </div>
             </div>
           </div>
         </div>

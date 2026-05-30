@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: 'class',
   content: [
     './src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
@@ -44,14 +43,13 @@ const config: Config = {
         emergency: {
           DEFAULT: '#ef4444',
           light: '#fca5a5',
-          dark:  '#b91c1c',
         },
         warm: {
           50:  '#faf8f4', 100: '#f5f0e8', 200: '#ede8df',
           300: '#e4ddd5', 400: '#d4cdbf', 500: '#b3afac',
           600: '#8c8480', 700: '#6b6460', 800: '#524d49', 900: '#1e1a17',
         },
-        success: { DEFAULT: '#22c55e', light: '#86efac', dark: '#15803d' },
+        success: { DEFAULT: '#22c55e', light: '#86efac' },
       },
       boxShadow: {
         'brand':    '0 0 40px rgba(245,158,11,0.15)',

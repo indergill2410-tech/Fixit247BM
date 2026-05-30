@@ -1,10 +1,10 @@
 function SkeletonBlock({ className }: { className?: string }) {
-  return <div className={`animate-pulse rounded-lg bg-white/8 ${className ?? ''}`} />;
+  return <div className={`animate-pulse rounded-lg bg-background-alt ${className ?? ''}`} />;
 }
 
 function SkeletonStatCard() {
   return (
-    <div className="rounded-2xl border border-white/8 bg-white/4 p-6">
+    <div className="rounded-2xl border border-border bg-background-elevated p-6">
       <SkeletonBlock className="mb-3 h-4 w-24" />
       <SkeletonBlock className="h-8 w-32" />
     </div>
@@ -13,7 +13,7 @@ function SkeletonStatCard() {
 
 function SkeletonListItem() {
   return (
-    <div className="flex items-center gap-4 rounded-xl border border-white/8 bg-white/4 p-4">
+    <div className="flex items-center gap-4 rounded-xl border border-border bg-background-elevated p-4">
       <SkeletonBlock className="h-10 w-10 shrink-0 rounded-full" />
       <div className="flex-1 space-y-2">
         <SkeletonBlock className="h-4 w-3/4" />

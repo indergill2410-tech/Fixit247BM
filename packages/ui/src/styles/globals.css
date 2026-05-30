@@ -3,17 +3,12 @@
 @tailwind utilities;
 
 /* ═══════════════════════════════════════════════════════════
-   FIXIT 24/7 — DUAL-THEME DESIGN SYSTEM
-   Warm Light Theme + Cinematic Dark Theme
+   FIXIT 24/7 — LIGHT DESIGN SYSTEM
+   Warm Ivory · Soft Cream · Premium Neutral
    ═══════════════════════════════════════════════════════════ */
 
 @layer base {
 
-  /* ──────────────────────────────────────────────────────────
-     LIGHT THEME (DEFAULT)
-     Warm Ivory · Soft Cream · Premium Neutral
-     "Premium Apple-style warmth meets fintech polish"
-     ────────────────────────────────────────────────────────── */
   :root {
     /* Base surfaces */
     --background:            38 35% 97%;    /* #FAF8F4 — warm ivory */
@@ -28,13 +23,13 @@
 
     /* Text hierarchy */
     --foreground:            25 15% 11%;    /* #1E1A17 — rich charcoal */
-    --foreground-secondary:  25 10% 30%;    /* #524D49 — warm dark */
+    --foreground-secondary:  25 10% 30%;    /* #524D49 — warm charcoal */
     --foreground-muted:      30 7% 52%;     /* #8C8480 — warm muted gray */
     --foreground-subtle:     30 5% 68%;     /* #B3AFAC — subtle neutral */
 
     /* Primary brand — Emergency Gold stays the same */
     --primary:               38 92% 50%;    /* #F59E0B — amber */
-    --primary-foreground:    25 15% 11%;    /* dark text on amber */
+    --primary-foreground:    25 15% 11%;    /* charcoal text on amber */
     --primary-hover:         38 92% 45%;    /* slightly deeper amber */
 
     /* Secondary & muted */
@@ -73,69 +68,6 @@
     --shadow-emergency:      0 4px 24px rgba(239,68,68,0.22), 0 2px 8px rgba(239,68,68,0.14);
   }
 
-  /* ──────────────────────────────────────────────────────────
-     DARK THEME
-     Cinematic Black · Tactical Depth · Premium Fintech
-     "Emergency dispatch center meets Linear/Stripe"
-     ────────────────────────────────────────────────────────── */
-  .dark {
-    /* Base surfaces — rich warm blacks, not pure */
-    --background:            25 8% 4%;      /* #0B0A09 — near-black with warmth */
-    --background-alt:        25 6% 7%;      /* #131210 — elevated surface */
-    --background-elevated:   25 5% 10%;     /* #1A1918 — highest elevation */
-
-    /* Card & popover */
-    --card:                  25 6% 7%;      /* #131210 — dark card */
-    --card-foreground:       38 25% 96%;    /* #F8F5F0 — warm white */
-    --popover:               25 7% 9%;      /* #171614 */
-    --popover-foreground:    38 25% 96%;
-
-    /* Text hierarchy */
-    --foreground:            38 25% 96%;    /* #F8F5F0 — warm white (not harsh pure) */
-    --foreground-secondary:  38 12% 78%;    /* #CAC5BC — warm light gray */
-    --foreground-muted:      30 8% 52%;     /* #8C8480 — warm medium gray */
-    --foreground-subtle:     25 6% 34%;     /* #595450 — subtle dark gray */
-
-    /* Primary brand */
-    --primary:               38 92% 50%;    /* #F59E0B — unchanged amber */
-    --primary-foreground:    25 15% 9%;
-    --primary-hover:         38 92% 55%;    /* slightly brighter in dark */
-
-    /* Secondary & muted */
-    --secondary:             25 6% 12%;     /* #1E1C1A — dark secondary */
-    --secondary-foreground:  38 25% 96%;
-    --muted:                 25 6% 12%;     /* #1E1C1A */
-    --muted-foreground:      30 8% 52%;     /* warm gray */
-
-    /* Accent */
-    --accent:                38 92% 50%;
-    --accent-foreground:     25 15% 9%;
-
-    /* Status */
-    --destructive:           0 62% 50%;     /* slightly muted red for dark */
-    --destructive-foreground: 0 0% 100%;
-    --emergency:             0 72% 55%;     /* #E84444 */
-    --success:               142 60% 42%;   /* muted green */
-    --warning:               38 92% 50%;
-    --info:                  217 80% 55%;
-
-    /* Chrome */
-    --border:                25 8% 14%;     /* #252220 — subtle warm border */
-    --border-strong:         25 7% 20%;     /* #352F2B — stronger */
-    --input:                 25 8% 14%;
-    --ring:                  38 92% 50%;
-
-    /* Shadows (dark) — deep, cinematic */
-    --shadow-sm:             0 1px 3px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.3);
-    --shadow-md:             0 4px 12px rgba(0,0,0,0.5), 0 2px 6px rgba(0,0,0,0.4);
-    --shadow-lg:             0 8px 32px rgba(0,0,0,0.6), 0 4px 16px rgba(0,0,0,0.4);
-    --shadow-xl:             0 16px 48px rgba(0,0,0,0.7), 0 6px 24px rgba(0,0,0,0.5);
-    --shadow-card:           0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3);
-    --shadow-card-hover:     0 2px 8px rgba(0,0,0,0.6), 0 8px 32px rgba(0,0,0,0.4);
-    --shadow-brand:          0 4px 32px rgba(245,158,11,0.18), 0 2px 12px rgba(245,158,11,0.10);
-    --shadow-emergency:      0 4px 32px rgba(239,68,68,0.25), 0 2px 12px rgba(239,68,68,0.15);
-  }
-
   /* ── Resets & Typography ── */
   * {
     @apply border-border;
@@ -162,28 +94,17 @@
    UTILITY CLASSES
    ═══════════════════════════════════════════════════════════ */
 @layer utilities {
-
-  /* ── Scrollbar ── */
   .scrollbar-hide {
     -ms-overflow-style: none;
     scrollbar-width: none;
   }
+
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
 
-  /* ──────────────────────────────────────────────────────────
-     GLASS MORPHISM — dual-theme aware
-     ────────────────────────────────────────────────────────── */
-
-  /* Dark: classic glass; Light: frosted warm white */
-  .glass {
-    background: rgba(255, 255, 255, 0.04);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    backdrop-filter: blur(12px) saturate(1.5);
-    -webkit-backdrop-filter: blur(12px) saturate(1.5);
-  }
-  :root:not(.dark) .glass {
+  .glass,
+  .glass-sm {
     background: rgba(255, 253, 248, 0.75);
     border: 1px solid rgba(180, 160, 130, 0.18);
     backdrop-filter: blur(16px) saturate(1.8);
@@ -192,26 +113,13 @@
   }
 
   .glass-sm {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.06);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
-  }
-  :root:not(.dark) .glass-sm {
     background: rgba(255, 253, 248, 0.6);
-    border: 1px solid rgba(180, 160, 130, 0.14);
     backdrop-filter: blur(10px);
     -webkit-backdrop-filter: blur(10px);
     box-shadow: 0 2px 12px rgba(90, 70, 40, 0.06);
   }
 
   .glass-brand {
-    background: rgba(245, 158, 11, 0.06);
-    border: 1px solid rgba(245, 158, 11, 0.15);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-  :root:not(.dark) .glass-brand {
     background: rgba(245, 158, 11, 0.08);
     border: 1px solid rgba(245, 158, 11, 0.20);
     backdrop-filter: blur(12px);
@@ -221,32 +129,17 @@
 
   .glass-emergency {
     background: rgba(239, 68, 68, 0.06);
-    border: 1px solid rgba(239, 68, 68, 0.15);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-  :root:not(.dark) .glass-emergency {
-    background: rgba(239, 68, 68, 0.06);
     border: 1px solid rgba(239, 68, 68, 0.18);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     box-shadow: 0 4px 16px rgba(239, 68, 68, 0.08);
   }
 
-  /* ──────────────────────────────────────────────────────────
-     BRAND GLOW
-     ────────────────────────────────────────────────────────── */
   .brand-glow {
-    box-shadow: 0 0 40px rgba(245, 158, 11, 0.15), 0 0 80px rgba(245, 158, 11, 0.05);
-  }
-  :root:not(.dark) .brand-glow {
     box-shadow: 0 0 32px rgba(245, 158, 11, 0.20), 0 0 64px rgba(245, 158, 11, 0.08);
   }
 
   .brand-glow-sm {
-    box-shadow: 0 0 20px rgba(245, 158, 11, 0.12);
-  }
-  :root:not(.dark) .brand-glow-sm {
     box-shadow: 0 0 16px rgba(245, 158, 11, 0.18);
   }
 
@@ -254,9 +147,6 @@
     box-shadow: 0 0 30px rgba(239, 68, 68, 0.20), 0 0 60px rgba(239, 68, 68, 0.08);
   }
 
-  /* ──────────────────────────────────────────────────────────
-     TEXT GRADIENTS
-     ────────────────────────────────────────────────────────── */
   .text-gradient-brand {
     background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #d97706 100%);
     -webkit-background-clip: text;
@@ -264,58 +154,25 @@
     background-clip: text;
   }
 
-  /* Slightly richer in light mode */
-  :root:not(.dark) .text-gradient-brand {
-    background: linear-gradient(135deg, #f59e0b 0%, #d97706 60%, #b45309 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
   .text-gradient-white {
-    background: linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.7) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  /* Charcoal gradient for light mode headings */
-  .text-gradient-charcoal {
     background: linear-gradient(180deg, #1E1A17 0%, #4A4540 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
   }
 
-  /* ──────────────────────────────────────────────────────────
-     BACKGROUND PATTERNS
-     ────────────────────────────────────────────────────────── */
-
-  /* Dot pattern — adapts to theme */
   .dot-pattern {
-    background-image: radial-gradient(rgba(255,255,255,0.07) 1px, transparent 1px);
-    background-size: 24px 24px;
-  }
-  :root:not(.dark) .dot-pattern {
     background-image: radial-gradient(rgba(90,70,40,0.07) 1px, transparent 1px);
     background-size: 24px 24px;
   }
 
-  /* Grid pattern */
   .grid-pattern {
-    background-image:
-      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-  :root:not(.dark) .grid-pattern {
     background-image:
       linear-gradient(rgba(90,70,40,0.05) 1px, transparent 1px),
       linear-gradient(90deg, rgba(90,70,40,0.05) 1px, transparent 1px);
     background-size: 60px 60px;
   }
 
-  /* Noise texture */
   .noise::after {
     content: '';
     position: absolute;
@@ -325,62 +182,41 @@
     opacity: 0.4;
   }
 
-  /* Warm ambient background radial glow */
   .ambient-warm {
-    background-image: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(245,158,11,0.12), transparent);
-  }
-  :root:not(.dark) .ambient-warm {
     background-image: radial-gradient(ellipse 80% 60% at 50% -10%, rgba(245,158,11,0.08), transparent);
   }
 
-  /* Hero background glow for light mode */
   .hero-glow-light {
     background-image:
       radial-gradient(ellipse 70% 50% at 50% -5%, rgba(245,158,11,0.10), transparent),
       radial-gradient(ellipse 40% 30% at 80% 20%, rgba(180,83,9,0.06), transparent);
   }
 
-  /* ──────────────────────────────────────────────────────────
-     CARD STYLES
-     ────────────────────────────────────────────────────────── */
-
-  /* Premium card — adapts */
-  .card-premium {
+  .card-premium,
+  .card-feature {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
     box-shadow: var(--shadow-card);
-    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+    transition: box-shadow 0.2s ease, transform 0.2s ease, border-color 0.2s ease, background 0.2s ease;
   }
-  .card-premium:hover {
+
+  .card-premium:hover,
+  .card-feature:hover {
     box-shadow: var(--shadow-card-hover);
     border-color: hsl(var(--border-strong));
     transform: translateY(-1px);
   }
 
-  /* Feature card with brand accent on hover */
-  .card-feature {
-    background: hsl(var(--card));
-    border: 1px solid hsl(var(--border));
-    box-shadow: var(--shadow-card);
-    transition: all 0.2s ease;
-  }
   .card-feature:hover {
-    box-shadow: var(--shadow-card-hover);
     border-color: rgba(245, 158, 11, 0.3);
     background: rgba(245, 158, 11, 0.03);
   }
-  .dark .card-feature:hover {
-    border-color: rgba(245, 158, 11, 0.25);
-    background: rgba(245, 158, 11, 0.04);
-  }
 
-  /* ──────────────────────────────────────────────────────────
-     LIVE PULSE DOT
-     ────────────────────────────────────────────────────────── */
   .live-dot {
     position: relative;
     display: inline-flex;
   }
+
   .live-dot::before {
     content: '';
     position: absolute;
@@ -390,23 +226,12 @@
     animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
   }
 
-  /* ──────────────────────────────────────────────────────────
-     EMERGENCY BADGE
-     ────────────────────────────────────────────────────────── */
   .emergency-badge {
-    background: rgba(239, 68, 68, 0.08);
-    border: 1px solid rgba(239, 68, 68, 0.20);
-    color: #ef4444;
-  }
-  :root:not(.dark) .emergency-badge {
     background: rgba(239, 68, 68, 0.07);
     border: 1px solid rgba(239, 68, 68, 0.22);
     color: #dc2626;
   }
 
-  /* ──────────────────────────────────────────────────────────
-     NAVIGATION
-     ────────────────────────────────────────────────────────── */
   .nav-link {
     color: hsl(var(--foreground-muted));
     border-radius: 0.75rem;
@@ -415,24 +240,17 @@
     font-weight: 500;
     transition: all 0.15s ease;
   }
+
   .nav-link:hover {
     color: hsl(var(--foreground));
-    background: rgba(255,255,255,0.04);
-  }
-  :root:not(.dark) .nav-link:hover {
     background: rgba(90, 70, 40, 0.06);
   }
+
   .nav-link.active {
     color: hsl(var(--foreground));
-    background: rgba(255,255,255,0.06);
-  }
-  :root:not(.dark) .nav-link.active {
     background: rgba(90, 70, 40, 0.08);
   }
 
-  /* ──────────────────────────────────────────────────────────
-     FORM INPUTS
-     ────────────────────────────────────────────────────────── */
   .input-premium {
     background: hsl(var(--card));
     border: 1px solid hsl(var(--border));
@@ -445,36 +263,26 @@
     outline: none;
     width: 100%;
   }
+
   .input-premium:focus {
     border-color: rgba(245, 158, 11, 0.5);
     box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12), var(--shadow-sm);
   }
+
   .input-premium::placeholder {
     color: hsl(var(--foreground-subtle));
   }
 
-  /* ──────────────────────────────────────────────────────────
-     SHIMMER / SKELETON
-     ────────────────────────────────────────────────────────── */
   .shimmer {
-    background: linear-gradient(
-      90deg,
-      hsl(var(--muted)) 0%,
-      hsl(var(--secondary)) 50%,
-      hsl(var(--muted)) 100%
-    );
+    background: linear-gradient(90deg, hsl(var(--muted)) 0%, hsl(var(--secondary)) 50%, hsl(var(--muted)) 100%);
     background-size: 200% 100%;
     animation: shimmer 2s linear infinite;
   }
 
-  /* ──────────────────────────────────────────────────────────
-     TYPOGRAPHY HELPERS
-     ────────────────────────────────────────────────────────── */
   .text-balance {
     text-wrap: balance;
   }
 
-  /* Section label — uppercase tracking */
   .section-label {
     font-size: 0.625rem;
     font-weight: 700;
@@ -483,69 +291,41 @@
     color: hsl(var(--primary));
   }
 
-  /* ──────────────────────────────────────────────────────────
-     DIVIDERS
-     ────────────────────────────────────────────────────────── */
   .divider {
     border-top: 1px solid hsl(var(--border));
   }
+
   .divider-subtle {
-    border-top: 1px solid rgba(255,255,255,0.06);
-  }
-  :root:not(.dark) .divider-subtle {
     border-top: 1px solid rgba(90,70,40,0.08);
   }
 
-  /* ──────────────────────────────────────────────────────────
-     BADGE SYSTEM
-     ────────────────────────────────────────────────────────── */
   .badge-brand {
-    background: rgba(245, 158, 11, 0.10);
-    border: 1px solid rgba(245, 158, 11, 0.20);
-    color: #f59e0b;
+    background: rgba(245, 158, 11, 0.12);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    color: #b45309;
     padding: 0.25rem 0.75rem;
     border-radius: 9999px;
     font-size: 0.75rem;
     font-weight: 700;
   }
-  :root:not(.dark) .badge-brand {
-    background: rgba(245, 158, 11, 0.12);
-    border: 1px solid rgba(245, 158, 11, 0.25);
-    color: #b45309;
-  }
 
-  /* ──────────────────────────────────────────────────────────
-     STAT CARD
-     ────────────────────────────────────────────────────────── */
   .stat-value {
     font-size: 1.75rem;
     font-weight: 900;
     letter-spacing: -0.03em;
     color: hsl(var(--foreground));
   }
+
   .stat-label {
     font-size: 0.75rem;
     color: hsl(var(--foreground-muted));
     margin-top: 0.125rem;
   }
-
-  /* ──────────────────────────────────────────────────────────
-     THEME TRANSITION
-     ────────────────────────────────────────────────────────── */
-  .theme-transition,
-  .theme-transition * {
-    transition: background-color 0.25s ease, border-color 0.25s ease, color 0.2s ease, box-shadow 0.25s ease !important;
-  }
 }
-
 /* ═══════════════════════════════════════════════════════════
    CUSTOM SELECTION
    ═══════════════════════════════════════════════════════════ */
 ::selection {
   background-color: rgba(245, 158, 11, 0.25);
   color: inherit;
-}
-.dark ::selection {
-  background-color: rgba(245, 158, 11, 0.30);
-  color: #ffffff;
 }

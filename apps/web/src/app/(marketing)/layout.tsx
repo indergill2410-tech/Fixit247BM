@@ -21,7 +21,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               { label: 'Available 24/7 across Australia' },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2 text-xs text-foreground-muted">
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500/20 text-brand-600 dark:text-brand-400 text-[10px] font-bold">✓</span>
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500/20 text-brand-600 text-[10px] font-bold">✓</span>
                 {item.label}
               </div>
             ))}
@@ -72,7 +72,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
                 <a href="mailto:hello@fixit247.com.au" className="block transition-colors hover:text-foreground">hello@fixit247.com.au</a>
                 <a href="tel:1800348498" className="block transition-colors hover:text-foreground">1800-FIXIT-247</a>
                 <p className="text-[11px] text-foreground-subtle">Available 24 hours, 7 days</p>
-                <Link href="/emergency" className="mt-1 block font-medium text-brand-600 transition-colors hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300">Emergency Dispatch →</Link>
+                <Link href="/emergency" className="mt-1 block font-medium text-brand-600 transition-colors hover:text-brand-500">Emergency Dispatch →</Link>
               </div>
             </div>
           </div>

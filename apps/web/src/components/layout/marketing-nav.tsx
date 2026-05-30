@@ -4,7 +4,6 @@ import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Menu, Phone, X } from 'lucide-react';
-import { ThemeToggle } from '@/components/shared/theme-toggle';
 
 const NAV_LINKS = [
   { href: '/how-it-works', label: 'How it works' },
@@ -35,7 +34,7 @@ export function MarketingNav() {
       <nav
         className={`sticky top-0 z-50 transition-all duration-300 ${
           scrolled
-            ? 'border-b border-border bg-background/95 shadow-sm-warm backdrop-blur-xl dark:shadow-none dark:bg-background/95'
+            ? 'border-b border-border bg-background/95 shadow-sm-warm backdrop-blur-xl'
             : 'border-b border-transparent bg-transparent'
         }`}
       >
@@ -67,12 +66,12 @@ export function MarketingNav() {
             ))}
           </div>
 
-          {/* Right: Emergency + auth + theme toggle + hamburger */}
+          {/* Right: Emergency + auth + hamburger */}
           <div className="flex items-center gap-2">
             {/* Emergency button */}
             <Link
               href="/emergency"
-              className="hidden items-center gap-1.5 rounded-xl border border-emergency/25 bg-emergency/[0.08] px-3.5 py-2 text-xs font-bold text-emergency-600 transition-all hover:border-emergency/40 hover:bg-emergency/[0.12] dark:text-emergency-400 dark:text-red-400 sm:inline-flex"
+              className="hidden items-center gap-1.5 rounded-xl border border-emergency/25 bg-emergency/[0.08] px-3.5 py-2 text-xs font-bold text-emergency-600 transition-all hover:border-emergency/40 hover:bg-emergency/[0.12] sm:inline-flex"
             >
               <span className="relative flex h-1.5 w-1.5">
                 <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
@@ -80,9 +79,6 @@ export function MarketingNav() {
               </span>
               Emergency
             </Link>
-
-            {/* Theme toggle */}
-            <ThemeToggle className="hidden sm:flex" />
 
             <Link
               href="/login"
@@ -114,12 +110,12 @@ export function MarketingNav() {
           onClick={() => { setOpen(false); }}
         >
           {/* Backdrop */}
-          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm dark:bg-black/70" />
+          <div className="absolute inset-0 bg-background/70 backdrop-blur-sm" />
 
           {/* Drawer */}
           <div
             ref={drawerRef}
-            className="absolute right-0 top-0 flex h-full w-[min(320px,90vw)] flex-col border-l border-border bg-background p-6 shadow-xl-warm dark:shadow-2xl"
+            className="absolute right-0 top-0 flex h-full w-[min(320px,90vw)] flex-col border-l border-border bg-background p-6 shadow-xl-warm"
             onClick={(e) => { e.stopPropagation(); }}
           >
             {/* Header */}
@@ -132,15 +128,12 @@ export function MarketingNav() {
                 <span className="text-brand-500">🔑</span>
                 Fixit <span className="text-brand-500">24/7</span>
               </Link>
-              <div className="flex items-center gap-1">
-                <ThemeToggle compact />
-                <button
-                  onClick={() => { setOpen(false); }}
-                  className="rounded-xl p-1.5 text-foreground-muted transition-colors hover:text-foreground"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+              <button
+                onClick={() => { setOpen(false); }}
+                className="rounded-xl p-1.5 text-foreground-muted transition-colors hover:text-foreground"
+              >
+                <X size={20} />
+              </button>
             </div>
 
             {/* Nav links */}
@@ -186,13 +179,13 @@ export function MarketingNav() {
                   <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-red-400 opacity-75" />
                   <span className="relative inline-flex h-2 w-2 rounded-full bg-red-400" />
                 </span>
-                <p className="text-xs font-bold text-red-500 dark:text-red-400">Emergency?</p>
+                <p className="text-xs font-bold text-red-500">Emergency?</p>
               </div>
               <p className="mb-3 text-xs text-foreground-muted">Tradies available right now</p>
               <Link
                 href="/emergency"
                 onClick={() => { setOpen(false); }}
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 py-3 text-center text-sm font-bold text-white transition-all hover:bg-red-600 active:scale-[0.98] dark:hover:bg-red-400"
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-red-500 py-3 text-center text-sm font-bold text-white transition-all hover:bg-red-600 active:scale-[0.98]"
               >
                 <Phone size={14} />
                 Dispatch a tradie now
