@@ -97,7 +97,7 @@ export default function FindATradiePage() {
         </div>
       </section>
 
-      <section className="border-t border-white/8 bg-[#0f0f0f] px-4 py-20">
+      <section className="border-t border-white/[0.08] bg-[#0f0f0f] px-4 py-20">
         <div className="mx-auto max-w-6xl">
           <div className="mb-8">
             <p className="mb-2 text-xs font-bold uppercase tracking-widest text-brand-400">Areas</p>
