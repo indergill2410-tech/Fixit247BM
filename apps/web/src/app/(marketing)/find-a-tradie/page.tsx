@@ -50,7 +50,7 @@ export default function FindATradiePage() {
         </div>
       </section>
 
-      <section className="border-y border-white/8 bg-[#0f0f0f] px-4 py-10">
+      <section className="border-y border-white/[0.08] bg-[#0f0f0f] px-4 py-10">
         <div className="mx-auto grid max-w-5xl gap-6 sm:grid-cols-3">
           {[
             { icon: ShieldCheck, label: 'Licence and insurance checks' },
