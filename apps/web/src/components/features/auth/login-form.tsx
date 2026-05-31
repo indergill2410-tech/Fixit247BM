@@ -119,7 +119,7 @@ export function LoginForm() {
     setDemoLoading(email);
     try {
       const supabase = getSupabaseBrowserClient();
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error('Demo login failed — account may not be seeded yet');
         setDemoLoading(null);
