@@ -150,13 +150,15 @@ Once new app is verified live:
 Run through each flow manually after first deploy:
 
 - [ ] `/` loads without auth — hero, trade categories, all sections visible
-- [ ] `/about`, `/pricing`, `/how-it-works`, `/join-as-tradie`, `/fixit-plus`, `/blog`, `/emergency` all load without auth
+- [ ] `/about`, `/how-it-works`, `/join-as-tradie`, `/fixit-plus`, `/blog`, `/emergency` all load without auth
+- [ ] Demo login buttons are visible unless `NEXT_PUBLIC_DEMO_MODE=false`
+- [ ] Demo customer, tradie, and super admin accounts reach their dashboards
 - [ ] `/register` → new customer account created, verification email received
 - [ ] `/login` → redirects to `/dashboard`
 - [ ] Customer: post job → AI scope analysis runs → job created
 - [ ] Tradie: register with role=TRADIE → onboarding flow → verification
 - [ ] Stripe: create test payment → checkout → escrow held → release
-- [ ] Admin: `/admin` login → all dashboard sections load
+- [ ] Admin: `/admin` login → dashboard, users, jobs, verifications, payments, reports, settings, and operations sections load
 - [ ] `/sitemap.xml` returns valid XML with all pages
 - [ ] `/robots.txt` returns correct directives
 - [ ] `/api/health` returns 200 for both services
