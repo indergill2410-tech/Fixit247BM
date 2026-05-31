@@ -100,7 +100,7 @@ export default async function AdminJobsPage() {
                     <td className="px-4 py-4">
                       <p className="font-medium text-gray-900">{job.title}</p>
                       <p className="mt-1 text-xs text-gray-500">
-                        {job.category.replace(/_/g, ' ')}{job.isEmergency ? ' - Emergency' : ''}
+                        {job.category.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}{job.isEmergency ? ' - Emergency' : ''}
                       </p>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">{formatName(job.customer.user)}</td>
