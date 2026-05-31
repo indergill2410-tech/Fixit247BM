@@ -112,7 +112,7 @@ export default async function AdminJobsPage() {
                       <Badge variant={statusVariant(job.status)}>{job.status}</Badge>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">
-                      {job.payment ? `${fmtAud(job.payment.amount)} - ${job.payment.status}` : 'No payment'}
+                      {job.payment ? fmtAud(job.payment.amount) + ' - ' + job.payment.status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : 'No payment'}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-500">
                       {job.createdAt.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
