@@ -62,7 +62,7 @@ export function RegisterForm() {
         <p className="mt-2 text-foreground-muted">Join Australia&apos;s trusted trades platform</p>
       </div>
 
-      <Card className="border-border bg-background-elevated shadow-card-warm dark:shadow-glass">
+      <Card className="border-border bg-background-elevated shadow-card-warm">
         <CardContent className="px-6 pb-6 pt-8">
           {/* Role selector */}
           <div className="mb-6 grid grid-cols-2 gap-3">
@@ -194,7 +194,7 @@ export function RegisterForm() {
 
       <p className="mt-6 text-center text-sm text-foreground-muted">
         Already have an account?{' '}
-        <Link href="/login" className="font-semibold text-brand-600 hover:underline dark:text-brand-400">
+        <Link href="/login" className="font-semibold text-brand-600 hover:underline">
           Log in
         </Link>
       </p>

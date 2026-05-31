@@ -6,7 +6,12 @@ Follow these steps in order before deploying to Render.
 
 ## 1. Supabase Project
 
-1. Create a new project at https://supabase.com — region: **ap-southeast-1 (Singapore)**
+1. Use the existing Fixit247BM Supabase production project:
+   - Project ref: `ropgwnprmfisbrkqkhxd`
+   - Project URL: `https://ropgwnprmfisbrkqkhxd.supabase.co`
+   - Region: **ap-south-1 (Mumbai)**
+   - Repository link: `indergill2410-tech/Fixit247BM`
+   - Do not reuse Supabase project refs from Carelink or any other product.
 2. Go to **Project Settings → API** and copy:
    - `Project URL` → `NEXT_PUBLIC_SUPABASE_URL`
    - `anon / public` key → `NEXT_PUBLIC_SUPABASE_ANON_KEY`
@@ -21,6 +26,13 @@ Follow these steps in order before deploying to Render.
 6. Under **Project Settings → Database**, copy:
    - Pooled connection string (port 6543) → `DATABASE_URL` (append `?pgbouncer=true&connection_limit=1`)
    - Direct connection string (port 5432) → `DIRECT_URL`
+7. Link the local Supabase CLI only to this project:
+   - `SUPABASE_ACCESS_TOKEN=<token> npx supabase link --project-ref ropgwnprmfisbrkqkhxd`
+   - The CLI link requires `supabase login` or `SUPABASE_ACCESS_TOKEN`; do not link this repo to another project.
+8. Deploy database changes in this order:
+   - Prisma schema migrations: `pnpm --filter @fixit247/database exec prisma migrate deploy`
+   - Supabase SQL migrations: apply files from `supabase/migrations` in filename order.
+   - Verify RLS with `scripts/verify-rls.sh` against `https://ropgwnprmfisbrkqkhxd.supabase.co`.
 
 ---
 

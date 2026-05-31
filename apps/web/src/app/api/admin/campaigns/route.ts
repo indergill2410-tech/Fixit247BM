@@ -1,11 +1,12 @@
 import { NextResponse } from 'next/server';
-import { requireRole } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
 
 export async function GET() {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
   const campaigns = await db.marketingCampaign.findMany({
     orderBy: { createdAt: 'desc' },
     take: 50,
@@ -18,7 +19,8 @@ export async function GET() {
 }
 
 export async function POST(req: Request) {
-  await requireRole('ADMIN');
+  const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+  if (session instanceof NextResponse) return session;
   const body = z
     .object({
       name: z.string().min(1),

@@ -1,6 +1,6 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import type { Prisma } from '@fixit247/database';
 import { z } from 'zod';
@@ -16,8 +16,8 @@ const ActionSchema = z.object({
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await requireSession();
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+    if (session instanceof NextResponse) return session;
 
     const limit = Math.min(Number(req.nextUrl.searchParams.get('limit') ?? '50'), 100);
     const cursor = req.nextUrl.searchParams.get('cursor');
@@ -41,8 +41,8 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const session = await requireSession();
-    if (!['ADMIN', 'SUPER_ADMIN'].includes(session.role)) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
+    const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
+    if (session instanceof NextResponse) return session;
     const data = ActionSchema.parse(await req.json());
 
     const ops: Prisma.PrismaPromise<unknown>[] = [

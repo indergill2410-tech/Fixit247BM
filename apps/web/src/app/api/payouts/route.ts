@@ -1,13 +1,14 @@
 import type { NextRequest} from 'next/server';
 import { NextResponse } from 'next/server';
-import { requireSession } from '@/lib/auth/session';
+import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { getPayoutHistory } from '@fixit247/payments';
 import { logger } from '@/lib/logger';
 
 export async function GET(req: NextRequest) {
   try {
-    const session = await requireSession();
+    const session = await requireApiSession();
+    if (session instanceof NextResponse) return session;
     const { searchParams } = new URL(req.url);
     const limit = Math.min(parseInt(searchParams.get('limit') ?? '20'), 50);
     const offset = parseInt(searchParams.get('offset') ?? '0');

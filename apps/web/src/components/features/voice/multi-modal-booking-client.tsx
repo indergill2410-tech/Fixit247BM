@@ -16,10 +16,14 @@ interface JobData {
 async function uploadImages(files: File[]): Promise<string[]> {
   if (files.length === 0) return [];
   const supabase = getSupabaseBrowserClient();
+  const { data: { user }, error: userError } = await supabase.auth.getUser();
+  if (userError || !user) throw new Error('Please sign in before uploading job photos.');
+
   const urls: string[] = [];
   await Promise.all(
     files.map(async (file) => {
-      const path = `uploads/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, '_')}`;
+      const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_');
+      const path = `${user.id}/${crypto.randomUUID()}-${safeName}`;
       const { error } = await supabase.storage.from('job-media').upload(path, file, { upsert: false });
       if (error) throw new Error(`Image upload failed: ${error.message}`);
       const { data } = supabase.storage.from('job-media').getPublicUrl(path);

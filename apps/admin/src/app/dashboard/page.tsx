@@ -27,21 +27,34 @@ export default async function AdminDashboardPage() {
 
   const [
     totalUsers,
+    customerCount,
+    tradieCount,
     activeJobs,
     emergencyJobs,
+    completedJobsMtd,
     pendingVerifications,
     revenueResult,
+    heldEscrowResult,
+    heldEscrowCount,
     verificationQueue,
     openDisputes,
   ] = await Promise.all([
     db.user.count(),
+    db.user.count({ where: { role: 'CUSTOMER' } }),
+    db.user.count({ where: { role: 'TRADIE' } }),
     db.job.count({ where: { status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] } } }),
     db.job.count({ where: { isEmergency: true, status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] } } }),
+    db.job.count({ where: { status: 'COMPLETED', completedAt: { gte: startOfMonth } } }),
     db.tradieProfile.count({ where: { verificationStatus: 'PENDING' } }),
     db.payment.aggregate({
       where: { status: 'RELEASED', createdAt: { gte: startOfMonth } },
       _sum: { platformFee: true },
     }),
+    db.payment.aggregate({
+      where: { status: 'HELD_IN_ESCROW' },
+      _sum: { amount: true },
+    }),
+    db.payment.count({ where: { status: 'HELD_IN_ESCROW' } }),
     db.tradieProfile.findMany({
       where: { verificationStatus: 'PENDING' },
       take: 4,
@@ -61,12 +74,14 @@ export default async function AdminDashboardPage() {
   ]);
 
   const revenueMtd = Number(revenueResult._sum.platformFee ?? 0);
+  const heldEscrow = Number(heldEscrowResult._sum.amount ?? 0);
+  const adminCount = totalUsers - customerCount - tradieCount;
 
   return (
     <AdminShell>
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Platform Overview</h1>
-        <p className="mt-1.5 text-sm text-gray-500">Real-time platform metrics and operations</p>
+        <h1 className="text-3xl font-bold text-gray-900">Super Admin Command Centre</h1>
+        <p className="mt-1.5 text-sm text-gray-500">Real-time trust, revenue, support, and marketplace operations</p>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
@@ -74,6 +89,68 @@ export default async function AdminDashboardPage() {
         <StatCard title="Active Jobs" value={activeJobs.toString()} delta={`${emergencyJobs} emergency`} icon="🔧" />
         <StatCard title="Revenue (MTD)" value={fmtAud(revenueMtd)} icon="💰" trend="up" />
         <StatCard title="Pending Verifications" value={pendingVerifications.toString()} delta="Needs review" icon="🔒" highlight={pendingVerifications > 0} />
+      </div>
+
+      <div className="mt-6 grid gap-4 lg:grid-cols-3">
+        <Card>
+          <CardHeader>
+            <CardTitle>User mix</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Customers</span>
+              <span className="font-semibold text-gray-900">{customerCount.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Tradies</span>
+              <span className="font-semibold text-gray-900">{tradieCount.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Admins</span>
+              <span className="font-semibold text-gray-900">{adminCount.toLocaleString()}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Dispatch health</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Active jobs</span>
+              <span className="font-semibold text-gray-900">{activeJobs.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Emergency jobs</span>
+              <span className="font-semibold text-red-600">{emergencyJobs.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Completed this month</span>
+              <span className="font-semibold text-gray-900">{completedJobsMtd.toLocaleString()}</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Payment control</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-3 text-sm">
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Escrow balance</span>
+              <span className="font-semibold text-gray-900">{fmtAud(heldEscrow)}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Held payments</span>
+              <span className="font-semibold text-gray-900">{heldEscrowCount.toLocaleString()}</span>
+            </div>
+            <div className="flex items-center justify-between">
+              <span className="text-gray-500">Open disputes</span>
+              <span className="font-semibold text-gray-900">{openDisputes.length.toLocaleString()}</span>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">

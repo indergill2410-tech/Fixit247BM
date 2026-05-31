@@ -11,12 +11,7 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import { loginSchema, type LoginValues } from '@/lib/validators/auth';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-
-// Prevent open-redirect: only allow same-origin relative paths.
-function sanitiseRedirectTo(raw: string | null): string {
-  if (!raw) return '/dashboard';
-  return raw.startsWith('/') && !raw.startsWith('//') && !raw.startsWith('/\\') ? raw : '/dashboard';
-}
+import { getDashboardTarget, normalizeRedirectTarget } from '@/lib/auth/redirects';
 
 // Use NEXT_PUBLIC_SITE_URL so OAuth callbacks work correctly behind reverse proxies
 // (window.location.origin resolves to the container's internal address, not the public URL)
@@ -30,39 +25,39 @@ const DEMO_ACCOUNTS = [
   {
     email: 'emma.williams@demo.fixit247.com',
     password: 'Demo1234!',
-    dest: '/dashboard',
+    role: 'CUSTOMER',
     label: 'Homeowner',
     description: 'Post jobs, hire tradies, track progress',
     icon: '🏠',
     badge: 'Customer view',
-    badgeColor: 'bg-blue-500/15 text-blue-400',
+    badgeColor: 'bg-blue-100 text-blue-700',
   },
   {
     email: 'mike.torres@demo.fixit247.com',
     password: 'Demo1234!',
-    dest: '/tradie/dashboard',
+    role: 'TRADIE',
     label: 'Tradie',
     description: 'Browse leads, manage jobs & earnings',
     icon: '🔧',
     badge: 'Tradie view',
-    badgeColor: 'bg-brand-500/15 text-brand-400',
+    badgeColor: 'bg-brand-100 text-brand-700',
   },
   {
     email: 'admin@demo.fixit247.com.au',
     password: 'Demo1234!',
-    dest: '/admin',
-    label: 'Admin',
-    description: 'Platform dashboard & user management',
+    role: 'SUPER_ADMIN',
+    label: 'Super Admin',
+    description: 'Platform control room, trust, revenue & support',
     icon: '⚙️',
-    badge: 'Admin view',
-    badgeColor: 'bg-purple-500/15 text-purple-400',
+    badge: 'Ops view',
+    badgeColor: 'bg-purple-100 text-purple-700',
   },
 ] as const;
 
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const redirectTo = sanitiseRedirectTo(searchParams.get('redirectTo'));
+  const redirectTo = searchParams.get('redirectTo') ?? '/dashboard';
   const urlError = searchParams.get('error');
   const [showPassword, setShowPassword] = React.useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
@@ -93,21 +88,24 @@ export function LoginForm() {
       return;
     }
 
-    void supabase.rpc('increment_login_stats', { user_id: data.user.id });
+    void supabase.rpc('increment_login_count', { user_id: data.user.id });
 
-    const role = (data.user.user_metadata as Record<string, unknown>).role;
+    const appMeta = (data.user.app_metadata ?? {}) as Record<string, unknown>;
+    const userMeta = data.user.user_metadata as Record<string, unknown>;
+    const role = (appMeta.role ?? userMeta.role) as string | undefined;
+    const safeRedirect = normalizeRedirectTarget(redirectTo, window.location.origin);
     const dest =
-      redirectTo !== '/dashboard'
-        ? redirectTo
-        : role === 'TRADIE'
-        ? '/tradie/dashboard'
-        : role === 'ADMIN' || role === 'SUPER_ADMIN'
-        ? '/admin'
-        : '/dashboard';
+      safeRedirect !== '/dashboard'
+        ? safeRedirect
+        : getDashboardTarget(role);
 
     toast.success('Welcome back!');
-    router.push(dest);
-    router.refresh();
+    if (dest.startsWith('http')) {
+      window.location.assign(dest);
+    } else {
+      router.push(dest);
+      router.refresh();
+    }
   }
 
   async function handleResendVerification(email: string) {
@@ -116,20 +114,26 @@ export function LoginForm() {
     toast.success('Verification email sent');
   }
 
-  async function loginAsDemo(email: string, password: string, dest: string) {
+  async function loginAsDemo(email: string, password: string, role: string) {
     if (demoLoading || isSubmitting || isGoogleLoading) return;
     setDemoLoading(email);
     try {
       const supabase = getSupabaseBrowserClient();
-      const { error } = await supabase.auth.signInWithPassword({ email, password });
+      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
       if (error) {
         toast.error('Demo login failed — account may not be seeded yet');
         setDemoLoading(null);
         return;
       }
+      void supabase.rpc('increment_login_count', { user_id: data.user.id });
+      const dest = getDashboardTarget(role);
       toast.success('Signed in as demo user');
-      router.push(dest);
-      router.refresh();
+      if (dest.startsWith('http')) {
+        window.location.assign(dest);
+      } else {
+        router.push(dest);
+        router.refresh();
+      }
     } catch {
       toast.error('An unexpected error occurred during demo login');
       setDemoLoading(null);
@@ -147,7 +151,7 @@ export function LoginForm() {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: `${getSiteOrigin()}/auth/callback?redirectTo=${encodeURIComponent(redirectTo)}&googleRole=${role}`,
+        redirectTo: `${getSiteOrigin()}/auth/callback?redirectTo=${encodeURIComponent(normalizeRedirectTarget(redirectTo, window.location.origin))}&googleRole=${role}`,
         queryParams: { access_type: 'offline', prompt: 'consent' },
       },
     });
@@ -160,14 +164,14 @@ export function LoginForm() {
   return (
     <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
       <div className="mb-8 text-center">
-        <h1 className="text-3xl font-bold text-white">Welcome back</h1>
-        <p className="mt-2 text-brand-200">Log in to your Fixit247 account</p>
+        <h1 className="text-3xl font-bold text-foreground">Welcome back</h1>
+        <p className="mt-2 text-foreground-muted">Log in to your Fixit247 account</p>
       </div>
 
-      <Card className="border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl">
+      <Card className="border-border bg-card shadow-card-warm">
         <CardContent className="px-6 pb-6 pt-8">
           {urlError && (
-            <div className="mb-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+            <div className="mb-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-700">
               {urlError === 'auth_callback_failed'
                 ? 'Google sign-in failed. Please try again or use email and password.'
                 : 'An error occurred. Please try again.'}
@@ -176,15 +180,15 @@ export function LoginForm() {
 
           <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-5" noValidate>
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="email" className="text-sm font-medium text-white/90">Email address</label>
+              <label htmlFor="email" className="text-sm font-medium text-foreground-secondary">Email address</label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-subtle" />
                 <Input
                   id="email"
                   type="email"
                   placeholder="you@example.com"
                   autoComplete="email"
-                  className="border-white/20 bg-white/10 pl-10 text-white placeholder:text-white/30 focus-visible:ring-white/40"
+                  className="pl-10"
                   error={errors.email?.message}
                   {...register('email')}
                 />
@@ -193,26 +197,26 @@ export function LoginForm() {
 
             <div className="flex flex-col gap-1.5">
               <div className="flex items-center justify-between">
-                <label htmlFor="password" className="text-sm font-medium text-white/90">Password</label>
-                <Link href="/forgot-password" className="text-xs text-brand-300 transition-colors hover:text-white">
+                <label htmlFor="password" className="text-sm font-medium text-foreground-secondary">Password</label>
+                <Link href="/forgot-password" className="text-xs text-brand-600 transition-colors hover:text-brand-700">
                   Forgot password?
                 </Link>
               </div>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
+                <Lock className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-foreground-subtle" />
                 <Input
                   id="password"
                   type={showPassword ? 'text' : 'password'}
                   placeholder="••••••••"
                   autoComplete="current-password"
-                  className="border-white/20 bg-white/10 pl-10 pr-10 text-white placeholder:text-white/30 focus-visible:ring-white/40"
+                  className="pl-10 pr-10"
                   error={errors.password?.message}
                   {...register('password')}
                 />
                 <button
                   type="button"
                   onClick={() => { setShowPassword(!showPassword); }}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-white/40 hover:text-white/80"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-foreground-subtle hover:text-foreground-muted"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
@@ -224,35 +228,35 @@ export function LoginForm() {
               type="submit"
               loading={isSubmitting}
               size="lg"
-              className="mt-1 w-full bg-white font-semibold text-brand-700 shadow-lg hover:bg-white/90"
+              className="mt-1 w-full"
             >
               Log in
             </Button>
           </form>
 
           <div className="my-5 flex items-center gap-3">
-            <div className="flex-1 border-t border-white/10" />
-            <span className="text-xs text-white/40">or continue with</span>
-            <div className="flex-1 border-t border-white/10" />
+            <div className="flex-1 border-t border-border" />
+            <span className="text-xs text-foreground-subtle">or continue with</span>
+            <div className="flex-1 border-t border-border" />
           </div>
 
           {showGoogleRoleSelect ? (
-            <div className="rounded-2xl border border-white/15 bg-white/8 p-4">
-              <p className="mb-3 text-center text-sm font-semibold text-white">
+            <div className="rounded-2xl border border-border bg-background-alt p-4">
+              <p className="mb-3 text-center text-sm font-semibold text-foreground">
                 Are you signing in as a customer or a tradie?
               </p>
               <div className="flex gap-2">
                 <button
                   type="button"
                   onClick={() => void handleGoogleOAuth('CUSTOMER')}
-                  className="flex-1 rounded-xl border border-white/20 bg-white/5 py-3 text-sm font-semibold text-white transition-all hover:bg-white/10"
+                  className="flex-1 rounded-xl border border-border bg-card py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated"
                 >
                   Customer
                 </button>
                 <button
                   type="button"
                   onClick={() => void handleGoogleOAuth('TRADIE')}
-                  className="flex-1 rounded-xl border border-brand-500/40 bg-brand-500/15 py-3 text-sm font-semibold text-brand-300 transition-all hover:bg-brand-500/25"
+                  className="flex-1 rounded-xl border border-brand-500/40 bg-brand-500/15 py-3 text-sm font-semibold text-brand-700 transition-all hover:bg-brand-500/25"
                 >
                   Tradie
                 </button>
@@ -260,7 +264,7 @@ export function LoginForm() {
               <button
                 type="button"
                 onClick={() => { setShowGoogleRoleSelect(false); }}
-                className="mt-2 w-full text-center text-xs text-white/40 hover:text-white/60"
+                className="mt-2 w-full text-center text-xs text-foreground-subtle hover:text-foreground-muted"
               >
                 Cancel
               </button>
@@ -272,7 +276,7 @@ export function LoginForm() {
               size="lg"
               loading={isGoogleLoading}
               onClick={handleGoogleLogin}
-              className="w-full border-white/20 bg-white/5 text-white hover:bg-white/10"
+              className="w-full"
             >
               <svg className="h-4 w-4" viewBox="0 0 24 24" aria-hidden="true">
                 <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
@@ -288,13 +292,13 @@ export function LoginForm() {
           {SHOW_DEMO && (
             <>
               <div className="my-5 flex items-center gap-3">
-                <div className="flex-1 border-t border-white/10" />
-                <span className="text-xs text-white/40">or try a demo account</span>
-                <div className="flex-1 border-t border-white/10" />
+                <div className="flex-1 border-t border-border" />
+                <span className="text-xs text-foreground-subtle">or try a demo account</span>
+                <div className="flex-1 border-t border-border" />
               </div>
-              <div className="overflow-hidden rounded-2xl border border-white/8 bg-white/[0.03]">
-                <div className="divide-y divide-white/6">
-                  {DEMO_ACCOUNTS.map(({ email, password, dest, label, description, icon, badge, badgeColor }) => {
+              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm-warm">
+                <div className="divide-y divide-border">
+                  {DEMO_ACCOUNTS.map(({ email, password, role, label, description, icon, badge, badgeColor }) => {
                     const isLoading = demoLoading === email;
                     const isDisabled = demoLoading !== null || isSubmitting || isGoogleLoading;
                     return (
@@ -302,27 +306,27 @@ export function LoginForm() {
                         key={email}
                         type="button"
                         disabled={isDisabled}
-                        onClick={() => void loginAsDemo(email, password, dest)}
-                        className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all hover:bg-white/[0.04] disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={() => void loginAsDemo(email, password, role)}
+                        className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all hover:bg-background-alt disabled:cursor-not-allowed disabled:opacity-60"
                       >
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-white/[0.05] text-lg group-hover:bg-white/[0.08]">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background-alt text-lg group-hover:bg-background-elevated">
                           {icon}
                         </span>
                         <span className="min-w-0 flex-1">
                           <span className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-gray-200">{label}</span>
+                            <span className="text-sm font-semibold text-foreground">{label}</span>
                             <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${badgeColor}`}>{badge}</span>
                           </span>
-                          <span className="mt-0.5 block truncate text-xs text-gray-500">{description}</span>
+                          <span className="mt-0.5 block truncate text-xs text-foreground-muted">{description}</span>
                         </span>
                         <span className="shrink-0">
                           {isLoading ? (
-                            <svg className="h-4 w-4 animate-spin text-brand-400" fill="none" viewBox="0 0 24 24">
+                            <svg className="h-4 w-4 animate-spin text-brand-600" fill="none" viewBox="0 0 24 24">
                               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                             </svg>
                           ) : (
-                            <svg className="h-4 w-4 text-gray-600 transition-colors group-hover:text-gray-400" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+                            <svg className="h-4 w-4 text-foreground-subtle transition-colors group-hover:text-foreground-muted" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
                             </svg>
                           )}
@@ -331,7 +335,7 @@ export function LoginForm() {
                     );
                   })}
                 </div>
-                <div className="border-t border-white/6 px-5 py-2.5 text-center text-[11px] text-gray-600">
+                <div className="border-t border-border bg-background-alt px-5 py-2.5 text-center text-[11px] text-foreground-muted">
                   One click — instantly signed in, no password needed
                 </div>
               </div>
@@ -340,9 +344,9 @@ export function LoginForm() {
         </CardContent>
       </Card>
 
-      <p className="mt-6 text-center text-sm text-brand-200">
+      <p className="mt-6 text-center text-sm text-foreground-muted">
         Don&apos;t have an account?{' '}
-        <Link href="/register" className="font-semibold text-white hover:underline">
+        <Link href="/register" className="font-semibold text-brand-600 hover:underline">
           Sign up free
         </Link>
       </p>

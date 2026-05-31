@@ -18,16 +18,16 @@ const buttonVariants = cva(
           'bg-red-600 text-white hover:bg-red-500 shadow-sm',
         /* Outline — theme-aware */
         outline:
-          'border border-border bg-transparent text-foreground hover:border-border-strong hover:bg-background-elevated dark:border-white/12 dark:text-white dark:hover:border-white/20 dark:hover:bg-white/[0.04]',
+          'border border-border bg-transparent text-foreground hover:border-border-strong hover:bg-background-elevated',
         /* Secondary — subtle fill */
         secondary:
-          'bg-background-elevated text-foreground hover:bg-background-alt border border-border dark:bg-white/[0.06] dark:text-white dark:hover:bg-white/[0.10] dark:border-white/[0.07]',
+          'bg-background-elevated text-foreground hover:bg-background-alt border border-border',
         /* Ghost */
         ghost:
-          'text-foreground-muted hover:bg-background-elevated hover:text-foreground dark:hover:bg-white/[0.05] dark:hover:text-white',
+          'text-foreground-muted hover:bg-background-elevated hover:text-foreground',
         /* Link style */
         link:
-          'text-brand-600 underline-offset-4 hover:underline p-0 h-auto font-medium dark:text-brand-400',
+          'text-brand-600 underline-offset-4 hover:underline p-0 h-auto font-medium',
         /* Emergency red */
         emergency:
           'bg-red-600 text-white hover:bg-red-500 shadow-emergency-md hover:shadow-[0_0_40px_rgba(239,68,68,0.35)]',

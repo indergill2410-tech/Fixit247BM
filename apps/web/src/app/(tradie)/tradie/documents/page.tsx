@@ -224,7 +224,7 @@ export default function TradieDocumentsPage() {
                               type="date"
                               value={expiryDates[type] ?? ''}
                               onChange={(e) => { setExpiryDates((p) => ({ ...p, [type]: e.target.value })); }}
-                              className="mt-0.5 block rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:dark]"
+                              className="mt-0.5 block rounded-lg border border-white/8 bg-white/4 px-2 py-1 text-xs text-white [color-scheme:light]"
                             />
                           </div>
                         )}

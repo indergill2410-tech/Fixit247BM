@@ -1,7 +1,6 @@
 import type { Config } from 'tailwindcss';
 
 const config: Config = {
-  darkMode: 'class',
   content: [
     './src/**/*.{ts,tsx}',
     '../../packages/ui/src/**/*.{ts,tsx}',
@@ -85,18 +84,6 @@ const config: Config = {
           800: '#991b1b',
           900: '#7f1d1d',
           light: '#fca5a5',
-          dark:  '#b91c1c',
-        },
-
-        /* ── Dark Surface Palette ── */
-        surface: {
-          DEFAULT: '#0b0a09',
-          50:  '#131210',
-          100: '#1a1918',
-          200: '#222120',
-          300: '#2a2928',
-          400: '#343230',
-          500: '#404040',
         },
 
         /* ── Warm Light Palette ── */
@@ -118,14 +105,12 @@ const config: Config = {
         success: {
           DEFAULT: '#22c55e',
           light:   '#86efac',
-          dark:    '#15803d',
         },
 
         /* ── Info ── */
         info: {
           DEFAULT: '#3b82f6',
           light:   '#93c5fd',
-          dark:    '#1d4ed8',
         },
       },
 
@@ -162,18 +147,11 @@ const config: Config = {
         'emergency':    '0 0 30px rgba(239,68,68,0.20)',
         'emergency-md': '0 4px 24px rgba(239,68,68,0.22), 0 2px 8px rgba(239,68,68,0.14)',
 
-        /* Glass — dark */
-        'glass':    '0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06)',
-        'glass-lg': '0 8px 48px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08)',
-
-        /* Glass — light (warm) */
+        /* Glass */
         'glass-warm':    '0 4px 24px rgba(90,70,40,0.08), inset 0 1px 0 rgba(255,255,255,0.9)',
         'glass-warm-lg': '0 8px 40px rgba(90,70,40,0.10), inset 0 1px 0 rgba(255,255,255,0.95)',
 
         /* Cards */
-        'card':       '0 1px 3px rgba(0,0,0,0.5), 0 4px 16px rgba(0,0,0,0.3)',
-        'card-hover': '0 2px 8px rgba(0,0,0,0.6), 0 8px 32px rgba(0,0,0,0.4)',
-        /* Cards — light */
         'card-warm':       '0 1px 4px rgba(90,70,40,0.08), 0 4px 16px rgba(90,70,40,0.06)',
         'card-warm-hover': '0 4px 12px rgba(90,70,40,0.12), 0 12px 32px rgba(90,70,40,0.10)',
 

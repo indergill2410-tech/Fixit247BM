@@ -26,6 +26,15 @@ interface AuthContextValue {
 
 const AuthContext = React.createContext<AuthContextValue | null>(null);
 
+function getOptionalSupabaseClient(): ReturnType<typeof getSupabaseBrowserClient> | null {
+  try {
+    return getSupabaseBrowserClient();
+  } catch (error) {
+    console.error('[auth] Supabase browser client unavailable', error);
+    return null;
+  }
+}
+
 function mapUser(supabaseUser: User): AuthUser {
   // app_metadata is authoritative (service-role-only writeable).
   // user_metadata is kept as a fallback for pre-existing accounts.
@@ -48,16 +57,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = React.useState(true);
 
   const refreshUser = React.useCallback(async () => {
-    const supabase = getSupabaseBrowserClient();
-    const { data: { user: supabaseUser } } = await supabase.auth.getUser();
+    const supabase = getOptionalSupabaseClient();
+    if (!supabase) {
+      setUser(null);
+      setIsLoading(false);
+      return;
+    }
+    const { data: { session } } = await supabase.auth.getSession();
+    const supabaseUser = session?.user ?? null;
     setUser(supabaseUser ? mapUser(supabaseUser) : null);
   }, []);
 
   React.useEffect(() => {
-    const supabase = getSupabaseBrowserClient();
+    const supabase = getOptionalSupabaseClient();
+    if (!supabase) {
+      setIsLoading(false);
+      return undefined;
+    }
 
-    void supabase.auth.getUser().then(({ data: { user: u } }) => {
-      setUser(u ? mapUser(u) : null);
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ? mapUser(session.user) : null);
       setIsLoading(false);
     });
 
@@ -70,8 +89,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const signOut = React.useCallback(async () => {
-    const supabase = getSupabaseBrowserClient();
-    await supabase.auth.signOut();
+    const supabase = getOptionalSupabaseClient();
+    if (supabase) {
+      await supabase.auth.signOut();
+    }
     window.location.href = '/login';
   }, []);
 

@@ -28,7 +28,7 @@ export default function HomePage() {
           ══════════════════════════════════════════════════ */}
       <section className="relative overflow-hidden">
         <div className="pointer-events-none absolute inset-0 grid-pattern opacity-100" />
-        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/[0.08] blur-[120px] dark:bg-brand-500/[0.08]" />
+        <div className="pointer-events-none absolute left-1/2 top-0 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-brand-500/[0.08] blur-[120px]" />
         <div className="pointer-events-none absolute -right-64 top-1/3 h-96 w-96 rounded-full bg-brand-500/[0.05] blur-[80px]" />
 
         <div className="relative mx-auto w-full max-w-7xl px-4 pb-16 pt-14 md:pb-24 md:pt-20 lg:pb-28 lg:pt-24">
@@ -37,13 +37,13 @@ export default function HomePage() {
             {/* Left column */}
             <div className="flex flex-col animate-fade-up">
               {/* Live status badge */}
-              <div className="mb-8 inline-flex w-fit items-center gap-2.5 rounded-full border border-border bg-background-alt px-4 py-2 text-xs font-medium text-foreground-muted shadow-sm-warm backdrop-blur-sm dark:border-white/10 dark:bg-white/[0.04] dark:shadow-none">
+              <div className="mb-8 inline-flex w-fit items-center gap-2.5 rounded-full border border-border bg-background-alt px-4 py-2 text-xs font-medium text-foreground-muted shadow-sm-warm backdrop-blur-sm">
                 <span className="relative flex h-2 w-2">
-                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75 dark:bg-emerald-400" />
-                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500 dark:bg-emerald-400" />
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
                 </span>
                 <span className="text-foreground-secondary">247 tradies online right now</span>
-                <span className="ml-1 rounded-full bg-brand-500/20 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:text-brand-400">LIVE</span>
+                <span className="ml-1 rounded-full bg-brand-500/20 px-2 py-0.5 text-[10px] font-bold text-brand-700">LIVE</span>
               </div>
 
               {/* Main headline */}
@@ -69,7 +69,7 @@ export default function HomePage() {
                 </Link>
                 <Link
                   href="/jobs/new"
-                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-background-alt px-7 py-4 text-sm font-semibold text-foreground transition-all hover:border-border-strong hover:bg-background-elevated active:scale-[0.98] dark:border-white/12 dark:bg-white/[0.04] dark:hover:border-white/20 dark:hover:bg-white/[0.07]"
+                  className="inline-flex items-center justify-center gap-2 rounded-2xl border border-border bg-background-alt px-7 py-4 text-sm font-semibold text-foreground transition-all hover:border-border-strong hover:bg-background-elevated active:scale-[0.98]"
                 >
                   Post a job — free
                 </Link>
@@ -79,7 +79,7 @@ export default function HomePage() {
               <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
                 {TRUST_ITEMS.map((item) => (
                   <div key={item.label} className="flex items-center gap-2 text-xs text-foreground-muted">
-                    <item.icon size={13} className="shrink-0 text-brand-600 dark:text-brand-500" />
+                    <item.icon size={13} className="shrink-0 text-brand-600" />
                     <span>{item.label}</span>
                   </div>
                 ))}
@@ -118,7 +118,7 @@ export default function HomePage() {
               <AnimatedEntry key={cat.slug} delay={i * 0.04}>
                 <Link
                   href={`/emergency/${cat.slug}/sydney-cbd`}
-                  className="group flex flex-col items-center gap-2.5 rounded-2xl border border-border bg-card px-3.5 py-3.5 text-center shadow-sm-warm transition-all hover:border-brand-500/30 hover:shadow-card-warm active:scale-[0.97] dark:bg-white/[0.03] dark:shadow-none dark:hover:border-brand-500/30 dark:hover:bg-brand-500/[0.06]"
+                  className="group flex flex-col items-center gap-2.5 rounded-2xl border border-border bg-card px-3.5 py-3.5 text-center shadow-sm-warm transition-all hover:border-brand-500/30 hover:shadow-card-warm active:scale-[0.97]"
                 >
                   <span className="text-2xl transition-transform group-hover:scale-110">{cat.emoji}</span>
                   <span className="text-[11px] font-medium text-foreground-muted group-hover:text-foreground">{cat.label}</span>
@@ -151,7 +151,7 @@ export default function HomePage() {
           <div className="grid gap-4 md:grid-cols-3">
             {TESTIMONIALS.map((t, i) => (
               <AnimatedEntry key={t.name} delay={i * 0.08}>
-              <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
+              <div className="flex h-full flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover">
                 <div className="mb-3 flex gap-0.5">
                   {Array.from({ length: 5 }, (_, j) => (
                     <Star key={j} size={12} className="fill-brand-500 text-brand-500" />
@@ -159,7 +159,7 @@ export default function HomePage() {
                 </div>
                 <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">&ldquo;{t.text}&rdquo;</p>
                 <div className="mt-4 flex items-center gap-3 border-t border-border pt-4">
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-700 dark:text-brand-400">
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-700">
                     {t.name[0]}
                   </div>
                   <div>
@@ -224,13 +224,13 @@ export default function HomePage() {
           ══════════════════════════════════════════════════ */}
       <section className="border-t border-border bg-background-alt px-4 py-20 transition-colors duration-300">
         <div className="mx-auto max-w-5xl">
-          <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-card-warm transition-all md:p-12 dark:border-white/[0.07] dark:bg-background-elevated dark:shadow-none">
+          <div className="relative overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-card-warm transition-all md:p-12">
             <div className="pointer-events-none absolute -left-24 -top-24 h-64 w-64 rounded-full bg-brand-500/[0.08] blur-3xl" />
             <div className="pointer-events-none absolute -bottom-16 -right-16 h-48 w-48 rounded-full bg-brand-500/[0.05] blur-2xl" />
 
             <div className="relative grid gap-10 md:grid-cols-2 md:items-center">
               <div>
-                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-500/25 bg-brand-500/10 px-3 py-1.5 text-xs font-bold text-brand-700 dark:text-brand-400">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-500/25 bg-brand-500/10 px-3 py-1.5 text-xs font-bold text-brand-700">
                   <Shield size={11} />
                   For Tradies
                 </div>
@@ -244,7 +244,7 @@ export default function HomePage() {
                 <ul className="mt-5 space-y-2">
                   {TRADIE_BENEFITS.map((b) => (
                     <li key={b} className="flex items-start gap-2.5 text-sm text-foreground-secondary">
-                      <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-brand-600 dark:text-brand-500" />
+                      <CheckCircle2 size={14} className="mt-0.5 shrink-0 text-brand-600" />
                       {b}
                     </li>
                   ))}
@@ -259,7 +259,7 @@ export default function HomePage() {
                   </Link>
                   <Link
                     href="/join-as-tradie"
-                    className="inline-flex items-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated dark:border-white/10 dark:hover:bg-white/[0.06]"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated"
                   >
                     Learn more
                   </Link>
@@ -267,8 +267,8 @@ export default function HomePage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {TRADIE_STATS.map((s) => (
-                  <div key={s.label} className="rounded-2xl border border-border bg-background-alt p-5 shadow-sm-warm dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
-                    <div className="text-2xl font-black text-brand-600 dark:text-brand-400">{s.value}</div>
+                  <div key={s.label} className="rounded-2xl border border-border bg-background-alt p-5 shadow-sm-warm">
+                    <div className="text-2xl font-black text-brand-600">{s.value}</div>
                     <div className="mt-1 text-xs font-medium text-foreground">{s.label}</div>
                     <div className="mt-0.5 text-[11px] text-foreground-subtle">{s.sub}</div>
                   </div>
@@ -284,13 +284,13 @@ export default function HomePage() {
           ══════════════════════════════════════════════════ */}
       <section className="border-t border-border px-4 py-20 transition-colors duration-300">
         <div className="mx-auto max-w-5xl">
-          <div className="relative overflow-hidden rounded-3xl border border-brand-500/20 bg-gradient-to-br from-brand-500/[0.08] via-brand-500/[0.04] to-transparent p-8 shadow-brand-md transition-all md:p-12 dark:shadow-none">
+          <div className="relative overflow-hidden rounded-3xl border border-brand-500/20 bg-gradient-to-br from-brand-500/[0.08] via-brand-500/[0.04] to-transparent p-8 shadow-brand-md transition-all md:p-12">
             <div className="pointer-events-none absolute -right-32 -top-32 h-80 w-80 rounded-full bg-brand-500/10 blur-[80px]" />
             <div className="pointer-events-none absolute bottom-0 left-0 h-40 w-64 rounded-full bg-brand-500/5 blur-3xl" />
 
             <div className="relative grid gap-8 md:grid-cols-2 md:items-center">
               <div>
-                <span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/15 px-3 py-1.5 text-xs font-bold text-brand-700 dark:text-brand-400">
+                <span className="mb-4 inline-flex items-center gap-1.5 rounded-full border border-brand-500/30 bg-brand-500/15 px-3 py-1.5 text-xs font-bold text-brand-700">
                   <Shield size={11} />
                   Fixit Plus Membership
                 </span>
@@ -303,7 +303,7 @@ export default function HomePage() {
                 </p>
                 {/* Price anchoring */}
                 <p className="mt-3 text-xs text-foreground-subtle">
-                  A single emergency call-out averages <span className="font-semibold text-foreground-muted">$180–$300</span>. Fixit Plus Total is <span className="font-semibold text-brand-600 dark:text-brand-400">$49/month</span> for unlimited coverage.
+                  A single emergency call-out averages <span className="font-semibold text-foreground-muted">$180–$300</span>. Fixit Plus Total is <span className="font-semibold text-brand-600">$49/month</span> for unlimited coverage.
                 </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <Link
@@ -315,7 +315,7 @@ export default function HomePage() {
                   </Link>
                   <Link
                     href="/fixit-plus"
-                    className="inline-flex items-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated dark:border-white/15 dark:hover:bg-white/[0.06]"
+                    className="inline-flex items-center gap-2 rounded-2xl border border-border px-6 py-3 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated"
                   >
                     See what&apos;s covered
                   </Link>
@@ -324,7 +324,7 @@ export default function HomePage() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 {PLUS_FEATURES.map((f) => (
-                  <div key={f.title} className="rounded-2xl border border-border/60 bg-card/60 p-4 shadow-sm-warm backdrop-blur-sm dark:border-white/[0.08] dark:bg-white/[0.03] dark:shadow-none">
+                  <div key={f.title} className="rounded-2xl border border-border/60 bg-card/60 p-4 shadow-sm-warm backdrop-blur-sm">
                     <div className="mb-2 text-xl">{f.icon}</div>
                     <p className="text-xs font-semibold text-foreground">{f.title}</p>
                     <p className="mt-0.5 text-[11px] text-foreground-muted">{f.desc}</p>
@@ -358,7 +358,7 @@ export default function HomePage() {
             </Link>
             <Link
               href="/emergency"
-              className="inline-flex items-center gap-2 rounded-2xl border border-border px-8 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated dark:border-white/12 dark:hover:border-white/20 dark:hover:bg-white/[0.05]"
+              className="inline-flex items-center gap-2 rounded-2xl border border-border px-8 py-4 text-sm font-semibold text-foreground transition-all hover:bg-background-elevated"
             >
               <Phone size={14} />
               Emergency dispatch

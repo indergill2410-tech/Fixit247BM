@@ -113,9 +113,9 @@ function EarningsCalculator() {
 
       {/* Net earnings highlight */}
       <div className="mb-6 rounded-2xl bg-green-500/10 border border-green-500/30 p-5 text-center">
-        <p className="text-sm font-medium text-green-600 dark:text-green-400">Your NET weekly take-home</p>
-        <p className="mt-1 text-4xl font-extrabold text-green-600 dark:text-green-400">${Math.round(netWeekly).toLocaleString()}</p>
-        <p className="mt-1 text-xs text-green-600/70 dark:text-green-500">= ${Math.round(netMonthly).toLocaleString()}/mo · ${Math.round(netYearly).toLocaleString()}/yr</p>
+        <p className="text-sm font-medium text-green-600">Your NET weekly take-home</p>
+        <p className="mt-1 text-4xl font-extrabold text-green-600">${Math.round(netWeekly).toLocaleString()}</p>
+        <p className="mt-1 text-xs text-green-600/70">= ${Math.round(netMonthly).toLocaleString()}/mo · ${Math.round(netYearly).toLocaleString()}/yr</p>
       </div>
 
       <Link
@@ -277,7 +277,7 @@ function JoinAsTradiePageInner() {
         <div className="pointer-events-none absolute inset-0 grid-pattern" />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-brand-500/8 blur-[100px]" />
         <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-2 text-sm font-bold text-emerald-600">
             🎁 Sign up bonus: $111/month in free credits for your first 6 months
           </div>
           <h1 className="text-[2.75rem] font-black leading-[1.06] tracking-tighter sm:text-5xl lg:text-[4rem]">
@@ -311,7 +311,7 @@ function JoinAsTradiePageInner() {
           <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
             {STATS.map((stat) => (
               <div key={stat.label} className="text-center">
-                <p className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">{stat.value}</p>
+                <p className="text-2xl font-extrabold text-brand-600">{stat.value}</p>
                 <p className="mt-0.5 text-sm text-foreground-muted">{stat.label}</p>
               </div>
             ))}
@@ -336,7 +336,7 @@ function JoinAsTradiePageInner() {
               <ul className="mt-6 space-y-3">
                 {['No lock-in contracts', 'Cancel anytime', '85% of every job goes to you', 'Direct bank deposits'].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm font-medium text-foreground-muted">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400 text-xs">✓</span>
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 text-green-600 text-xs">✓</span>
                     {item}
                   </li>
                 ))}
@@ -450,7 +450,7 @@ function JoinAsTradiePageInner() {
                 <ul className="mt-6 space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-foreground-muted">
-                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400 text-xs">✓</span>
+                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-500/20 text-green-600 text-xs">✓</span>
                       {f}
                     </li>
                   ))}

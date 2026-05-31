@@ -70,7 +70,7 @@ export function HowItWorksTabs() {
     <div>
       {/* Toggle */}
       <div className="mb-10 flex justify-center">
-        <div className="flex rounded-2xl border border-border bg-background-alt p-1 dark:border-white/10 dark:bg-white/[0.04]">
+        <div className="flex rounded-2xl border border-border bg-background-alt p-1">
           <button
             onClick={() => { setTab('homeowner'); }}
             className={`flex items-center gap-2 rounded-xl px-5 py-2.5 text-sm font-semibold transition-all ${
@@ -103,12 +103,12 @@ export function HowItWorksTabs() {
             key={step.n}
             className={`relative flex flex-col rounded-2xl border p-6 transition-all ${
               step.highlighted
-                ? 'border-brand-500/40 bg-brand-500/10 shadow-brand-sm dark:bg-brand-500/10'
-                : 'border-border bg-card shadow-card-warm dark:border-white/[0.08] dark:bg-white/[0.04] dark:shadow-none'
+                ? 'border-brand-500/40 bg-brand-500/10 shadow-brand-sm'
+                : 'border-border bg-card shadow-card-warm'
             }`}
           >
             {/* Step number */}
-            <span className="absolute right-5 top-5 text-3xl font-extrabold text-foreground/[0.07] dark:text-white/[0.08]">
+            <span className="absolute right-5 top-5 text-3xl font-extrabold text-foreground/[0.07]">
               {step.n}
             </span>
 
@@ -116,7 +116,7 @@ export function HowItWorksTabs() {
             <div className={`mb-4 flex h-10 w-10 items-center justify-center rounded-xl text-xl ${
               step.highlighted
                 ? 'bg-brand-500/20'
-                : 'bg-background-elevated dark:bg-white/[0.08]'
+                : 'bg-background-elevated'
             }`}>
               {step.icon}
             </div>
@@ -125,7 +125,7 @@ export function HowItWorksTabs() {
             <p className="flex-1 text-xs leading-relaxed text-foreground-muted">{step.desc}</p>
 
             {step.badge && (
-              <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-brand-700 dark:text-brand-400">
+              <div className="mt-4 flex items-center gap-1.5 text-xs font-semibold text-brand-700">
                 <CheckCircle size={13} />
                 {step.badge}
               </div>
@@ -145,7 +145,7 @@ export function HowItWorksTabs() {
         </Link>
         <Link
           href="/how-it-works"
-          className="flex items-center gap-2 rounded-xl border border-border px-7 py-3.5 text-sm font-bold text-foreground transition-colors hover:bg-background-elevated dark:border-white/15 dark:hover:bg-white/[0.08]"
+          className="flex items-center gap-2 rounded-xl border border-border px-7 py-3.5 text-sm font-bold text-foreground transition-colors hover:bg-background-elevated"
         >
           See the full process
           <span>›</span>

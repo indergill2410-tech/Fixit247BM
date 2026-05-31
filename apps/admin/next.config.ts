@@ -2,6 +2,8 @@ import path from 'path';
 import type { NextConfig } from 'next';
 
 const isProd = process.env['NODE_ENV'] === 'production';
+const appUrl = (process.env['NEXT_PUBLIC_APP_URL'] ?? 'http://localhost:3000').replace(/\/$/, '');
+const appOrigin = new URL(appUrl).origin;
 
 const csp = [
   "default-src 'self'",
@@ -9,7 +11,7 @@ const csp = [
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
   "font-src 'self' https://fonts.gstatic.com data:",
   "img-src 'self' data: blob: https://*.supabase.co https://avatars.githubusercontent.com https://*.googleusercontent.com",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://*.upstash.io https://*.sentry.io" +
+  `connect-src 'self' ${appOrigin} https://*.supabase.co wss://*.supabase.co https://*.upstash.io https://*.sentry.io` +
     (isProd ? '' : ' ws://localhost:* http://localhost:*'),
   "frame-src 'none'",
   "object-src 'none'",
@@ -64,6 +66,14 @@ const nextConfig: NextConfig = {
       {
         source: '/api/(.*)',
         headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' }],
+      },
+    ];
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/admin/:path*',
+        destination: `${appUrl}/api/admin/:path*`,
       },
     ];
   },

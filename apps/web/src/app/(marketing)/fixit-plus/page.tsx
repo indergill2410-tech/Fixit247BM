@@ -164,7 +164,7 @@ export default function FixitPlusPage() {
           {/* Price anchoring */}
           <p className="mx-auto mt-3 max-w-sm text-sm text-foreground-subtle">
             A single emergency call-out averages <span className="font-semibold text-foreground-muted">$180–$300</span>.
-            {' '}Fixit Plus is <span className="font-semibold text-brand-600 dark:text-brand-400">$29–$49/month</span> for unlimited coverage.
+            {' '}Fixit Plus is <span className="font-semibold text-brand-600">$29–$49/month</span> for unlimited coverage.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
@@ -322,7 +322,7 @@ export default function FixitPlusPage() {
           </div>
           <div className="grid gap-4 md:grid-cols-3">
             {PLUS_TESTIMONIALS.map((t) => (
-              <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
+              <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover">
                 <div className="mb-3 flex gap-0.5">
                   {Array.from({ length: 5 }, (_, i) => (
                     <Star key={i} size={11} className="fill-brand-500 text-brand-500" />
@@ -331,7 +331,7 @@ export default function FixitPlusPage() {
                 <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">&ldquo;{t.text}&rdquo;</p>
                 <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-700 dark:text-brand-400">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-700">
                       {t.name[0]}
                     </div>
                     <div>
@@ -339,7 +339,7 @@ export default function FixitPlusPage() {
                       <p className="text-[11px] text-foreground-subtle">{t.suburb}</p>
                     </div>
                   </div>
-                  <span className="shrink-0 rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:text-brand-400">
+                  <span className="shrink-0 rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold text-brand-700">
                     {t.plan}
                   </span>
                 </div>
