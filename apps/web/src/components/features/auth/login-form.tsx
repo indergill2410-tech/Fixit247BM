@@ -19,7 +19,7 @@ function getSiteOrigin(): string {
   return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || window.location.origin;
 }
 
-const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE !== 'false';
 
 const DEMO_ACCOUNTS = [
   {

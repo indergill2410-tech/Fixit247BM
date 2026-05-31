@@ -6,7 +6,7 @@ import { createBrowserClient } from '@supabase/ssr';
 import { Suspense } from 'react';
 
 const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
-const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE === 'true';
+const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE !== 'false';
 const DEMO_EMAIL = 'admin@demo.fixit247.com.au';
 const DEMO_PASSWORD = 'Demo1234!';
 type LoadingMode = 'form' | 'demo' | null;

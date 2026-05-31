@@ -22,7 +22,7 @@ function fmtAud(n: number) {
 }
 
 export default async function AdminDashboardPage() {
-  const now = new Date();
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
 
   const [

@@ -320,7 +320,7 @@ function JoinAsTradiePageInner() {
       </section>
 
       {/* 3. Earnings Calculator */}
-      <section className="bg-background-alt py-20 px-4">
+      <section id="earnings-calculator" className="bg-background-alt py-20 px-4">
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
@@ -501,10 +501,10 @@ function JoinAsTradiePageInner() {
               Claim your $111/mo bonus — free
             </Link>
             <Link
-              href="/pricing"
+              href="#earnings-calculator"
               className="rounded-xl border border-border px-8 py-4 text-base font-bold text-foreground hover:bg-background-elevated transition-colors"
             >
-              See full pricing
+              Estimate earnings
             </Link>
           </div>
           <p className="mt-4 text-xs text-foreground-subtle">No credit card. No lock-in. Cancel anytime.</p>

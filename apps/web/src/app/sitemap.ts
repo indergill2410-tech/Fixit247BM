@@ -31,9 +31,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages: MetadataRoute.Sitemap = [
     { url: SITE_URL, lastModified: new Date(), changeFrequency: 'daily', priority: 1.0 },
     { url: `${SITE_URL}/emergency`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.95 },
+    { url: `${SITE_URL}/find-a-tradie`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
     { url: `${SITE_URL}/join-as-tradie`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.85 },
     { url: `${SITE_URL}/fixit-plus`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.8 },
     { url: `${SITE_URL}/how-it-works`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.75 },
+    { url: `${SITE_URL}/contact`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.65 },
     { url: `${SITE_URL}/about`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.65 },
     { url: `${SITE_URL}/blog`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.65 },
     { url: `${SITE_URL}/refer`, lastModified: new Date(), changeFrequency: 'monthly', priority: 0.6 },
