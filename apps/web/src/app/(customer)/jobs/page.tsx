@@ -85,9 +85,11 @@ export default async function CustomerJobsPage() {
                     const tradieName = job.tradie
                       ? `${job.tradie.user.firstName} ${job.tradie.user.lastName}`.trim()
                       : 'Finding tradie';
-                    const budget = job.budgetMin
-                      ? `$${Number(job.budgetMin).toLocaleString('en-AU')}${job.budgetMax ? ` - $${Number(job.budgetMax).toLocaleString('en-AU')}` : ''}`
-                      : 'Quote required';
+                    const minBudget = job.budgetMin ? `$${Number(job.budgetMin).toLocaleString('en-AU')}` : null;
+                    const maxBudget = job.budgetMax ? `$${Number(job.budgetMax).toLocaleString('en-AU')}` : null;
+                    const budget = minBudget && maxBudget
+                      ? `${minBudget} - ${maxBudget}`
+                      : minBudget ?? (maxBudget ? `Up to ${maxBudget}` : 'Quote required');
 
                     return (
                       <tr key={job.id} className="hover:bg-background-alt">
