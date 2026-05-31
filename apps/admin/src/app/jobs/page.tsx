@@ -109,7 +109,7 @@ export default async function AdminJobsPage() {
                       {job.address ? `${job.address.suburb}, ${job.address.state}` : 'No address'}
                     </td>
                     <td className="px-4 py-4">
-                      <Badge variant={statusVariant(job.status)}>{job.status}</Badge>
+                      <Badge variant={statusVariant(job.status)}>{job.status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</Badge>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">
                       {job.payment ? fmtAud(job.payment.amount) + ' - ' + job.payment.status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : 'No payment'}
