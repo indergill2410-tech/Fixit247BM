@@ -22,6 +22,13 @@ function formatName(user: { firstName: string; lastName: string; email: string }
   return name || user.email;
 }
 
+function formatEnumLabel(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 function statusVariant(status: string): 'default' | 'secondary' | 'warning' | 'success' | 'destructive' {
   if (status === 'COMPLETED') return 'success';
   if (status === 'CANCELLED') return 'destructive';
@@ -31,7 +38,8 @@ function statusVariant(status: string): 'default' | 'secondary' | 'warning' | 's
 }
 
 export default async function AdminJobsPage() {
-  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+  const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
   const [
     totalJobs,
     openJobs,
@@ -100,7 +108,7 @@ export default async function AdminJobsPage() {
                     <td className="px-4 py-4">
                       <p className="font-medium text-gray-900">{job.title}</p>
                       <p className="mt-1 text-xs text-gray-500">
-                        {job.category.toLowerCase().replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}{job.isEmergency ? ' - Emergency' : ''}
+                        {formatEnumLabel(job.category)}{job.isEmergency ? ' - Emergency' : ''}
                       </p>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">{formatName(job.customer.user)}</td>
@@ -109,10 +117,10 @@ export default async function AdminJobsPage() {
                       {job.address ? `${job.address.suburb}, ${job.address.state}` : 'No address'}
                     </td>
                     <td className="px-4 py-4">
-                      <Badge variant={statusVariant(job.status)}>{job.status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase())}</Badge>
+                      <Badge variant={statusVariant(job.status)}>{formatEnumLabel(job.status)}</Badge>
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-600">
-                      {job.payment ? fmtAud(job.payment.amount) + ' - ' + job.payment.status.replace(/_/g, ' ').toLowerCase().replace(/\b\w/g, (c) => c.toUpperCase()) : 'No payment'}
+                      {job.payment ? `${fmtAud(job.payment.amount)} - ${formatEnumLabel(job.payment.status)}` : 'No payment'}
                     </td>
                     <td className="px-4 py-4 text-sm text-gray-500">
                       {job.createdAt.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}

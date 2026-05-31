@@ -22,6 +22,13 @@ function pct(part: number, total: number): string {
   return `${Math.round((part / total) * 100)}%`;
 }
 
+function formatEnumLabel(value: string): string {
+  return value
+    .toLowerCase()
+    .replace(/_/g, ' ')
+    .replace(/\b\w/g, (char) => char.toUpperCase());
+}
+
 export default async function AdminReportsPage() {
   const since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
 
@@ -82,7 +89,7 @@ export default async function AdminReportsPage() {
             {topCategories.map((row) => (
               <div key={row.category}>
                 <div className="mb-1 flex items-center justify-between text-sm">
-                  <span className="font-medium text-gray-800">{row.category.replace(/_/g, ' ')}</span>
+                  <span className="font-medium text-gray-800">{formatEnumLabel(row.category)}</span>
                   <span className="text-gray-500">{row._count.id.toLocaleString()} jobs</span>
                 </div>
                 <div className="h-2 rounded-full bg-gray-100">
