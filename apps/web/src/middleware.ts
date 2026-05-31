@@ -90,6 +90,7 @@ const PUBLIC_EXACT: readonly string[] = [
   '/emergency',
   '/voice',
   '/api/health',
+  '/api/readiness',
 ];
 
 const PUBLIC_PREFIXES: readonly string[] = [
@@ -117,6 +118,7 @@ const ROUTE_ROLES: { pattern: RegExp; roles: Role[] }[] = [
   { pattern: /^\/tradie\/dashboard/, roles: ['TRADIE'] },
   { pattern: /^\/tradie\/jobs/, roles: ['TRADIE'] },
   { pattern: /^\/tradie\/messages/, roles: ['TRADIE'] },
+  { pattern: /^\/tradie\/offers/, roles: ['TRADIE'] },
   { pattern: /^\/tradie\/profile/, roles: ['TRADIE'] },
   { pattern: /^\/tradie\/earnings/, roles: ['TRADIE'] },
   { pattern: /^\/tradie\/wallet/, roles: ['TRADIE'] },
