@@ -61,7 +61,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
             <CardHeader><CardTitle>Tradie Profile</CardTitle></CardHeader>
             <CardContent className="space-y-3 text-sm">
               <div className="flex justify-between"><span className="text-gray-500">Business</span><span>{user.tradieProfile.businessName}</span></div>
-              <div className="flex justify-between"><span className="text-gray-500">Verification</span><Badge>{user.tradieProfile.verificationStatus}</Badge></div>
+<div className="flex justify-between"><span className="text-gray-500">Verification</span><Badge>{formatEnumLabel(user.tradieProfile.verificationStatus)}</Badge></div>
               <div className="flex justify-between"><span className="text-gray-500">Completed jobs</span><span>{user.tradieProfile.totalJobsCompleted}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Earnings</span><span>${Number(user.tradieProfile.totalEarnings).toLocaleString('en-AU')}</span></div>
               <div className="flex justify-between"><span className="text-gray-500">Trust score</span><span>{Number(user.tradieProfile.trustScore).toFixed(0)}/100</span></div>
