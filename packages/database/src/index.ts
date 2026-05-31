@@ -58,7 +58,7 @@ const databaseUrl = process.env.DATABASE_URL;
 if (!databaseUrl) throw new Error('DATABASE_URL environment variable is not set');
 
 const baseClient = new PrismaClient({
-  adapter: new PrismaPg(databaseUrl),
+  adapter: new PrismaPg({ connectionString: databaseUrl }),
   log:
     process.env.NODE_ENV === 'development'
       ? ['query', 'error', 'warn']
