@@ -38,7 +38,7 @@ export default async function AdminUserDetailPage({ params }: { params: Promise<
         <Card>
           <CardHeader><CardTitle>Account</CardTitle></CardHeader>
           <CardContent className="space-y-3 text-sm">
-            <div className="flex justify-between"><span className="text-gray-500">Role</span><Badge>{user.role}</Badge></div>
+<div className="flex justify-between"><span className="text-gray-500">Role</span><Badge>{formatEnumLabel(user.role)}</Badge></div>
             <div className="flex justify-between"><span className="text-gray-500">Status</span><Badge variant={user.isActive ? 'success' : 'destructive'}>{user.isActive ? 'Active' : 'Suspended'}</Badge></div>
             <div className="flex justify-between"><span className="text-gray-500">Onboarding</span><span>{user.onboardingComplete ? 'Complete' : 'Incomplete'}</span></div>
             <div className="flex justify-between"><span className="text-gray-500">Joined</span><span>{user.createdAt.toLocaleDateString('en-AU')}</span></div>
