@@ -118,7 +118,7 @@ async function handleCallback(request: NextRequest) {
         const isUnique = dbErr instanceof Error && dbErr.message.includes('Unique constraint');
         if (!isUnique) {
           logger.error('[auth/callback] DB create failed (email)', dbErr);
-          return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+          return NextResponse.redirect(`${origin}/login?error=profile_unavailable`);
         }
       }
       const dest = metaRole === 'TRADIE' ? '/tradie/onboarding/business' : '/onboarding';
@@ -174,7 +174,7 @@ async function handleCallback(request: NextRequest) {
         const isUnique = dbErr instanceof Error && dbErr.message.includes('Unique constraint');
         if (!isUnique) {
           logger.error('[auth/callback] DB create failed (OAuth)', dbErr);
-          return NextResponse.redirect(`${origin}/login?error=auth_callback_failed`);
+          return NextResponse.redirect(`${origin}/login?error=profile_unavailable`);
         }
       }
       const dest = metaRole === 'TRADIE' ? '/tradie/onboarding/business' : '/onboarding';

@@ -1,5 +1,6 @@
 import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
+import type { User } from '@supabase/supabase-js';
 import type { Role } from '@fixit247/auth';
 
 const ROLE_CACHE_COOKIE = '__fixit_role_cache';
@@ -10,6 +11,26 @@ interface RoleCachePayload {
   onboardingComplete: boolean;
   userId: string;
   expiresAt: number;
+}
+
+interface AuthzProfile {
+  role: Role;
+  onboardingComplete: boolean;
+  isActive: boolean;
+}
+
+type AuthzProfileRead =
+  | { ok: true; profile: AuthzProfile | null }
+  | { ok: false };
+
+interface AuthzSupabaseClient {
+  from(table: 'users'): {
+    select(columns: string): {
+      eq(column: 'id', value: string): {
+        maybeSingle(): PromiseLike<{ data: unknown; error: unknown }>;
+      };
+    };
+  };
 }
 
 function b64urlEncode(bytes: Uint8Array): string {
@@ -81,6 +102,7 @@ const PUBLIC_EXACT: readonly string[] = [
   '/contact',
   '/unauthorized',
   '/how-it-works',
+  '/find-a-tradie',
   '/fixit-plus',
   '/join-as-tradie',
   '/refer',
@@ -88,6 +110,7 @@ const PUBLIC_EXACT: readonly string[] = [
   '/privacy',
   '/blog',
   '/emergency',
+  '/post-job',
   '/voice',
   '/api/health',
   '/api/readiness',
@@ -171,6 +194,44 @@ function getDashboardPath(role: Role): string {
   return '/dashboard';
 }
 
+function metadataRole(user: User): Role {
+  const appMeta = user.app_metadata as Record<string, unknown>;
+  const appRole = appMeta.role;
+  if (appRole === 'ADMIN' || appRole === 'SUPER_ADMIN' || appRole === 'TRADIE' || appRole === 'CUSTOMER') {
+    return appRole;
+  }
+
+  const userMeta = user.user_metadata as Record<string, unknown>;
+  return userMeta.role === 'TRADIE' ? 'TRADIE' : 'CUSTOMER';
+}
+
+async function readAuthzProfile(supabase: AuthzSupabaseClient, userId: string): Promise<AuthzProfileRead> {
+  const { data, error } = await supabase
+    .from('users')
+    .select('role, "onboardingComplete", "isActive"')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) return { ok: false };
+  if (!data) return { ok: true, profile: null };
+
+  const row = data as Record<string, unknown>;
+  const rawRole = row.role;
+  const role: Role =
+    rawRole === 'TRADIE' || rawRole === 'ADMIN' || rawRole === 'SUPER_ADMIN'
+      ? rawRole
+      : 'CUSTOMER';
+
+  return {
+    ok: true,
+    profile: {
+      role,
+      onboardingComplete: Boolean(row.onboardingComplete),
+      isActive: Boolean(row.isActive),
+    },
+  };
+}
+
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -204,6 +265,7 @@ export async function middleware(request: NextRequest) {
       },
     },
   });
+  const authzSupabase = supabase as unknown as AuthzSupabaseClient;
 
   const { data: { user } } = await supabase.auth.getUser();
 
@@ -214,9 +276,9 @@ export async function middleware(request: NextRequest) {
       if (cached && cached.userId === user.id) {
         role = cached.role;
       } else {
-        const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
-        const userMeta = user.user_metadata as Record<string, unknown>;
-        role = ((appMeta.role ?? userMeta.role) as Role | undefined) ?? 'CUSTOMER';
+        const profileRead = await readAuthzProfile(authzSupabase, user.id);
+        if (!profileRead.ok) return response;
+        role = profileRead.profile ? profileRead.profile.role : metadataRole(user);
       }
       return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
     }
@@ -234,29 +296,28 @@ export async function middleware(request: NextRequest) {
 
   let role: Role;
   let onboardingComplete: boolean;
+  let isActive = true;
 
   const cached = await parseRoleCache(request.cookies.get(ROLE_CACHE_COOKIE)?.value);
   if (cached && cached.userId === user.id) {
     role = cached.role;
     onboardingComplete = cached.onboardingComplete;
   } else {
-    // FIX: column is camelCase "onboardingComplete", not snake_case
-    const { data: dbUser } = await supabase
-      .from('users')
-      .select('role, "onboardingComplete"')
-      .eq('id', user.id)
-      .single();
+    const profileRead = await readAuthzProfile(authzSupabase, user.id);
 
-    if (dbUser) {
-      role = (dbUser.role as Role | undefined) ?? 'CUSTOMER';
-      onboardingComplete = Boolean((dbUser as Record<string, unknown>).onboardingComplete ?? false);
+    if (!profileRead.ok) {
+      if (pathname.startsWith('/api/')) {
+        return NextResponse.json({ error: 'Profile unavailable' }, { status: 503 });
+      }
+      return NextResponse.redirect(new URL('/login?error=profile_unavailable', request.url));
+    }
+
+    if (profileRead.profile) {
+      role = profileRead.profile.role;
+      onboardingComplete = profileRead.profile.onboardingComplete;
+      isActive = profileRead.profile.isActive;
     } else {
-      const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
-      const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
-      const rawRole = (appMeta.role ?? userMeta.role) as Role | undefined;
-      role = rawRole === 'ADMIN' || rawRole === 'SUPER_ADMIN'
-        ? ((appMeta.role as Role | undefined) ?? 'CUSTOMER')
-        : (rawRole ?? 'CUSTOMER');
+      role = metadataRole(user);
       onboardingComplete = role === 'ADMIN' || role === 'SUPER_ADMIN';
     }
 
@@ -276,6 +337,13 @@ export async function middleware(request: NextRequest) {
         path: '/',
       });
     }
+  }
+
+  if (!isActive) {
+    if (pathname.startsWith('/api/')) {
+      return NextResponse.json({ error: 'Account inactive' }, { status: 403 });
+    }
+    return NextResponse.redirect(new URL('/login?error=access_denied', request.url));
   }
 
   const requiredRoles = getRequiredRoles(pathname);

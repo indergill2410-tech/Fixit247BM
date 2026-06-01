@@ -2,24 +2,31 @@
 
 import * as React from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createBrowserClient } from '@supabase/ssr';
 import { Suspense } from 'react';
 
-const ADMIN_ROLES = ['ADMIN', 'SUPER_ADMIN'];
 const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE !== 'false';
 const DEMO_EMAIL = 'admin@demo.fixit247.com.au';
 const DEMO_PASSWORD = 'Demo1234!';
 type LoadingMode = 'form' | 'demo' | null;
 
+interface LoginResponse {
+  redirectTo?: string;
+  error?: string;
+}
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const accessDenied = searchParams.get('error') === 'access_denied';
+  const routeError = searchParams.get('error');
 
   const [email, setEmail] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [error, setError] = React.useState<string | null>(
-    accessDenied ? 'Your account does not have admin access.' : null
+    routeError === 'access_denied'
+      ? 'Your account does not have admin access.'
+      : routeError === 'profile_unavailable'
+        ? 'Admin profile lookup failed. Please try again in a minute.'
+        : null
   );
   const [loading, setLoading] = React.useState<LoadingMode>(null);
 
@@ -27,34 +34,22 @@ function LoginForm() {
     setError(null);
     setLoading(mode);
 
-    const supabase = createBrowserClient(
-      process.env.NEXT_PUBLIC_SUPABASE_URL!,
-      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    );
-
-    const { data, error: authError } = await supabase.auth.signInWithPassword({
-      email: emailValue,
-      password: passwordValue,
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailValue, password: passwordValue }),
     });
 
-    if (authError || !data.user) {
-      setError('Invalid email or password.');
+    const payload = await response.json().catch(() => ({})) as LoginResponse;
+
+    if (!response.ok || !payload.redirectTo) {
+      setError(payload.error ?? 'Sign in failed. Please try again.');
       setLoading(null);
       return;
     }
 
-    const appMeta = (data.user.app_metadata ?? {}) as Record<string, unknown>;
-    const userMeta = (data.user.user_metadata ?? {}) as Record<string, unknown>;
-    const role = (appMeta.role ?? userMeta.role) as string | undefined;
-
-    if (!role || !ADMIN_ROLES.includes(role)) {
-      await supabase.auth.signOut();
-      setError('Your account does not have admin access.');
-      setLoading(null);
-      return;
-    }
-
-    router.push('/dashboard');
+    router.push(payload.redirectTo);
     router.refresh();
   }
 
