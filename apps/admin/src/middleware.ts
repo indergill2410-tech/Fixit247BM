@@ -41,12 +41,24 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
 
-  // Role from app_metadata (service-role-only, tamper-proof) with user_metadata fallback
-  const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
-  const userMeta = (user.user_metadata ?? {}) as Record<string, unknown>;
-  const role = ((appMeta.role ?? userMeta.role) as Role | undefined) ?? 'CUSTOMER';
+  const { data: dbUser, error: dbError } = await supabase
+    .from('users')
+    .select('role, "isActive"')
+    .eq('id', user.id)
+    .single();
 
-  if (role !== 'ADMIN' && role !== 'SUPER_ADMIN') {
+  if (dbError) {
+    return NextResponse.redirect(new URL('/login?error=profile_unavailable', request.url));
+  }
+
+  const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
+  const metadataRole = appMeta.role === 'ADMIN' || appMeta.role === 'SUPER_ADMIN'
+    ? appMeta.role as Role
+    : undefined;
+  const role = (dbUser?.role as Role | undefined) ?? metadataRole ?? 'CUSTOMER';
+  const isActive = Boolean((dbUser as Record<string, unknown> | null)?.isActive ?? false);
+
+  if (!isActive || (role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
     return NextResponse.redirect(new URL('/login?error=access_denied', request.url));
   }
 

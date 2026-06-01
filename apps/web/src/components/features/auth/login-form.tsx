@@ -11,15 +11,28 @@ import { Eye, EyeOff, Mail, Lock } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@fixit247/ui';
 import { loginSchema, type LoginValues } from '@/lib/validators/auth';
 import { getSupabaseBrowserClient } from '@/lib/supabase/client';
-import { getDashboardTarget, normalizeRedirectTarget } from '@/lib/auth/redirects';
+import { normalizeRedirectTarget } from '@/lib/auth/redirects';
 
 // Use NEXT_PUBLIC_SITE_URL so OAuth callbacks work correctly behind reverse proxies
 // (window.location.origin resolves to the container's internal address, not the public URL)
 function getSiteOrigin(): string {
-  return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') || window.location.origin;
+  return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? window.location.origin;
 }
 
 const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE !== 'false';
+
+interface LoginResponse {
+  redirectTo?: string;
+  error?: string;
+  code?: string;
+}
+
+const URL_ERROR_COPY: Record<string, string> = {
+  auth_callback_failed: 'Google sign-in failed. Please try again or use email and password.',
+  email_required: 'Your provider did not return an email address. Please use another sign-in method.',
+  profile_unavailable: 'Your profile could not be loaded. Please try again in a minute.',
+  access_denied: 'This account is not active or cannot access that area.',
+};
 
 const DEMO_ACCOUNTS = [
   {
@@ -68,44 +81,40 @@ export function LoginForm() {
     resolver: zodResolver(loginSchema),
   });
 
-  async function onSubmit(values: LoginValues) {
-    const supabase = getSupabaseBrowserClient();
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
+  async function completePasswordLogin(email: string, password: string, successMessage: string) {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      credentials: 'same-origin',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, redirectTo }),
     });
 
-    if (error) {
-      if (error.message.includes('Invalid login')) {
-        toast.error('Invalid email or password');
-      } else if (error.message.includes('Email not confirmed')) {
+    const payload = await response.json().catch(() => ({})) as LoginResponse;
+
+    if (!response.ok || !payload.redirectTo) {
+      if (payload.code === 'email_not_confirmed') {
         toast.error('Please verify your email first', {
-          action: { label: 'Resend', onClick: () => void handleResendVerification(values.email) },
+          action: { label: 'Resend', onClick: () => void handleResendVerification(email) },
         });
       } else {
-        toast.error(error.message);
+        toast.error(payload.error ?? 'Login failed. Please try again.');
       }
-      return;
+      return false;
     }
 
-    void supabase.rpc('increment_login_count', { user_id: data.user.id });
-
-    const appMeta = (data.user.app_metadata ?? {}) as Record<string, unknown>;
-    const userMeta = data.user.user_metadata as Record<string, unknown>;
-    const role = (appMeta.role ?? userMeta.role) as string | undefined;
-    const safeRedirect = normalizeRedirectTarget(redirectTo, window.location.origin);
-    const dest =
-      safeRedirect !== '/dashboard'
-        ? safeRedirect
-        : getDashboardTarget(role);
-
-    toast.success('Welcome back!');
+    toast.success(successMessage);
+    const dest = payload.redirectTo;
     if (dest.startsWith('http')) {
       window.location.assign(dest);
     } else {
       router.push(dest);
       router.refresh();
     }
+    return true;
+  }
+
+  async function onSubmit(values: LoginValues) {
+    await completePasswordLogin(values.email, values.password, 'Welcome back!');
   }
 
   async function handleResendVerification(email: string) {
@@ -114,26 +123,12 @@ export function LoginForm() {
     toast.success('Verification email sent');
   }
 
-  async function loginAsDemo(email: string, password: string, role: string) {
-    if (demoLoading || isSubmitting || isGoogleLoading) return;
+  async function loginAsDemo(email: string, password: string) {
+    if (demoLoading !== null || isSubmitting || isGoogleLoading) return;
     setDemoLoading(email);
     try {
-      const supabase = getSupabaseBrowserClient();
-      const { data, error } = await supabase.auth.signInWithPassword({ email, password });
-      if (error) {
-        toast.error('Demo login failed — account may not be seeded yet');
-        setDemoLoading(null);
-        return;
-      }
-      void supabase.rpc('increment_login_count', { user_id: data.user.id });
-      const dest = getDashboardTarget(role);
-      toast.success('Signed in as demo user');
-      if (dest.startsWith('http')) {
-        window.location.assign(dest);
-      } else {
-        router.push(dest);
-        router.refresh();
-      }
+      const loggedIn = await completePasswordLogin(email, password, 'Signed in as demo user');
+      if (!loggedIn) setDemoLoading(null);
     } catch {
       toast.error('An unexpected error occurred during demo login');
       setDemoLoading(null);
@@ -172,9 +167,7 @@ export function LoginForm() {
         <CardContent className="px-6 pb-6 pt-8">
           {urlError && (
             <div className="mb-5 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-700">
-              {urlError === 'auth_callback_failed'
-                ? 'Google sign-in failed. Please try again or use email and password.'
-                : 'An error occurred. Please try again.'}
+              {URL_ERROR_COPY[urlError] ?? 'An error occurred. Please try again.'}
             </div>
           )}
 
@@ -298,7 +291,7 @@ export function LoginForm() {
               </div>
               <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm-warm">
                 <div className="divide-y divide-border">
-                  {DEMO_ACCOUNTS.map(({ email, password, role, label, description, icon, badge, badgeColor }) => {
+                  {DEMO_ACCOUNTS.map(({ email, password, label, description, icon, badge, badgeColor }) => {
                     const isLoading = demoLoading === email;
                     const isDisabled = demoLoading !== null || isSubmitting || isGoogleLoading;
                     return (
@@ -306,7 +299,7 @@ export function LoginForm() {
                         key={email}
                         type="button"
                         disabled={isDisabled}
-                        onClick={() => void loginAsDemo(email, password, role)}
+                        onClick={() => void loginAsDemo(email, password)}
                         className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all hover:bg-background-alt disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background-alt text-lg group-hover:bg-background-elevated">
