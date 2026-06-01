@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 172 180" fill="none">
+  <defs>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Amber rounded square -->
+  <rect x="0" y="4" width="172" height="172" rx="36" fill="url(#amber)"/>
+
+  <!-- 3 speed lines (left of wrench, dark charcoal) -->
+  <line x1="16" y1="80"  x2="52" y2="80"  stroke="#1E2235" stroke-width="9" stroke-linecap="round"/>
+  <line x1="11" y1="100" x2="47" y2="100" stroke="#1E2235" stroke-width="9" stroke-linecap="round"/>
+  <line x1="16" y1="120" x2="48" y2="120" stroke="#1E2235" stroke-width="8" stroke-linecap="round"/>
+
+  <!-- Wrench (open jaw upper-right, handle lower-left, angled ~-45deg) -->
+  <path
+    d="
+      M132 18
+      C149 18 163 31 164 48
+      C165 59 160 68 152 74
+      L106 120
+      L110 124
+      C113 127 113 132 110 135
+      L84 161
+      C79 166 71 166 66 161
+      C61 156 61 148 66 143
+      L92 117
+      C95 114 100 114 103 117
+      L107 121
+      L153 75
+      C160 68 164 59 162 48
+      C160 31 147 18 132 18Z
+    "
+    fill="#1E2235"
+  />
+  <!-- Open jaw cutout (creates the C-shape at the head) -->
+  <path
+    d="
+      M132 36
+      C141 36 148 43 148 52
+      C148 58 145 63 140 67
+      L122 49
+      C126 44 129 40 130 36
+      C130.6 36 131.3 36 132 36Z
+    "
+    fill="url(#amber)"
+  />
+  <!-- Lower jaw arm -->
+  <path
+    d="
+      M164 48
+      C165 38 160 28 152 22
+      L140 36
+      C145 39 148 45 148 52
+      C148 55 147 58 145 60
+      L158 74
+      C162 68 164 59 164 48Z
+    "
+    fill="#1E2235"
+    opacity="0"
+  />
+</svg>
