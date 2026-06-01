@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1400"/>
+<title>V3 — Canvas (Vercel × Raycast)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',system-ui,sans-serif;background:#111110;color:#F8F5F0;display:flex;flex-direction:column;gap:40px;padding:40px;min-height:100vh;}
+  .label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#595450;margin-bottom:12px;}
+  .screen{border-radius:16px;overflow:hidden;border:1px solid #1E1C1A;box-shadow:0 24px 80px rgba(0,0,0,.8);width:1300px;}
+  /* MINIMAL TOP BAR */
+  .topbar{background:#0F0E0D;border-bottom:1px solid #1E1C1A;padding:0 28px;height:44px;display:flex;align-items:center;gap:24px;}
+  .logo{display:flex;align-items:center;gap:7px;font-weight:800;font-size:14px;color:#F59E0B;letter-spacing:-.01em;}
+  .bolt{width:20px;height:20px;background:#F59E0B;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:10px;}
+  .search-pill{background:#1A1918;border:1px solid #252220;border-radius:8px;padding:5px 14px;font-size:12px;color:#595450;display:flex;align-items:center;gap:8px;cursor:pointer;min-width:200px;}
+  .search-pill kbd{background:#252220;border-radius:4px;padding:1px 5px;font-size:10px;color:#8C8480;}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:10px;}
+  .icon-btn{width:28px;height:28px;border-radius:7px;background:#1A1918;border:1px solid #252220;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;}
+  .avatar{width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#1a1208;}
+  /* THREE-PANEL LAYOUT */
+  .layout{display:flex;height:700px;}
+  /* LEFT SLIM NAV */
+  .slim-nav{width:52px;background:#0B0A09;border-right:1px solid #1A1918;display:flex;flex-direction:column;align-items:center;padding:12px 0;gap:4px;}
+  .nav-icon{width:36px;height:36px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;cursor:pointer;color:#595450;transition:all .15s;}
+  .nav-icon:hover{background:#1A1918;color:#F8F5F0;}
+  .nav-icon.active{background:#1E1C1A;color:#F59E0B;}
+  .nav-dot{width:5px;height:5px;border-radius:50%;background:#EF4444;position:relative;top:-8px;right:-8px;margin-left:-5px;}
+  /* CENTER MAIN */
+  .main{flex:1;background:#0D0C0B;padding:24px 28px;overflow-y:auto;display:flex;flex-direction:column;gap:16px;}
+  .page-title{font-size:18px;font-weight:700;color:#F8F5F0;}
+  .page-sub{font-size:12px;color:#595450;margin-top:2px;}
+  .metric-strip{display:flex;gap:1px;background:#1A1918;border-radius:10px;overflow:hidden;border:1px solid #252220;}
+  .metric{flex:1;background:#131210;padding:14px 16px;}
+  .metric:not(:last-child){border-right:1px solid #1A1918;}
+  .metric-val{font-size:19px;font-weight:800;color:#F8F5F0;margin-bottom:1px;}
+  .metric-key{font-size:11px;color:#595450;font-weight:500;}
+  .metric-delta{font-size:10px;color:#22C55E;margin-top:2px;}
+  /* JOB ROWS */
+  .job-row{display:flex;align-items:center;gap:12px;padding:11px 14px;border-radius:8px;cursor:pointer;border:1px solid transparent;transition:all .15s;}
+  .job-row:hover{background:#131210;border-color:#252220;}
+  .job-row-icon{width:32px;height:32px;border-radius:8px;background:#1A1918;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+  .job-row-title{font-size:13.5px;font-weight:600;color:#F8F5F0;margin-bottom:1px;}
+  .job-row-sub{font-size:11px;color:#595450;}
+  .job-row-status{margin-left:auto;display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;white-space:nowrap;}
+  .dot-g{width:6px;height:6px;border-radius:50%;background:#22C55E;}
+  .dot-a{width:6px;height:6px;border-radius:50%;background:#F59E0B;animation:pulse 1.5s infinite;}
+  .dot-b{width:6px;height:6px;border-radius:50%;background:#3B82F6;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .divider{height:1px;background:#1A1918;}
+  .section-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#595450;padding:4px 0;}
+  /* TRADE GRID MINI */
+  .trade-mini{display:flex;gap:8px;flex-wrap:wrap;}
+  .trade-chip{background:#131210;border:1px solid #252220;border-radius:8px;padding:8px 14px;font-size:12px;color:#8C8480;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .15s;}
+  .trade-chip:hover{border-color:#F59E0B;color:#F8F5F0;}
+  .emrg-strip{background:linear-gradient(90deg,#7F1D1D22,#EF444408);border:1px solid #7F1D1D55;border-radius:8px;padding:10px 16px;display:flex;align-items:center;justify-content:space-between;}
+  .emrg-btn{background:#EF4444;color:white;border:none;border-radius:7px;padding:7px 18px;font-size:12px;font-weight:700;cursor:pointer;}
+  /* RIGHT PANEL */
+  .right-panel{width:260px;background:#0B0A09;border-left:1px solid #1A1918;display:flex;flex-direction:column;overflow-y:auto;}
+  .panel-section{padding:16px 16px 12px;border-bottom:1px solid #1A1918;}
+  .panel-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#595450;margin-bottom:10px;}
+  .activity-item{display:flex;gap:8px;margin-bottom:10px;align-items:flex-start;}
+  .act-dot{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0;}
+  .act-text{font-size:12px;color:#8C8480;line-height:1.4;}
+  .act-time{font-size:10px;color:#3C3835;margin-top:2px;}
+  .tradie-item{display:flex;align-items:center;gap:9px;margin-bottom:10px;}
+  .t-avatar{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:white;flex-shrink:0;}
+  .t-name{font-size:12px;font-weight:600;color:#F8F5F0;}
+  .t-sub{font-size:11px;color:#595450;}
+  .avail-dot{width:7px;height:7px;border-radius:50%;margin-left:auto;flex-shrink:0;}
+  /* VERSION LABEL */
+  .version-tag{background:#F59E0B;color:#1a1208;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:.06em;display:inline-block;margin-bottom:8px;}
+  /* ADMIN SPECIFIC */
+  .health-row{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:20px;}
+  .health-card{background:#131210;border:1px solid #1E1C1A;border-radius:10px;padding:14px 16px;text-align:center;}
+  .health-val{font-size:22px;font-weight:800;color:#F8F5F0;margin-bottom:2px;}
+  .health-key{font-size:10px;color:#595450;text-transform:uppercase;letter-spacing:.06em;}
+  .health-delta{font-size:10px;color:#22C55E;margin-top:3px;}
+  .live-ticker{background:#0D0C0B;border:1px solid #1A1918;border-radius:10px;overflow:hidden;}
+  .ticker-header{background:#131210;padding:10px 16px;display:flex;align-items:center;gap:8px;border-bottom:1px solid #1A1918;}
+  .live-indicator{width:7px;height:7px;border-radius:50%;background:#22C55E;animation:pulse 1.5s infinite;}
+  .ticker-title{font-size:11px;font-weight:700;color:#F8F5F0;text-transform:uppercase;letter-spacing:.08em;}
+  .ticker-item{display:flex;align-items:center;gap:10px;padding:9px 16px;border-bottom:1px solid #1A1918;font-size:12px;}
+  .ticker-item:last-child{border-bottom:none;}
+  .ticker-dot{width:6px;height:6px;border-radius:50%;flex-shrink:0;}
+  .ticker-text{color:#8C8480;flex:1;}
+  .ticker-text strong{color:#F8F5F0;font-weight:600;}
+  .ticker-time{font-size:10px;color:#3C3835;font-family:monospace;}
+  .queue-item{display:flex;align-items:center;gap:10px;padding:10px 14px;border-radius:8px;border:1px solid #1A1918;margin-bottom:6px;cursor:pointer;transition:all .15s;}
+  .queue-item:hover{border-color:#252220;background:#131210;}
+  .queue-icon{font-size:16px;width:30px;text-align:center;}
+  .queue-title{font-size:13px;font-weight:600;color:#F8F5F0;margin-bottom:1px;}
+  .queue-sub{font-size:11px;color:#595450;}
+  .queue-action{margin-left:auto;background:#1E1C1A;border:1px solid #252220;border-radius:6px;padding:5px 12px;font-size:11px;font-weight:600;color:#F8F5F0;cursor:pointer;white-space:nowrap;}
+  .mini-chart{display:flex;align-items:flex-end;gap:3px;height:40px;}
+  .bar{background:#F59E0B;border-radius:2px 2px 0 0;opacity:.7;flex:1;}
+  .bar.peak{opacity:1;background:#F59E0B;}
+</style>
+</head>
+<body>
+
+<div>
+  <div class="version-tag">VERSION 3 — CANVAS</div>
+  <div style="font-size:28px;font-weight:800;color:#F8F5F0;margin-bottom:4px;">Vercel × Raycast — Minimal Chrome, Maximum Content</div>
+  <div style="font-size:14px;color:#595450;margin-bottom:20px;">Icon-only left nav · contextual right panel · slide-out details · feels instant</div>
+</div>
+
+<!-- CUSTOMER -->
+<div class="label">CUSTOMER DASHBOARD</div>
+<div class="screen">
+  <div class="topbar">
+    <div class="logo"><div class="bolt">⚡</div>FIXIT247</div>
+    <div class="search-pill">Search jobs, tradies, suburbs… <kbd>⌘K</kbd></div>
+    <div class="topbar-right">
+      <div class="icon-btn">🌙</div>
+      <div class="icon-btn">🔔<span style="position:absolute;width:5px;height:5px;background:#EF4444;border-radius:50%;transform:translate(4px,-8px);display:inline-block;"></span></div>
+      <div class="avatar">SJ</div>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="slim-nav">
+      <div class="nav-icon active">🏠</div>
+      <div class="nav-icon" style="position:relative;">📋<span class="nav-dot"></span></div>
+      <div class="nav-icon">💬</div>
+      <div class="nav-icon">🔖</div>
+      <div style="flex:1;"></div>
+      <div class="nav-icon" style="color:#EF4444;font-size:14px;">🚨</div>
+      <div class="nav-icon">👤</div>
+    </div>
+    <div class="main">
+      <div>
+        <div class="page-title">Dashboard</div>
+        <div class="page-sub">Sunday 1 June · Bondi Beach</div>
+      </div>
+      <div class="metric-strip">
+        <div class="metric"><div class="metric-val">2</div><div class="metric-key">Active jobs</div></div>
+        <div class="metric"><div class="metric-val">$480</div><div class="metric-key">This month</div><div class="metric-delta">↓ 12% vs last</div></div>
+        <div class="metric"><div class="metric-val">4.9★</div><div class="metric-key">Avg rating</div></div>
+        <div class="metric"><div class="metric-val">8 min</div><div class="metric-key">Avg response</div><div class="metric-delta">In Bondi</div></div>
+      </div>
+      <div>
+        <div class="section-label">Active Jobs</div>
+        <div class="job-row">
+          <div class="job-row-icon">🔧</div>
+          <div>
+            <div class="job-row-title">Plumbing · Leaking kitchen tap</div>
+            <div class="job-row-sub">Mike Torres · ETA 2:30pm · $280 agreed</div>
+          </div>
+          <div class="job-row-status"><div class="dot-g"></div><span style="color:#22C55E;">In Progress</span></div>
+        </div>
+        <div class="job-row" style="background:#131210;border-color:#2a2118;">
+          <div class="job-row-icon">⚡</div>
+          <div>
+            <div class="job-row-title">Electrical · Power outage — 3 rooms</div>
+            <div class="job-row-sub">3 quotes · reply by 5pm ← action needed</div>
+          </div>
+          <div class="job-row-status"><div class="dot-a"></div><span style="color:#F59E0B;">Reply needed</span></div>
+        </div>
+      </div>
+      <div class="divider"></div>
+      <div>
+        <div class="section-label">Post a new job</div>
+        <div class="trade-mini">
+          <div class="trade-chip">🔧 Plumbing</div>
+          <div class="trade-chip">⚡ Electrical</div>
+          <div class="trade-chip">🪣 Cleaning</div>
+          <div class="trade-chip">🏗 Building</div>
+          <div class="trade-chip">🌿 Gardening</div>
+          <div class="trade-chip">🔒 Locksmith</div>
+          <div class="trade-chip">🎨 Painting</div>
+          <div class="trade-chip">··· More</div>
+        </div>
+      </div>
+      <div class="emrg-strip">
+        <div>
+          <div style="font-size:13px;font-weight:600;color:#F8F5F0;">Need a tradie urgently?</div>
+          <div style="font-size:11px;color:#595450;margin-top:2px;">Emergency dispatch · average 15 min arrival in your suburb</div>
+        </div>
+        <button class="emrg-btn">🚨 Book now</button>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="panel-section">
+        <div class="panel-title">Live activity</div>
+        <div class="activity-item"><div class="act-dot" style="background:#22C55E;"></div><div><div class="act-text"><strong style="color:#F8F5F0;">Mike T.</strong> is on his way</div><div class="act-time">09:41</div></div></div>
+        <div class="activity-item"><div class="act-dot" style="background:#F59E0B;"></div><div><div class="act-text">Quote from <strong style="color:#F8F5F0;">Ana S.</strong> arrived</div><div class="act-time">09:21</div></div></div>
+        <div class="activity-item"><div class="act-dot" style="background:#3B82F6;"></div><div><div class="act-text">Job #4802 completed ✓</div><div class="act-time">Yesterday</div></div></div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-title">Available nearby</div>
+        <div class="tradie-item">
+          <div class="t-avatar" style="background:linear-gradient(135deg,#F59E0B,#D97706);">MT</div>
+          <div><div class="t-name">Mike Torres</div><div class="t-sub">⚡ Elec · 0.4km</div></div>
+          <div class="avail-dot" style="background:#22C55E;"></div>
+        </div>
+        <div class="tradie-item">
+          <div class="t-avatar" style="background:linear-gradient(135deg,#6366F1,#4F46E5);">AS</div>
+          <div><div class="t-name">Ana Santos</div><div class="t-sub">🔧 Plumb · 1.2km</div></div>
+          <div class="avail-dot" style="background:#22C55E;"></div>
+        </div>
+        <div class="tradie-item">
+          <div class="t-avatar" style="background:linear-gradient(135deg,#EC4899,#DB2777);">JK</div>
+          <div><div class="t-name">James Kim</div><div class="t-sub">🌿 Garden · 0.9km</div></div>
+          <div class="avail-dot" style="background:#F59E0B;"></div>
+        </div>
+        <div style="font-size:11px;color:#F59E0B;margin-top:4px;cursor:pointer;">+9 more available →</div>
+      </div>
+      <div class="panel-section" style="border-bottom:none;">
+        <div class="panel-title">Bondi Beach · this week</div>
+        <div style="font-size:22px;font-weight:700;color:#F8F5F0;">47 jobs</div>
+        <div style="font-size:11px;color:#595450;margin:4px 0 10px;">completed · avg 9 min response</div>
+        <div class="mini-chart">
+          <div class="bar" style="height:40%;"></div><div class="bar" style="height:55%;"></div><div class="bar" style="height:45%;"></div><div class="bar" style="height:70%;"></div><div class="bar" style="height:60%;"></div><div class="bar" style="height:80%;"></div><div class="bar peak" style="height:100%;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ADMIN -->
+<div class="label" style="margin-top:32px;">ADMIN — PLATFORM OPERATIONS</div>
+<div class="screen">
+  <div class="topbar">
+    <div class="logo"><div class="bolt">⚡</div>FIXIT247 ADMIN</div>
+    <div class="search-pill">Search users, jobs, disputes… <kbd>⌘K</kbd></div>
+    <div class="topbar-right">
+      <div style="font-size:11px;color:#595450;">Sun 1 Jun · 09:41</div>
+      <div class="icon-btn">🔔</div>
+      <div class="avatar" style="background:linear-gradient(135deg,#6366F1,#4F46E5);">AD</div>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="slim-nav">
+      <div class="nav-icon active">📊</div>
+      <div class="nav-icon">👥</div>
+      <div class="nav-icon">🔨</div>
+      <div class="nav-icon">✅</div>
+      <div class="nav-icon" style="position:relative;">⚖️<span class="nav-dot"></span></div>
+      <div class="nav-icon">🚩</div>
+      <div style="flex:1;"></div>
+      <div class="nav-icon">💰</div>
+      <div class="nav-icon">📈</div>
+      <div class="nav-icon">⚙️</div>
+    </div>
+    <div class="main">
+      <div>
+        <div class="page-title">Platform Operations</div>
+        <div class="page-sub">All systems operational · Last updated 09:41:02</div>
+      </div>
+      <div class="health-row">
+        <div class="health-card"><div class="health-val" style="color:#22C55E;">94%</div><div class="health-key">Match rate</div><div class="health-delta">↑ 2% WoW</div></div>
+        <div class="health-card"><div class="health-val">8.2m</div><div class="health-key">Avg response</div><div class="health-delta" style="color:#EF4444;">↑ 0.4m WoW</div></div>
+        <div class="health-card"><div class="health-val" style="color:#F59E0B;">$48.2k</div><div class="health-key">Revenue today</div><div class="health-delta">↑ 12% WoW</div></div>
+        <div class="health-card"><div class="health-val" style="color:#EF4444;">3</div><div class="health-key">Open disputes</div><div class="health-delta" style="color:#EF4444;">↑ 1 new</div></div>
+        <div class="health-card"><div class="health-val">🟢</div><div class="health-key">Uptime</div><div class="health-delta">99.98% 30d</div></div>
+      </div>
+      <div class="live-ticker">
+        <div class="ticker-header"><div class="live-indicator"></div><div class="ticker-title">Live operations feed</div></div>
+        <div class="ticker-item"><div class="ticker-dot" style="background:#22C55E;"></div><div class="ticker-text">Job <strong>#4821</strong> matched — Plumbing, Bondi Beach</div><div class="ticker-time">09:41:02</div></div>
+        <div class="ticker-item"><div class="ticker-dot" style="background:#3B82F6;"></div><div class="ticker-text">Tradie <strong>Jake M.</strong> verification approved</div><div class="ticker-time">09:40:55</div></div>
+        <div class="ticker-item"><div class="ticker-dot" style="background:#F59E0B;"></div><div class="ticker-text">Job <strong>#4820</strong> completed — $340 released to tradie</div><div class="ticker-time">09:40:48</div></div>
+        <div class="ticker-item"><div class="ticker-dot" style="background:#8B5CF6;"></div><div class="ticker-text">New customer signup — Surry Hills</div><div class="ticker-time">09:39:12</div></div>
+      </div>
+      <div>
+        <div class="section-label">Action queue</div>
+        <div class="queue-item">
+          <div class="queue-icon">⚠️</div>
+          <div><div class="queue-title">Dispute #291 — unresolved 48 hours</div><div class="queue-sub">Electrical job · $480 in escrow · both parties waiting</div></div>
+          <div class="queue-action">Resolve →</div>
+        </div>
+        <div class="queue-item">
+          <div class="queue-icon">✅</div>
+          <div><div class="queue-title">Jake M. submitted verification docs</div><div class="queue-sub">Electrician · NSW licence + insurance uploaded</div></div>
+          <div class="queue-action">Verify →</div>
+        </div>
+        <div class="queue-item">
+          <div class="queue-icon">🚩</div>
+          <div><div class="queue-title">Suspicious activity — User #8821</div><div class="queue-sub">3 chargebacks this week · pattern matches fraud signals</div></div>
+          <div class="queue-action">Investigate →</div>
+        </div>
+      </div>
+    </div>
+    <div class="right-panel">
+      <div class="panel-section">
+        <div class="panel-title">Revenue · 7 days</div>
+        <div style="font-size:26px;font-weight:800;color:#F8F5F0;">$312k</div>
+        <div style="font-size:11px;color:#22C55E;margin-bottom:10px;">↑ 12% week on week</div>
+        <div class="mini-chart">
+          <div class="bar" style="height:50%;"></div><div class="bar" style="height:65%;"></div><div class="bar" style="height:55%;"></div><div class="bar" style="height:75%;"></div><div class="bar" style="height:70%;"></div><div class="bar" style="height:85%;"></div><div class="bar peak" style="height:100%;"></div>
+        </div>
+      </div>
+      <div class="panel-section">
+        <div class="panel-title">Today</div>
+        <div class="activity-item"><div class="act-dot" style="background:#22C55E;"></div><div><div class="act-text"><strong style="color:#F8F5F0;">312</strong> jobs created</div></div></div>
+        <div class="activity-item"><div class="act-dot" style="background:#F59E0B;"></div><div><div class="act-text"><strong style="color:#F8F5F0;">294</strong> jobs matched (94%)</div></div></div>
+        <div class="activity-item"><div class="act-dot" style="background:#3B82F6;"></div><div><div class="act-text"><strong style="color:#F8F5F0;">48</strong> new signups</div></div></div>
+        <div class="activity-item"><div class="act-dot" style="background:#8B5CF6;"></div><div><div class="act-text"><strong style="color:#F8F5F0;">6</strong> tradies verified</div></div></div>
+      </div>
+      <div class="panel-section" style="border-bottom:none;">
+        <div class="panel-title">Top suburbs</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:#8C8480;">Bondi Beach</span><span style="font-size:12px;font-weight:700;color:#F8F5F0;">47 jobs</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:#8C8480;">Surry Hills</span><span style="font-size:12px;font-weight:700;color:#F8F5F0;">39 jobs</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:#8C8480;">Manly</span><span style="font-size:12px;font-weight:700;color:#F8F5F0;">31 jobs</span></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;"><span style="font-size:12px;color:#8C8480;">Newtown</span><span style="font-size:12px;font-weight:700;color:#F8F5F0;">28 jobs</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
