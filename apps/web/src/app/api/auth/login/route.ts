@@ -77,8 +77,7 @@ export async function POST(request: NextRequest) {
   });
 
   if (error) {
-    const message = error?.message ?? '';
-    if (message.includes('Email not confirmed')) {
+    if (error.message.includes('Email not confirmed')) {
       return json({ error: 'Please verify your email first', code: 'email_not_confirmed' }, 403);
     }
     return json({ error: 'Invalid email or password', code: 'invalid_credentials' }, 401);

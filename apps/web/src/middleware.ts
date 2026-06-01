@@ -277,9 +277,8 @@ export async function middleware(request: NextRequest) {
         role = cached.role;
       } else {
         const profileRead = await readAuthzProfile(authzSupabase, user.id);
-        role = profileRead.ok && profileRead.profile
-          ? profileRead.profile.role
-          : metadataRole(user);
+        if (!profileRead.ok) return response;
+        role = profileRead.profile ? profileRead.profile.role : metadataRole(user);
       }
       return NextResponse.redirect(new URL(getDashboardPath(role), request.url));
     }

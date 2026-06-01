@@ -45,7 +45,7 @@ export async function middleware(request: NextRequest) {
     .from('users')
     .select('role, "isActive"')
     .eq('id', user.id)
-    .single();
+    .maybeSingle();
 
   if (dbError) {
     return NextResponse.redirect(new URL('/login?error=profile_unavailable', request.url));
@@ -56,7 +56,9 @@ export async function middleware(request: NextRequest) {
     ? appMeta.role as Role
     : undefined;
   const role = (dbUser?.role as Role | undefined) ?? metadataRole ?? 'CUSTOMER';
-  const isActive = Boolean((dbUser as Record<string, unknown> | null)?.isActive ?? false);
+  const isActive = dbUser
+    ? Boolean((dbUser as Record<string, unknown>).isActive)
+    : Boolean(metadataRole);
 
   if (!isActive || (role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
     return NextResponse.redirect(new URL('/login?error=access_denied', request.url));

@@ -62,7 +62,7 @@ function onboardingTarget(role: Role): string | null {
 }
 
 function isDemoAccount(email: string | undefined): boolean {
-  return Boolean(email?.toLowerCase().includes('@demo.fixit247.'));
+  return Boolean(email && /@demo\.fixit247\.(com|com\.au)$/i.test(email));
 }
 
 export async function resolveLoginRedirect(input: LoginRedirectInput): Promise<LoginRedirectResult> {

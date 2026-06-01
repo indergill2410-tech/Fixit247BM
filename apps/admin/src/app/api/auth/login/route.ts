@@ -55,13 +55,17 @@ export async function POST(request: NextRequest) {
 
   let role: Role | undefined;
   let active = true;
+  let hasDbProfile = false;
   try {
     const user = await db.user.findFirst({
       where: { id: data.user.id },
       select: { role: true, isActive: true },
     });
-    role = user?.role;
-    active = user?.isActive ?? false;
+    if (user) {
+      role = user.role;
+      active = user.isActive;
+      hasDbProfile = true;
+    }
   } catch {
     await supabase.auth.signOut();
     return json({ error: 'Admin database is temporarily unavailable.', code: 'profile_unavailable' }, 503);
@@ -69,6 +73,10 @@ export async function POST(request: NextRequest) {
 
   const appMeta = data.user.app_metadata as Record<string, unknown>;
   role ??= isAdminRole(appMeta.role) ? appMeta.role : undefined;
+
+  if (!hasDbProfile && role) {
+    active = true;
+  }
 
   if (!active || !role || !ADMIN_ROLES.includes(role)) {
     await supabase.auth.signOut();
