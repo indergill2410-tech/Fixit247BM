@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { requireApiRole } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 
-export async function POST(req: Request, { params }: { params: Promise<{ id: string }> }) {
+export async function POST(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const session = await requireApiRole(['ADMIN', 'SUPER_ADMIN']);
   if (session instanceof NextResponse) return session;
   const { id } = await params;

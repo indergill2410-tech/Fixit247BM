@@ -30,6 +30,7 @@ const nextConfig: NextConfig = {
     '@fixit247/payments',
     '@fixit247/fraud',
     '@fixit247/trust',
+    '@fixit247/notifications',
   ],
   images: {
     remotePatterns: [
@@ -66,14 +67,6 @@ const nextConfig: NextConfig = {
       {
         source: '/api/(.*)',
         headers: [{ key: 'Cache-Control', value: 'no-store, no-cache, must-revalidate' }],
-      },
-    ];
-  },
-  async rewrites() {
-    return [
-      {
-        source: '/api/admin/:path*',
-        destination: `${appUrl}/api/admin/:path*`,
       },
     ];
   },

@@ -13,6 +13,7 @@ interface RevenueData {
   pendingPayoutsTotal: number;
   subscriptionCounts: { tier: string; _count: { id: number } }[];
   openDisputeCount: number;
+  monthlyRevenue: { month: string; revenue: number }[];
 }
 
 const TIER_MONTHLY: Record<string, number> = {
@@ -22,8 +23,6 @@ const TIER_MONTHLY: Record<string, number> = {
 function fmtAud(n: number) {
   return new Intl.NumberFormat('en-AU', { style: 'currency', currency: 'AUD', minimumFractionDigits: 0 }).format(n);
 }
-
-const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
 function MiniBarChart({ values, labels }: { values: number[]; labels: string[] }) {
   const max = Math.max(...values, 1);
@@ -70,14 +69,10 @@ export default function AdminRevenuePage() {
     0
   );
 
-  // Simulated monthly trend (replace with real query in production)
-  const now = new Date();
-  const last6Months: string[] = Array.from({ length: 6 }, (_, i) => {
-    const d = new Date(now);
-    d.setMonth(d.getMonth() - (5 - i));
-    return MONTHS[d.getMonth()] ?? '';
-  });
-  const mockMonthlyRevenue = [4200, 5800, 7100, 6500, 9200, revenue?.monthRevenuePlatform ?? 0];
+  // Real 6-month platform-fee series from the API.
+  const monthlySeries = revenue?.monthlyRevenue ?? [];
+  const last6Months: string[] = monthlySeries.map((m) => m.month);
+  const monthlyRevenueValues = monthlySeries.map((m) => m.revenue);
 
   return (
     <AdminShell>
@@ -138,9 +133,9 @@ export default function AdminRevenuePage() {
             {loading ? (
               <div className="h-24 animate-pulse rounded-lg bg-gray-100" />
             ) : (
-              <MiniBarChart values={mockMonthlyRevenue} labels={last6Months} />
+              <MiniBarChart values={monthlyRevenueValues} labels={last6Months} />
             )}
-            <p className="mt-2 text-right text-xs text-gray-400">*Current month is live data; prior months are illustrative</p>
+            <p className="mt-2 text-right text-xs text-gray-400">Platform fees from released payments, last 6 months</p>
           </CardContent>
         </Card>
 
