@@ -13,10 +13,12 @@ FROM base AS installer
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-# Skip lifecycle scripts: the root postinstall runs `prisma generate`, but the
-# schema isn't in the pruned json layer yet. We run generate explicitly in the
-# builder stage below, once the full source (incl. schema) is present.
-RUN pnpm install --frozen-lockfile --ignore-scripts
+# The root `postinstall` hook runs `prisma generate`, which needs the schema +
+# prisma config. turbo's json layer only has package.json files, so copy the
+# Prisma files in first — this lets postinstall (and sharp/engine scripts) run.
+COPY --from=pruner /app/out/full/packages/database/prisma ./packages/database/prisma
+COPY --from=pruner /app/out/full/packages/database/prisma.config.ts ./packages/database/prisma.config.ts
+RUN pnpm install --frozen-lockfile
 
 # ── Build ────────────────────────────────────────────────────────────────────
 FROM base AS builder
