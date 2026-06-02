@@ -1,20 +1,56 @@
 import type { Metadata } from 'next';
-import { FxIcon } from '@/components/ui/fx-icon';
+import { requireRole } from '@/lib/auth/session';
+import { db } from '@fixit247/database';
+import { DashboardShell, PageHeader } from '@/components/shared/dashboard-shell';
+import { CustomerProfileForm } from '@/components/features/customer/customer-profile-form';
 
 export const metadata: Metadata = { title: 'My Profile | Fixit247' };
+export const dynamic = 'force-dynamic';
 
-export default function ProfilePage() {
+export default async function ProfilePage() {
+  const session = await requireRole('CUSTOMER');
+
+  const [user, profile] = await Promise.all([
+    db.user.findUnique({
+      where: { id: session.id },
+      select: { firstName: true, lastName: true, email: true, phone: true },
+    }),
+    db.customerProfile.findUnique({
+      where: { userId: session.id },
+      select: {
+        suburb: true,
+        postcode: true,
+        state: true,
+        emergencyContactName: true,
+        emergencyContactPhone: true,
+        notifyBySms: true,
+        notifyByEmail: true,
+        notifyByPush: true,
+      },
+    }),
+  ]);
+
+  const initial = {
+    firstName: user?.firstName ?? session.firstName,
+    lastName: user?.lastName ?? session.lastName,
+    email: user?.email ?? session.email,
+    phone: user?.phone ?? '',
+    suburb: profile?.suburb ?? '',
+    postcode: profile?.postcode ?? '',
+    state: profile?.state ?? '',
+    emergencyContactName: profile?.emergencyContactName ?? '',
+    emergencyContactPhone: profile?.emergencyContactPhone ?? '',
+    notifyBySms: profile?.notifyBySms ?? true,
+    notifyByEmail: profile?.notifyByEmail ?? true,
+    notifyByPush: profile?.notifyByPush ?? true,
+  };
+
   return (
-    <div className="mx-auto max-w-2xl px-4 py-12">
-      <div className="flex items-center gap-3 mb-8">
-        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/15 text-brand-400">
-          <FxIcon name="user" size={20} />
-        </div>
-        <h1 className="text-2xl font-bold text-white">My Profile</h1>
+    <DashboardShell role="CUSTOMER">
+      <PageHeader title="My Profile" description="Manage your contact details and notification preferences" />
+      <div className="mt-6 max-w-3xl">
+        <CustomerProfileForm initial={initial} />
       </div>
-      <div className="rounded-2xl border border-white/8 bg-white/4 p-8 text-center">
-        <p className="text-gray-500">Profile settings coming soon. Contact <a href="mailto:hello@fixit247.com.au" className="text-brand-400 hover:underline">hello@fixit247.com.au</a> to update your details.</p>
-      </div>
-    </div>
+    </DashboardShell>
   );
 }

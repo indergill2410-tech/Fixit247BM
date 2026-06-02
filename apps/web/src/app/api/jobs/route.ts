@@ -5,6 +5,9 @@ import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { rateLimit, rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
 import { matchAndDispatch } from '@fixit247/matching';
+import { runFraudCheck } from '@fixit247/fraud';
+import { lookupPromoCode } from '@/lib/promo';
+import { after } from 'next/server';
 import { logger } from '@/lib/logger';
 
 // ── Lead price by trade (server-side authoritative) ───────────────────────────
@@ -75,17 +78,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Customer profile not found' }, { status: 404 });
     }
 
-    // Validate optional promo code (static lookup — no DB round-trip)
-    const PROMO_CODES: Partial<Record<string, { discountPercent: number; description: string }>> = {
-      'FIRST20':     { discountPercent: 20, description: '20% off your first job' },
-      'WELCOME10':   { discountPercent: 10, description: '10% off for new customers' },
-      'EMERGENCY15': { discountPercent: 15, description: '15% off emergency callouts' },
-    };
-
+    // Validate optional promo code (DB-first, static fallback — see lib/promo).
     let promoDiscount: { discountPercent: number; description: string } | null = null;
     if (data.promoCode) {
-      const normalised = data.promoCode.trim().toUpperCase();
-      promoDiscount = PROMO_CODES[normalised] ?? null;
+      promoDiscount = await lookupPromoCode(data.promoCode);
       if (!promoDiscount) {
         return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 400 });
       }
@@ -97,6 +93,25 @@ export async function POST(req: NextRequest) {
       if (!addr) {
         return NextResponse.json({ error: 'Address not found' }, { status: 404 });
       }
+    }
+
+    // Idempotency guard: a double-clicked submit or a network retry can fire the
+    // same POST twice. If this customer already created an identical job (title,
+    // category AND description all match) in the last 30s, return that one instead
+    // of creating a duplicate. Matching on description too avoids false positives
+    // when a customer legitimately posts two distinct same-titled jobs.
+    const recentDuplicate = await db.job.findFirst({
+      where: {
+        customerId: customerProfile.id,
+        title: data.title,
+        description: data.description,
+        category: data.category as never,
+        createdAt: { gte: new Date(Date.now() - 30_000) },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (recentDuplicate) {
+      return NextResponse.json({ job: recentDuplicate, deduplicated: true }, { status: 200 });
     }
 
     const job = await db.$transaction(async (tx) => {
@@ -139,10 +154,22 @@ export async function POST(req: NextRequest) {
       return newJob;
     });
 
-    // Fire-and-forget: trigger matching engine — never blocks job creation
-    void matchAndDispatch(job).catch((err: unknown) => {
-      logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
-    });
+    // Background work via after(): keeps these off the response path while
+    // ensuring the serverless runtime doesn't tear down before they finish.
+    // Matching engine — never blocks job creation.
+    after(() =>
+      matchAndDispatch(job).catch((err: unknown) => {
+        logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
+      }),
+    );
+
+    // Fraud scoring (auto-flags high-risk customers for admin review, e.g.
+    // fake-job / refund-abuse patterns).
+    after(() =>
+      runFraudCheck(session.id, 'customer').catch((err: unknown) => {
+        logger.error('Fraud check failed', { userId: session.id, error: String(err) });
+      }),
+    );
 
     return NextResponse.json({
       job,

@@ -48,6 +48,7 @@ export default function TradieAvailabilityPage() {
         travelRadiusKm?: number;
         isAutoAccept?: boolean;
       };
+      workingHours?: WorkingHours[];
     }
     fetch('/api/availability')
       .then((r) => r.json() as Promise<AvailabilityResponse>)
@@ -56,6 +57,15 @@ export default function TradieAvailabilityPage() {
           setStatus(data.status.onlineStatus ?? 'OFFLINE');
           setTravelRadius(data.status.travelRadiusKm ?? 25);
           setIsAutoAccept(data.status.isAutoAccept ?? false);
+        }
+        // Merge any saved per-day hours over the defaults so all 7 days render.
+        if (data.workingHours && data.workingHours.length > 0) {
+          setHours(
+            DEFAULT_HOURS.map((def) => {
+              const saved = data.workingHours?.find((w) => w.dayOfWeek === def.dayOfWeek);
+              return saved ?? def;
+            }),
+          );
         }
         setIsLoading(false);
       })
@@ -95,11 +105,12 @@ export default function TradieAvailabilityPage() {
   const handleSave = async () => {
     setIsSaving(true);
     try {
-      await fetch('/api/availability', {
+      const res = await fetch('/api/availability', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ onlineStatus: status, travelRadiusKm: travelRadius, isAutoAccept }),
+        body: JSON.stringify({ onlineStatus: status, travelRadiusKm: travelRadius, isAutoAccept, workingHours: hours }),
       });
+      if (!res.ok) throw new Error();
       toast.success('Availability saved successfully');
     } catch {
       toast.error('Failed to save availability');
