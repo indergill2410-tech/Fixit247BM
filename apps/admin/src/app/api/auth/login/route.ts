@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
       await supabase.auth.signOut();
       return json({ error: 'Admin database is temporarily unavailable.', code: 'profile_unavailable' }, 503);
     }
-    role = appMetaFallback.role as Role;
+    role = appMetaFallback.role as unknown as Role;
     active = true;
   }
 
