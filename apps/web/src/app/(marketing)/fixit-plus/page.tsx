@@ -54,7 +54,7 @@ const PLUS_FAQS = [
   },
 ];
 
-export const PLANS = [
+const PLANS = [
   {
     name: 'Fixit Plus Home',
     price: 29,
