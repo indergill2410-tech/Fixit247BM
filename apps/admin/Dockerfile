@@ -28,9 +28,8 @@ WORKDIR /app
 COPY --from=installer /app/node_modules ./node_modules
 COPY --from=pruner /app/out/full/ .
 COPY --from=installer /app/apps/admin/node_modules ./apps/admin/node_modules
-# Carry the already-generated Prisma client from the installer stage (prisma
-# generate ran via postinstall there; re-running it here would need the prisma
-# binary from packages/database/node_modules which isn't copied).
+# Carry the already-generated Prisma client and database dependencies from the installer stage
+COPY --from=installer /app/packages/database/node_modules ./packages/database/node_modules
 COPY --from=installer /app/packages/database/src/generated ./packages/database/src/generated
 
 # Public NEXT_PUBLIC_* values are inlined into the client bundle at build time.
