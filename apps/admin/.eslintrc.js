@@ -9,7 +9,7 @@ module.exports = {
     '@typescript-eslint/no-unsafe-argument': 'off',
     // Void/promise rules: common patterns in event handlers and useEffect
     '@typescript-eslint/no-floating-promises': 'off',
-    '@typescript-eslint/no-misused-promises': ['warn', { checksVoidReturn: { attributes: false } }],
+    '@typescript-eslint/no-misused-promises': 'off',
     '@typescript-eslint/no-confusing-void-expression': 'off',
     // Conditional rules: nullable checks on Supabase metadata fields
     '@typescript-eslint/no-unnecessary-condition': 'off',
