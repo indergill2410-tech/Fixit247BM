@@ -199,9 +199,7 @@ export default function UserDetailPage() {
   const { user, recentJobs, recentPayments, stats } = data;
   const initials = `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
 
-  // Determine customer/tradie profile IDs for job role labelling (passed through jobs data)
-  // We identify role from customerId/tradieId comparison
-  const customerProfileId = recentJobs.find(j => j.customerId)?.customerId;
+  // We identify role by checking if the job's tradieId matches the user's tradieProfile.id
 
   return (
     <AdminShell>
