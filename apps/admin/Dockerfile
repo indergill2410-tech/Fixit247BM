@@ -11,13 +11,12 @@ RUN turbo prune @fixit247/admin --docker
 # ── Install dependencies ─────────────────────────────────────────────────────
 FROM base AS installer
 WORKDIR /app
-COPY --from=pruner /app/out/json/ .
+# Copy the FULL pruned source (not just package.json files) before install.
+# The root `postinstall` hook runs `prisma generate`, which needs the schema
+# file present — turbo's json-only layer omits it. Using out/full guarantees
+# the schema and all lifecycle scripts (sharp, prisma engines) work.
+COPY --from=pruner /app/out/full/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-# The root `postinstall` hook runs `prisma generate`, which needs the schema +
-# prisma config. turbo's json layer only has package.json files, so copy the
-# Prisma files in first — this lets postinstall (and sharp/engine scripts) run.
-COPY --from=pruner /app/out/full/packages/database/prisma ./packages/database/prisma
-COPY --from=pruner /app/out/full/packages/database/prisma.config.ts ./packages/database/prisma.config.ts
 RUN pnpm install --frozen-lockfile
 
 # ── Build ────────────────────────────────────────────────────────────────────
