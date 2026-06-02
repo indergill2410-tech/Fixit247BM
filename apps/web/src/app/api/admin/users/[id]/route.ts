@@ -75,14 +75,14 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     // Compute totalSpent and totalEarned from payments
     const totalSpent = customerProfile
       ? await db.payment.aggregate({
-          where: { customerId: customerProfile.id, status: 'COMPLETED' },
+          where: { customerId: customerProfile.id, status: 'RELEASED' },
           _sum: { amount: true },
         })
       : null;
 
     const totalEarned = tradieProfile
       ? await db.payment.aggregate({
-          where: { tradieId: tradieProfile.id, status: 'COMPLETED' },
+          where: { tradieId: tradieProfile.id, status: 'RELEASED' },
           _sum: { tradieAmount: true },
         })
       : null;
@@ -94,8 +94,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
       stats: {
         totalJobsAsCustomer,
         totalJobsAsTradie,
-        totalSpent: Number(totalSpent?._sum.amount ?? 0),
-        totalEarned: Number(totalEarned?._sum.tradieAmount ?? 0),
+        totalSpent: Number(totalSpent?._sum?.amount ?? 0),
+        totalEarned: Number(totalEarned?._sum?.tradieAmount ?? 0),
       },
     });
   } catch (err) {

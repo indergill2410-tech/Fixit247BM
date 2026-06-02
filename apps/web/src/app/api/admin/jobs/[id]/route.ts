@@ -93,7 +93,7 @@ export async function PATCH(
         db.jobEvent.create({
           data: {
             jobId: id,
-            type: 'JOB_CANCELLED',
+            type: 'CANCELLED',
             actorId: session.id,
             actorRole: session.role as never,
             metadata: { reason: body.reason, forcedBy: 'admin' } as never,
@@ -124,7 +124,7 @@ export async function PATCH(
         db.jobEvent.create({
           data: {
             jobId: id,
-            type: 'JOB_COMPLETED',
+            type: 'WORK_COMPLETED',
             actorId: session.id,
             actorRole: session.role as never,
             metadata: { reason: body.reason, forcedBy: 'admin' } as never,
