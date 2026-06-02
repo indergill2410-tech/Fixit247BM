@@ -23,17 +23,16 @@ COPY --from=pruner /app/out/full/ .
 RUN pnpm install --frozen-lockfile
 
 # ── Build ────────────────────────────────────────────────────────────────────
-FROM base AS builder
+# Build from the installer stage so EVERY workspace package's node_modules are
+# present and correctly linked. Previously the builder copied only a subset
+# (root + admin + database), which left the transpiled packages (@fixit247/ui,
+# auth, payments, fraud, trust, notifications, realtime) unable to resolve their
+# react / eslint types during `next build` — breaking both type-checking and
+# linting. Inheriting the installer keeps the build environment identical to CI.
+FROM installer AS builder
 WORKDIR /app
-COPY --from=installer /app/node_modules ./node_modules
-COPY --from=pruner /app/out/full/ .
-# turbo prune omits the root tsconfig.json; copy it explicitly so apps/admin/tsconfig.json
-# (which extends ../../tsconfig.json) can resolve it during the build.
+# turbo prune omits the root tsconfig.json that apps/admin/tsconfig.json extends.
 COPY --from=pruner /app/tsconfig.json ./tsconfig.json
-COPY --from=installer /app/apps/admin/node_modules ./apps/admin/node_modules
-# Carry the already-generated Prisma client and database dependencies from the installer stage
-COPY --from=installer /app/packages/database/node_modules ./packages/database/node_modules
-COPY --from=installer /app/packages/database/src/generated ./packages/database/src/generated
 
 # Public NEXT_PUBLIC_* values are inlined into the client bundle at build time.
 ARG NEXT_PUBLIC_SUPABASE_URL
