@@ -156,11 +156,13 @@ export async function POST(request: Request) {
     await db.user.update({ where: { id: user.id }, data: { onboardingComplete: true } });
     await sendWelcomeTradieEmail(user.id);
 
-    // Fire-and-forget: fraud scoring for new tradies (multi-account / fake-review
+    // Fraud scoring for new tradies (multi-account / fake-review
     // signals) — auto-flags high risk for admin review without blocking signup.
-    void runFraudCheck(user.id, 'tradie').catch((err: unknown) => {
-      logger.error('Fraud check failed', { userId: user.id, error: String(err) });
-    });
+    waitUntil(
+      runFraudCheck(user.id, 'tradie').catch((err: unknown) => {
+        logger.error('Fraud check failed', { userId: user.id, error: String(err) });
+      })
+    );
 
     return NextResponse.json({ success: true, freeCreditsAwarded: 10 });
   } catch (err) {
