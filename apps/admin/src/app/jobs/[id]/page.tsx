@@ -328,12 +328,12 @@ export default function JobDetailPage({ params }: { params: Promise<{ id: string
         <Card>
           <CardContent className="pt-5">
             <h2 className="mb-3 flex items-center gap-2 font-semibold text-foreground"><User size={16} />Tradie</h2>
-            {job.tradie && tradieName ? (
+            {job.tradie ? (
               <div className="flex items-center gap-3">
-                <Initials name={tradieName} />
+                <Initials name={tradieName ?? job.tradie.businessName ?? 'Unknown'} />
                 <div>
-                  <p className="font-medium text-foreground">{tradieName}</p>
-                  {job.tradie.businessName && <p className="text-sm text-foreground">{job.tradie.businessName}</p>}
+                  <p className="font-medium text-foreground">{tradieName ?? job.tradie.businessName ?? 'Unknown Tradie'}</p>
+                  {job.tradie.businessName && tradieName && <p className="text-sm text-foreground">{job.tradie.businessName}</p>}
                   {job.tradie.user?.email && <p className="text-sm text-muted-foreground">{job.tradie.user.email}</p>}
                 </div>
               </div>
