@@ -1,7 +1,9 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { CheckCircle, Shield, Star, Zap, Phone } from 'lucide-react';
+import { CheckCircle, Shield, Star, Zap, Phone, Home, KeyRound, Droplets, Car, CloudLightning, Wind } from 'lucide-react';
 import { FaqAccordion } from '@/components/shared/faq-accordion';
+import { RevealSection } from '@/components/shared/reveal-section';
+import { FixitPlusPlans } from './fixit-plus-plans';
 
 export const metadata: Metadata = {
   title: 'Fixit Plus — Homeowner Peace of Mind | Fixit 24/7',
@@ -52,13 +54,13 @@ const PLUS_FAQS = [
   },
 ];
 
-const PLANS = [
+export const PLANS = [
   {
     name: 'Fixit Plus Home',
     price: 29,
     period: 'month',
     highlight: false,
-    icon: '🏠',
+    Icon: Home,
     tagline: 'Everything covered at home',
     features: [
       'Unlimited call-outs — no per-job fees',
@@ -76,7 +78,7 @@ const PLANS = [
     price: 49,
     period: 'month',
     highlight: true,
-    icon: '🛡️',
+    Icon: Shield,
     tagline: 'Home + on the road',
     features: [
       'Everything in Home, plus:',
@@ -94,42 +96,46 @@ const PLANS = [
 
 const COVER_SCENARIOS = [
   {
-    icon: '🚰',
+    Icon: Droplets,
     title: 'Burst Pipe at 2am',
     scenario: 'Water flooding your kitchen. We dispatch a licensed plumber to your door — no call-out fee, no wait.',
     cover: 'Home + Total',
+    totalOnly: false,
   },
   {
-    icon: '🔑',
+    Icon: KeyRound,
     title: 'Locked Out of Home',
     scenario: 'Forgot your keys on a Sunday night. Our locksmith is there in under 30 minutes.',
     cover: 'Home + Total',
+    totalOnly: false,
   },
   {
-    icon: '⚡',
+    Icon: Zap,
     title: 'Power Goes Out',
     scenario: 'RCD tripping and you don\'t know why. A licensed electrician diagnoses and fixes it — covered.',
     cover: 'Home + Total',
+    totalOnly: false,
   },
   {
-    icon: '🚗',
+    Icon: Car,
     title: 'Locked Out of Your Car',
     scenario: 'Keys inside the car at the shops. Fixit Plus Total dispatches a locksmith wherever you are.',
     cover: 'Total only',
     totalOnly: true,
   },
   {
-    icon: '🌩️',
+    Icon: CloudLightning,
     title: 'Storm Damage',
     scenario: 'Roof damaged in a storm. Emergency tarping and repair team dispatched same day.',
     cover: 'Total only',
     totalOnly: true,
   },
   {
-    icon: '❄️',
+    Icon: Wind,
     title: 'AC Fails in a Heatwave',
     scenario: '42°C outside, AC dead. Priority HVAC dispatch gets you cooling within the hour.',
     cover: 'Home + Total',
+    totalOnly: false,
   },
 ];
 
@@ -145,8 +151,10 @@ export default function FixitPlusPage() {
     <div className="bg-background text-foreground transition-colors duration-300">
       {/* Hero */}
       <section className="relative overflow-hidden px-4 py-24 text-center">
+        {/* Animated amber glow blob */}
         <div className="pointer-events-none absolute inset-0">
-          <div className="absolute left-1/2 top-0 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-brand-500/8 blur-3xl" />
+          <div className="absolute left-1/2 top-[-80px] h-[600px] w-[600px] -translate-x-1/2 animate-pulse rounded-full bg-brand-500/10 blur-3xl" />
+          <div className="absolute left-1/2 top-[60px] h-[300px] w-[400px] -translate-x-1/2 rounded-full bg-brand-500/6 blur-2xl" />
         </div>
         <div className="relative z-10 mx-auto max-w-3xl">
           <span className="mb-4 inline-flex items-center gap-2 rounded-full border border-brand-500/25 bg-brand-500/10 px-4 py-1.5 text-sm font-medium text-brand-500">
@@ -164,7 +172,7 @@ export default function FixitPlusPage() {
           {/* Price anchoring */}
           <p className="mx-auto mt-3 max-w-sm text-sm text-foreground-subtle">
             A single emergency call-out averages <span className="font-semibold text-foreground-muted">$180–$300</span>.
-            {' '}Fixit Plus is <span className="font-semibold text-brand-600">$29–$49/month</span> for unlimited coverage.
+            {' '}Fixit Plus is <span className="font-semibold text-brand-600 dark:text-brand-400">$29–$49/month</span> for unlimited coverage.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
             <Link
@@ -185,212 +193,179 @@ export default function FixitPlusPage() {
       </section>
 
       {/* Trust Stats */}
-      <section className="border-y border-border bg-background-alt py-8">
-        <div className="mx-auto max-w-4xl px-4">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {TRUST_STATS.map((s) => (
-              <div key={s.label} className="text-center">
-                <p className="text-2xl font-extrabold text-brand-500">{s.value}</p>
-                <p className="mt-1 text-xs text-foreground-subtle">{s.label}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* What's covered */}
-      <section className="px-4 py-20">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold">Real scenarios. Real coverage.</h2>
-            <p className="mt-3 text-foreground-muted">When life doesn&apos;t go to plan, Fixit Plus is ready.</p>
-          </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {COVER_SCENARIOS.map((s) => (
-              <div
-                key={s.title}
-                className={`rounded-2xl border p-5 ${s.totalOnly ? 'border-brand-500/30 bg-brand-500/5' : 'border-border bg-background-elevated'}`}
-              >
-                <div className="mb-3 flex items-start justify-between gap-3">
-                  <span className="text-3xl">{s.icon}</span>
-                  <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold ${s.totalOnly ? 'bg-brand-500/20 text-brand-500' : 'bg-background-alt text-foreground-muted'}`}>
-                    {s.cover}
-                  </span>
+      <RevealSection>
+        <section className="border-y border-border bg-background-alt py-10">
+          <div className="mx-auto max-w-4xl px-4">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {TRUST_STATS.map((s) => (
+                <div key={s.label} className="text-center">
+                  <p className="text-3xl font-extrabold text-brand-500">{s.value}</p>
+                  <p className="mt-1.5 text-xs font-medium text-foreground-subtle">{s.label}</p>
                 </div>
-                <h3 className="mb-1.5 font-semibold text-foreground">{s.title}</h3>
-                <p className="text-sm text-foreground-subtle">{s.scenario}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Plans */}
-      <section id="plans" className="bg-background-alt px-4 py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold">Choose your cover</h2>
-            <p className="mt-3 text-foreground-muted">Flat monthly fee. No surprise bills. No per-call charges.</p>
-          </div>
-          <div className="grid gap-6 md:grid-cols-2">
-            {PLANS.map((plan) => (
-              <div
-                key={plan.name}
-                className={`relative flex flex-col rounded-3xl border p-8 ${
-                  plan.highlight
-                    ? 'border-brand-500/50 bg-brand-500/8 shadow-lg shadow-brand-500/10'
-                    : 'border-border bg-background-elevated'
-                }`}
-              >
-                {plan.highlight && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 rounded-full bg-brand-500 px-4 py-1 text-xs font-bold text-gray-900">
-                    Most popular
-                  </div>
-                )}
-                <div className="mb-2 text-3xl">{plan.icon}</div>
-                <p className="text-xs font-semibold uppercase tracking-widest text-foreground-subtle">{plan.tagline}</p>
-                <h3 className="mt-1 text-xl font-bold text-foreground">{plan.name}</h3>
-                <div className="my-4 flex items-baseline gap-1">
-                  <span className="text-4xl font-extrabold text-foreground">${plan.price}</span>
-                  <span className="text-foreground-subtle">/{plan.period}</span>
-                </div>
-                <ul className="mb-8 flex-1 space-y-3">
-                  {plan.features.map((f) => (
-                    <li key={f} className="flex items-start gap-2.5 text-sm text-foreground-secondary">
-                      <CheckCircle size={16} className="mt-0.5 shrink-0 text-brand-500" />
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link
-                  href={plan.href}
-                  className={`block rounded-xl px-6 py-3.5 text-center text-sm font-bold transition-colors ${
-                    plan.highlight
-                      ? 'bg-brand-500 text-gray-900 hover:bg-brand-400'
-                      : 'border border-border text-foreground hover:bg-background-alt'
-                  }`}
-                >
-                  {plan.cta}
-                </Link>
-              </div>
-            ))}
-          </div>
-          <p className="mt-6 text-center text-sm text-foreground-subtle">
-            All plans include a 14-day free trial. No credit card required to start.
-          </p>
-        </div>
-      </section>
-
-      {/* How it works */}
-      <section className="px-4 py-20">
-        <div className="mx-auto max-w-4xl">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold">How Fixit Plus works</h2>
-          </div>
-          <div className="grid gap-6 md:grid-cols-3">
-            {[
-              { step: '1', icon: <Shield size={24} />, title: 'Subscribe once', desc: 'Pick Home or Total cover. Set and forget — we handle everything else.' },
-              { step: '2', icon: <Phone size={24} />, title: 'Call us anytime', desc: 'Emergency? Call or tap the app. We dispatch a verified tradie to your location immediately.' },
-              { step: '3', icon: <Star size={24} />, title: 'Zero bill surprise', desc: 'Your monthly plan covers it. No call-out fees, no hidden charges. Just peace of mind.' },
-            ].map((s) => (
-              <div key={s.step} className="rounded-2xl border border-border bg-background-elevated p-6 text-center">
-                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500/15 text-brand-500">
-                  {s.icon}
-                </div>
-                <div className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-500">Step {s.step}</div>
-                <h3 className="mb-2 font-semibold text-foreground">{s.title}</h3>
-                <p className="text-sm text-foreground-subtle">{s.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Member Testimonials */}
-      <section className="border-t border-border px-4 py-20">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
-            <p className="section-label mb-3">Member stories</p>
-            <h2 className="text-3xl font-bold">Real emergencies. Real coverage.</h2>
-            <div className="mt-4 flex items-center justify-center gap-1.5">
-              {Array.from({ length: 5 }, (_, i) => (
-                <Star key={i} size={14} className="fill-brand-500 text-brand-500" />
               ))}
-              <span className="ml-2 text-sm font-semibold text-foreground">4.9</span>
-              <span className="text-sm text-foreground-muted">member satisfaction</span>
             </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
-            {PLUS_TESTIMONIALS.map((t) => (
-              <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover">
-                <div className="mb-3 flex gap-0.5">
-                  {Array.from({ length: 5 }, (_, i) => (
-                    <Star key={i} size={11} className="fill-brand-500 text-brand-500" />
-                  ))}
-                </div>
-                <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">&ldquo;{t.text}&rdquo;</p>
-                <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-brand-500/15 text-xs font-bold text-brand-700">
-                      {t.name[0]}
+        </section>
+      </RevealSection>
+
+      {/* What's covered */}
+      <RevealSection>
+        <section className="px-4 py-20">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-bold">Real scenarios. Real coverage.</h2>
+              <p className="mt-3 text-foreground-muted">When life doesn&apos;t go to plan, Fixit Plus is ready.</p>
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {COVER_SCENARIOS.map((s) => (
+                <div
+                  key={s.title}
+                  className={`rounded-2xl border p-5 ${s.totalOnly ? 'border-brand-500/30 bg-brand-500/5' : 'border-border bg-background-elevated'}`}
+                >
+                  <div className="mb-3 flex items-start justify-between gap-3">
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+                      <s.Icon size={20} className="text-amber-500" />
                     </div>
-                    <div>
-                      <p className="text-xs font-semibold text-foreground">{t.name}</p>
-                      <p className="text-[11px] text-foreground-subtle">{t.suburb}</p>
-                    </div>
+                    <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold ${s.totalOnly ? 'bg-brand-500/20 text-brand-500' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}`}>
+                      {s.cover}
+                    </span>
                   </div>
-                  <span className="shrink-0 rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold text-brand-700">
-                    {t.plan}
-                  </span>
+                  <h3 className="mb-1.5 font-semibold text-foreground">{s.title}</h3>
+                  <p className="text-sm text-foreground-subtle">{s.scenario}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+      </RevealSection>
+
+      {/* Plans — client component with monthly/annual toggle */}
+      <FixitPlusPlans plans={PLANS} />
+
+      {/* How it works */}
+      <RevealSection>
+        <section className="px-4 py-20">
+          <div className="mx-auto max-w-4xl">
+            <div className="mb-12 text-center">
+              <h2 className="text-3xl font-bold">How Fixit Plus works</h2>
+            </div>
+            <div className="grid gap-6 md:grid-cols-3">
+              {[
+                { step: '1', icon: <Shield size={24} />, title: 'Subscribe once', desc: 'Pick Home or Total cover. Set and forget — we handle everything else.' },
+                { step: '2', icon: <Phone size={24} />, title: 'Call us anytime', desc: 'Emergency? Call or tap the app. We dispatch a verified tradie to your location immediately.' },
+                { step: '3', icon: <Star size={24} />, title: 'Zero bill surprise', desc: 'Your monthly plan covers it. No call-out fees, no hidden charges. Just peace of mind.' },
+              ].map((s) => (
+                <div key={s.step} className="relative overflow-hidden rounded-2xl border border-border bg-background-elevated p-6 text-center">
+                  {/* Watermark step number */}
+                  <div className="pointer-events-none absolute right-3 top-1 select-none text-7xl font-black text-foreground/5">
+                    {s.step}
+                  </div>
+                  <div className="relative z-10">
+                    <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-brand-500 text-gray-900">
+                      {s.icon}
+                    </div>
+                    <div className="mb-1 text-xs font-bold uppercase tracking-widest text-brand-500">Step {s.step}</div>
+                    <h3 className="mb-2 font-semibold text-foreground">{s.title}</h3>
+                    <p className="text-sm text-foreground-subtle">{s.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </RevealSection>
+
+      {/* Member Testimonials */}
+      <RevealSection>
+        <section className="border-t border-border px-4 py-20">
+          <div className="mx-auto max-w-5xl">
+            <div className="mb-12 text-center">
+              <p className="section-label mb-3">Member stories</p>
+              <h2 className="text-3xl font-bold">Real emergencies. Real coverage.</h2>
+              <div className="mt-4 flex items-center justify-center gap-1.5">
+                {Array.from({ length: 5 }, (_, i) => (
+                  <Star key={i} size={14} className="fill-brand-500 text-brand-500" />
+                ))}
+                <span className="ml-2 text-sm font-semibold text-foreground">4.9</span>
+                <span className="text-sm text-foreground-muted">member satisfaction</span>
+              </div>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {PLUS_TESTIMONIALS.map((t) => (
+                <div key={t.name} className="flex flex-col rounded-2xl border border-border bg-card p-6 shadow-card-warm transition-all hover:shadow-card-warm-hover dark:border-white/[0.07] dark:bg-white/[0.03] dark:shadow-none">
+                  <div className="mb-3 flex gap-0.5">
+                    {Array.from({ length: 5 }, (_, i) => (
+                      <Star key={i} size={11} className="fill-brand-500 text-brand-500" />
+                    ))}
+                  </div>
+                  <p className="flex-1 text-sm leading-relaxed text-foreground-secondary">&ldquo;{t.text}&rdquo;</p>
+                  <div className="mt-4 flex items-center justify-between gap-3 border-t border-border pt-4">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-brand-500/15 text-sm font-bold text-brand-700 dark:text-brand-400">
+                        {t.name[0]}
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-foreground">{t.name}</p>
+                        <p className="text-[11px] text-foreground-subtle">{t.suburb}</p>
+                      </div>
+                    </div>
+                    <span className="shrink-0 rounded-full bg-brand-500/15 px-2 py-0.5 text-[10px] font-bold text-brand-700 dark:text-brand-400">
+                      {t.plan}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      </RevealSection>
 
       {/* FAQ */}
-      <section className="border-t border-border bg-background-alt px-4 py-20">
-        <div className="mx-auto max-w-3xl">
-          <div className="mb-12 text-center">
-            <p className="section-label mb-3">Common questions</p>
-            <h2 className="text-3xl font-bold">Everything you need to know</h2>
+      <RevealSection>
+        <section className="border-t border-border bg-background-alt px-4 py-20">
+          <div className="mx-auto max-w-3xl">
+            <div className="mb-12 text-center">
+              <p className="section-label mb-3">Common questions</p>
+              <h2 className="text-3xl font-bold">Everything you need to know</h2>
+            </div>
+            <FaqAccordion faqs={PLUS_FAQS} namespace="fixit-plus" />
           </div>
-          <FaqAccordion faqs={PLUS_FAQS} namespace="fixit-plus" />
-        </div>
-      </section>
+        </section>
+      </RevealSection>
 
       {/* Final CTA */}
-      <section className="border-t border-border px-4 py-20 text-center">
-        <div className="mx-auto max-w-2xl">
-          <div className="mb-3 flex items-center justify-center gap-2 text-brand-500">
-            <Zap size={18} />
-            <span className="text-sm font-bold uppercase tracking-widest">Start today</span>
+      <RevealSection>
+        <section className="border-t border-border px-4 py-20 text-center">
+          <div className="mx-auto max-w-2xl">
+            <div className="mb-3 flex items-center justify-center gap-2 text-brand-500">
+              <Zap size={18} />
+              <span className="text-sm font-bold uppercase tracking-widest">Start today</span>
+            </div>
+            <h2 className="text-3xl font-extrabold">
+              Stop worrying.<br />Start your free trial.
+            </h2>
+            <p className="mx-auto mt-4 max-w-lg text-foreground-muted">
+              Join 50,000+ Australian homeowners who sleep easy knowing Fixit Plus has them covered — at home and on the road.
+            </p>
+            <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+              <Link
+                href="/register?plan=fixit-plus-total"
+                className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-500/20"
+              >
+                Try free for 14 days →
+              </Link>
+              <Link
+                href="/emergency"
+                className="rounded-xl border border-border px-8 py-4 text-base font-bold text-foreground hover:bg-background-elevated transition-colors inline-flex items-center gap-1.5"
+              >
+                <Phone size={14} />
+                Emergency dispatch
+              </Link>
+            </div>
+            <p className="mt-4 text-xs text-foreground-subtle">No credit card required. Cancel anytime in under 60 seconds.</p>
           </div>
-          <h2 className="text-3xl font-extrabold">
-            Stop worrying.<br />Start your free trial.
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-foreground-muted">
-            Join 50,000+ Australian homeowners who sleep easy knowing Fixit Plus has them covered — at home and on the road.
-          </p>
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            <Link
-              href="/register?plan=fixit-plus-total"
-              className="rounded-xl bg-brand-500 px-8 py-4 text-base font-bold text-gray-900 hover:bg-brand-400 transition-colors shadow-lg shadow-brand-500/20"
-            >
-              Try free for 14 days →
-            </Link>
-            <Link
-              href="/emergency"
-              className="inline-flex items-center gap-1.5 text-sm font-medium text-foreground-muted hover:text-foreground transition-colors"
-            >
-              <Phone size={13} />
-              Need help right now? Emergency dispatch
-            </Link>
-          </div>
-          <p className="mt-4 text-xs text-foreground-subtle">No credit card required. Cancel anytime in under 60 seconds.</p>
-        </div>
-      </section>
+        </section>
+      </RevealSection>
 
       {/* Mobile sticky CTA */}
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-border bg-background/95 p-3 backdrop-blur-md sm:hidden">
