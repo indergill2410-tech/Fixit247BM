@@ -1,10 +1,12 @@
 'use client';
 
 import * as React from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { MapPin, Clock, Zap, AlertTriangle, CheckCircle2, XCircle, Loader2 } from 'lucide-react';
 import { Button } from '@fixit247/ui';
 import { cn } from '@fixit247/ui/src/lib/utils';
+import { DashboardShell, PageHeader } from '@/components/shared/dashboard-shell';
 
 interface Offer {
   id: string;
@@ -141,15 +143,22 @@ export default function TradieOffersPage() {
   };
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 px-4 py-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-white">Job Offers</h1>
-          <p className="text-sm text-gray-500">Accept an offer to claim the job and earn credits.</p>
-        </div>
-        <Button variant="outline" size="sm" onClick={load}>Refresh</Button>
-      </div>
+    <DashboardShell role="TRADIE">
+      <PageHeader
+        title="Job Offers"
+        description="Jobs matched and dispatched to you — accept to claim and earn credits."
+        badge={offers.length > 0 ? { label: `${offers.length} pending`, variant: 'warning' } : undefined}
+        actions={
+          <div className="flex items-center gap-2">
+            <Button variant="ghost" size="sm" asChild>
+              <Link href="/tradie/jobs">Browse all jobs</Link>
+            </Button>
+            <Button variant="outline" size="sm" onClick={load}>Refresh</Button>
+          </div>
+        }
+      />
 
+      <div className="mx-auto max-w-2xl space-y-6">
       {error && (
         <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3 text-sm text-red-400">
           {error}
@@ -250,6 +259,7 @@ export default function TradieOffersPage() {
           ))}
         </div>
       )}
-    </div>
+      </div>
+    </DashboardShell>
   );
 }

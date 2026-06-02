@@ -99,6 +99,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    // Idempotency guard: a double-clicked submit or a network retry can fire the
+    // same POST twice. If this customer already created an identical job in the
+    // last 30s, return that one instead of creating a duplicate.
+    const recentDuplicate = await db.job.findFirst({
+      where: {
+        customerId: customerProfile.id,
+        title: data.title,
+        category: data.category as never,
+        createdAt: { gte: new Date(Date.now() - 30_000) },
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+    if (recentDuplicate) {
+      return NextResponse.json({ job: recentDuplicate, deduplicated: true }, { status: 200 });
+    }
+
     const job = await db.$transaction(async (tx) => {
       const newJob = await tx.job.create({
         data: {
