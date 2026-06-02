@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { cn } from '@fixit247/ui/src/lib/utils';
 import { TrendingUp, TrendingDown } from 'lucide-react';
 
@@ -6,7 +7,7 @@ interface StatCardProps {
   value: string | number;
   delta?: string;
   trend?: 'up' | 'down' | 'neutral';
-  icon?: string;
+  icon?: ReactNode;
   highlight?: boolean;
 }
 

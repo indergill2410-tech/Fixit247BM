@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { User } from 'lucide-react';
+import { FxIcon } from '@/components/ui/fx-icon';
 
 export const metadata: Metadata = { title: 'My Profile | Fixit247' };
 
@@ -8,7 +8,7 @@ export default function ProfilePage() {
     <div className="mx-auto max-w-2xl px-4 py-12">
       <div className="flex items-center gap-3 mb-8">
         <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-brand-500/15 text-brand-400">
-          <User size={20} />
+          <FxIcon name="user" size={20} />
         </div>
         <h1 className="text-2xl font-bold text-white">My Profile</h1>
       </div>
