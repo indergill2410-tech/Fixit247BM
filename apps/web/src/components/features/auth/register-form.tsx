@@ -2,19 +2,23 @@
 
 import * as React from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import { Eye, EyeOff, User, Mail, Lock, Wrench, ShieldCheck } from 'lucide-react';
 import { Button, Card, CardContent, Input } from '@fixit247/ui';
+import { FxIcon } from '@/components/ui/fx-icon';
 import { registerSchema, type RegisterValues } from '@/lib/validators/auth';
 
 type RoleOption = 'CUSTOMER' | 'TRADIE';
 
 export function RegisterForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const plan = searchParams.get('plan') ?? '';
+  const showPlanBanner = plan === 'fixit-plus-home' || plan === 'fixit-plus-total';
   const [showPassword, setShowPassword] = React.useState(false);
   const [selectedRole, setSelectedRole] = React.useState<RoleOption>('CUSTOMER');
 
@@ -64,6 +68,15 @@ export function RegisterForm() {
 
       <Card className="border-border bg-background-elevated shadow-card-warm">
         <CardContent className="px-6 pb-6 pt-8">
+          {showPlanBanner && (
+            <div className="mb-6 rounded-xl bg-brand-500/10 border border-brand-500/20 px-4 py-3 flex items-center gap-3">
+              <FxIcon name="shield" size={16} className="text-brand-500 shrink-0" />
+              <div>
+                <p className="text-sm font-semibold text-foreground">Starting your {plan === 'fixit-plus-total' ? 'Plus Total' : 'Plus Home'} free trial</p>
+                <p className="text-xs text-foreground-muted">14 days free — no credit card needed</p>
+              </div>
+            </div>
+          )}
           {/* Role selector */}
           <div className="mb-6 grid grid-cols-2 gap-3">
             {ROLE_OPTIONS.map(({ value, label, description, icon: Icon }) => (

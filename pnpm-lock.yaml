@@ -53,6 +53,9 @@ importers:
       '@fixit247/database':
         specifier: workspace:*
         version: link:../../packages/database
+      '@fixit247/notifications':
+        specifier: workspace:*
+        version: link:../../packages/notifications
       '@fixit247/ui':
         specifier: workspace:*
         version: link:../../packages/ui

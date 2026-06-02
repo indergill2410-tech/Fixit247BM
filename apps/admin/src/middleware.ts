@@ -2,7 +2,7 @@ import { type NextRequest, NextResponse } from 'next/server';
 import { createServerClient } from '@supabase/ssr';
 import type { Role } from '@fixit247/auth';
 
-const PUBLIC_PREFIXES = ['/_next', '/favicon', '/api/health'];
+const PUBLIC_PREFIXES = ['/_next', '/favicon', '/api/health', '/api/auth'];
 const PUBLIC_EXACT = ['/login'];
 
 function isPublic(pathname: string): boolean {
@@ -15,6 +15,14 @@ export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   if (isPublic(pathname)) return response;
+
+  // API routes should fail with a JSON 401/403 rather than an HTML redirect,
+  // so the admin console's fetch().json() calls degrade gracefully.
+  const isApi = pathname.startsWith('/api/');
+  const deny = (status: number, error: string) =>
+    isApi
+      ? NextResponse.json({ error }, { status })
+      : NextResponse.redirect(new URL(`/login${status === 403 ? '?error=access_denied' : ''}`, request.url));
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
@@ -38,7 +46,7 @@ export async function middleware(request: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
 
   if (!user) {
-    return NextResponse.redirect(new URL('/login', request.url));
+    return deny(401, 'Unauthorized');
   }
 
   const { data: dbUser, error: dbError } = await supabase
@@ -48,7 +56,9 @@ export async function middleware(request: NextRequest) {
     .maybeSingle();
 
   if (dbError) {
-    return NextResponse.redirect(new URL('/login?error=profile_unavailable', request.url));
+    return isApi
+      ? NextResponse.json({ error: 'Profile unavailable' }, { status: 503 })
+      : NextResponse.redirect(new URL('/login?error=profile_unavailable', request.url));
   }
 
   const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
@@ -61,7 +71,7 @@ export async function middleware(request: NextRequest) {
     : Boolean(metadataRole);
 
   if (!isActive || (role !== 'ADMIN' && role !== 'SUPER_ADMIN')) {
-    return NextResponse.redirect(new URL('/login?error=access_denied', request.url));
+    return deny(403, 'Forbidden');
   }
 
   return response;

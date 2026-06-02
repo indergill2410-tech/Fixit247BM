@@ -52,3 +52,6 @@ pnpm-debug.log*
 *.pem
 .vercel
 **/*.tsbuildinfo
+
+# Node compile cache
+node-compile-cache/

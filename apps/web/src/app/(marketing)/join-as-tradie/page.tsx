@@ -3,6 +3,8 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { FaqAccordion } from '@/components/shared/faq-accordion';
+import { FxIcon } from '@/components/ui/fx-icon';
+import { RevealSection } from '@/components/shared/reveal-section';
 
 // ─── Earnings Calculator (client component) ─────────────────────────────────
 
@@ -113,9 +115,9 @@ function EarningsCalculator() {
 
       {/* Net earnings highlight */}
       <div className="mb-6 rounded-2xl bg-green-500/10 border border-green-500/30 p-5 text-center">
-        <p className="text-sm font-medium text-green-600">Your NET weekly take-home</p>
-        <p className="mt-1 text-4xl font-extrabold text-green-600">${Math.round(netWeekly).toLocaleString()}</p>
-        <p className="mt-1 text-xs text-green-600/70">= ${Math.round(netMonthly).toLocaleString()}/mo · ${Math.round(netYearly).toLocaleString()}/yr</p>
+        <p className="text-sm font-medium text-green-600 dark:text-green-400">Your NET weekly take-home</p>
+        <p className="mt-1 text-4xl font-extrabold text-green-600 dark:text-green-400">${Math.round(netWeekly).toLocaleString()}</p>
+        <p className="mt-1 text-xs text-green-600/70 dark:text-green-500">= ${Math.round(netMonthly).toLocaleString()}/mo · ${Math.round(netYearly).toLocaleString()}/yr</p>
       </div>
 
       <Link
@@ -215,10 +217,10 @@ const PLANS = [
 ];
 
 const TRUST_BADGES = [
-  { icon: '🔍', label: 'Background Checked' },
-  { icon: '📋', label: 'License Verified' },
-  { icon: '🛡️', label: 'Insurance Confirmed' },
-  { icon: '⚡', label: 'Instant Payment' },
+  { icon: 'search' as const, label: 'Background Checked' },
+  { icon: 'clipboard' as const, label: 'License Verified' },
+  { icon: 'shield' as const, label: 'Insurance Confirmed' },
+  { icon: 'zap' as const, label: 'Instant Payment' },
 ];
 
 const TESTIMONIALS = [
@@ -277,7 +279,7 @@ function JoinAsTradiePageInner() {
         <div className="pointer-events-none absolute inset-0 grid-pattern" />
         <div className="pointer-events-none absolute left-1/2 top-0 h-[500px] w-[700px] -translate-x-1/2 -translate-y-1/3 rounded-full bg-brand-500/8 blur-[100px]" />
         <div className="relative z-10 mx-auto max-w-4xl">
-          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-2 text-sm font-bold text-emerald-600">
+          <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-emerald-500/25 bg-emerald-500/[0.08] px-4 py-2 text-sm font-bold text-emerald-600 dark:text-emerald-400">
             🎁 Sign up bonus: $111/month in free credits for your first 6 months
           </div>
           <h1 className="text-[2.75rem] font-black leading-[1.06] tracking-tighter sm:text-5xl lg:text-[4rem]">
@@ -307,20 +309,23 @@ function JoinAsTradiePageInner() {
 
       {/* 2. Stats bar */}
       <section className="border-y border-border bg-background-alt py-8">
-        <div className="mx-auto max-w-6xl px-4">
-          <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
-            {STATS.map((stat) => (
-              <div key={stat.label} className="text-center">
-                <p className="text-2xl font-extrabold text-brand-600">{stat.value}</p>
-                <p className="mt-0.5 text-sm text-foreground-muted">{stat.label}</p>
-              </div>
-            ))}
+        <RevealSection>
+          <div className="mx-auto max-w-6xl px-4">
+            <div className="grid grid-cols-2 gap-6 md:grid-cols-4">
+              {STATS.map((stat) => (
+                <div key={stat.label} className="text-center">
+                  <p className="text-2xl font-extrabold text-brand-600 dark:text-brand-400">{stat.value}</p>
+                  <p className="mt-0.5 text-sm text-foreground-muted">{stat.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </RevealSection>
       </section>
 
       {/* 3. Earnings Calculator */}
-      <section id="earnings-calculator" className="bg-background-alt py-20 px-4">
+      <section className="bg-background-alt py-20 px-4">
+        <RevealSection>
         <div className="mx-auto max-w-6xl">
           <div className="grid gap-12 lg:grid-cols-2 lg:items-center">
             <div>
@@ -336,7 +341,7 @@ function JoinAsTradiePageInner() {
               <ul className="mt-6 space-y-3">
                 {['No lock-in contracts', 'Cancel anytime', '85% of every job goes to you', 'Direct bank deposits'].map((item) => (
                   <li key={item} className="flex items-center gap-2 text-sm font-medium text-foreground-muted">
-                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 text-green-600 text-xs">✓</span>
+                    <span className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400 text-xs">✓</span>
                     {item}
                   </li>
                 ))}
@@ -345,10 +350,12 @@ function JoinAsTradiePageInner() {
             <EarningsCalculator />
           </div>
         </div>
+        </RevealSection>
       </section>
 
       {/* 4. How It Works */}
       <section id="how-it-works" className="border-t border-border bg-background py-20 px-4">
+        <RevealSection>
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
@@ -371,6 +378,7 @@ function JoinAsTradiePageInner() {
             ))}
           </div>
         </div>
+        </RevealSection>
       </section>
 
       {/* 5. Testimonials — proof before pricing */}
@@ -403,20 +411,25 @@ function JoinAsTradiePageInner() {
 
       {/* 6. Trust badges */}
       <section className="border-t border-border bg-background py-10 px-4">
-        <div className="mx-auto max-w-4xl">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {TRUST_BADGES.map((badge) => (
-              <div key={badge.label} className="flex flex-col items-center gap-2 text-center">
-                <span className="text-3xl">{badge.icon}</span>
-                <p className="text-sm font-semibold text-foreground-muted">{badge.label}</p>
-              </div>
-            ))}
+        <RevealSection>
+          <div className="mx-auto max-w-4xl">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {TRUST_BADGES.map((badge) => (
+                <div key={badge.label} className="flex flex-col items-center gap-2 text-center">
+                  <div className="text-brand-500">
+                    <FxIcon name={badge.icon} size={32} />
+                  </div>
+                  <p className="text-sm font-semibold text-foreground-muted">{badge.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </RevealSection>
       </section>
 
       {/* 7. Subscription Plans — after proof */}
       <section className="border-t border-border bg-background-alt py-20 px-4">
+        <RevealSection>
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
@@ -450,7 +463,7 @@ function JoinAsTradiePageInner() {
                 <ul className="mt-6 space-y-3">
                   {plan.features.map((f) => (
                     <li key={f} className="flex items-start gap-2 text-sm text-foreground-muted">
-                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-500/20 text-green-600 text-xs">✓</span>
+                      <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full bg-green-500/20 text-green-600 dark:text-green-400 text-xs">✓</span>
                       {f}
                     </li>
                   ))}
@@ -469,6 +482,7 @@ function JoinAsTradiePageInner() {
             ))}
           </div>
         </div>
+        </RevealSection>
       </section>
 
       {/* 8. FAQ — accordion */}
@@ -501,10 +515,10 @@ function JoinAsTradiePageInner() {
               Claim your $111/mo bonus — free
             </Link>
             <Link
-              href="#earnings-calculator"
+              href="/pricing"
               className="rounded-xl border border-border px-8 py-4 text-base font-bold text-foreground hover:bg-background-elevated transition-colors"
             >
-              Estimate earnings
+              See full pricing
             </Link>
           </div>
           <p className="mt-4 text-xs text-foreground-subtle">No credit card. No lock-in. Cancel anytime.</p>

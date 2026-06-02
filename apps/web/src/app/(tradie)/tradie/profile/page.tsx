@@ -4,7 +4,8 @@ import { DashboardShell, PageHeader } from '@/components/shared/dashboard-shell'
 import { db } from '@fixit247/database';
 import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@fixit247/ui';
 import Link from 'next/link';
-import { Pencil, Star, Shield, Clock, Briefcase, Phone, Mail, DollarSign } from 'lucide-react';
+import { Pencil, Star } from 'lucide-react';
+import { FxIcon } from '@/components/ui/fx-icon';
 
 export const metadata: Metadata = { title: 'My Profile | Fixit247 Tradie' };
 export const dynamic = 'force-dynamic';
@@ -117,11 +118,11 @@ export default async function TradieProfilePage() {
             <CardHeader><CardTitle>Contact Information</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center gap-3 text-sm">
-                <Mail size={16} className="text-gray-500 shrink-0" />
+                <FxIcon name="mail" size={16} className="text-gray-500 shrink-0" />
                 <span className="text-gray-300">{user?.email ?? '—'}</span>
               </div>
               <div className="flex items-center gap-3 text-sm">
-                <Phone size={16} className="text-gray-500 shrink-0" />
+                <FxIcon name="phone" size={16} className="text-gray-500 shrink-0" />
                 <span className="text-gray-300">{user?.phone ?? 'No phone number added'}</span>
               </div>
             </CardContent>
@@ -134,30 +135,30 @@ export default async function TradieProfilePage() {
             <CardHeader><CardTitle className="text-sm">Profile Stats</CardTitle></CardHeader>
             <CardContent className="space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2 text-gray-400"><Briefcase size={14} />Jobs Completed</span>
+                <span className="flex items-center gap-2 text-gray-400"><FxIcon name="briefcase" size={14} />Jobs Completed</span>
                 <span className="font-semibold text-white">{tradieProfile?.totalJobsCompleted ?? 0}</span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2 text-gray-400"><Clock size={14} />Response Time</span>
+                <span className="flex items-center gap-2 text-gray-400"><FxIcon name="clock" size={14} />Response Time</span>
                 <span className="font-semibold text-white">
                   {tradieProfile?.responseTimeMinutes ? `${tradieProfile.responseTimeMinutes} min` : '—'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2 text-gray-400"><Shield size={14} />Completion Rate</span>
+                <span className="flex items-center gap-2 text-gray-400"><FxIcon name="shield" size={14} />Completion Rate</span>
                 <span className="font-semibold text-white">
                   {tradieProfile?.completionRate ? `${Number(tradieProfile.completionRate).toFixed(0)}%` : '—'}
                 </span>
               </div>
               <div className="flex items-center justify-between text-sm">
-                <span className="flex items-center gap-2 text-gray-400"><DollarSign size={14} />Hourly Rate</span>
+                <span className="flex items-center gap-2 text-gray-400"><FxIcon name="dollar" size={14} />Hourly Rate</span>
                 <span className="font-semibold text-white">
                   {tradieProfile?.hourlyRate ? `$${Number(tradieProfile.hourlyRate).toFixed(0)}/hr` : 'Quote based'}
                 </span>
               </div>
               {tradieProfile?.yearsExperience !== undefined && tradieProfile.yearsExperience !== null && (
                 <div className="flex items-center justify-between text-sm">
-                  <span className="flex items-center gap-2 text-gray-400"><Briefcase size={14} />Experience</span>
+                  <span className="flex items-center gap-2 text-gray-400"><FxIcon name="briefcase" size={14} />Experience</span>
                   <span className="font-semibold text-white">{tradieProfile.yearsExperience} years</span>
                 </div>
               )}

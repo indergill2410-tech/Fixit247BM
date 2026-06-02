@@ -6,9 +6,18 @@ import { StatCard } from '@/components/shared/stat-card';
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@fixit247/ui';
 import { TrustScoreMeter, TrustBadge } from '@fixit247/ui';
 import Link from 'next/link';
-import { CheckCircle, AlertTriangle } from 'lucide-react';
+import { FxIcon } from '@/components/ui/fx-icon';
+import { AvailabilityToggle } from '@/components/features/jobs/availability-toggle';
+import { CreditsChip } from '@/components/features/dashboard/credits-chip';
+import { TradieOffersFeed } from '@/components/features/dashboard/tradie-offers-feed';
 
 export const metadata: Metadata = { title: 'Tradie Dashboard' };
+
+function startOfDay(d: Date): number {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x.getTime();
+}
 
 export default async function TradieDashboardPage() {
   const session = await requireOnboarding();
@@ -30,48 +39,97 @@ export default async function TradieDashboardPage() {
     },
   });
 
-  const [incomingJobs, activeJobCount] = await Promise.all([
-    db.job.findMany({
-      where: { status: 'OPEN', tradieId: null },
-      orderBy: [{ isEmergency: 'desc' }, { createdAt: 'desc' }],
-      take: 10,
-      select: {
-        id: true,
-        title: true,
-        category: true,
-        budgetMin: true,
-        budgetMax: true,
-        isEmergency: true,
-        createdAt: true,
-      },
-    }),
+  const [activeJobCount, activeJobs, payments] = await Promise.all([
     tradieProfile
       ? db.job.count({
-          where: {
-            tradieId: tradieProfile.id,
-            status: { in: ['CLAIMED', 'IN_PROGRESS'] },
-          },
+          where: { tradieId: tradieProfile.id, status: { in: ['CLAIMED', 'IN_PROGRESS'] } },
         })
       : Promise.resolve(0),
+    tradieProfile
+      ? db.job.findMany({
+          where: { tradieId: tradieProfile.id, status: { in: ['CLAIMED', 'IN_PROGRESS'] } },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+          select: {
+            id: true,
+            title: true,
+            category: true,
+            status: true,
+            isEmergency: true,
+            createdAt: true,
+          },
+        })
+      : Promise.resolve([]),
+    tradieProfile
+      ? db.payment.findMany({
+          where: {
+            tradieId: tradieProfile.id,
+            status: 'RELEASED',
+            createdAt: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) },
+          },
+          select: { amount: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+        })
+      : Promise.resolve([]),
   ]);
 
   const trustScore = tradieProfile ? Math.round(Number(tradieProfile.trustScore)) : 0;
   const avgRating = tradieProfile ? Number(tradieProfile.avgRating) : 0;
   const totalReviews = tradieProfile?.totalReviews ?? 0;
   const completedJobs = tradieProfile?.totalJobsCompleted ?? 0;
-  const totalEarnings = tradieProfile
-    ? `$${Number(tradieProfile.totalEarnings).toLocaleString('en-AU', { maximumFractionDigits: 0 })}`
-    : '$0';
   const ratingDisplay = avgRating > 0 ? `${avgRating.toFixed(1)} ★` : '—';
 
   const hasLicence = (tradieProfile?.licences.length ?? 0) > 0;
   const hasInsurance = (tradieProfile?.insurances.length ?? 0) > 0;
-  const responseTimeDisplay = tradieProfile?.responseTimeMinutes
-    ? `${tradieProfile.responseTimeMinutes} min`
-    : 'Not tracked';
-  const completionRateDisplay = tradieProfile?.completionRate
-    ? `${Number(tradieProfile.completionRate).toFixed(0)}%`
-    : '100%';
+
+  // --- Earnings: last 7 days daily buckets + week-over-week ---
+  const now = new Date();
+  const todayStart = startOfDay(now);
+  const dayMs = 24 * 60 * 60 * 1000;
+
+  const dailyEarnings: { label: string; total: number }[] = [];
+  for (let i = 6; i >= 0; i--) {
+    const dayStart = todayStart - i * dayMs;
+    const dayEnd = dayStart + dayMs;
+    const total = payments
+      .filter((p) => {
+        const t = new Date(p.createdAt).getTime();
+        return t >= dayStart && t < dayEnd;
+      })
+      .reduce((sum, p) => sum + Number(p.amount), 0);
+    dailyEarnings.push({
+      label: new Date(dayStart).toLocaleDateString('en-AU', { weekday: 'short' }),
+      total,
+    });
+  }
+
+  const thisWeekStart = todayStart - 6 * dayMs;
+  const lastWeekStart = thisWeekStart - 7 * dayMs;
+  const thisWeekTotal = payments
+    .filter((p) => new Date(p.createdAt).getTime() >= thisWeekStart)
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+  const lastWeekTotal = payments
+    .filter((p) => {
+      const t = new Date(p.createdAt).getTime();
+      return t >= lastWeekStart && t < thisWeekStart;
+    })
+    .reduce((sum, p) => sum + Number(p.amount), 0);
+
+  const weekDelta =
+    lastWeekTotal > 0
+      ? `${thisWeekTotal >= lastWeekTotal ? '+' : ''}${Math.round(
+          ((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100,
+        )}% vs last week`
+      : thisWeekTotal > 0
+        ? 'New this week'
+        : 'No earnings yet';
+  const weekTrend: 'up' | 'down' | 'neutral' =
+    thisWeekTotal > lastWeekTotal ? 'up' : thisWeekTotal < lastWeekTotal ? 'down' : 'neutral';
+
+  const fmtCurrency = (n: number) =>
+    `$${n.toLocaleString('en-AU', { maximumFractionDigits: 0 })}`;
+
+  const maxDaily = Math.max(1, ...dailyEarnings.map((d) => d.total));
 
   return (
     <DashboardShell role="TRADIE">
@@ -79,75 +137,94 @@ export default async function TradieDashboardPage() {
         title={`G'day, ${session.firstName}`}
         description="Manage your jobs, earnings, and availability"
         actions={
-          <div className="flex items-center gap-2">
-            <Badge variant="success">● Available</Badge>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/tradie/availability">Update availability</Link>
-            </Button>
+          <div className="flex flex-wrap items-center gap-3">
+            <AvailabilityToggle />
+            <CreditsChip />
           </div>
         }
       />
 
       <StatsGrid cols={4}>
-        <StatCard title="Active Jobs" value={activeJobCount} icon="🔧" />
-        <StatCard title="Total Earnings" value={totalEarnings} delta="AUD lifetime" icon="💰" />
+        <StatCard
+          title="Active Jobs"
+          value={activeJobCount}
+          color="amber"
+          icon={<FxIcon name="wrench" size={18} />}
+        />
+        <StatCard
+          title="This Week"
+          value={fmtCurrency(thisWeekTotal)}
+          color="green"
+          trend={weekTrend}
+          delta={weekDelta}
+          icon={<FxIcon name="dollar" size={18} />}
+        />
         <StatCard
           title="Trust Score"
           value={trustScore > 0 ? `${trustScore}/100` : '—'}
-          icon="⭐"
+          color="blue"
+          icon={<FxIcon name="shield" size={18} />}
         />
         <StatCard
           title="Avg Rating"
           value={ratingDisplay}
+          color="amber"
           delta={totalReviews > 0 ? `${totalReviews} review${totalReviews === 1 ? '' : 's'}` : 'No reviews yet'}
-          icon="⚡"
+          icon={<FxIcon name="star" size={18} />}
         />
       </StatsGrid>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-3">
-        {/* Incoming jobs */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Left column */}
+        <div className="space-y-6 lg:col-span-2">
+          <TradieOffersFeed />
+
+          {/* Active jobs */}
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle>Incoming jobs</CardTitle>
-              <Badge variant="warning">{incomingJobs.length} new</Badge>
+              <CardTitle>Active jobs</CardTitle>
+              {activeJobs.length > 0 && <Badge variant="success">{activeJobs.length}</Badge>}
             </CardHeader>
             <CardContent>
-              <div className="divide-y divide-border">
-                {incomingJobs.length === 0 ? (
-                  <div className="py-10 text-center">
-                    <p className="text-sm font-medium text-foreground-muted">No open jobs right now</p>
-                    <p className="mt-1 text-xs text-foreground-subtle">New jobs will appear here as customers post them.</p>
-                  </div>
-                ) : (
-                  incomingJobs.map((job) => (
-                    <div key={job.id} className="flex items-start justify-between py-4">
-                      <div className="flex-1">
+              {activeJobs.length === 0 ? (
+                <div className="py-10 text-center">
+                  <p className="text-sm font-medium text-foreground-muted">No active jobs</p>
+                  <p className="mt-1 text-xs text-foreground-subtle">
+                    Accept an offer above to start working.
+                  </p>
+                </div>
+              ) : (
+                <div className="divide-y divide-border">
+                  {activeJobs.map((job) => (
+                    <Link
+                      key={job.id}
+                      href={`/tradie/jobs/${job.id}`}
+                      className="flex items-center justify-between gap-3 py-3 transition-colors hover:bg-background-alt -mx-2 px-2 rounded-lg"
+                    >
+                      <div className="min-w-0 flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-foreground">{job.title}</p>
+                          <p className="truncate font-medium text-foreground">{job.title}</p>
                           {job.isEmergency && <Badge variant="emergency">EMERGENCY</Badge>}
                         </div>
-                        <p className="mt-0.5 text-sm text-foreground-muted">{job.category.replace(/_/g, ' ')}</p>
-                        <p className="mt-1 text-xs text-foreground-subtle">{new Date(job.createdAt).toLocaleString()}</p>
+                        <p className="mt-0.5 text-xs text-foreground-muted">
+                          {job.category.replace(/_/g, ' ')}
+                        </p>
                       </div>
-                      <div className="flex flex-col items-end gap-2 pl-4">
-                        <p className="font-semibold text-foreground">{job.budgetMin ? `$${job.budgetMin}` : 'Quote required'}</p>
-                        <Button size="sm" asChild>
-                          <Link href={`/tradie/jobs/${job.id}`}>View job</Link>
-                        </Button>
+                      <div className="flex items-center gap-2">
+                        <Badge variant={job.status === 'IN_PROGRESS' ? 'warning' : 'default'}>
+                          {job.status.replace(/_/g, ' ')}
+                        </Badge>
+                        <FxIcon name="arrowRight" size={16} className="text-foreground-subtle" />
                       </div>
-                    </div>
-                  ))
-                )}
-              </div>
-              <Link href="/tradie/jobs" className="mt-2 block text-center text-sm text-brand-600 hover:underline">
-                View all available jobs →
-              </Link>
+                    </Link>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         </div>
 
-        {/* Sidebar */}
+        {/* Right rail */}
         <div className="space-y-4">
           {/* Trust score */}
           <Card>
@@ -168,9 +245,35 @@ export default async function TradieDashboardPage() {
             </CardContent>
           </Card>
 
+          {/* 7-day earnings sparkline */}
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-sm">7-day earnings</CardTitle>
+              <span className="text-sm font-semibold text-foreground">{fmtCurrency(thisWeekTotal)}</span>
+            </CardHeader>
+            <CardContent>
+              <div className="flex h-24 items-end gap-1.5">
+                {dailyEarnings.map((d, i) => (
+                  <div key={i} className="flex flex-1 flex-col items-center gap-1">
+                    <div className="flex w-full flex-1 items-end">
+                      <div
+                        className="w-full rounded-t bg-brand-500/80 transition-all"
+                        style={{ height: `${Math.max(4, (d.total / maxDaily) * 100)}%` }}
+                        title={`${d.label}: ${fmtCurrency(d.total)}`}
+                      />
+                    </div>
+                    <span className="text-[10px] text-foreground-subtle">{d.label}</span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Verification status */}
           <Card>
-            <CardHeader><CardTitle className="text-sm">Verification status</CardTitle></CardHeader>
+            <CardHeader>
+              <CardTitle className="text-sm">Verification status</CardTitle>
+            </CardHeader>
             <CardContent>
               {[
                 { label: 'Identity', done: !!session.emailVerified },
@@ -178,34 +281,18 @@ export default async function TradieDashboardPage() {
                 { label: 'Insurance', done: hasInsurance },
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-2 py-1.5">
-                  {item.done
-                    ? <CheckCircle size={16} className="text-green-500 shrink-0" />
-                    : <AlertTriangle size={16} className="text-amber-500 shrink-0" />}
-                  <span className="text-sm text-foreground-muted">{item.label}</span>
-                  {!item.done && <span className="ml-auto text-xs text-amber-600">Needed</span>}
+                  {item.done ? (
+                    <FxIcon name="checkCircle" size={16} className="shrink-0 text-emerald-500" />
+                  ) : (
+                    <FxIcon name="alertTriangle" size={16} className="shrink-0 text-brand-500" />
+                  )}
+                  <span className="text-sm text-foreground-secondary">{item.label}</span>
+                  {!item.done && <span className="ml-auto text-xs text-brand-500">Needed</span>}
                 </div>
               ))}
               <Button asChild size="sm" className="mt-3 w-full" variant="outline">
                 <Link href="/tradie/documents">Complete verification →</Link>
               </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle className="text-sm">Performance pulse</CardTitle></CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-foreground-muted">Response time</span>
-                <span className="font-semibold text-foreground">{responseTimeDisplay}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-foreground-muted">Completion rate</span>
-                <span className="font-semibold text-foreground">{completionRateDisplay}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-foreground-muted">Documents</span>
-                <span className="font-semibold text-foreground">{hasLicence && hasInsurance ? 'Ready' : 'Action needed'}</span>
-              </div>
             </CardContent>
           </Card>
         </div>

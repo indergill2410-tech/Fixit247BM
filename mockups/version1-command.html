@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1400"/>
+<title>V1 — Command (Linear × Notion)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',system-ui,sans-serif;background:#0B0A09;color:#F8F5F0;display:flex;flex-direction:column;gap:40px;padding:40px;min-height:100vh;}
+  .label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8C8480;margin-bottom:12px;}
+  .screen{border-radius:16px;overflow:hidden;border:1px solid #252220;box-shadow:0 24px 80px rgba(0,0,0,.7);width:1300px;}
+  .topbar{background:#131210;border-bottom:1px solid #252220;padding:0 20px;height:48px;display:flex;align-items:center;gap:16px;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:15px;color:#F59E0B;letter-spacing:-.02em;}
+  .bolt{width:22px;height:22px;background:#F59E0B;border-radius:6px;display:flex;align-items:center;justify-content:center;}
+  .topbar-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+  .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#1a1208;}
+  .layout{display:flex;height:680px;}
+  /* SIDEBAR */
+  .sidebar{width:220px;background:#0F0E0D;border-right:1px solid #1E1C1A;display:flex;flex-direction:column;padding:12px 0;flex-shrink:0;}
+  .nav-section{padding:4px 8px;margin-bottom:2px;}
+  .nav-label{font-size:10px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:#595450;padding:8px 12px 4px;}
+  .nav-item{display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:8px;margin:1px 4px;cursor:pointer;font-size:13.5px;color:#8C8480;transition:all .15s;}
+  .nav-item:hover{background:#1A1918;color:#F8F5F0;}
+  .nav-item.active{background:#1E1C1A;color:#F8F5F0;font-weight:600;}
+  .nav-item .icon{width:20px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+  .badge{margin-left:auto;background:#F59E0B;color:#1a1208;font-size:10px;font-weight:700;padding:2px 6px;border-radius:10px;}
+  .badge.red{background:#E84444;color:white;}
+  .emergency-btn{margin:12px 8px 0;background:linear-gradient(135deg,#E84444,#DC2626);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:white;cursor:pointer;border:none;}
+  .emergency-btn .dot{width:8px;height:8px;background:white;border-radius:50%;animation:pulse 1.5s infinite;flex-shrink:0;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+  /* MAIN */
+  .main{flex:1;background:#0B0A09;padding:28px 32px;overflow-y:auto;}
+  .greeting{font-size:22px;font-weight:700;color:#F8F5F0;margin-bottom:4px;}
+  .sub{font-size:13px;color:#8C8480;margin-bottom:24px;display:flex;align-items:center;gap:6px;}
+  .stat-row{display:flex;gap:12px;margin-bottom:28px;}
+  .stat{background:#131210;border:1px solid #1E1C1A;border-radius:12px;padding:16px 20px;flex:1;}
+  .stat-val{font-size:22px;font-weight:800;color:#F8F5F0;margin-bottom:2px;}
+  .stat-key{font-size:12px;color:#595450;font-weight:500;}
+  .stat-delta{font-size:11px;color:#22C55E;margin-top:4px;}
+  .section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+  .section-title{font-size:13px;font-weight:700;color:#CAC5BC;letter-spacing:.04em;text-transform:uppercase;display:flex;align-items:center;gap:6px;}
+  .btn-sm{background:#1E1C1A;border:1px solid #252220;border-radius:8px;padding:6px 14px;font-size:12px;font-weight:600;color:#F8F5F0;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .btn-amber{background:#F59E0B;color:#1a1208;border:none;border-radius:8px;padding:7px 16px;font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .job-card{background:#131210;border:1px solid #1E1C1A;border-radius:12px;padding:16px 20px;margin-bottom:8px;display:flex;align-items:center;gap:16px;cursor:pointer;transition:border-color .15s;}
+  .job-card:hover{border-color:#352F2B;}
+  .job-icon{width:40px;height:40px;border-radius:10px;background:#1E1C1A;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#8C8480;}
+  .job-info{flex:1;}
+  .job-title{font-size:14px;font-weight:600;color:#F8F5F0;margin-bottom:2px;}
+  .job-sub{font-size:12px;color:#595450;}
+  .status{display:flex;align-items:center;gap:6px;font-size:12px;font-weight:600;}
+  .dot-green{width:7px;height:7px;border-radius:50%;background:#22C55E;}
+  .dot-amber{width:7px;height:7px;border-radius:50%;background:#F59E0B;}
+  .progress-bar{height:4px;background:#1E1C1A;border-radius:4px;margin-top:6px;overflow:hidden;}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#F59E0B,#D97706);border-radius:4px;}
+  .trade-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:16px;}
+  .trade-tile{background:#131210;border:1px solid #1E1C1A;border-radius:12px;padding:14px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+  .trade-tile:hover{border-color:#F59E0B;background:#1E1C1A;}
+  .trade-icon{display:flex;justify-content:center;align-items:center;margin-bottom:6px;color:#8C8480;}
+  .trade-name{font-size:11px;color:#8C8480;font-weight:500;}
+  .social-proof{background:#1A1918;border:1px solid #252220;border-radius:10px;padding:12px 16px;font-size:12px;color:#8C8480;margin-top:20px;display:flex;align-items:center;gap:10px;}
+  .proof-avatars{display:flex;}
+  .proof-avatar{width:24px;height:24px;border-radius:50%;border:2px solid #0B0A09;margin-left:-6px;background:linear-gradient(135deg,#F59E0B,#92400e);font-size:9px;display:flex;align-items:center;justify-content:center;font-weight:700;color:#1a1208;}
+  .proof-avatar:first-child{margin-left:0;}
+  .divider{height:1px;background:#1E1C1A;margin:20px 0;}
+  /* VERSION LABEL */
+  .version-tag{background:#F59E0B;color:#1a1208;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:.06em;display:inline-block;margin-bottom:8px;}
+</style>
+<script>
+const ICONS = {
+  bolt: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  logoBolt: `<svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1208" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  home: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  jobs: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M8 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>`,
+  message: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+  bookmark: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg>`,
+  receipt: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg>`,
+  user: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>`,
+  settings: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg>`,
+  siren: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 18v-6a5 5 0 1 1 10 0v6"/><path d="M5 21a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-1a1 1 0 0 0-1-1H6a1 1 0 0 0-1 1v1z"/><path d="M21 12h1"/><path d="M2 12h1"/><path d="M12 2v1"/><path d="m4.93 4.93.7.7"/><path d="m18.37 4.93-.7.7"/></svg>`,
+  wrench: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+  zap: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  droplets: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>`,
+  hammer: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"/></svg>`,
+  scissors: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>`,
+  chart: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg>`,
+  target: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>`,
+  dollar: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>`,
+  card: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>`,
+  file: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>`,
+  pin: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  moon: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`,
+  arrow: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+  plus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+};
+</script>
+</head>
+<body>
+
+<div>
+  <div class="version-tag">VERSION 1 — COMMAND</div>
+  <div style="font-size:28px;font-weight:800;color:#F8F5F0;margin-bottom:4px;">Linear × Notion — Dense Sidebar</div>
+  <div style="font-size:14px;color:#595450;margin-bottom:20px;">Fixed left nav · power-user · best for Tradie + Admin daily use</div>
+</div>
+
+<!-- CUSTOMER VIEW -->
+<div class="label">CUSTOMER DASHBOARD</div>
+<div class="screen">
+  <div class="topbar">
+    <div class="logo">
+      <div class="bolt"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1208" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      FIXIT247
+    </div>
+    <div class="topbar-right">
+      <div style="color:#595450;display:flex;align-items:center;"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg></div>
+      <div class="avatar">SJ</div>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="nav-item active"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></span>Dashboard</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M8 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></span>My Jobs<span class="badge">2</span></div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Messages<span class="badge red">3</span></div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 21-7-4-7 4V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v16z"/></svg></span>Saved Tradies</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1-2-1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/></svg></span>Invoices</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>My Profile</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg></span>Settings</div>
+      <div style="flex:1;"></div>
+      <button class="emergency-btn"><div class="dot"></div>Emergency Tradie</button>
+    </div>
+    <div class="main">
+      <div class="greeting">Good morning, Sarah</div>
+      <div class="sub"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Bondi Beach · Sunday 1 June</div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-val">2</div><div class="stat-key">Active Jobs</div></div>
+        <div class="stat"><div class="stat-val">$480</div><div class="stat-key">Spent this month</div><div class="stat-delta">&#x2193; 12% vs last month</div></div>
+        <div class="stat"><div class="stat-val">4.9★</div><div class="stat-key">Avg tradie rating</div></div>
+        <div class="stat"><div class="stat-val">8 min</div><div class="stat-key">Avg response time</div><div class="stat-delta">In your suburb</div></div>
+      </div>
+      <div class="section-header">
+        <div class="section-title">Active Jobs</div>
+        <button class="btn-amber"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg> Post New Job</button>
+      </div>
+      <div class="job-card">
+        <div class="job-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="job-info">
+          <div class="job-title">Plumbing · Leaking kitchen tap</div>
+          <div class="job-sub">Mike Torres · ETA 2:30pm · $280 agreed</div>
+          <div class="progress-bar"><div class="progress-fill" style="width:80%"></div></div>
+        </div>
+        <div class="status"><div class="dot-green"></div><span style="color:#22C55E;">In Progress</span></div>
+      </div>
+      <div class="job-card">
+        <div class="job-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="job-info">
+          <div class="job-title">Electrical · Power outage — 3 rooms</div>
+          <div class="job-sub">3 quotes received · Respond by 5pm to secure tradie</div>
+        </div>
+        <div class="status"><div class="dot-amber"></div><span style="color:#F59E0B;">Reply needed</span></div>
+      </div>
+      <div class="divider"></div>
+      <div class="section-header">
+        <div class="section-title">Post a Job — What do you need?</div>
+      </div>
+      <div class="trade-grid">
+        <div class="trade-tile">
+          <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <div class="trade-name">Plumbing</div>
+        </div>
+        <div class="trade-tile">
+          <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+          <div class="trade-name">Electrical</div>
+        </div>
+        <div class="trade-tile">
+          <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg></div>
+          <div class="trade-name">Cleaning</div>
+        </div>
+        <div class="trade-tile">
+          <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"/></svg></div>
+          <div class="trade-name">Building</div>
+        </div>
+        <div class="trade-tile">
+          <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></div>
+          <div class="trade-name">Gardening</div>
+        </div>
+        <div class="trade-tile">
+          <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+          <div class="trade-name">More</div>
+        </div>
+      </div>
+      <div class="social-proof">
+        <div class="proof-avatars">
+          <div class="proof-avatar">M</div><div class="proof-avatar">J</div><div class="proof-avatar">A</div><div class="proof-avatar">+6</div>
+        </div>
+        <span style="color:#F8F5F0;">47 jobs completed in Bondi this week</span>
+        <span>· avg response <strong style="color:#F59E0B;">9 minutes</strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRADIE VIEW -->
+<div class="label" style="margin-top:32px;">TRADIE DASHBOARD</div>
+<div class="screen">
+  <div class="topbar">
+    <div class="logo">
+      <div class="bolt"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1208" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      FIXIT247
+    </div>
+    <div class="topbar-right">
+      <div style="background:#22C55E;border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:white;display:flex;align-items:center;gap:5px;"><span style="width:6px;height:6px;background:white;border-radius:50%;display:inline-block;"></span>Available</div>
+      <div class="avatar" style="background:linear-gradient(135deg,#22C55E,#16A34A);color:white;">MT</div>
+    </div>
+  </div>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="nav-item active"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span>Dashboard</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>New Leads<span class="badge">8</span></div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"/></svg></span>My Jobs</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Messages<span class="badge red">2</span></div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span>Earnings</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span>Wallet &amp; Plan</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span>Documents</div>
+      <div class="nav-item"><span class="icon"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>My Profile</div>
+      <div style="flex:1;"></div>
+      <div style="padding:12px 8px;">
+        <div style="background:#1A1918;border:1px solid #252220;border-radius:10px;padding:12px 14px;">
+          <div style="font-size:11px;color:#595450;margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.06em;">Profile completeness</div>
+          <div style="height:5px;background:#252220;border-radius:4px;overflow:hidden;margin-bottom:6px;"><div style="width:82%;height:100%;background:linear-gradient(90deg,#F59E0B,#D97706);border-radius:4px;"></div></div>
+          <div style="font-size:11px;color:#F59E0B;font-weight:600;display:flex;align-items:center;gap:4px;">82% · Add insurance <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+        </div>
+      </div>
+    </div>
+    <div class="main">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:24px;">
+        <div>
+          <div style="font-size:13px;color:#595450;margin-bottom:2px;">EARNINGS THIS WEEK</div>
+          <div style="font-size:36px;font-weight:800;color:#F8F5F0;">$2,140</div>
+          <div style="font-size:13px;color:#22C55E;">&#x2191; On track for $2,520 this month</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:12px;color:#595450;margin-bottom:6px;">Response time</div>
+          <div style="font-size:20px;font-weight:700;color:#F59E0B;display:flex;align-items:center;gap:6px;justify-content:flex-end;">8.2 min <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+          <div style="font-size:11px;color:#22C55E;">Top 10% in your area</div>
+        </div>
+      </div>
+      <div class="stat-row">
+        <div class="stat"><div class="stat-val">8</div><div class="stat-key">New leads today</div></div>
+        <div class="stat"><div class="stat-val">2</div><div class="stat-key">Jobs in progress</div></div>
+        <div class="stat"><div class="stat-val">$680</div><div class="stat-key">Pending payout</div></div>
+        <div class="stat"><div class="stat-val">4.8★</div><div class="stat-key">Your rating</div></div>
+      </div>
+      <div class="section-header">
+        <div class="section-title"><span style="background:#EF444422;color:#EF4444;font-size:10px;font-weight:800;padding:2px 7px;border-radius:6px;letter-spacing:.04em;">HOT</span> New leads near you</div>
+        <button class="btn-sm">See all 8 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+      </div>
+      <div class="job-card" style="border-left:3px solid #22C55E;">
+        <div class="job-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="job-info">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div class="job-title">Plumbing · Randwick · $200–350</div>
+            <div style="background:#22C55E22;color:#22C55E;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;">HOT LEAD</div>
+          </div>
+          <div class="job-sub">"Leaking kitchen tap, urgent fix needed" · 0.8km away · posted 6 min ago</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+            <div style="font-size:11px;color:#595450;font-weight:600;">Lead score</div>
+            <div style="height:5px;background:#1E1C1A;border-radius:4px;flex:1;overflow:hidden;"><div style="width:94%;height:100%;background:linear-gradient(90deg,#22C55E,#16A34A);border-radius:4px;"></div></div>
+            <div style="font-size:11px;color:#22C55E;font-weight:700;">94</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button class="btn-amber" style="font-size:12px;padding:7px 16px;">&#x2713; Accept</button>
+          <button class="btn-sm" style="font-size:12px;text-align:center;justify-content:center;">Skip</button>
+        </div>
+      </div>
+      <div class="job-card" style="border-left:3px solid #F59E0B;">
+        <div class="job-icon" style="color:#8C8480;font-size:18px;">&#9633;</div>
+        <div class="job-info">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px;">
+            <div class="job-title">Tiling · Coogee · $500–800</div>
+            <div style="background:#F59E0B22;color:#F59E0B;font-size:10px;font-weight:700;padding:2px 8px;border-radius:6px;">GOOD MATCH</div>
+          </div>
+          <div class="job-sub">"Bathroom reno, 8m² floor tiling" · 2.1km away · posted 12 min ago</div>
+          <div style="display:flex;align-items:center;gap:8px;margin-top:6px;">
+            <div style="font-size:11px;color:#595450;font-weight:600;">Lead score</div>
+            <div style="height:5px;background:#1E1C1A;border-radius:4px;flex:1;overflow:hidden;"><div style="width:78%;height:100%;background:linear-gradient(90deg,#F59E0B,#D97706);border-radius:4px;"></div></div>
+            <div style="font-size:11px;color:#F59E0B;font-weight:700;">78</div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:6px;flex-shrink:0;">
+          <button class="btn-amber" style="font-size:12px;padding:7px 16px;">&#x2713; Accept</button>
+          <button class="btn-sm" style="font-size:12px;text-align:center;justify-content:center;">Skip</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

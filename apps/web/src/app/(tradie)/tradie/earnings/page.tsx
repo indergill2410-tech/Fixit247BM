@@ -3,6 +3,7 @@ import { requireRole } from '@/lib/auth/session';
 import { DashboardShell, PageHeader, StatsGrid } from '@/components/shared/dashboard-shell';
 import { StatCard } from '@/components/shared/stat-card';
 import { PayoutHistory } from '@/components/features/payments/payout-history';
+import { FxIcon } from '@/components/ui/fx-icon';
 import { db } from '@fixit247/database';
 
 export const metadata: Metadata = { title: 'Earnings' };
@@ -53,26 +54,26 @@ export default async function EarningsPage() {
           title="Total Earned"
           value={`$${Number(tradieProfile?.totalEarnings ?? 0).toLocaleString()}`}
           delta="AUD lifetime"
-          icon="💰"
+          icon={<FxIcon name="dollar" size={18} />}
         />
         <StatCard
           title="This Month"
           value={`$${monthEarnings.toLocaleString()}`}
           delta="Last 30 days"
           trend="up"
-          icon="📈"
+          icon={<FxIcon name="trendUp" size={18} />}
         />
         <StatCard
           title="Pending"
           value={`$${Number(pendingPayouts._sum.amount ?? 0).toFixed(2)}`}
           delta="Awaiting release"
-          icon="⏳"
+          icon={<FxIcon name="clock" size={18} />}
         />
         <StatCard
           title="Jobs Completed"
           value={String(tradieProfile?.totalJobsCompleted ?? 0)}
           delta="All time"
-          icon="✅"
+          icon={<FxIcon name="checkCircle" size={18} />}
         />
       </StatsGrid>
 

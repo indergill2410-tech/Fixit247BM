@@ -53,7 +53,7 @@ export async function PATCH(req: NextRequest, { params }: { params: Promise<{ tr
     await db.$transaction([
       db.tradieProfile.update({ where: { id: tradieId }, data: { trustScore: score } }),
       db.trustScoreHistory.create({
-        data: { tradieId, score, previousScore: (profile.trustScore !== null && profile.trustScore !== undefined) ? Math.round(Number(profile.trustScore)) : undefined, reason: `Admin override: ${reason}`, adminId: session.id },
+        data: { tradieId, score, previousScore: (profile.trustScore !== null && profile.trustScore !== undefined) ? Math.round(Number(profile.trustScore)) : null, reason: `Admin override: ${reason}`, adminId: session.id },
       }),
       db.adminAuditLog.create({
         data: { adminId: session.id, action: 'TRUST_SCORE_OVERRIDE', entity: 'TradieProfile', entityId: tradieId, metadata: { score, reason } as never },

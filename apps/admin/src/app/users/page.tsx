@@ -37,21 +37,21 @@ export default async function UsersPage() {
     <AdminShell>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Users</h1>
-          <p className="mt-1.5 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-foreground">Users</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             {totalCount.toLocaleString()} total · {tradieCount} tradies · {suspendedCount} suspended
           </p>
         </div>
       </div>
 
-      <div className="mb-4 flex gap-2 text-sm">
+      <div className="mb-4 flex flex-wrap gap-2 text-sm">
         {[
           { label: `All (${totalCount.toLocaleString()})` },
           { label: `Customers (${customerCount.toLocaleString()})` },
           { label: `Tradies (${tradieCount.toLocaleString()})` },
           { label: `Admins (${adminCount.toLocaleString()})` },
-        ].map((tab) => (
-          <span key={tab.label} className="rounded-lg px-3 py-1.5 font-medium text-gray-600 bg-gray-100">
+        ].map((tab, i) => (
+          <span key={tab.label} className={`cursor-pointer rounded-lg px-3 py-1.5 font-medium transition-colors ${i === 0 ? 'bg-amber-500 text-gray-900' : 'bg-muted text-muted-foreground hover:bg-muted/80'}`}>
             {tab.label}
           </span>
         ))}
@@ -61,17 +61,17 @@ export default async function UsersPage() {
         <CardContent className="p-0">
           <table className="w-full">
             <thead>
-              <tr className="border-b bg-gray-50">
+              <tr className="border-b bg-muted/50">
                 {['Name', 'Email', 'Role', 'Status', 'Joined', 'Actions'].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody className="divide-y">
               {users.map((u) => (
-                <tr key={u.id} className="hover:bg-gray-50">
-                  <td className="px-4 py-4 font-medium text-gray-900">{u.firstName} {u.lastName}</td>
-                  <td className="px-4 py-4 text-sm text-gray-500">{u.email}</td>
+                <tr key={u.id} className="hover:bg-muted/30 transition-colors">
+                  <td className="px-4 py-4 font-medium text-foreground">{u.firstName} {u.lastName}</td>
+                  <td className="px-4 py-4 text-sm text-muted-foreground">{u.email}</td>
                   <td className="px-4 py-4">
                     <Badge variant={u.role === 'TRADIE' ? 'default' : u.role === 'ADMIN' || u.role === 'SUPER_ADMIN' ? 'destructive' : 'secondary'}>
                       {u.role}
@@ -82,7 +82,7 @@ export default async function UsersPage() {
                       {u.isActive ? 'Active' : 'Suspended'}
                     </Badge>
                   </td>
-                  <td className="px-4 py-4 text-sm text-gray-500">
+                  <td className="px-4 py-4 text-sm text-muted-foreground">
                     {u.createdAt.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
                   </td>
                   <td className="px-4 py-4">
@@ -95,10 +95,10 @@ export default async function UsersPage() {
             </tbody>
           </table>
           {users.length === 0 && (
-            <p className="py-12 text-center text-sm text-gray-400">No users yet</p>
+            <p className="py-12 text-center text-sm text-muted-foreground">No users yet</p>
           )}
           {totalCount > 100 && (
-            <p className="border-t px-4 py-3 text-center text-xs text-gray-400">
+            <p className="border-t px-4 py-3 text-center text-xs text-muted-foreground">
               Showing latest 100 of {totalCount.toLocaleString()} users
             </p>
           )}

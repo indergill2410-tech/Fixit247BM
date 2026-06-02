@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { StatCard } from '@/components/shared/stat-card';
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@fixit247/ui';
+import { Users, Wrench, DollarSign, ShieldCheck, Shield, CheckCircle, Star } from 'lucide-react';
 import { db } from '@fixit247/database';
 import Link from 'next/link';
 
@@ -22,39 +23,31 @@ function fmtAud(n: number) {
 }
 
 export default async function AdminDashboardPage() {
-  const now = new Date(new Date().toLocaleString('en-US', { timeZone: 'Australia/Sydney' }));
+  const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   const [
     totalUsers,
-    customerCount,
-    tradieCount,
     activeJobs,
     emergencyJobs,
-    completedJobsMtd,
     pendingVerifications,
     revenueResult,
-    heldEscrowResult,
-    heldEscrowCount,
     verificationQueue,
     openDisputes,
+    plusCount,
+    completedToday,
+    avgRatingResult,
+    topTrades,
   ] = await Promise.all([
     db.user.count(),
-    db.user.count({ where: { role: 'CUSTOMER' } }),
-    db.user.count({ where: { role: 'TRADIE' } }),
     db.job.count({ where: { status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] } } }),
     db.job.count({ where: { isEmergency: true, status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] } } }),
-    db.job.count({ where: { status: 'COMPLETED', completedAt: { gte: startOfMonth } } }),
     db.tradieProfile.count({ where: { verificationStatus: 'PENDING' } }),
     db.payment.aggregate({
       where: { status: 'RELEASED', createdAt: { gte: startOfMonth } },
       _sum: { platformFee: true },
     }),
-    db.payment.aggregate({
-      where: { status: 'HELD_IN_ESCROW' },
-      _sum: { amount: true },
-    }),
-    db.payment.count({ where: { status: 'HELD_IN_ESCROW' } }),
     db.tradieProfile.findMany({
       where: { verificationStatus: 'PENDING' },
       take: 4,
@@ -71,86 +64,43 @@ export default async function AdminDashboardPage() {
       orderBy: { createdAt: 'desc' },
       include: { job: { select: { title: true, id: true } } },
     }),
+    db.subscription.count({ where: { tier: { not: 'FREE' }, status: 'ACTIVE' } }),
+    db.job.count({ where: { status: 'COMPLETED', completedAt: { gte: startOfToday } } }),
+    db.tradieProfile.aggregate({ _avg: { avgRating: true } }),
+    db.job.groupBy({
+      by: ['category'],
+      where: { createdAt: { gte: startOfToday } },
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+      take: 5,
+    }),
   ]);
 
   const revenueMtd = Number(revenueResult._sum.platformFee ?? 0);
-  const heldEscrow = Number(heldEscrowResult._sum.amount ?? 0);
-  const adminCount = totalUsers - customerCount - tradieCount;
+  const avgRating = avgRatingResult._avg.avgRating?.toFixed(1) ?? '—';
+  const maxTrades = Math.max(1, ...topTrades.map((t) => t._count.id));
 
   return (
     <AdminShell>
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900">Super Admin Command Centre</h1>
-        <p className="mt-1.5 text-sm text-gray-500">Real-time trust, revenue, support, and marketplace operations</p>
+      <div className="mb-8 flex items-start justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <span className="relative flex h-2 w-2">
+              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-500 opacity-75" />
+              <span className="relative inline-flex h-2 w-2 rounded-full bg-emerald-500" />
+            </span>
+            <span className="text-xs font-semibold text-emerald-600 uppercase tracking-wider">Live</span>
+          </div>
+          <h1 className="text-2xl font-bold text-foreground">Platform Overview</h1>
+          <p className="mt-1 text-sm text-muted-foreground">Real-time platform metrics and operations</p>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <StatCard title="Total Users" value={totalUsers.toLocaleString()} icon="👥" />
-        <StatCard title="Active Jobs" value={activeJobs.toString()} delta={`${emergencyJobs} emergency`} icon="🔧" />
-        <StatCard title="Revenue (MTD)" value={fmtAud(revenueMtd)} icon="💰" trend="up" />
-        <StatCard title="Pending Verifications" value={pendingVerifications.toString()} delta="Needs review" icon="🔒" highlight={pendingVerifications > 0} />
-      </div>
-
-      <div className="mt-6 grid gap-4 lg:grid-cols-3">
-        <Card>
-          <CardHeader>
-            <CardTitle>User mix</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Customers</span>
-              <span className="font-semibold text-gray-900">{customerCount.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Tradies</span>
-              <span className="font-semibold text-gray-900">{tradieCount.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Admins</span>
-              <span className="font-semibold text-gray-900">{adminCount.toLocaleString()}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Dispatch health</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Active jobs</span>
-              <span className="font-semibold text-gray-900">{activeJobs.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Emergency jobs</span>
-              <span className="font-semibold text-red-600">{emergencyJobs.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Completed this month</span>
-              <span className="font-semibold text-gray-900">{completedJobsMtd.toLocaleString()}</span>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Payment control</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Escrow balance</span>
-              <span className="font-semibold text-gray-900">{fmtAud(heldEscrow)}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Held payments</span>
-              <span className="font-semibold text-gray-900">{heldEscrowCount.toLocaleString()}</span>
-            </div>
-            <div className="flex items-center justify-between">
-              <span className="text-gray-500">Open disputes</span>
-              <span className="font-semibold text-gray-900">{openDisputes.length.toLocaleString()}</span>
-            </div>
-          </CardContent>
-        </Card>
+        <StatCard title="Total Users" value={totalUsers.toLocaleString()} icon={<Users size={18} />} color="blue" />
+        <StatCard title="Active Jobs" value={activeJobs.toString()} delta={`${emergencyJobs} emergency`} icon={<Wrench size={18} />} color="amber" trend="up" />
+        <StatCard title="Revenue (MTD)" value={fmtAud(revenueMtd)} icon={<DollarSign size={18} />} color="green" trend="up" />
+        <StatCard title="Pending Verifications" value={pendingVerifications.toString()} delta="Needs review" icon={<ShieldCheck size={18} />} color="red" highlight={pendingVerifications > 0} />
       </div>
 
       <div className="mt-8 grid gap-6 lg:grid-cols-2">
@@ -221,6 +171,85 @@ export default async function AdminDashboardPage() {
             </Link>
           </CardContent>
         </Card>
+      </div>
+      {/* Platform Health */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Platform Health</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+                <Shield size={20} className="text-amber-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{plusCount.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Fixit Plus Members</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
+                <CheckCircle size={20} className="text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{completedToday.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Jobs Completed Today</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+                <Star size={20} className="text-amber-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{avgRating}</p>
+                <p className="text-xs text-muted-foreground">Avg Tradie Rating</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Top Trades Today */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Trades Today</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {topTrades.length === 0 ? (
+              <p className="py-4 text-center text-sm text-muted-foreground">No jobs posted today yet</p>
+            ) : (
+              <div className="space-y-3">
+                {topTrades.map((trade) => (
+                  <div key={trade.category} className="flex items-center gap-3">
+                    <span className="w-28 shrink-0 truncate text-sm text-foreground">{trade.category}</span>
+                    <div className="flex-1 overflow-hidden rounded-full bg-muted h-2">
+                      <div
+                        className="h-2 rounded-full bg-amber-500"
+                        style={{ width: `${(trade._count.id / maxTrades) * 100}%` }}
+                      />
+                    </div>
+                    <span className="w-6 shrink-0 text-right text-xs font-semibold text-muted-foreground">{trade._count.id}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="mt-6 grid gap-3 sm:grid-cols-4">
+        {[
+          { label: 'Review Verifications', href: '/verifications', color: 'bg-amber-500 hover:bg-amber-400 text-gray-900' },
+          { label: 'Manage Disputes', href: '/disputes', color: 'bg-red-500 hover:bg-red-400 text-white' },
+          { label: 'View Analytics', href: '/analytics', color: 'bg-blue-500 hover:bg-blue-400 text-white' },
+          { label: 'Live Monitor', href: '/live', color: 'bg-emerald-500 hover:bg-emerald-400 text-white' },
+        ].map((a) => (
+          <Link key={a.href} href={a.href} className={`flex items-center justify-center rounded-xl px-4 py-3 text-sm font-bold transition-colors ${a.color}`}>
+            {a.label}
+          </Link>
+        ))}
       </div>
     </AdminShell>
   );

@@ -44,7 +44,7 @@ export function MarketingNav() {
             className="flex items-center gap-2 text-[15px] font-extrabold text-foreground transition-opacity hover:opacity-80"
             onClick={() => { setOpen(false); }}
           >
-            <span className="text-brand-500">🔑</span>
+            <span className="text-brand-500"><svg width="20" height="20" viewBox="0 0 172 176" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lnav" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#FCD34D"/><stop offset="100%" stopColor="#D97706"/></linearGradient></defs><rect x="0" y="4" width="172" height="172" rx="36" fill="url(#lnav)"/><path d="M118 22C138 22 154 37 156 57C157 69 152 80 143 87L90 140L95 145C98 148 98 154 95 157L65 187C59 193 49 193 43 187C37 181 37 171 43 165L73 135C76 132 82 132 85 135L90 140L143 87C151 80 156 69 154 57C151 38 136 22 118 22Z M118 42C128 42 136 50 136 60C136 67 132 73 127 77L108 58C112 53 115 48 116 42C116.7 42 117.3 42 118 42Z" fill="#1E2235" fillRule="evenodd"/></svg></span>
             Fixit <span className="text-brand-500">24/7</span>
           </Link>
 
@@ -86,7 +86,7 @@ export function MarketingNav() {
               Sign in
             </Link>
             <Link
-              href="/jobs/new"
+              href="/register"
               className="hidden rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-gray-900 transition-all hover:bg-brand-400 sm:inline-block"
             >
               Post a job free
@@ -124,7 +124,7 @@ export function MarketingNav() {
                 className="flex items-center gap-2 text-[15px] font-extrabold text-foreground"
                 onClick={() => { setOpen(false); }}
               >
-                <span className="text-brand-500">🔑</span>
+                <span className="text-brand-500"><svg width="20" height="20" viewBox="0 0 172 176" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="lnav2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#FCD34D"/><stop offset="100%" stopColor="#D97706"/></linearGradient></defs><rect x="0" y="4" width="172" height="172" rx="36" fill="url(#lnav2)"/><path d="M118 22C138 22 154 37 156 57C157 69 152 80 143 87L90 140L95 145C98 148 98 154 95 157L65 187C59 193 49 193 43 187C37 181 37 171 43 165L73 135C76 132 82 132 85 135L90 140L143 87C151 80 156 69 154 57C151 38 136 22 118 22Z M118 42C128 42 136 50 136 60C136 67 132 73 127 77L108 58C112 53 115 48 116 42C116.7 42 117.3 42 118 42Z" fill="#1E2235" fillRule="evenodd"/></svg></span>
                 Fixit <span className="text-brand-500">24/7</span>
               </Link>
               <button
@@ -163,7 +163,7 @@ export function MarketingNav() {
                 Sign in
               </Link>
               <Link
-                href="/jobs/new"
+                href="/register"
                 onClick={() => { setOpen(false); }}
                 className="w-full rounded-xl bg-brand-500 py-3 text-center text-sm font-bold text-gray-900 transition-colors hover:bg-brand-400"
               >

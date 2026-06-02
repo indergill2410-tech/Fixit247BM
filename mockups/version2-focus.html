@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=1400"/>
+<title>V2 — Focus (Stripe × Apple)</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{font-family:'Inter',system-ui,sans-serif;background:#F5F0E8;color:#1E1A17;display:flex;flex-direction:column;gap:40px;padding:40px;min-height:100vh;}
+  .label{font-size:13px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:#8C8480;margin-bottom:12px;}
+  .screen{border-radius:16px;overflow:hidden;border:1px solid #E4DDD5;box-shadow:0 8px 48px rgba(90,70,40,.12);width:1300px;}
+  /* TOP NAV */
+  .topnav{background:white;border-bottom:1px solid #E4DDD5;padding:0 32px;height:56px;display:flex;align-items:center;gap:32px;}
+  .logo{display:flex;align-items:center;gap:8px;font-weight:800;font-size:16px;color:#1E1A17;letter-spacing:-.02em;margin-right:8px;}
+  .bolt{width:26px;height:26px;background:#F59E0B;border-radius:7px;display:flex;align-items:center;justify-content:center;}
+  .nav-link{font-size:14px;color:#8C8480;font-weight:500;cursor:pointer;padding:4px 0;border-bottom:2px solid transparent;}
+  .nav-link.active{color:#1E1A17;border-bottom-color:#F59E0B;font-weight:600;}
+  .topnav-right{margin-left:auto;display:flex;align-items:center;gap:12px;}
+  .emrg-btn{background:#EF4444;color:white;border:none;border-radius:20px;padding:8px 18px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .pulse{width:7px;height:7px;background:white;border-radius:50%;animation:pulse 1.5s infinite;flex-shrink:0;}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:#1a1208;}
+  /* HERO BANNER */
+  .hero{background:linear-gradient(135deg,#F59E0B 0%,#D97706 60%,#B45309 100%);padding:32px 40px;display:flex;align-items:center;justify-content:space-between;}
+  .hero-title{font-size:26px;font-weight:800;color:white;margin-bottom:4px;}
+  .hero-sub{font-size:14px;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:6px;}
+  .hero-stats{display:flex;gap:32px;}
+  .hero-stat{text-align:center;}
+  .hero-stat-val{font-size:24px;font-weight:800;color:white;}
+  .hero-stat-key{font-size:11px;color:rgba(255,255,255,.75);text-transform:uppercase;letter-spacing:.06em;}
+  .hero-actions{display:flex;gap:12px;margin-top:16px;}
+  .btn-white{background:white;color:#D97706;border:none;border-radius:10px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .btn-dark{background:rgba(0,0,0,.2);color:white;border:1px solid rgba(255,255,255,.3);border-radius:10px;padding:10px 24px;font-size:14px;font-weight:700;cursor:pointer;}
+  /* MAIN */
+  .main{background:#FAF8F4;padding:32px 40px;}
+  .card-row{display:flex;gap:20px;margin-bottom:28px;}
+  .card{background:white;border:1px solid #E4DDD5;border-radius:14px;padding:22px 24px;box-shadow:0 1px 4px rgba(90,70,40,.06);}
+  .card.flex-1{flex:1;}
+  .card-title{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#8C8480;margin-bottom:12px;}
+  .card-job{border-bottom:1px solid #F0ECE5;padding:14px 0;display:flex;align-items:center;gap:14px;}
+  .card-job:first-of-type{padding-top:0;}
+  .card-job:last-of-type{border-bottom:none;padding-bottom:0;}
+  .job-icon-light{width:38px;height:38px;border-radius:10px;background:#FEF3C7;display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#B45309;}
+  .job-title-l{font-size:14px;font-weight:600;color:#1E1A17;margin-bottom:2px;}
+  .job-sub-l{font-size:12px;color:#8C8480;}
+  .status-chip{border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;display:flex;align-items:center;gap:5px;}
+  .status-green{background:#DCFCE7;color:#15803D;}
+  .status-amber{background:#FEF3C7;color:#B45309;}
+  .action-link{font-size:12px;color:#F59E0B;font-weight:600;cursor:pointer;white-space:nowrap;}
+  /* TRADE GRID */
+  .section-title-l{font-size:18px;font-weight:700;color:#1E1A17;margin-bottom:16px;}
+  .trade-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:28px;}
+  .trade-tile{background:white;border:1.5px solid #E4DDD5;border-radius:14px;padding:16px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+  .trade-tile:hover{border-color:#F59E0B;box-shadow:0 4px 16px rgba(245,158,11,.12);}
+  .trade-icon{display:flex;justify-content:center;align-items:center;margin-bottom:6px;color:#8C8480;}
+  .trade-name{font-size:11px;color:#8C8480;font-weight:600;}
+  /* PROOF BAR */
+  .proof-bar{background:white;border:1px solid #E4DDD5;border-radius:12px;padding:16px 24px;display:flex;align-items:center;justify-content:space-between;}
+  .proof-avatars{display:flex;}
+  .proof-avatar{width:28px;height:28px;border-radius:50%;border:2px solid white;margin-left:-8px;background:linear-gradient(135deg,#F59E0B,#B45309);font-size:10px;display:flex;align-items:center;justify-content:center;font-weight:700;color:white;}
+  .proof-avatar:first-child{margin-left:0;}
+  .version-tag{background:#1E1A17;color:#F59E0B;font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;letter-spacing:.06em;display:inline-block;margin-bottom:8px;}
+  /* TRADIE HERO */
+  .tradie-hero{background:linear-gradient(135deg,#1E1A17 0%,#352F2B 100%);padding:28px 40px;display:flex;align-items:center;justify-content:space-between;}
+  .earn-big{font-size:40px;font-weight:800;color:white;}
+  .earn-sub{font-size:13px;color:#22C55E;margin-top:4px;}
+  .avail-toggle{background:#22C55E;color:white;border:none;border-radius:20px;padding:10px 22px;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:8px;}
+  .lead-card{background:white;border:1px solid #E4DDD5;border-radius:14px;padding:20px 24px;margin-bottom:12px;box-shadow:0 1px 4px rgba(90,70,40,.06);}
+  .lead-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+  .lead-title-l{font-size:15px;font-weight:700;color:#1E1A17;}
+  .hot-badge{background:#FEE2E2;color:#DC2626;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;}
+  .good-badge{background:#FEF3C7;color:#D97706;font-size:10px;font-weight:700;padding:3px 10px;border-radius:20px;}
+  .lead-desc{font-size:13px;color:#8C8480;margin-bottom:12px;}
+  .score-row{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+  .score-bar{flex:1;height:6px;background:#F0ECE5;border-radius:4px;overflow:hidden;}
+  .score-fill-g{height:100%;background:linear-gradient(90deg,#22C55E,#16A34A);border-radius:4px;}
+  .score-fill-a{height:100%;background:linear-gradient(90deg,#F59E0B,#D97706);border-radius:4px;}
+  .btn-accept{background:#F59E0B;color:#1a1208;border:none;border-radius:10px;padding:9px 24px;font-size:13px;font-weight:700;cursor:pointer;}
+  .btn-pass{background:#F5F0E8;color:#8C8480;border:1px solid #E4DDD5;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;}
+  .profile-nudge{background:linear-gradient(135deg,#FEF3C7,#FDE68A);border:1px solid #FCD34D;border-radius:12px;padding:16px 20px;display:flex;align-items:center;gap:16px;margin-bottom:20px;}
+  .nudge-bar{flex:1;}
+  .nudge-title{font-size:13px;font-weight:700;color:#92400E;margin-bottom:6px;}
+  .nudge-progress{height:6px;background:#FDE68A;border-radius:4px;overflow:hidden;}
+  .nudge-fill{height:100%;background:#D97706;border-radius:4px;}
+  .nudge-cta{background:#D97706;color:white;border:none;border-radius:8px;padding:8px 16px;font-size:12px;font-weight:700;cursor:pointer;white-space:nowrap;display:flex;align-items:center;gap:6px;}
+</style>
+<script>
+const ICONS = {
+  bolt: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  logoBolt: `<svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1208" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  home: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`,
+  jobs: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M8 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg>`,
+  message: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>`,
+  wrench: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg>`,
+  zap: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>`,
+  droplets: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg>`,
+  hammer: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"/></svg>`,
+  scissors: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg>`,
+  lock: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>`,
+  pin: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>`,
+  arrow: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>`,
+  plus: `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>`,
+};
+</script>
+</head>
+<body>
+
+<div>
+  <div class="version-tag">VERSION 2 — FOCUS</div>
+  <div style="font-size:28px;font-weight:800;color:#1E1A17;margin-bottom:4px;">Stripe × Apple — Light, Full-Width</div>
+  <div style="font-size:14px;color:#8C8480;margin-bottom:20px;">Top navigation · clean cards · progressive disclosure · best for Customers</div>
+</div>
+
+<!-- CUSTOMER -->
+<div class="label">CUSTOMER DASHBOARD</div>
+<div class="screen">
+  <div class="topnav">
+    <div class="logo">
+      <div class="bolt"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1208" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      FIXIT247
+    </div>
+    <div class="nav-link active">Home</div>
+    <div class="nav-link">My Jobs</div>
+    <div class="nav-link">Messages</div>
+    <div class="nav-link">Saved</div>
+    <div class="topnav-right">
+      <button class="emrg-btn"><div class="pulse"></div>Emergency</button>
+      <div class="avatar">SJ</div>
+    </div>
+  </div>
+  <div class="hero">
+    <div>
+      <div class="hero-title">Good morning, Sarah</div>
+      <div class="hero-sub"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.9)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg> Bondi Beach · 2 active jobs · 1 reply needed</div>
+      <div class="hero-actions">
+        <button class="btn-white">View active jobs <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+        <button class="btn-dark">Post a new job</button>
+      </div>
+    </div>
+    <div class="hero-stats">
+      <div class="hero-stat"><div class="hero-stat-val">2</div><div class="hero-stat-key">Active</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">$480</div><div class="hero-stat-key">This month</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">4.9★</div><div class="hero-stat-key">Avg rating</div></div>
+      <div class="hero-stat"><div class="hero-stat-val">8 min</div><div class="hero-stat-key">Response</div></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="card-row">
+      <div class="card flex-1">
+        <div class="card-title">Active Jobs</div>
+        <div class="card-job">
+          <div class="job-icon-light"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <div style="flex:1;">
+            <div class="job-title-l">Plumbing · Leaking kitchen tap</div>
+            <div class="job-sub-l">Mike Torres · ETA 2:30pm · $280 agreed</div>
+            <div style="height:4px;background:#F0ECE5;border-radius:4px;margin-top:6px;overflow:hidden;"><div style="width:80%;height:100%;background:linear-gradient(90deg,#F59E0B,#D97706);border-radius:4px;"></div></div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <div class="status-chip status-green"><span style="width:6px;height:6px;border-radius:50%;background:#15803D;display:inline-block;"></span> In Progress</div>
+            <div class="action-link">Track <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          </div>
+        </div>
+        <div class="card-job">
+          <div class="job-icon-light"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+          <div style="flex:1;">
+            <div class="job-title-l">Electrical · Power outage</div>
+            <div class="job-sub-l">3 quotes received · Respond by 5pm</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+            <div class="status-chip status-amber"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Reply needed</div>
+            <div class="action-link">Review quotes <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="width:280px;">
+        <div class="card-title">Nearby Tradies</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#F59E0B,#D97706);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;">MT</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#1E1A17;">Mike Torres</div><div style="font-size:11px;color:#8C8480;display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Electrical · 0.4km</div></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:#22C55E;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#6366F1,#4F46E5);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;">AS</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#1E1A17;">Ana Santos</div><div style="font-size:11px;color:#8C8480;display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> Plumbing · 1.2km</div></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:#22C55E;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#EC4899,#DB2777);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0;">JK</div>
+            <div style="flex:1;"><div style="font-size:13px;font-weight:600;color:#1E1A17;">James Kim</div><div style="font-size:11px;color:#8C8480;display:flex;align-items:center;gap:4px;"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg> Gardening · 0.9km</div></div>
+            <div style="width:8px;height:8px;border-radius:50%;background:#F59E0B;"></div>
+          </div>
+        </div>
+        <div class="action-link" style="display:block;margin-top:14px;">See all available tradies <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline;"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>
+      </div>
+    </div>
+
+    <div class="section-title-l">Post a job — what do you need done?</div>
+    <div class="trade-grid">
+      <div class="trade-tile">
+        <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+        <div class="trade-name">Plumbing</div>
+      </div>
+      <div class="trade-tile">
+        <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+        <div class="trade-name">Electrical</div>
+      </div>
+      <div class="trade-tile">
+        <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 16.3c2.2 0 4-1.83 4-4.05 0-1.16-.57-2.26-1.71-3.19S7.29 6.75 7 5.3c-.29 1.45-1.14 2.84-2.29 3.76S3 11.1 3 12.25c0 2.22 1.8 4.05 4 4.05z"/><path d="M12.56 6.6A10.97 10.97 0 0 0 14 3.02c.5 2.5 2 4.9 4 6.5s3 3.5 3 5.5a6.98 6.98 0 0 1-11.91 4.97"/></svg></div>
+        <div class="trade-name">Cleaning</div>
+      </div>
+      <div class="trade-tile">
+        <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 12-8.5 8.5c-.83.83-2.17.83-3 0 0 0 0 0 0 0a2.12 2.12 0 0 1 0-3L12 9"/><path d="M17.64 15 22 10.64"/><path d="m20.91 11.7-1.25-1.25c-.6-.6-.93-1.4-.93-2.25v-.86L16.01 4.6a5.56 5.56 0 0 0-3.94-1.64H9l.92.82A6.18 6.18 0 0 1 12 8.4v1.56l2 2h2.47l2.26 1.91"/></svg></div>
+        <div class="trade-name">Building</div>
+      </div>
+      <div class="trade-tile">
+        <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><line x1="20" y1="4" x2="8.12" y2="15.88"/><line x1="14.47" y1="14.48" x2="20" y2="20"/><line x1="8.12" y1="8.12" x2="12" y2="12"/></svg></div>
+        <div class="trade-name">Gardening</div>
+      </div>
+      <div class="trade-tile">
+        <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+        <div class="trade-name">Locksmith</div>
+      </div>
+      <div class="trade-tile">
+        <div class="trade-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div>
+        <div class="trade-name">More</div>
+      </div>
+    </div>
+
+    <div class="proof-bar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <div class="proof-avatars">
+          <div class="proof-avatar">M</div><div class="proof-avatar">A</div><div class="proof-avatar">J</div><div class="proof-avatar" style="background:linear-gradient(135deg,#6366F1,#4F46E5);">+9</div>
+        </div>
+        <span style="font-size:14px;font-weight:600;color:#1E1A17;">12 tradies available in Bondi right now</span>
+      </div>
+      <span style="font-size:14px;color:#8C8480;">47 jobs completed this week · <strong style="color:#D97706;">avg 9 min response</strong></span>
+    </div>
+  </div>
+</div>
+
+<!-- TRADIE -->
+<div class="label" style="margin-top:32px;">TRADIE DASHBOARD</div>
+<div class="screen">
+  <div class="topnav">
+    <div class="logo">
+      <div class="bolt"><svg width="14" height="14" viewBox="0 0 24 24" fill="#1a1208" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div>
+      FIXIT247
+    </div>
+    <div class="nav-link active">Dashboard</div>
+    <div class="nav-link">Leads <span style="background:#EF4444;color:white;font-size:10px;font-weight:700;padding:1px 6px;border-radius:10px;margin-left:4px;">8</span></div>
+    <div class="nav-link">My Jobs</div>
+    <div class="nav-link">Messages</div>
+    <div class="nav-link">Earnings</div>
+    <div class="topnav-right">
+      <button class="avail-toggle"><span style="width:8px;height:8px;background:white;border-radius:50%;display:inline-block;"></span>Available</button>
+      <div class="avatar" style="background:linear-gradient(135deg,#22C55E,#16A34A);color:white;">MT</div>
+    </div>
+  </div>
+  <div class="tradie-hero">
+    <div>
+      <div style="font-size:13px;color:#8C8480;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Earnings this week</div>
+      <div class="earn-big">$2,140</div>
+      <div class="earn-sub">&#x2191; On track for $2,520 this month</div>
+    </div>
+    <div style="display:flex;gap:32px;">
+      <div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:white;">8</div><div style="font-size:11px;color:#8C8480;text-transform:uppercase;letter-spacing:.06em;">New Leads</div></div>
+      <div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:#F59E0B;display:flex;align-items:center;gap:6px;justify-content:center;">8.2m <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div style="font-size:11px;color:#8C8480;text-transform:uppercase;letter-spacing:.06em;">Response time</div></div>
+      <div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:white;">4.8★</div><div style="font-size:11px;color:#8C8480;text-transform:uppercase;letter-spacing:.06em;">Rating</div></div>
+      <div style="text-align:center;"><div style="font-size:24px;font-weight:800;color:#F59E0B;">$680</div><div style="font-size:11px;color:#8C8480;text-transform:uppercase;letter-spacing:.06em;">Pending payout</div></div>
+    </div>
+  </div>
+  <div class="main">
+    <div class="profile-nudge">
+      <div style="color:#B45309;display:flex;align-items:center;"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="4" rx="1"/><path d="M8 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2h-2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg></div>
+      <div class="nudge-bar">
+        <div class="nudge-title">Profile 82% complete — Tradies with full profiles get 3× more leads</div>
+        <div class="nudge-progress"><div class="nudge-fill" style="width:82%"></div></div>
+      </div>
+      <button class="nudge-cta">Add insurance <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    </div>
+    <div class="section-title-l" style="display:flex;align-items:center;gap:8px;"><span style="background:#EF444422;color:#EF4444;font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px;">HOT</span> New leads near you — respond fast</div>
+    <div class="lead-card">
+      <div class="lead-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="color:#B45309;display:flex;align-items:center;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></div>
+          <div>
+            <div class="lead-title-l">Plumbing · Randwick · $200–350</div>
+            <div style="font-size:12px;color:#8C8480;">0.8km away · posted 6 min ago</div>
+          </div>
+        </div>
+        <div class="hot-badge">HOT LEAD</div>
+      </div>
+      <div class="lead-desc">"Leaking kitchen tap, urgent fix needed — please call when available"</div>
+      <div class="score-row">
+        <div style="font-size:12px;color:#8C8480;font-weight:600;white-space:nowrap;">Lead score</div>
+        <div class="score-bar"><div class="score-fill-g" style="width:94%"></div></div>
+        <div style="font-size:13px;color:#22C55E;font-weight:700;white-space:nowrap;">94 / 100</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-accept">&#x2713; Accept — 1 credit ($15)</button>
+        <button class="btn-pass">Pass</button>
+        <div style="flex:1;"></div>
+        <div style="font-size:12px;color:#8C8480;align-self:center;">Budget match · Distance · Urgency: all high</div>
+      </div>
+    </div>
+    <div class="lead-card">
+      <div class="lead-header">
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div style="color:#8C8480;font-size:20px;">&#9633;</div>
+          <div>
+            <div class="lead-title-l">Tiling · Coogee · $500–800</div>
+            <div style="font-size:12px;color:#8C8480;">2.1km away · posted 12 min ago</div>
+          </div>
+        </div>
+        <div class="good-badge">GOOD MATCH</div>
+      </div>
+      <div class="lead-desc">"Bathroom renovation, 8m² floor tiling in porcelain"</div>
+      <div class="score-row">
+        <div style="font-size:12px;color:#8C8480;font-weight:600;white-space:nowrap;">Lead score</div>
+        <div class="score-bar"><div class="score-fill-a" style="width:78%"></div></div>
+        <div style="font-size:13px;color:#D97706;font-weight:700;white-space:nowrap;">78 / 100</div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <button class="btn-accept">&#x2713; Accept — 1 credit ($15)</button>
+        <button class="btn-pass">Pass</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

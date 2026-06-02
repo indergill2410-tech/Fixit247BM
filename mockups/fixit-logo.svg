@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 180" fill="none">
+  <defs>
+    <linearGradient id="amber" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#FCD34D"/>
+      <stop offset="100%" stop-color="#D97706"/>
+    </linearGradient>
+    <linearGradient id="amberText" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#FBBF24"/>
+      <stop offset="100%" stop-color="#F59E0B"/>
+    </linearGradient>
+  </defs>
+
+  <!-- ─── Icon Mark ─────────────────────────────── -->
+  <!-- Amber rounded square -->
+  <rect x="0" y="4" width="172" height="172" rx="36" fill="url(#amber)"/>
+
+  <!-- Full wrench path: head (open C-jaw top-right) + handle (bottom-left) -->
+  <path
+    d="
+      M130 18
+      C146 18 160 30 162 46
+      C163 56 159 65 152 71
+      L104 119
+      C103 120 103 122 104 123
+      L108 127
+      C110 129 110 133 108 135
+      L82 161
+      C77 166 69 166 64 161
+      C59 156 59 148 64 143
+      L90 117
+      C92 115 96 115 98 117
+      L102 121
+      L150 73
+      C156 67 160 58 158 48
+      C155 32 143 20 130 18Z
+
+      M130 36
+      C138 36 145 43 145 51
+      C145 57 142 62 138 65
+      L122 49
+      C125 45 127 41 128 36
+      C128.7 36 129.3 36 130 36Z
+    "
+    fill="#1E2235"
+    fill-rule="evenodd"
+  />
+
+  <!-- ─── Wordmark ────────────────────────────────── -->
+  <!-- "Fixit" — dark charcoal, bold -->
+  <text
+    x="194" y="130"
+    font-family="'Inter','SF Pro Display','Helvetica Neue',Arial,sans-serif"
+    font-size="96"
+    font-weight="800"
+    fill="#1E2235"
+    letter-spacing="-4"
+  >Fixit</text>
+
+  <!-- " 24/7" — amber gradient -->
+  <text
+    x="404" y="130"
+    font-family="'Inter','SF Pro Display','Helvetica Neue',Arial,sans-serif"
+    font-size="96"
+    font-weight="800"
+    fill="url(#amberText)"
+    letter-spacing="-3"
+  > 24/7</text>
+</svg>

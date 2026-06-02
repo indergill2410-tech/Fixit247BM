@@ -1,121 +1,252 @@
-import type { Metadata } from 'next';
-import Link from 'next/link';
+'use client';
+
+import { useState, useEffect, useCallback } from 'react';
 import { AdminShell } from '@/components/shared/admin-shell';
-import { Badge, Button, Card, CardContent, CardHeader, CardTitle } from '@fixit247/ui';
-import { db } from '@fixit247/database';
+import { Card, CardContent, CardHeader, CardTitle } from '@fixit247/ui';
+import { Settings, DollarSign, ToggleLeft, Package } from 'lucide-react';
+import { toast } from 'sonner';
 
-export const metadata: Metadata = { title: 'Platform Settings' };
-export const dynamic = 'force-dynamic';
+// ── Types ─────────────────────────────────────────────────────────────────────
 
-const REQUIRED_ENV = [
-  'NEXT_PUBLIC_APP_URL',
-  'NEXT_PUBLIC_ADMIN_URL',
-  'NEXT_PUBLIC_SUPABASE_URL',
-  'NEXT_PUBLIC_SUPABASE_ANON_KEY',
-  'DATABASE_URL',
-  'SUPABASE_SERVICE_ROLE_KEY',
-] as const;
-
-function maskValue(value: string): string {
-  if (value.length <= 12) return 'set';
-  return `${value.slice(0, 6)}...${value.slice(-4)}`;
+interface PricingConfig {
+  platform_fee_percent: string;
+  emergency_dispatch_fee_aud: string;
+  credit_cost_simple_standard: string;
+  credit_cost_medium_standard: string;
+  credit_cost_complex_standard: string;
+  surge_enabled: string;
+  referral_bonus_credits: string;
+  [key: string]: string;
 }
 
-export default async function AdminSettingsPage() {
-  const [configs, auditLogs] = await Promise.all([
-    db.platformConfig.findMany({ orderBy: [{ category: 'asc' }, { key: 'asc' }], take: 100 }),
-    db.auditLog.findMany({
-      orderBy: { createdAt: 'desc' },
-      take: 8,
-      select: { id: true, action: true, resource: true, createdAt: true },
-    }),
-  ]);
+// ── Feature flags (static — UI only) ─────────────────────────────────────────
+
+const FEATURE_FLAGS = [
+  { key: 'emergency_dispatch', label: 'Emergency Dispatch', description: 'Allow customers to raise emergency jobs with priority routing' },
+  { key: 'ai_job_analysis', label: 'AI Job Analysis', description: 'Automatically analyse and categorise new job listings with AI' },
+  { key: 'voice_calls', label: 'Voice Calls (Twilio)', description: 'Enable in-app voice calls between customers and tradies' },
+  { key: 'fixit_plus', label: 'Fixit Plus Subscriptions', description: 'Allow tradies to upgrade to paid subscription tiers' },
+  { key: 'fraud_detection', label: 'Fraud Detection', description: 'Run automated fraud scoring on new users and payments' },
+];
+
+// ── Subscription tiers (static) ───────────────────────────────────────────────
+
+const SUBSCRIPTION_TIERS = [
+  { name: 'FREE', price: 0, features: 3, tradieLimit: 5 },
+  { name: 'BASIC', price: 49, features: 8, tradieLimit: 20 },
+  { name: 'PROFESSIONAL', price: 99, features: 14, tradieLimit: 50 },
+  { name: 'ELITE', price: 199, features: 20, tradieLimit: 0 },
+];
+
+const TIER_BADGE: Record<string, string> = {
+  FREE: 'bg-gray-100 text-gray-600',
+  BASIC: 'bg-blue-100 text-blue-700',
+  PROFESSIONAL: 'bg-amber-100 text-amber-700',
+  ELITE: 'bg-purple-100 text-purple-700',
+};
+
+// ── Editable fee row ──────────────────────────────────────────────────────────
+
+function FeeRow({ label, fieldKey, value, onSave }: {
+  label: string;
+  fieldKey: string;
+  value: string;
+  onSave: (key: string, val: string) => Promise<void>;
+}) {
+  const [editing, setEditing] = useState(value);
+  const [saving, setSaving] = useState(false);
+
+  // keep in sync if parent reloads
+  useEffect(() => { setEditing(value); }, [value]);
+
+  async function handleSave() {
+    setSaving(true);
+    try {
+      await onSave(fieldKey, editing);
+      toast.success(`${label} saved`);
+    } catch {
+      toast.error(`Failed to save ${label}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-4 py-3 border-b last:border-0">
+      <span className="text-sm font-medium text-gray-700 min-w-[200px]">{label}</span>
+      <div className="flex items-center gap-2">
+        <input
+          type="number"
+          step="0.01"
+          min="0"
+          value={editing}
+          onChange={(e) => setEditing(e.target.value)}
+          className="w-28 rounded-lg border border-gray-300 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={handleSave}
+          disabled={saving || editing === value}
+          className="rounded-lg bg-blue-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-40"
+        >
+          {saving ? 'Saving…' : 'Save'}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+export default function SettingsPage() {
+  const [config, setConfig] = useState<PricingConfig | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchConfig = useCallback(async () => {
+    try {
+      const res = await fetch('/api/admin/pricing');
+      if (res.ok) {
+        const json = await res.json() as { config: PricingConfig };
+        setConfig(json.config);
+      }
+    } catch {
+      /* silent */
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => { fetchConfig(); }, [fetchConfig]);
+
+  async function handleSave(key: string, value: string) {
+    const res = await fetch('/api/admin/pricing', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ updates: { [key]: value } }),
+    });
+    const result = await res.json() as { error?: string };
+    if (!res.ok) throw new Error(result.error ?? 'Failed');
+    // Update local state
+    setConfig((prev) => prev ? { ...prev, [key]: value } : prev);
+  }
+
+  const FEE_FIELDS: { label: string; key: keyof PricingConfig }[] = [
+    { label: 'Platform Fee (%)', key: 'platform_fee_percent' },
+    { label: 'Emergency Dispatch Fee (AUD)', key: 'emergency_dispatch_fee_aud' },
+    { label: 'Credit Cost — Simple Job', key: 'credit_cost_simple_standard' },
+    { label: 'Credit Cost — Medium Job', key: 'credit_cost_medium_standard' },
+    { label: 'Credit Cost — Complex Job', key: 'credit_cost_complex_standard' },
+    { label: 'Referral Bonus Credits', key: 'referral_bonus_credits' },
+  ];
 
   return (
     <AdminShell>
-      <div className="mb-8 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold text-gray-900">Platform Settings</h1>
-          <p className="mt-1.5 text-sm text-gray-500">Environment readiness, platform config, and recent admin activity.</p>
-        </div>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" asChild><Link href="/payments">Pricing config</Link></Button>
-          <Button variant="outline" size="sm" asChild><Link href="/marketplace">Marketplace config</Link></Button>
-        </div>
+      <div className="mb-8">
+        <h1 className="flex items-center gap-2 text-2xl font-bold text-gray-900">
+          <Settings size={22} />
+          Platform Settings
+        </h1>
+        <p className="mt-1 text-sm text-gray-500">Configure fees, feature flags, and subscription tiers</p>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-2">
+      <div className="space-y-8">
+        {/* ── Section 1: Platform Fees ── */}
         <Card>
           <CardHeader>
-            <CardTitle>Required environment</CardTitle>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <DollarSign size={16} />
+              Platform Fees
+            </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
-            {REQUIRED_ENV.map((key) => {
-              const value = process.env[key];
-              return (
-                <div key={key} className="flex items-center justify-between rounded-lg border border-gray-100 px-3 py-2">
-                  <span className="text-sm font-medium text-gray-700">{key}</span>
-                  <Badge variant={value ? 'success' : 'destructive'}>{value ? maskValue(value) : 'missing'}</Badge>
-                </div>
-              );
-            })}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent admin activity</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            {auditLogs.map((log) => (
-              <div key={log.id} className="rounded-lg border border-gray-100 px-3 py-2">
-                <p className="text-sm font-medium text-gray-900">{log.action}</p>
-                <p className="mt-1 text-xs text-gray-500">
-                  {log.resource ?? 'Platform'} - {log.createdAt.toLocaleDateString('en-AU', {
-                    day: 'numeric',
-                    month: 'short',
-                    hour: '2-digit',
-                    minute: '2-digit',
-                  })}
-                </p>
-              </div>
-            ))}
-            {auditLogs.length === 0 && <p className="py-8 text-center text-sm text-gray-400">No admin activity has been recorded yet.</p>}
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="mt-8">
-        <CardHeader>
-          <CardTitle>Platform configuration values</CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full min-w-[760px]">
-              <thead>
-                <tr className="border-b bg-gray-50">
-                  {['Key', 'Category', 'Value', 'Updated'].map((header) => (
-                    <th key={header} className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">{header}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody className="divide-y">
-                {configs.map((config) => (
-                  <tr key={config.id} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">{config.key}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{config.category}</td>
-                    <td className="px-4 py-3 text-sm text-gray-700">{config.value}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      {config.updatedAt.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
-                    </td>
-                  </tr>
+          <CardContent>
+            {loading || !config ? (
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="h-10 animate-pulse rounded-lg bg-gray-100" />
                 ))}
-              </tbody>
-            </table>
-          </div>
-          {configs.length === 0 && <p className="py-12 text-center text-sm text-gray-400">No platform config values found.</p>}
-        </CardContent>
-      </Card>
+              </div>
+            ) : (
+              <div>
+                {FEE_FIELDS.map((f) => (
+                  <FeeRow
+                    key={f.key}
+                    label={f.label}
+                    fieldKey={String(f.key)}
+                    value={config[f.key] ?? '0'}
+                    onSave={handleSave}
+                  />
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+
+        {/* ── Section 2: Feature Flags ── */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <ToggleLeft size={16} />
+              Feature Flags
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="divide-y">
+              {FEATURE_FLAGS.map((flag) => (
+                <div key={flag.key} className="flex items-center justify-between gap-4 py-4">
+                  <div>
+                    <p className="text-sm font-medium text-gray-800">{flag.label}</p>
+                    <p className="text-xs text-gray-500">{flag.description}</p>
+                  </div>
+                  <span className="shrink-0 rounded-full bg-green-100 px-3 py-0.5 text-xs font-semibold text-green-700">
+                    ON
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* ── Section 3: Subscription Tiers ── */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2 text-sm font-semibold">
+              <Package size={16} />
+              Subscription Tiers
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b text-left text-xs font-semibold uppercase tracking-wide text-gray-500">
+                    <th className="pb-3 pr-6">Tier</th>
+                    <th className="pb-3 pr-6">Monthly Price</th>
+                    <th className="pb-3 pr-6">Features</th>
+                    <th className="pb-3">Tradie Limit</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y">
+                  {SUBSCRIPTION_TIERS.map((tier) => (
+                    <tr key={tier.name} className="hover:bg-gray-50">
+                      <td className="py-3 pr-6">
+                        <span className={`rounded-full px-2.5 py-0.5 text-xs font-semibold ${TIER_BADGE[tier.name] ?? 'bg-gray-100 text-gray-600'}`}>
+                          {tier.name}
+                        </span>
+                      </td>
+                      <td className="py-3 pr-6 font-semibold text-gray-900">
+                        {tier.price === 0 ? 'Free' : `$${tier.price}/mo`}
+                      </td>
+                      <td className="py-3 pr-6 text-gray-600">{tier.features} features</td>
+                      <td className="py-3 text-gray-600">
+                        {tier.tradieLimit === 0 ? 'Unlimited' : tier.tradieLimit}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </AdminShell>
   );
 }

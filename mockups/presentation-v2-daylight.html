@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fixit247BM — Daylight Presentation</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#FAF8F4;--bg2:#F3F0EA;--card:#FFFFFF;--border:#E8E3DA;--border2:#D8D3C8;
+  --amber:#F59E0B;--amber2:#D97706;--amber-dim:#FEF3C7;--amber-light:#FFFBEB;
+  --text:#1E1A17;--text2:#6B6560;--text3:#9B9590;
+  --green:#16A34A;--green-light:#DCFCE7;--red:#DC2626;--red-light:#FEE2E2;
+  --blue:#2563EB;--blue-light:#DBEAFE;--purple:#7C3AED;--purple-light:#EDE9FE;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 1px 2px rgba(0,0,0,0.04);
+  --shadow-md:0 4px 6px rgba(0,0,0,0.07),0 2px 4px rgba(0,0,0,0.05);
+  --shadow-lg:0 10px 25px rgba(0,0,0,0.1),0 4px 10px rgba(0,0,0,0.06);
+}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);overflow:hidden;height:100vh;width:100vw}
+.deck{width:100vw;height:100vh;position:relative}
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity 0.4s ease;overflow:hidden;display:flex;flex-direction:column}
+.slide.active{opacity:1;pointer-events:all}
+
+/* NAV CONTROLS */
+.nav-controls{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);display:flex;align-items:center;gap:16px;background:white;border:1px solid var(--border);border-radius:40px;padding:8px 20px;z-index:1000;box-shadow:var(--shadow-md)}
+.nav-btn{background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px;padding:4px 8px;transition:color 0.2s}
+.nav-btn:hover{color:var(--amber)}
+.slide-info{font-size:12px;color:var(--text3);min-width:120px;text-align:center;font-weight:500}
+.slide-title-badge{position:fixed;top:16px;right:20px;background:white;border:1px solid var(--border);border-radius:6px;padding:4px 10px;font-size:11px;color:var(--text3);z-index:1000;box-shadow:var(--shadow)}
+
+/* TOPNAV */
+.topnav{height:56px;background:white;border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:16px;flex-shrink:0;box-shadow:var(--shadow)}
+.logo-wrap{display:flex;align-items:center;gap:10px}
+.logo-mark{width:30px;height:30px;background:var(--amber);border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;color:white}
+.logo-text{font-weight:800;font-size:15px;letter-spacing:-0.5px;color:var(--text)}
+.logo-text span{color:var(--amber)}
+.nav-tabs{display:flex;gap:4px;margin-left:16px}
+.nav-tab{padding:6px 14px;border-radius:6px;font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;transition:all 0.15s}
+.nav-tab:hover,.nav-tab.active{background:var(--amber-dim);color:var(--amber2)}
+.nav-badge{display:inline-flex;align-items:center;justify-content:center;background:var(--amber);color:white;font-size:9px;font-weight:700;border-radius:10px;padding:1px 5px;min-width:16px;margin-left:4px}
+.nav-badge.red{background:var(--red)}
+.topnav-right{margin-left:auto;display:flex;align-items:center;gap:10px}
+.avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;color:white;flex-shrink:0}
+.avatar.sm{width:26px;height:26px;font-size:10px}
+.avatar.lg{width:44px;height:44px;font-size:17px}
+.avatar.xl{width:56px;height:56px;font-size:22px}
+
+/* MAIN */
+.page-main{flex:1;overflow-y:auto;background:var(--bg);padding:28px}
+
+/* CARDS */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:var(--shadow)}
+.card-sm{padding:14px}
+.card:hover{box-shadow:var(--shadow-md)}
+.grid{display:grid;gap:14px}
+.grid-2{grid-template-columns:1fr 1fr}
+.grid-3{grid-template-columns:1fr 1fr 1fr}
+.grid-4{grid-template-columns:1fr 1fr 1fr 1fr}
+
+/* STATS */
+.stat-card{background:white;border:1px solid var(--border);border-radius:12px;padding:18px 20px;box-shadow:var(--shadow)}
+.stat-label{font-size:12px;font-weight:500;color:var(--text3);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px}
+.stat-value{font-size:28px;font-weight:800;letter-spacing:-1px}
+.stat-change{font-size:12px;margin-top:4px}
+.stat-change.up{color:var(--green)}
+.stat-change.down{color:var(--red)}
+.sparkline{display:flex;align-items:flex-end;gap:2px;height:24px;margin-top:8px}
+.spark-bar{background:var(--amber);border-radius:2px;width:7px;opacity:0.5}
+.spark-bar:last-child{opacity:1}
+
+/* TAGS */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.tag.amber{background:var(--amber-dim);color:var(--amber2)}
+.tag.green{background:var(--green-light);color:var(--green)}
+.tag.red{background:var(--red-light);color:var(--red)}
+.tag.blue{background:var(--blue-light);color:var(--blue)}
+.tag.purple{background:var(--purple-light);color:var(--purple)}
+.tag.gray{background:var(--bg2);color:var(--text2)}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;transition:all 0.15s;font-family:inherit}
+.btn-primary{background:var(--amber);color:white;box-shadow:0 1px 3px rgba(245,158,11,0.35)}
+.btn-primary:hover{background:var(--amber2)}
+.btn-ghost{background:white;border:1px solid var(--border);color:var(--text2);box-shadow:var(--shadow)}
+.btn-ghost:hover{border-color:var(--amber);color:var(--amber2)}
+.btn-sm{padding:5px 13px;font-size:12px}
+.btn-danger{background:var(--red-light);color:var(--red);border:1px solid #FCA5A5}
+.btn-success{background:var(--green-light);color:var(--green);border:1px solid #86EFAC}
+
+/* INPUTS */
+.input{background:var(--bg);border:1.5px solid var(--border);border-radius:8px;padding:9px 13px;font-size:13px;color:var(--text);font-family:inherit;outline:none;width:100%;transition:border-color 0.2s}
+.input:focus{border-color:var(--amber);background:white}
+.input-group{display:flex;flex-direction:column;gap:5px;margin-bottom:14px}
+.input-label{font-size:12px;font-weight:600;color:var(--text2)}
+
+/* TABLE */
+.table{width:100%;border-collapse:collapse}
+.table th{font-size:11px;font-weight:600;color:var(--text3);text-align:left;padding:10px 14px;border-bottom:1.5px solid var(--border);text-transform:uppercase;letter-spacing:0.5px;background:var(--bg)}
+.table td{font-size:13px;color:var(--text);padding:11px 14px;border-bottom:1px solid var(--border)}
+.table tr:last-child td{border-bottom:none}
+.table tr:hover td{background:#FAFAF7}
+
+/* PROGRESS */
+.progress{height:5px;background:var(--bg2);border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:var(--amber);border-radius:3px}
+.progress-fill.green{background:var(--green)}
+.progress-fill.red{background:var(--red)}
+
+/* TIMELINE */
+.tl-item{display:flex;gap:12px;position:relative}
+.tl-line{display:flex;flex-direction:column;align-items:center;flex-shrink:0}
+.tl-dot{width:10px;height:10px;border-radius:50%;background:var(--amber);border:2px solid white;box-shadow:0 0 0 2px var(--amber);flex-shrink:0;margin-top:3px}
+.tl-dot.done{background:var(--green);box-shadow:0 0 0 2px var(--green)}
+.tl-dot.pending{background:var(--border2);box-shadow:0 0 0 2px var(--border2)}
+.tl-connector{width:2px;flex:1;background:var(--border);min-height:20px}
+.tl-content{padding-bottom:16px;flex:1}
+.tl-title{font-size:13px;font-weight:500;color:var(--text)}
+.tl-time{font-size:11px;color:var(--text3);margin-top:1px}
+
+/* CHAT */
+.chat-bubble{padding:9px 13px;border-radius:12px;font-size:13px;max-width:76%;margin-bottom:8px;line-height:1.5}
+.chat-bubble.them{background:var(--bg2);border-radius:12px 12px 12px 3px}
+.chat-bubble.me{background:var(--amber);color:white;border-radius:12px 12px 3px 12px;margin-left:auto}
+
+/* DIVIDER */
+.divider{height:1px;background:var(--border);margin:16px 0}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.section-title{font-size:15px;font-weight:700;color:var(--text)}
+.section-link{font-size:12px;color:var(--amber2);cursor:pointer;font-weight:500}
+
+/* WIZARD STEPS */
+.wizard-steps{display:flex;align-items:center;gap:0;margin-bottom:28px}
+.step-circle{width:30px;height:30px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:var(--text3);flex-shrink:0;background:white}
+.step-circle.done{background:var(--green);border-color:var(--green);color:white}
+.step-circle.active{background:var(--amber);border-color:var(--amber);color:white}
+.step-label{font-size:11px;color:var(--text3);margin-left:7px;white-space:nowrap;font-weight:500}
+.step-label.active{color:var(--amber2);font-weight:600}
+.step-label.done{color:var(--green)}
+.step-connector{width:40px;height:2px;background:var(--border);margin:0 8px}
+.step-connector.done{background:var(--green)}
+
+/* LEAD CARD */
+.lead-card{background:white;border:1px solid var(--border);border-radius:12px;padding:16px;margin-bottom:12px;cursor:pointer;transition:all 0.2s;box-shadow:var(--shadow)}
+.lead-card:hover{border-color:var(--amber);box-shadow:var(--shadow-md)}
+.lead-score{display:flex;align-items:center;justify-content:center;width:46px;height:46px;border-radius:50%;font-weight:800;font-size:15px;flex-shrink:0}
+.lead-score.high{background:var(--green-light);color:var(--green)}
+.lead-score.med{background:var(--amber-dim);color:var(--amber2)}
+.lead-score.low{background:var(--red-light);color:var(--red)}
+
+/* CHART BARS */
+.chart-bars{display:flex;align-items:flex-end;gap:6px;height:80px}
+.chart-bar{background:var(--amber);border-radius:4px 4px 0 0;flex:1;opacity:0.6}
+.chart-bar:last-child{opacity:1}
+.chart-labels{display:flex;gap:6px;margin-top:6px}
+.chart-label{flex:1;text-align:center;font-size:10px;color:var(--text3)}
+
+/* SWITCH */
+.switch-group{display:flex;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:3px;gap:2px}
+.switch-opt{padding:5px 14px;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;color:var(--text2);transition:all 0.15s}
+.switch-opt.active{background:white;color:var(--text);box-shadow:var(--shadow)}
+
+/* MARKETING */
+.hero-full{width:100%;height:100%;display:flex;flex-direction:column;background:white}
+.hero-marketing-nav{padding:16px 60px;display:flex;align-items:center;border-bottom:1px solid var(--border);background:white}
+.hero-body{flex:1;display:flex;align-items:center;padding:0 80px;gap:60px;background:var(--bg)}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:var(--amber-dim);border:1px solid #F59E0B66;border-radius:20px;font-size:12px;color:var(--amber2);margin-bottom:20px;font-weight:600}
+.hero-h1{font-size:58px;font-weight:900;line-height:1.05;letter-spacing:-2.5px;color:var(--text);margin-bottom:18px}
+.hero-h1 span{color:var(--amber)}
+.hero-sub{font-size:17px;color:var(--text2);line-height:1.65;margin-bottom:28px;max-width:480px}
+.cta-primary{background:var(--amber);color:white;padding:13px 26px;border-radius:9px;font-weight:700;font-size:15px;cursor:pointer;border:none;box-shadow:0 4px 14px rgba(245,158,11,0.4)}
+.cta-secondary{background:white;border:1.5px solid var(--border);color:var(--text);padding:13px 26px;border-radius:9px;font-weight:600;font-size:15px;cursor:pointer;box-shadow:var(--shadow)}
+.hero-stats{display:flex;gap:32px;margin-top:36px;padding-top:28px;border-top:1px solid var(--border)}
+.hero-stat-val{font-size:26px;font-weight:800;color:var(--amber);letter-spacing:-0.5px}
+.hero-stat-label{font-size:12px;color:var(--text3);margin-top:2px}
+
+/* MISC */
+.flex{display:flex}.items-center{align-items:center}.justify-between{justify-content:space-between}.gap-8{gap:8px}.gap-12{gap:12px}.gap-16{gap:16px}
+.text-sm{font-size:12px}.text-xs{font-size:11px}.text-amber{color:var(--amber2)}.text-muted{color:var(--text2)}.text-dim{color:var(--text3)}
+.font-bold{font-weight:700}.font-semibold{font-weight:600}.font-medium{font-weight:500}
+.mb-4{margin-bottom:4px}.mb-8{margin-bottom:8px}.mb-12{margin-bottom:12px}.mb-16{margin-bottom:16px}.mb-20{margin-bottom:20px}
+.w-full{width:100%}.flex-1{flex:1}.truncate{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.rounded{border-radius:6px}.rounded-lg{border-radius:10px}.mt-auto{margin-top:auto}
+.notif-btn{width:34px;height:34px;border-radius:8px;background:var(--bg);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:15px;position:relative;cursor:pointer;box-shadow:var(--shadow)}
+.badge-dot{position:absolute;top:7px;right:7px;width:6px;height:6px;border-radius:50%;background:var(--red);border:1.5px solid white}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green)}
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- SLIDE 1: HOMEPAGE -->
+<div class="slide active" id="s1">
+  <div class="hero-full">
+    <div class="hero-marketing-nav">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="logo-mark">F</div>
+        <div class="logo-text">FIXIT<span>247</span></div>
+      </div>
+      <div style="display:flex;gap:24px;margin-left:48px">
+        <span style="font-size:13px;color:var(--text2);cursor:pointer;font-weight:500">How it works</span>
+        <span style="font-size:13px;color:var(--text2);cursor:pointer;font-weight:500">For Tradies</span>
+        <span style="font-size:13px;color:var(--text2);cursor:pointer;font-weight:500">Pricing</span>
+        <span style="font-size:13px;color:var(--text2);cursor:pointer;font-weight:500">About</span>
+      </div>
+      <div style="margin-left:auto;display:flex;gap:10px">
+        <button class="btn btn-ghost btn-sm">Sign in</button>
+        <button class="btn btn-primary btn-sm">Get started free</button>
+      </div>
+    </div>
+    <div class="hero-body">
+      <div style="flex:1">
+        <div class="hero-badge">⚡ Emergency dispatch · On-site in 15 minutes</div>
+        <div class="hero-h1">Australia's fastest<br>trades platform.<br><span>Fix it now.</span></div>
+        <div class="hero-sub">Connect with fully-licensed tradies in minutes. Plumbing, electrical, locksmith, tiling and more. Emergency or scheduled — Fixit247 gets it done.</div>
+        <div style="display:flex;gap:12px">
+          <button class="cta-primary">Post a job — it's free</button>
+          <button class="cta-secondary">I'm a tradie →</button>
+        </div>
+        <div class="hero-stats">
+          <div><div class="hero-stat-val">8,400+</div><div class="hero-stat-label">Licensed tradies</div></div>
+          <div><div class="hero-stat-val">94,000</div><div class="hero-stat-label">Jobs completed</div></div>
+          <div><div class="hero-stat-val">4.9★</div><div class="hero-stat-label">Average rating</div></div>
+          <div><div class="hero-stat-val">12 min</div><div class="hero-stat-label">Avg response time</div></div>
+        </div>
+      </div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:14px;max-width:440px">
+        <!-- Value props cards -->
+        <div style="background:white;border-radius:16px;padding:20px 22px;box-shadow:var(--shadow-lg);display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:28px">⚡</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px">Emergency dispatch in 15 min</div>
+            <div style="font-size:13px;color:var(--text2)">Burst pipe at midnight? Lockout on Sunday? Our emergency tradies arrive fast — guaranteed.</div>
+          </div>
+        </div>
+        <div style="background:white;border-radius:16px;padding:20px 22px;box-shadow:var(--shadow-lg);display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:28px">🛡️</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px">Every tradie fully verified</div>
+            <div style="font-size:13px;color:var(--text2)">Licence checks, police clearance, $5M public liability. You only see trusted professionals.</div>
+          </div>
+        </div>
+        <div style="background:white;border-radius:16px;padding:20px 22px;box-shadow:var(--shadow-lg);display:flex;gap:14px;align-items:flex-start">
+          <div style="font-size:28px">💳</div>
+          <div>
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px">Pay securely, dispute easily</div>
+            <div style="font-size:13px;color:var(--text2)">Stripe-powered escrow. Funds only released when you're happy. Full dispute support.</div>
+          </div>
+        </div>
+        <div style="background:var(--amber);border-radius:16px;padding:16px 22px;box-shadow:0 4px 20px rgba(245,158,11,0.3);display:flex;align-items:center;justify-content:space-between">
+          <div>
+            <div style="font-size:12px;color:rgba(255,255,255,0.8)">Live right now</div>
+            <div style="font-size:18px;font-weight:800;color:white">247 jobs in progress</div>
+          </div>
+          <div style="font-size:30px">🔥</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 2: LOGIN -->
+<div class="slide" id="s2">
+  <div style="display:flex;width:100%;height:100%;background:var(--bg)">
+    <div style="flex:1;background:linear-gradient(135deg,#1E1A17 0%,#2D2720 100%);display:flex;align-items:center;justify-content:center;padding:60px">
+      <div style="text-align:center;max-width:380px">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:32px">
+          <div class="logo-mark" style="width:40px;height:40px;font-size:18px">F</div>
+          <div class="logo-text" style="font-size:22px;color:white">FIXIT<span>247</span></div>
+        </div>
+        <div style="font-size:40px;font-weight:900;color:white;line-height:1.1;margin-bottom:14px;letter-spacing:-1.5px">Fix anything.<br><span style="color:var(--amber)">Anytime.</span></div>
+        <div style="font-size:15px;color:rgba(255,255,255,0.6);line-height:1.6;margin-bottom:32px">Australia's #1 emergency trades platform. 8,400+ verified tradies ready right now.</div>
+        <div style="display:flex;justify-content:center;gap:20px">
+          <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--amber)">94k</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">Jobs Done</div></div>
+          <div style="width:1px;background:rgba(255,255,255,0.1)"></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--amber)">4.9★</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">Avg Rating</div></div>
+          <div style="width:1px;background:rgba(255,255,255,0.1)"></div>
+          <div style="text-align:center"><div style="font-size:22px;font-weight:800;color:var(--amber)">12min</div><div style="font-size:11px;color:rgba(255,255,255,0.5)">Response</div></div>
+        </div>
+      </div>
+    </div>
+    <div style="width:440px;background:white;display:flex;flex-direction:column;justify-content:center;padding:48px 44px;box-shadow:-20px 0 60px rgba(0,0,0,0.08)">
+      <div style="font-size:22px;font-weight:800;margin-bottom:4px;letter-spacing:-0.5px">Welcome back</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:28px">Sign in to your Fixit247 account</div>
+      <div style="margin-bottom:22px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.5px">Quick demo access</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--amber-dim);border:1.5px solid var(--amber);border-radius:10px;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px"><span>🏠</span><div><div style="font-size:12px;font-weight:700;color:var(--amber2)">Customer demo</div><div style="font-size:10px;color:var(--text3)">sarah.chen@gmail.com</div></div></div>
+            <button class="btn btn-primary btn-sm">Use →</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px"><span>🔧</span><div><div style="font-size:12px;font-weight:600">Tradie demo</div><div style="font-size:10px;color:var(--text3)">mike.kowalski@fixit.au</div></div></div>
+            <button class="btn btn-ghost btn-sm">Use →</button>
+          </div>
+          <div style="display:flex;align-items:center;justify-content:space-between;padding:11px 14px;background:var(--bg);border:1px solid var(--border);border-radius:10px;cursor:pointer">
+            <div style="display:flex;align-items:center;gap:8px"><span>⚙️</span><div><div style="font-size:12px;font-weight:600">Admin demo</div><div style="font-size:10px;color:var(--text3)">admin@fixit247.com.au</div></div></div>
+            <button class="btn btn-ghost btn-sm">Use →</button>
+          </div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px"><div style="height:1px;flex:1;background:var(--border)"></div><div style="font-size:11px;color:var(--text3);white-space:nowrap">or sign in with email</div><div style="height:1px;flex:1;background:var(--border)"></div></div>
+      <div class="input-group"><div class="input-label">Email address</div><input class="input" value="sarah.chen@gmail.com" readonly></div>
+      <div class="input-group"><div class="input-label">Password</div><input class="input" type="password" value="••••••••" readonly></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;margin-top:-6px">
+        <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);cursor:pointer"><input type="checkbox" checked> Remember me</label>
+        <span style="font-size:12px;color:var(--amber2);cursor:pointer;font-weight:500">Forgot password?</span>
+      </div>
+      <button class="btn btn-primary" style="width:100%;justify-content:center;padding:12px;font-size:14px">Sign in →</button>
+      <div style="text-align:center;margin-top:18px;font-size:12px;color:var(--text3)">No account? <span style="color:var(--amber2);cursor:pointer;font-weight:600">Register free</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 3: REGISTER -->
+<div class="slide" id="s3">
+  <div style="display:flex;width:100%;height:100%;background:var(--bg);align-items:center;justify-content:center">
+    <div style="width:560px">
+      <div style="text-align:center;margin-bottom:32px">
+        <div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:20px"><div class="logo-mark">F</div><div class="logo-text">FIXIT<span>247</span></div></div>
+        <div class="wizard-steps" style="justify-content:center">
+          <div style="display:flex;align-items:center;gap:0">
+            <div class="step-circle active">1</div><span class="step-label active">Choose role</span>
+          </div>
+          <div class="step-connector"></div>
+          <div style="display:flex;align-items:center;gap:0">
+            <div class="step-circle">2</div><span class="step-label">Your details</span>
+          </div>
+          <div class="step-connector"></div>
+          <div style="display:flex;align-items:center;gap:0">
+            <div class="step-circle">3</div><span class="step-label">Verify &amp; done</span>
+          </div>
+        </div>
+      </div>
+      <div style="background:white;border-radius:20px;padding:36px;box-shadow:var(--shadow-lg);border:1px solid var(--border)">
+        <div style="font-size:22px;font-weight:800;text-align:center;margin-bottom:6px;letter-spacing:-0.5px">How will you use Fixit247?</div>
+        <div style="font-size:13px;color:var(--text2);text-align:center;margin-bottom:28px">Choose your account type to get started</div>
+        <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px">
+          <div style="padding:20px;background:var(--amber-dim);border:2px solid var(--amber);border-radius:14px;cursor:pointer;box-shadow:0 4px 12px rgba(245,158,11,0.15)">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:52px;height:52px;background:var(--amber);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🏠</div>
+              <div style="flex:1">
+                <div style="font-size:16px;font-weight:800;color:var(--amber2);margin-bottom:4px">I need a tradie</div>
+                <div style="font-size:13px;color:var(--text2)">Post jobs, get quotes instantly, pay securely. Emergency or scheduled — free to use.</div>
+              </div>
+              <div style="width:22px;height:22px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;color:white;font-weight:700">✓</div>
+            </div>
+          </div>
+          <div style="padding:20px;background:white;border:1.5px solid var(--border);border-radius:14px;cursor:pointer;box-shadow:var(--shadow)">
+            <div style="display:flex;align-items:center;gap:16px">
+              <div style="width:52px;height:52px;background:var(--bg2);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;flex-shrink:0">🔧</div>
+              <div style="flex:1">
+                <div style="font-size:16px;font-weight:700;margin-bottom:4px">I'm a tradie</div>
+                <div style="font-size:13px;color:var(--text2)">Find local jobs, grow your business, earn $500–$2,000/week with Fixit247 leads.</div>
+              </div>
+              <div style="width:22px;height:22px;border-radius:50%;border:2px solid var(--border)"></div>
+            </div>
+          </div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;justify-content:center;padding:13px;font-size:14px">Continue as Customer →</button>
+        <div style="text-align:center;margin-top:16px;font-size:12px;color:var(--text3)">Already have an account? <span style="color:var(--amber2);cursor:pointer;font-weight:600">Sign in</span></div>
+      </div>
+      <div style="display:flex;justify-content:center;gap:24px;margin-top:20px">
+        <div style="font-size:11px;color:var(--text3)">🔒 SSL encrypted</div>
+        <div style="font-size:11px;color:var(--text3)">🛡️ Licensed tradies only</div>
+        <div style="font-size:11px;color:var(--text3)">🇦🇺 Australian owned</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 4: CUSTOMER DASHBOARD -->
+<div class="slide" id="s4">
+  <div class="topnav">
+    <div class="logo-wrap"><div class="logo-mark">F</div><div class="logo-text">FIXIT<span>247</span></div></div>
+    <div class="nav-tabs">
+      <div class="nav-tab active">Dashboard</div>
+      <div class="nav-tab">Post a Job</div>
+      <div class="nav-tab">My Jobs <span class="nav-badge">3</span></div>
+      <div class="nav-tab">Messages <span class="nav-badge">2</span></div>
+      <div class="nav-tab">Payments</div>
+    </div>
+    <div class="topnav-right">
+      <button class="btn btn-primary btn-sm">+ Emergency Job</button>
+      <div class="notif-btn">🔔<div class="badge-dot"></div></div>
+      <div class="avatar" style="background:var(--amber)">SC</div>
+    </div>
+  </div>
+  <div class="page-main">
+    <div style="margin-bottom:22px;display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:24px;font-weight:800;letter-spacing:-0.8px">Good morning, Sarah 👋</div><div style="font-size:13px;color:var(--text2);margin-top:3px">1 job active · 2 quotes waiting for your review</div></div>
+      <div style="font-size:12px;color:var(--text3)">Sunday 1 June, 9:41 AM</div>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:22px">
+      <div class="stat-card">
+        <div class="stat-label">Active Jobs</div>
+        <div class="stat-value" style="color:var(--amber)">1</div>
+        <div class="tag amber" style="margin-top:8px">In progress</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Pending Quotes</div>
+        <div class="stat-value" style="color:var(--blue)">2</div>
+        <div class="tag blue" style="margin-top:8px">Review needed</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Total Spent</div>
+        <div class="stat-value">$2,840</div>
+        <div class="stat-change up" style="margin-top:6px">↑ 3 jobs this month</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">Reviews Given</div>
+        <div class="stat-value">6</div>
+        <div style="display:flex;gap:1px;margin-top:8px"><span style="color:var(--amber);font-size:14px">★★★★★</span></div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="gap:18px">
+      <div>
+        <div class="section-header"><div class="section-title">Active Jobs</div><div class="section-link">View all →</div></div>
+        <div class="card" style="margin-bottom:12px;border-color:#F59E0B66;background:var(--amber-light)">
+          <div style="display:flex;gap:14px">
+            <div class="avatar lg" style="background:#2563EB">MK</div>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px">
+                <div><div style="font-size:14px;font-weight:700">Burst pipe — kitchen</div><div style="font-size:12px;color:var(--text2);margin-top:2px">Mike Kowalski · Licensed Plumber</div></div>
+                <div class="tag amber">En route</div>
+              </div>
+              <div style="margin-bottom:10px">
+                <div style="display:flex;justify-content:space-between;font-size:12px;color:var(--text3);margin-bottom:5px"><span>ETA</span><span style="color:var(--amber2);font-weight:600">8 minutes</span></div>
+                <div class="progress"><div class="progress-fill" style="width:70%"></div></div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-ghost btn-sm">💬 Chat</button>
+                <button class="btn btn-ghost btn-sm">📍 Track live</button>
+                <div style="margin-left:auto;font-size:14px;font-weight:800;color:var(--amber2)">$120/hr</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card" style="opacity:0.7">
+          <div style="display:flex;gap:12px;align-items:center">
+            <div class="avatar" style="background:#7C3AED">SR</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">Electrical switchboard check</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Quote from Sarah Ramos · $140/hr</div></div>
+            <div class="tag blue">Quote</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header"><div class="section-title">Book a Trade</div></div>
+        <div class="grid grid-3" style="gap:8px;margin-bottom:18px">
+          <div class="card card-sm" style="cursor:pointer;text-align:center;border-color:transparent;background:white">
+            <div style="font-size:26px;margin-bottom:6px">🚿</div><div style="font-size:12px;font-weight:600">Plumbing</div>
+          </div>
+          <div class="card card-sm" style="cursor:pointer;text-align:center;border-color:transparent;background:white">
+            <div style="font-size:26px;margin-bottom:6px">⚡</div><div style="font-size:12px;font-weight:600">Electrical</div>
+          </div>
+          <div class="card card-sm" style="cursor:pointer;text-align:center;border-color:transparent;background:white">
+            <div style="font-size:26px;margin-bottom:6px">🔒</div><div style="font-size:12px;font-weight:600">Locksmith</div>
+          </div>
+          <div class="card card-sm" style="cursor:pointer;text-align:center;border-color:transparent;background:white">
+            <div style="font-size:26px;margin-bottom:6px">🎨</div><div style="font-size:12px;font-weight:600">Painting</div>
+          </div>
+          <div class="card card-sm" style="cursor:pointer;text-align:center;border-color:transparent;background:white">
+            <div style="font-size:26px;margin-bottom:6px">🌿</div><div style="font-size:12px;font-weight:600">Gardening</div>
+          </div>
+          <div class="card card-sm" style="cursor:pointer;text-align:center;border-color:transparent;background:white">
+            <div style="font-size:26px;margin-bottom:6px">🧹</div><div style="font-size:12px;font-weight:600">Cleaning</div>
+          </div>
+        </div>
+        <div class="section-header"><div class="section-title">Recent Reviews</div></div>
+        <div class="card">
+          <div style="display:flex;gap:10px;margin-bottom:10px">
+            <div class="avatar sm" style="background:var(--green)">JL</div>
+            <div><div style="font-size:13px;font-weight:600">James Lee · Electrician</div><div style="display:flex;gap:1px;font-size:13px;color:var(--amber)">★★★★★</div></div>
+            <div style="margin-left:auto;font-size:11px;color:var(--text3)">3 days ago</div>
+          </div>
+          <div style="font-size:13px;color:var(--text2);line-height:1.5">"Arrived exactly on time, diagnosed the fault in minutes and had it fixed in under an hour. Incredibly professional."</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 5: JOB POSTING WIZARD -->
+<div class="slide" id="s5">
+  <div class="topnav">
+    <div class="logo-wrap"><div class="logo-mark">F</div><div class="logo-text">FIXIT<span>247</span></div></div>
+    <div class="nav-tabs">
+      <div class="nav-tab">Dashboard</div>
+      <div class="nav-tab active">Post a Job</div>
+      <div class="nav-tab">My Jobs <span class="nav-badge">3</span></div>
+    </div>
+    <div class="topnav-right"><div class="notif-btn">🔔<div class="badge-dot"></div></div><div class="avatar" style="background:var(--amber)">SC</div></div>
+  </div>
+  <div class="page-main">
+    <div style="max-width:800px;margin:0 auto">
+      <div style="margin-bottom:28px">
+        <div style="font-size:22px;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px">Post a Job</div>
+        <div class="wizard-steps">
+          <div style="display:flex;align-items:center;gap:0"><div class="step-circle done">✓</div><span class="step-label done">Trade type</span></div>
+          <div class="step-connector done"></div>
+          <div style="display:flex;align-items:center;gap:0"><div class="step-circle done">✓</div><span class="step-label done">Describe</span></div>
+          <div class="step-connector done"></div>
+          <div style="display:flex;align-items:center;gap:0"><div class="step-circle active">3</div><span class="step-label active">Location &amp; urgency</span></div>
+          <div class="step-connector"></div>
+          <div style="display:flex;align-items:center;gap:0"><div class="step-circle">4</div><span class="step-label">Review &amp; match</span></div>
+        </div>
+      </div>
+      <div class="grid grid-2" style="gap:20px">
+        <div>
+          <div class="card">
+            <div style="font-size:15px;font-weight:700;margin-bottom:4px">Location &amp; Urgency</div>
+            <div style="font-size:13px;color:var(--text2);margin-bottom:20px">Where do you need the tradie and how urgent?</div>
+            <div class="input-group"><div class="input-label">Street address</div><input class="input" value="14 Campbell Parade, Bondi Beach NSW 2026"></div>
+            <div class="grid grid-2" style="gap:10px;margin-bottom:14px">
+              <div class="input-group" style="margin-bottom:0"><div class="input-label">Suburb</div><input class="input" value="Bondi Beach"></div>
+              <div class="input-group" style="margin-bottom:0"><div class="input-label">Postcode</div><input class="input" value="2026"></div>
+            </div>
+            <div class="input-label" style="margin-bottom:10px">Urgency level</div>
+            <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px">
+              <div style="padding:14px;background:var(--red-light);border:2px solid #FCA5A5;border-radius:10px;cursor:pointer">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span>🚨</span>
+                  <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--red)">Emergency — Right now</div><div style="font-size:11px;color:var(--text2)">Tradie dispatched within 15 min · +$40 call-out fee</div></div>
+                  <div style="width:16px;height:16px;border-radius:50%;background:var(--red);flex-shrink:0"></div>
+                </div>
+              </div>
+              <div style="padding:14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;cursor:pointer">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span>📅</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Schedule — Today</div><div style="font-size:11px;color:var(--text2)">Pick a time window · Standard rates apply</div></div>
+                </div>
+              </div>
+              <div style="padding:14px;background:var(--bg);border:1.5px solid var(--border);border-radius:10px;cursor:pointer">
+                <div style="display:flex;align-items:center;gap:10px">
+                  <span>🗓️</span><div style="flex:1"><div style="font-size:13px;font-weight:600">Quote only — Flexible timing</div><div style="font-size:11px;color:var(--text2)">Get 3+ quotes and choose</div></div>
+                </div>
+              </div>
+            </div>
+            <div style="display:flex;gap:10px">
+              <button class="btn btn-ghost" style="flex:1;justify-content:center">← Back</button>
+              <button class="btn btn-primary" style="flex:1;justify-content:center">Find tradies →</button>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div class="card" style="margin-bottom:14px;background:var(--amber-light);border-color:#F59E0B66">
+            <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+              <span style="font-size:16px">🤖</span>
+              <div style="font-size:13px;font-weight:700;color:var(--amber2)">AI Job Summary</div>
+            </div>
+            <div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:12px">"Burst kitchen pipe — cold water connection under sink. Likely compression fitting or cracked pipe. Est. repair: 1–2 hours. Parts: $40–80."</div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;padding-top:12px;border-top:1px solid #F59E0B33">
+              <div style="text-align:center"><div style="font-size:11px;color:var(--text3)">Duration</div><div style="font-size:13px;font-weight:700">1–2 hrs</div></div>
+              <div style="text-align:center"><div style="font-size:11px;color:var(--text3)">Est. cost</div><div style="font-size:13px;font-weight:700;color:var(--amber2)">$160–$280</div></div>
+              <div style="text-align:center"><div style="font-size:11px;color:var(--text3)">Skill</div><div style="font-size:13px;font-weight:700">Licensed</div></div>
+            </div>
+          </div>
+          <div class="card">
+            <div style="font-size:13px;font-weight:700;margin-bottom:14px">📍 3 Tradies Near You</div>
+            <div style="display:flex;flex-direction:column;gap:10px">
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
+                <div class="avatar" style="background:#2563EB">MK</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">Mike Kowalski</div><div style="font-size:11px;color:var(--text2)">⭐ 4.9 (127) · 0.8km · $120/hr</div></div>
+                <div class="tag green">8 min</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border)">
+                <div class="avatar" style="background:#7C3AED">DW</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">Dave Wilson</div><div style="font-size:11px;color:var(--text2)">⭐ 4.7 (84) · 1.2km · $110/hr</div></div>
+                <div class="tag amber">13 min</div>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;padding:12px;background:var(--bg);border-radius:10px;border:1px solid var(--border);opacity:0.6">
+                <div class="avatar" style="background:var(--green)">TN</div>
+                <div style="flex:1"><div style="font-size:13px;font-weight:700">Tom Nguyen</div><div style="font-size:11px;color:var(--text2)">⭐ 4.8 (61) · 2.1km · $125/hr</div></div>
+                <div class="tag gray">21 min</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 6: CUSTOMER JOB DETAIL -->
+<div class="slide" id="s6">
+  <div class="topnav">
+    <div style="font-size:13px;color:var(--text2);cursor:pointer;font-weight:500">← My Jobs</div>
+    <div style="font-size:14px;font-weight:700;margin-left:14px">Burst Pipe — Kitchen</div>
+    <div style="font-size:12px;color:var(--text3);margin-left:8px">#JOB-2847</div>
+    <div class="topnav-right"><div class="tag green" style="font-size:12px">● En route · 8 min</div><div class="notif-btn">🔔</div><div class="avatar" style="background:var(--amber)">SC</div></div>
+  </div>
+  <div class="page-main">
+    <div class="grid grid-2" style="gap:18px">
+      <div>
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;gap:14px;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--border);margin-bottom:16px">
+            <div class="avatar xl" style="background:#2563EB">MK</div>
+            <div style="flex:1">
+              <div style="font-size:16px;font-weight:800;margin-bottom:4px">Mike Kowalski</div>
+              <div style="font-size:12px;color:var(--text2);margin-bottom:6px">Licensed Plumber · NSW Lic# PLB-48291</div>
+              <div style="display:flex;gap:6px"><div class="tag green">⭐ 4.9 (127 reviews)</div><div class="tag blue">Bondi Beach</div></div>
+            </div>
+            <div style="text-align:right"><div style="font-size:22px;font-weight:900;color:var(--amber2)">$120<span style="font-size:13px;font-weight:500;color:var(--text3)">/hr</span></div><div style="font-size:11px;color:var(--text3)">+$40 call-out</div></div>
+          </div>
+          <div style="font-size:13px;font-weight:700;margin-bottom:14px">Job Timeline</div>
+          <div class="timeline">
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot done"></div><div class="tl-connector"></div></div><div class="tl-content"><div class="tl-title">Job posted</div><div class="tl-time">9:30 AM</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot done"></div><div class="tl-connector"></div></div><div class="tl-content"><div class="tl-title">Mike accepted</div><div class="tl-time">9:33 AM · 3 min response time</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot"></div><div class="tl-connector"></div></div><div class="tl-content"><div class="tl-title" style="color:var(--amber2);font-weight:600">Mike en route — ETA 8 min</div><div class="tl-time">9:41 AM · Now</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot pending"></div><div class="tl-connector"></div></div><div class="tl-content"><div class="tl-title" style="color:var(--text3)">Job in progress</div><div class="tl-time">Pending</div></div></div>
+            <div class="tl-item"><div class="tl-line"><div class="tl-dot pending"></div></div><div class="tl-content"><div class="tl-title" style="color:var(--text3)">Payment &amp; review</div><div class="tl-time">Pending</div></div></div>
+          </div>
+        </div>
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px"><div style="font-size:13px;font-weight:700">Payment</div><div class="tag green">Escrow held</div></div>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:13px">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Call-out fee</span><span>$40.00</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Labour (est. 1.5hr)</span><span>$180.00</span></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text2)">Parts (estimated)</span><span>$60.00</span></div>
+            <div class="divider" style="margin:8px 0"></div>
+            <div style="display:flex;justify-content:space-between;font-weight:800;font-size:15px"><span>Total estimate</span><span style="color:var(--amber2)">$280.00</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="card" style="height:340px;display:flex;flex-direction:column;margin-bottom:14px">
+          <div style="font-size:13px;font-weight:700;padding-bottom:12px;border-bottom:1px solid var(--border);margin-bottom:12px;display:flex;align-items:center;gap:8px"><span>💬</span>Chat with Mike</div>
+          <div style="flex:1;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;gap:3px">
+            <div class="chat-bubble them"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Mike · 9:34 AM</div>Hi Sarah! I've got your job — burst pipe in the kitchen. I'm about 8 mins away. Do you know which pipe?</div>
+            <div class="chat-bubble me">It's under the sink, the cold water tap connection. It's leaking quite badly.</div>
+            <div class="chat-bubble them"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Mike · 9:36 AM</div>Sounds like a compression fitting — very common. I've got parts on the van. Won't be a big job 👍</div>
+            <div class="chat-bubble me" style="font-size:12px">Great! I've turned the mains off already</div>
+            <div class="chat-bubble them"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Mike · 9:40 AM</div>Perfect! See you in 8 🚐</div>
+          </div>
+          <div style="margin-top:12px;display:flex;gap:8px">
+            <input class="input" placeholder="Type a message…" style="flex:1">
+            <button class="btn btn-primary btn-sm">Send</button>
+          </div>
+        </div>
+        <div class="card">
+          <div style="font-size:13px;font-weight:700;margin-bottom:10px">📍 Live Tracking</div>
+          <div style="background:var(--bg);border:1px solid var(--border);border-radius:10px;height:100px;display:flex;align-items:center;justify-content:center;position:relative">
+            <div style="font-size:13px;color:var(--text3)">🗺️ Bondi Beach, NSW 2026</div>
+            <div style="position:absolute;top:10px;right:10px;background:var(--amber);color:white;font-size:10px;font-weight:700;padding:3px 10px;border-radius:10px">● 0.8km away</div>
+            <div style="position:absolute;bottom:10px;left:10px;background:white;border:1px solid var(--border);border-radius:8px;padding:5px 10px;font-size:11px;color:var(--text2)">📱 Mike's location is live</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 7: TRADIE DASHBOARD -->
+<div class="slide" id="s7">
+  <div class="topnav">
+    <div class="logo-wrap"><div class="logo-mark">F</div><div class="logo-text">FIXIT<span>247</span></div></div>
+    <div class="nav-tabs">
+      <div class="nav-tab active">Dashboard</div>
+      <div class="nav-tab">Lead Feed <span class="nav-badge red">5</span></div>
+      <div class="nav-tab">Active Jobs</div>
+      <div class="nav-tab">Earnings</div>
+      <div class="nav-tab">Messages <span class="nav-badge">3</span></div>
+    </div>
+    <div class="topnav-right">
+      <div class="tag green" style="font-size:12px">● Available</div>
+      <div class="notif-btn">🔔<div class="badge-dot"></div></div>
+      <div class="avatar" style="background:#2563EB">MK</div>
+    </div>
+  </div>
+  <div class="page-main">
+    <div style="margin-bottom:20px"><div style="font-size:24px;font-weight:800;letter-spacing:-0.8px">Good morning, Mike 👋</div><div style="font-size:13px;color:var(--text2);margin-top:3px">5 new leads in your area · 1 active job in progress</div></div>
+    <div style="background:linear-gradient(135deg,#1E1A17,#2D2219);border-radius:16px;padding:24px 28px;margin-bottom:20px;position:relative;overflow:hidden">
+      <div style="position:absolute;right:0;top:0;bottom:0;width:200px;background:linear-gradient(90deg,transparent,rgba(245,158,11,0.08))"></div>
+      <div style="display:flex;align-items:center;gap:40px">
+        <div><div style="font-size:12px;color:rgba(255,255,255,0.5);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px">June earnings</div><div style="font-size:44px;font-weight:900;color:var(--amber);letter-spacing:-2px">$6,840</div><div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:4px">↑ +18% vs May</div></div>
+        <div style="display:flex;gap:28px">
+          <div style="text-align:center"><div style="font-size:24px;font-weight:800;color:white">34</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Jobs done</div></div>
+          <div style="text-align:center"><div style="font-size:24px;font-weight:800;color:white">4.9★</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Rating</div></div>
+          <div style="text-align:center"><div style="font-size:24px;font-weight:800;color:white">94%</div><div style="font-size:11px;color:rgba(255,255,255,0.4)">Accept rate</div></div>
+        </div>
+        <div style="display:flex;align-items:flex-end;gap:5px;height:60px;margin-left:auto">
+          <div style="background:rgba(245,158,11,0.4);border-radius:3px 3px 0 0;width:12px;height:35%"></div>
+          <div style="background:rgba(245,158,11,0.4);border-radius:3px 3px 0 0;width:12px;height:55%"></div>
+          <div style="background:rgba(245,158,11,0.4);border-radius:3px 3px 0 0;width:12px;height:45%"></div>
+          <div style="background:rgba(245,158,11,0.6);border-radius:3px 3px 0 0;width:12px;height:70%"></div>
+          <div style="background:rgba(245,158,11,0.6);border-radius:3px 3px 0 0;width:12px;height:60%"></div>
+          <div style="background:rgba(245,158,11,0.8);border-radius:3px 3px 0 0;width:12px;height:85%"></div>
+          <div style="background:var(--amber);border-radius:3px 3px 0 0;width:12px;height:100%"></div>
+        </div>
+      </div>
+    </div>
+    <div class="grid grid-2" style="gap:18px">
+      <div>
+        <div class="section-header"><div class="section-title">🎯 Hot Leads</div><div class="section-link">View all 5 →</div></div>
+        <div class="lead-card" style="border-color:#FCA5A5;background:var(--red-light)">
+          <div style="display:flex;gap:12px;margin-bottom:10px">
+            <div class="lead-score high" style="width:50px;height:50px;font-size:16px">97</div>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between"><div style="font-size:14px;font-weight:800;color:var(--red)">🚨 Burst pipe — kitchen sink</div><div style="font-size:14px;font-weight:800;color:var(--amber2)">$120/hr</div></div>
+              <div style="font-size:11px;color:var(--text2);margin-top:3px">📍 Bondi Beach · 0.8km · Posted 2 min ago</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px">"Water leaking under kitchen sink — mains off. Needs licensed plumber."</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px"><div class="tag red">🚨 Emergency</div><div class="tag green">High match</div><div class="tag blue">Plumbing</div></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary" style="flex:1;justify-content:center">✓ Accept — 40 credits</button><button class="btn btn-ghost btn-sm">Pass</button></div>
+        </div>
+        <div class="lead-card">
+          <div style="display:flex;gap:12px;margin-bottom:8px">
+            <div class="lead-score med">74</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">Hot water system — no heat</div><div style="font-size:11px;color:var(--text2)">📍 Coogee · 2.1km · 8 min ago</div></div>
+            <div style="font-size:13px;font-weight:700;color:var(--amber2)">$110/hr</div>
+          </div>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Accept</button><button class="btn btn-ghost btn-sm">Pass</button></div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header"><div class="section-title">Profile Health</div><div class="section-link">Complete →</div></div>
+        <div class="card" style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px"><div style="font-size:13px;font-weight:700">Profile strength</div><div style="font-size:15px;font-weight:800;color:var(--amber2)">78%</div></div>
+          <div class="progress" style="margin-bottom:14px;height:7px"><div class="progress-fill" style="width:78%"></div></div>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="color:var(--green);font-weight:700">✓</span><span>Identity verified</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="color:var(--green);font-weight:700">✓</span><span>Plumbing licence uploaded &amp; verified</span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="color:var(--amber);font-weight:700">○</span><span>Add portfolio photos <span style="color:var(--amber2);font-weight:600">+15% leads</span></span></div>
+            <div style="display:flex;align-items:center;gap:8px;font-size:12px"><span style="color:var(--amber);font-weight:700">○</span><span>Enable voice booking <span style="color:var(--amber2);font-weight:600">+7% leads</span></span></div>
+          </div>
+        </div>
+        <div class="card" style="background:var(--amber-light);border-color:#F59E0B66">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><div style="font-size:13px;font-weight:700">💳 Credit Wallet</div><button class="btn btn-primary btn-sm">Top up</button></div>
+          <div style="font-size:32px;font-weight:900;color:var(--amber2);margin-bottom:4px">$240</div>
+          <div style="font-size:12px;color:var(--text2)">Lead credits used: 18 of 25 this month</div>
+          <div class="progress" style="margin-top:8px;height:6px"><div class="progress-fill" style="width:72%"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 8: TRADIE LEAD FEED -->
+<div class="slide" id="s8">
+  <div class="topnav">
+    <div class="logo-wrap"><div class="logo-mark">F</div><div class="logo-text">FIXIT<span>247</span></div></div>
+    <div class="nav-tabs">
+      <div class="nav-tab">Dashboard</div>
+      <div class="nav-tab active">Lead Feed <span class="nav-badge red">5</span></div>
+      <div class="nav-tab">Active Jobs</div>
+    </div>
+    <div class="topnav-right">
+      <div class="switch-group"><div class="switch-opt active">All</div><div class="switch-opt">Plumbing</div><div class="switch-opt">Near me</div></div>
+      <div style="font-size:12px;color:var(--text3)">Updated 30s ago</div>
+      <div class="notif-btn">🔔</div>
+    </div>
+  </div>
+  <div class="page-main">
+    <div style="margin-bottom:16px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:22px;font-weight:800;letter-spacing:-0.5px">Lead Feed</div>
+      <div style="display:flex;align-items:center;gap:10px"><div class="tag amber">💳 $240 credits</div><div class="tag gray">7 leads left today</div></div>
+    </div>
+    <div class="grid grid-2" style="gap:14px">
+      <div>
+        <div class="lead-card" style="border-color:#FCA5A5;background:var(--red-light)">
+          <div style="display:flex;gap:12px;margin-bottom:10px">
+            <div class="lead-score high" style="width:52px;height:52px;font-size:17px">97</div>
+            <div style="flex:1">
+              <div style="display:flex;justify-content:space-between"><div style="font-size:14px;font-weight:800;color:var(--red)">🚨 Burst pipe — kitchen</div><div style="font-size:14px;font-weight:800;color:var(--amber2)">$120/hr</div></div>
+              <div style="font-size:11px;color:var(--text2);margin-top:3px">📍 Bondi Beach · 0.8km · Posted 2 min ago</div>
+            </div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5">"Water leaking under kitchen sink — cold water pipe. Mains turned off. Urgent!"</div>
+          <div style="display:flex;gap:6px;margin-bottom:10px"><div class="tag red">🚨 Emergency</div><div class="tag green">📍 0.8km</div><div class="tag green">High match</div></div>
+          <div style="font-size:11px;color:var(--text3);margin-bottom:10px">Sarah C. · Bondi Beach · ⭐ Good payer · 7 prior jobs</div>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary" style="flex:1;justify-content:center">✓ Accept — 40 credits</button><button class="btn btn-ghost btn-sm">Pass</button><button class="btn btn-ghost btn-sm">💬</button></div>
+        </div>
+        <div class="lead-card">
+          <div style="display:flex;gap:12px;margin-bottom:10px">
+            <div class="lead-score med" style="width:46px;height:46px">68</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700">Bathroom tap replacement x2</div><div style="font-size:11px;color:var(--text2)">📍 Randwick · 1.9km · 18 min ago</div></div>
+            <div style="font-size:13px;font-weight:700;color:var(--amber2)">$110/hr</div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">"Both bathroom taps dripping. New taps already purchased and ready."</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px"><div class="tag amber">📅 Today</div><div class="tag blue">Plumbing</div></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Accept — 25 credits</button><button class="btn btn-ghost btn-sm">Pass</button></div>
+        </div>
+      </div>
+      <div>
+        <div class="lead-card">
+          <div style="display:flex;gap:12px;margin-bottom:10px">
+            <div class="lead-score med" style="width:46px;height:46px">74</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700">Hot water system — no hot water</div><div style="font-size:11px;color:var(--text2)">📍 Coogee · 2.1km · 8 min ago</div></div>
+            <div style="font-size:13px;font-weight:700;color:var(--amber2)">$110/hr</div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">"Electric hot water system not heating. 5 years old — element may have failed."</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px"><div class="tag amber">📅 Today</div><div class="tag blue">Plumbing</div></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-primary btn-sm" style="flex:1;justify-content:center">Accept — 30 credits</button><button class="btn btn-ghost btn-sm">Pass</button></div>
+        </div>
+        <div class="lead-card" style="opacity:0.55">
+          <div style="display:flex;gap:12px;margin-bottom:8px">
+            <div class="lead-score low" style="width:46px;height:46px">41</div>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">Garden tap installation</div><div style="font-size:11px;color:var(--text2)">📍 Mosman · 4.8km · 45 min ago</div></div>
+            <div style="font-size:13px;font-weight:700;color:var(--amber2)">$95/hr</div>
+          </div>
+          <div style="font-size:12px;color:var(--text2);margin-bottom:8px">"New garden tap on side of house — no urgency."</div>
+          <div style="display:flex;gap:6px;margin-bottom:8px"><div class="tag gray">🗓️ Flexible</div><div class="tag gray">Low match</div></div>
+          <div style="display:flex;gap:8px"><button class="btn btn-ghost btn-sm" style="flex:1;justify-content:center">Accept — 15 credits</button><button class="btn btn-ghost btn-sm">Pass</button></div>
+        </div>
+        <div style="background:var(--amber-dim);border:1.5px solid var(--amber);border-radius:12px;padding:14px;display:flex;align-items:center;gap:14px">
+          <div style="font-size:28px">💳</div>
+          <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--amber2)">$240 credits remaining</div><div style="font-size:11px;color:var(--text2);margin-top:2px">7 more leads available today</div></div>
+          <button class="btn btn-primary btn-sm">Top up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 9: TRADIE ONBOARDING -->
+<div class="slide" id="s9">
+  <div style="display:flex;width:100%;height:100%">
+    <div style="width:300px;background:var(--card);border-right:1px solid var(--border);padding:32px 24px;display:flex;flex-direction:column;box-shadow:var(--shadow-md)">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:36px"><div class="logo-mark">F</div><div class="logo-text">FIXIT<span>247</span></div></div>
+      <div style="font-size:16px;font-weight:800;margin-bottom:4px">Welcome, Mike!</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:24px">Set up your tradie profile to start earning</div>
+      <div style="display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--green-light)">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">✓</div>
+          <div style="font-size:13px;font-weight:600;color:var(--green)">Create account</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:var(--green-light)">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--green);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">✓</div>
+          <div style="font-size:13px;font-weight:600;color:var(--green)">Business details</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:12px;border-radius:10px;background:var(--amber-dim);border:1.5px solid var(--amber)">
+          <div style="width:28px;height:28px;border-radius:50%;background:var(--amber);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;color:white;flex-shrink:0">3</div>
+          <div style="font-size:13px;font-weight:700;color:var(--amber2)">Licences &amp; certs</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px">
+          <div style="width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text3);flex-shrink:0">4</div>
+          <div style="font-size:13px;color:var(--text3)">Service area &amp; rates</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px">
+          <div style="width:28px;height:28px;border-radius:50%;border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--text3);flex-shrink:0">5</div>
+          <div style="font-size:13px;color:var(--text3)">Payment setup</div>
+        </div>
+      </div>
+      <div class="mt-auto">
+        <div class="progress" style="height:8px"><div class="progress-fill" style="width:40%"></div></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:8px">Step 3 of 5 · 40% complete</div>
+      </div>
+    </div>
+    <div style="flex:1;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:48px">
+      <div style="width:520px">
+        <div style="font-size:24px;font-weight:800;margin-bottom:6px;letter-spacing:-0.5px">Upload your licences &amp; insurance</div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:28px">We verify every tradie. Verification takes 2–4 hours and you'll be notified by email.</div>
+        <div style="display:flex;flex-direction:column;gap:12px;margin-bottom:24px">
+          <div style="padding:18px;background:var(--green-light);border:1.5px solid #86EFAC;border-radius:12px;display:flex;align-items:center;gap:14px">
+            <span style="font-size:28px">📄</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--green)">Plumbing Licence — NSW #PLB-48291</div><div style="font-size:11px;color:var(--text3);margin-top:2px">Uploaded · Expires Dec 2027</div></div>
+            <div class="tag green">Verified ✓</div>
+          </div>
+          <div style="padding:18px;background:var(--amber-light);border:2px dashed var(--amber);border-radius:12px;display:flex;align-items:center;gap:14px;cursor:pointer">
+            <span style="font-size:28px">⬆️</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:700;color:var(--amber2)">Public Liability Insurance</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Min $5M cover required · Click to upload</div></div>
+            <div class="tag amber">Required</div>
+          </div>
+          <div style="padding:18px;background:var(--bg2);border:1.5px dashed var(--border);border-radius:12px;display:flex;align-items:center;gap:14px;cursor:pointer;opacity:0.7">
+            <span style="font-size:28px">⬆️</span>
+            <div style="flex:1"><div style="font-size:13px;font-weight:600">Police Check (optional)</div><div style="font-size:11px;color:var(--text2);margin-top:2px">Adds trust badge +10 lead score</div></div>
+            <div class="tag gray">Optional</div>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-bottom:16px">
+          <button class="btn btn-ghost" style="flex:1;justify-content:center">← Back</button>
+          <button class="btn btn-primary" style="flex:1;justify-content:center">Save &amp; Continue →</button>
+        </div>
+        <div style="text-align:center;font-size:12px;color:var(--text3)">You can submit missing documents within 48 hours of completing setup</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 10: ADMIN DASHBOARD -->
+<div class="slide" id="s10">
+  <div class="topnav">
+    <div class="logo-wrap"><div class="logo-mark" style="background:#DC2626">A</div><div class="logo-text">FIXIT<span>247</span> <span style="font-size:10px;color:var(--text3);font-weight:400">Admin</span></div></div>
+    <div class="nav-tabs">
+      <div class="nav-tab active">Dashboard</div>
+      <div class="nav-tab">Users <span class="nav-badge">12</span></div>
+      <div class="nav-tab">Jobs</div>
+      <div class="nav-tab">Revenue</div>
+      <div class="nav-tab">Disputes <span class="nav-badge red">3</span></div>
+    </div>
+    <div class="topnav-right">
+      <div class="tag red">3 open disputes</div>
+      <div class="notif-btn">🔔<div class="badge-dot"></div></div>
+      <div class="avatar" style="background:#DC2626">JP</div>
+    </div>
+  </div>
+  <div class="page-main">
+    <div style="margin-bottom:20px;display:flex;align-items:center;justify-content:space-between">
+      <div><div style="font-size:22px;font-weight:800;letter-spacing:-0.5px">Platform Dashboard</div><div style="font-size:13px;color:var(--text2);margin-top:3px">Live data · Refreshed 30 seconds ago</div></div>
+      <div style="background:var(--green-light);border:1px solid #86EFAC;border-radius:8px;padding:7px 14px;font-size:12px;font-weight:600;color:var(--green)">● All systems operational</div>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:18px">
+      <div class="stat-card"><div class="stat-label">Active Jobs</div><div class="stat-value">247</div><div class="stat-change up">↑ +12 since 9AM</div><div class="sparkline"><div class="spark-bar" style="height:40%"></div><div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:50%"></div><div class="spark-bar" style="height:75%"></div><div class="spark-bar" style="height:65%"></div><div class="spark-bar" style="height:90%"></div><div class="spark-bar" style="height:100%"></div></div></div>
+      <div class="stat-card"><div class="stat-label">GMV Today</div><div class="stat-value" style="color:var(--amber2)">$94k</div><div class="stat-change up">↑ +22% vs yesterday</div><div class="sparkline"><div class="spark-bar" style="height:50%"></div><div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:85%"></div><div class="spark-bar" style="height:95%"></div><div class="spark-bar" style="height:80%"></div><div class="spark-bar" style="height:100%"></div></div></div>
+      <div class="stat-card"><div class="stat-label">Online Tradies</div><div class="stat-value">1,284</div><div class="stat-change up">94% of active pool</div><div class="sparkline"><div class="spark-bar" style="height:80%"></div><div class="spark-bar" style="height:85%"></div><div class="spark-bar" style="height:78%"></div><div class="spark-bar" style="height:92%"></div><div class="spark-bar" style="height:98%"></div><div class="spark-bar" style="height:94%"></div><div class="spark-bar" style="height:100%"></div></div></div>
+      <div class="stat-card"><div class="stat-label">Avg Response</div><div class="stat-value">11<span style="font-size:16px;font-weight:400">min</span></div><div class="stat-change up">Under 12min target ✓</div><div class="sparkline"><div class="spark-bar" style="height:60%"></div><div class="spark-bar" style="height:50%"></div><div class="spark-bar" style="height:70%"></div><div class="spark-bar" style="height:45%"></div><div class="spark-bar" style="height:55%"></div><div class="spark-bar" style="height:42%"></div><div class="spark-bar" style="height:38%"></div></div></div>
+    </div>
+    <div class="grid grid-2" style="gap:18px">
+      <div>
+        <div class="section-header"><div class="section-title">⚡ Action Queue</div><div class="tag red" style="font-size:10px">7 need attention</div></div>
+        <div class="card">
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--red-light);border:1px solid #FCA5A5;border-radius:10px">
+              <span>🚨</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--red)">Dispute #2821 — Incomplete work claim</div><div style="font-size:10px;color:var(--text3)">Opened 2h ago · $480 held in escrow</div></div><button class="btn btn-danger btn-sm">Review</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--red-light);border:1px solid #FCA5A5;border-radius:10px">
+              <span>⚠️</span><div style="flex:1"><div style="font-size:12px;font-weight:700;color:var(--red)">Dispute #2819 — Payment issue</div><div style="font-size:10px;color:var(--text3)">Opened 5h ago · Customer escalated</div></div><button class="btn btn-danger btn-sm">Review</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--amber-light);border:1px solid #FCD34D;border-radius:10px">
+              <span>👤</span><div style="flex:1"><div style="font-size:12px;font-weight:700">Tradie approval: Tom Bradley · Electrician</div><div style="font-size:10px;color:var(--text3)">Documents uploaded · Awaiting licence check</div></div><button class="btn btn-success btn-sm">Approve</button>
+            </div>
+            <div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--amber-light);border:1px solid #FCD34D;border-radius:10px">
+              <span>👤</span><div style="flex:1"><div style="font-size:12px;font-weight:700">Tradie approval: Lisa Wong · Cleaner</div><div style="font-size:10px;color:var(--text3)">Background check in progress</div></div><button class="btn btn-ghost btn-sm">Review</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="section-header"><div class="section-title">Revenue — Last 7 Days</div><div style="font-size:12px;color:var(--text3)">Platform 15% fee</div></div>
+        <div class="card">
+          <div class="chart-bars" style="height:100px">
+            <div class="chart-bar" style="height:42%"></div>
+            <div class="chart-bar" style="height:58%"></div>
+            <div class="chart-bar" style="height:51%"></div>
+            <div class="chart-bar" style="height:74%"></div>
+            <div class="chart-bar" style="height:67%"></div>
+            <div class="chart-bar" style="height:88%"></div>
+            <div class="chart-bar" style="height:100%"></div>
+          </div>
+          <div class="chart-labels"><div class="chart-label">Mon</div><div class="chart-label">Tue</div><div class="chart-label">Wed</div><div class="chart-label">Thu</div><div class="chart-label">Fri</div><div class="chart-label">Sat</div><div class="chart-label">Sun</div></div>
+          <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px">
+            <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Week Revenue</div><div style="font-size:16px;font-weight:800;color:var(--amber2)">$14,200</div></div>
+            <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Jobs Done</div><div style="font-size:16px;font-weight:800">1,847</div></div>
+            <div style="padding:10px;background:var(--bg);border-radius:8px;text-align:center"><div style="font-size:10px;color:var(--text3);margin-bottom:3px">Avg Job Value</div><div style="font-size:16px;font-weight:800">$340</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SLIDE 11: ADMIN USERS -->
+<div class="slide" id="s11">
+  <div class="topnav">
+    <div class="logo-wrap"><div class="logo-mark" style="background:#DC2626">A</div><div class="logo-text">FIXIT<span>247</span> <span style="font-size:10px;color:var(--text3);font-weight:400">Admin</span></div></div>
+    <div class="nav-tabs">
+      <div class="nav-tab">Dashboard</div>
+      <div class="nav-tab active">Users <span class="nav-badge">12</span></div>
+      <div class="nav-tab">Jobs</div>
+      <div class="nav-tab">Revenue</div>
+    </div>
+    <div class="topnav-right">
+      <input class="input" placeholder="Search users…" style="width:220px;padding:7px 13px">
+      <div class="switch-group"><div class="switch-opt active">All</div><div class="switch-opt">Customers</div><div class="switch-opt">Tradies</div><div class="switch-opt">Pending</div></div>
+      <div class="notif-btn">🔔<div class="badge-dot"></div></div>
+    </div>
+  </div>
+  <div class="page-main">
+    <div style="margin-bottom:18px;display:flex;align-items:center;justify-content:space-between">
+      <div style="font-size:22px;font-weight:800;letter-spacing:-0.5px">Users</div>
+      <button class="btn btn-primary btn-sm">+ Export CSV</button>
+    </div>
+    <div class="grid grid-4" style="margin-bottom:18px">
+      <div class="stat-card"><div class="stat-label">Total Users</div><div class="stat-value">12,841</div><div class="stat-change up">↑ +47 today</div></div>
+      <div class="stat-card"><div class="stat-label">Customers</div><div class="stat-value">4,557</div><div class="stat-change up">↑ +18 today</div></div>
+      <div class="stat-card"><div class="stat-label">Tradies</div><div class="stat-value">8,284</div><div class="stat-change up">↑ +29 today</div></div>
+      <div class="stat-card"><div class="stat-label">Pending Approval</div><div class="stat-value" style="color:var(--amber2)">12</div><div class="tag amber" style="margin-top:8px">Action needed</div></div>
+    </div>
+    <div class="card">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>User</th><th>Role</th><th>Location</th><th>Status</th><th>Joined</th><th>Activity</th><th>Rating</th><th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar sm" style="background:var(--amber)">SC</div><div><div style="font-size:13px;font-weight:600">Sarah Chen</div><div style="font-size:10px;color:var(--text3)">sarah.chen@gmail.com</div></div></div></td>
+            <td><div class="tag blue">Customer</div></td>
+            <td><div style="font-size:12px">Bondi Beach, NSW</div></td>
+            <td><div class="tag green">Active</div></td>
+            <td><div style="font-size:12px;color:var(--text2)">Mar 2025</div></td>
+            <td><div style="font-size:12px">7 jobs · $2,840</div></td>
+            <td><div style="font-size:12px;color:var(--amber2)">4.8★</div></td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar sm" style="background:#2563EB">MK</div><div><div style="font-size:13px;font-weight:600">Mike Kowalski</div><div style="font-size:10px;color:var(--text3)">mike.k@fixit.au</div></div></div></td>
+            <td><div class="tag purple">Tradie</div></td>
+            <td><div style="font-size:12px">Bondi Beach, NSW</div></td>
+            <td><div class="tag green">Active</div></td>
+            <td><div style="font-size:12px;color:var(--text2)">Jan 2024</div></td>
+            <td><div style="font-size:12px">127 jobs · $68,400</div></td>
+            <td><div style="font-size:12px;color:var(--amber2)">4.9★</div></td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+          <tr style="background:#FFFBEB">
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar sm" style="background:var(--green)">TB</div><div><div style="font-size:13px;font-weight:600">Tom Bradley</div><div style="font-size:10px;color:var(--text3)">t.bradley@email.com</div></div></div></td>
+            <td><div class="tag purple">Tradie</div></td>
+            <td><div style="font-size:12px">Newtown, NSW</div></td>
+            <td><div class="tag amber">Pending</div></td>
+            <td><div style="font-size:12px;color:var(--text2)">Today</div></td>
+            <td><div style="font-size:12px;color:var(--text3)">0 jobs</div></td>
+            <td><div style="font-size:12px;color:var(--text3)">—</div></td>
+            <td><div style="display:flex;gap:6px"><button class="btn btn-success btn-sm">Approve</button><button class="btn btn-danger btn-sm">Reject</button></div></td>
+          </tr>
+          <tr>
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar sm" style="background:#7C3AED">SR</div><div><div style="font-size:13px;font-weight:600">Sarah Ramos</div><div style="font-size:10px;color:var(--text3)">sramos@electricals.au</div></div></div></td>
+            <td><div class="tag purple">Tradie</div></td>
+            <td><div style="font-size:12px">Surry Hills, NSW</div></td>
+            <td><div class="tag green">Active</div></td>
+            <td><div style="font-size:12px;color:var(--text2)">Aug 2024</div></td>
+            <td><div style="font-size:12px">84 jobs · $51,200</div></td>
+            <td><div style="font-size:12px;color:var(--amber2)">4.8★</div></td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+          <tr style="background:#FFF5F5">
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar sm" style="background:#DC2626">JP</div><div><div style="font-size:13px;font-weight:600">James Pham</div><div style="font-size:10px;color:var(--text3)">j.pham@yahoo.com</div></div></div></td>
+            <td><div class="tag blue">Customer</div></td>
+            <td><div style="font-size:12px">Manly, NSW</div></td>
+            <td><div class="tag red">Suspended</div></td>
+            <td><div style="font-size:12px;color:var(--text2)">Nov 2024</div></td>
+            <td><div style="font-size:12px">3 jobs · $840</div></td>
+            <td><div style="font-size:12px;color:var(--red)">2.1★</div></td>
+            <td><div style="display:flex;gap:6px"><button class="btn btn-ghost btn-sm">View</button><button class="btn btn-success btn-sm">Reinstate</button></div></td>
+          </tr>
+          <tr style="background:#FFFBEB">
+            <td><div style="display:flex;align-items:center;gap:10px"><div class="avatar sm" style="background:var(--amber)">LW</div><div><div style="font-size:13px;font-weight:600">Lisa Wong</div><div style="font-size:10px;color:var(--text3)">lisa.w@cleanpro.au</div></div></div></td>
+            <td><div class="tag purple">Tradie</div></td>
+            <td><div style="font-size:12px">Chatswood, NSW</div></td>
+            <td><div class="tag amber">Pending</div></td>
+            <td><div style="font-size:12px;color:var(--text2)">Yesterday</div></td>
+            <td><div style="font-size:12px;color:var(--text3)">0 jobs</div></td>
+            <td><div style="font-size:12px;color:var(--text3)">—</div></td>
+            <td><div style="display:flex;gap:6px"><button class="btn btn-success btn-sm">Approve</button><button class="btn btn-danger btn-sm">Reject</button></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="display:flex;justify-content:space-between;align-items:center;padding:14px 14px 0;margin-top:4px;border-top:1px solid var(--border)">
+        <div style="font-size:12px;color:var(--text3)">Showing 6 of 12,841 users</div>
+        <div style="display:flex;gap:6px">
+          <button class="btn btn-ghost btn-sm">← Prev</button>
+          <button class="btn btn-ghost btn-sm" style="background:var(--amber-dim);border-color:var(--amber);color:var(--amber2)">1</button>
+          <button class="btn btn-ghost btn-sm">2</button>
+          <button class="btn btn-ghost btn-sm">3</button>
+          <button class="btn btn-ghost btn-sm">Next →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- end deck -->
+
+<div class="slide-title-badge" id="slideTitle">1 / 11 — Homepage</div>
+<div class="nav-controls">
+  <button class="nav-btn" onclick="changeSlide(-1)">←</button>
+  <div class="slide-info" id="slideInfo">Slide 1 of 11</div>
+  <button class="nav-btn" onclick="changeSlide(1)">→</button>
+</div>
+
+<script>
+const slides=[
+  {id:'s1',title:'Homepage'},
+  {id:'s2',title:'Login Page'},
+  {id:'s3',title:'Register — Role Select'},
+  {id:'s4',title:'Customer Dashboard'},
+  {id:'s5',title:'Job Posting Wizard'},
+  {id:'s6',title:'Customer Job Detail'},
+  {id:'s7',title:'Tradie Dashboard'},
+  {id:'s8',title:'Tradie Lead Feed'},
+  {id:'s9',title:'Tradie Onboarding'},
+  {id:'s10',title:'Admin Dashboard'},
+  {id:'s11',title:'Admin Users'},
+];
+let cur=0;
+function showSlide(n){
+  document.querySelectorAll('.slide').forEach(s=>s.classList.remove('active'));
+  document.getElementById(slides[n].id).classList.add('active');
+  document.getElementById('slideInfo').textContent=`Slide ${n+1} of ${slides.length}`;
+  document.getElementById('slideTitle').textContent=`${n+1} / ${slides.length} — ${slides[n].title}`;
+}
+function changeSlide(d){cur=Math.max(0,Math.min(slides.length-1,cur+d));showSlide(cur);}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key==='ArrowDown')changeSlide(1);
+  if(e.key==='ArrowLeft'||e.key==='ArrowUp')changeSlide(-1);
+});
+</script>
+</body>
+</html>
