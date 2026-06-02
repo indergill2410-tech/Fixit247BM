@@ -78,6 +78,14 @@ export default function HomePage() {
                 </Link>
               </div>
 
+              {/* Sign-in nudge */}
+              <p className="mt-3 text-xs text-foreground-subtle">
+                Already have an account?{' '}
+                <Link href="/login" className="font-semibold text-brand-600 hover:underline">Sign in</Link>
+                {' · '}
+                <Link href="/login" className="font-semibold text-foreground-muted hover:text-foreground hover:underline">Try a demo account</Link>
+              </p>
+
               {/* Trust row */}
               <div className="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
                 {TRUST_ITEMS.map((item) => (
