@@ -19,8 +19,6 @@ function getSiteOrigin(): string {
   return process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ?? window.location.origin;
 }
 
-const SHOW_DEMO = process.env.NEXT_PUBLIC_DEMO_MODE !== 'false';
-
 interface LoginResponse {
   redirectTo?: string;
   error?: string;
@@ -34,39 +32,6 @@ const URL_ERROR_COPY: Record<string, string> = {
   access_denied: 'This account is not active or cannot access that area.',
 };
 
-const DEMO_ACCOUNTS = [
-  {
-    email: 'emma.williams@demo.fixit247.com',
-    password: 'Demo1234!',
-    role: 'CUSTOMER',
-    label: 'Homeowner',
-    description: 'Post jobs, hire tradies, track progress',
-    icon: '🏠',
-    badge: 'Customer view',
-    badgeColor: 'bg-blue-100 text-blue-700',
-  },
-  {
-    email: 'mike.torres@demo.fixit247.com',
-    password: 'Demo1234!',
-    role: 'TRADIE',
-    label: 'Tradie',
-    description: 'Browse leads, manage jobs & earnings',
-    icon: '🔧',
-    badge: 'Tradie view',
-    badgeColor: 'bg-brand-100 text-brand-700',
-  },
-  {
-    email: 'admin@demo.fixit247.com.au',
-    password: 'Demo1234!',
-    role: 'SUPER_ADMIN',
-    label: 'Super Admin',
-    description: 'Platform control room, trust, revenue & support',
-    icon: '⚙️',
-    badge: 'Ops view',
-    badgeColor: 'bg-purple-100 text-purple-700',
-  },
-] as const;
-
 export function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -75,7 +40,6 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [isGoogleLoading, setIsGoogleLoading] = React.useState(false);
   const [showGoogleRoleSelect, setShowGoogleRoleSelect] = React.useState(false);
-  const [demoLoading, setDemoLoading] = React.useState<string | null>(null);
 
   const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm<LoginValues>({
     resolver: zodResolver(loginSchema),
@@ -121,18 +85,6 @@ export function LoginForm() {
     const supabase = getSupabaseBrowserClient();
     await supabase.auth.resend({ type: 'signup', email });
     toast.success('Verification email sent');
-  }
-
-  async function loginAsDemo(email: string, password: string) {
-    if (demoLoading !== null || isSubmitting || isGoogleLoading) return;
-    setDemoLoading(email);
-    try {
-      const loggedIn = await completePasswordLogin(email, password, 'Signed in as demo user');
-      if (!loggedIn) setDemoLoading(null);
-    } catch {
-      toast.error('An unexpected error occurred during demo login');
-      setDemoLoading(null);
-    }
   }
 
   function handleGoogleLogin() {
@@ -279,60 +231,6 @@ export function LoginForm() {
               </svg>
               Continue with Google
             </Button>
-          )}
-
-          {/* Demo accounts — one-click instant login, shown when NEXT_PUBLIC_DEMO_MODE=true */}
-          {SHOW_DEMO && (
-            <>
-              <div className="my-5 flex items-center gap-3">
-                <div className="flex-1 border-t border-border" />
-                <span className="text-xs text-foreground-subtle">or try a demo account</span>
-                <div className="flex-1 border-t border-border" />
-              </div>
-              <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-sm-warm">
-                <div className="divide-y divide-border">
-                  {DEMO_ACCOUNTS.map(({ email, password, label, description, icon, badge, badgeColor }) => {
-                    const isLoading = demoLoading === email;
-                    const isDisabled = demoLoading !== null || isSubmitting || isGoogleLoading;
-                    return (
-                      <button
-                        key={email}
-                        type="button"
-                        disabled={isDisabled}
-                        onClick={() => void loginAsDemo(email, password)}
-                        className="group flex w-full items-center gap-4 px-5 py-4 text-left transition-all hover:bg-background-alt disabled:cursor-not-allowed disabled:opacity-60"
-                      >
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-background-alt text-lg group-hover:bg-background-elevated">
-                          {icon}
-                        </span>
-                        <span className="min-w-0 flex-1">
-                          <span className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-foreground">{label}</span>
-                            <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-semibold ${badgeColor}`}>{badge}</span>
-                          </span>
-                          <span className="mt-0.5 block truncate text-xs text-foreground-muted">{description}</span>
-                        </span>
-                        <span className="shrink-0">
-                          {isLoading ? (
-                            <svg className="h-4 w-4 animate-spin text-brand-600" fill="none" viewBox="0 0 24 24">
-                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                            </svg>
-                          ) : (
-                            <svg className="h-4 w-4 text-foreground-subtle transition-colors group-hover:text-foreground-muted" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-                            </svg>
-                          )}
-                        </span>
-                      </button>
-                    );
-                  })}
-                </div>
-                <div className="border-t border-border bg-background-alt px-5 py-2.5 text-center text-[11px] text-foreground-muted">
-                  One click — instantly signed in, no password needed
-                </div>
-              </div>
-            </>
           )}
         </CardContent>
       </Card>
