@@ -355,6 +355,7 @@ function JoinAsTradiePageInner() {
 
       {/* 4. How It Works */}
       <section id="how-it-works" className="border-t border-border bg-background py-20 px-4">
+        <RevealSection>
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
@@ -377,6 +378,7 @@ function JoinAsTradiePageInner() {
             ))}
           </div>
         </div>
+        </RevealSection>
       </section>
 
       {/* 5. Testimonials — proof before pricing */}
@@ -409,20 +411,25 @@ function JoinAsTradiePageInner() {
 
       {/* 6. Trust badges */}
       <section className="border-t border-border bg-background py-10 px-4">
-        <div className="mx-auto max-w-4xl">
-          <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
-            {TRUST_BADGES.map((badge) => (
-              <div key={badge.label} className="flex flex-col items-center gap-2 text-center">
-                <span className="text-3xl">{badge.icon}</span>
-                <p className="text-sm font-semibold text-foreground-muted">{badge.label}</p>
-              </div>
-            ))}
+        <RevealSection>
+          <div className="mx-auto max-w-4xl">
+            <div className="grid grid-cols-2 gap-6 sm:grid-cols-4">
+              {TRUST_BADGES.map((badge) => (
+                <div key={badge.label} className="flex flex-col items-center gap-2 text-center">
+                  <div className="text-brand-500">
+                    <FxIcon name={badge.icon} size={32} />
+                  </div>
+                  <p className="text-sm font-semibold text-foreground-muted">{badge.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </RevealSection>
       </section>
 
       {/* 7. Subscription Plans — after proof */}
       <section className="border-t border-border bg-background-alt py-20 px-4">
+        <RevealSection>
         <div className="mx-auto max-w-6xl">
           <div className="mb-12 text-center">
             <span className="mb-3 inline-block rounded-full bg-brand-500/20 px-3 py-1 text-xs font-semibold text-brand-500">
@@ -475,6 +482,7 @@ function JoinAsTradiePageInner() {
             ))}
           </div>
         </div>
+        </RevealSection>
       </section>
 
       {/* 8. FAQ — accordion */}
