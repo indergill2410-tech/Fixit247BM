@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
-import { DashboardLayout, Header, HeaderBrand, Sidebar, SidebarNavItem } from '@fixit247/ui';
+import { DashboardLayout, Header, Sidebar, SidebarNavItem } from '@fixit247/ui';
 import {
   LayoutDashboard, Users, Wrench, Shield,
   DollarSign, BarChart3, Settings, Menu, X,

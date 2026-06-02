@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { use } from 'react';
 import Link from 'next/link';
 import { AdminShell } from '@/components/shared/admin-shell';
-import { Card, CardContent, Badge, Button } from '@fixit247/ui';
+import { Card, CardContent, Button } from '@fixit247/ui';
 import { ArrowLeft, AlertTriangle, User, Briefcase, CreditCard, Clock } from 'lucide-react';
 import { toast } from 'sonner';
 

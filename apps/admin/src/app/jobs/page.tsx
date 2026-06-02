@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { StatCard } from '@/components/shared/stat-card';
-import { Card, CardContent, Badge, Button } from '@fixit247/ui';
+import { Card, CardContent, Button } from '@fixit247/ui';
 import { Briefcase, Zap, CheckCircle, XCircle, AlertTriangle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 

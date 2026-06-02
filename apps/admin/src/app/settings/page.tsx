@@ -170,7 +170,7 @@ export default function SettingsPage() {
                   <FeeRow
                     key={f.key}
                     label={f.label}
-                    fieldKey={f.key}
+                    fieldKey={String(f.key)}
                     value={config[f.key] ?? '0'}
                     onSave={handleSave}
                   />

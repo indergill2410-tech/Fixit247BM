@@ -127,7 +127,7 @@ export default function ReportsPage() {
       downloadCSV(
         `users-export-${usersFrom}-to-${usersTo}.csv`,
         ['id', 'email', 'first_name', 'last_name', 'role', 'is_active', 'created_at'],
-        filtered.map((u) => [u.id, u.email, u.firstName ?? '', u.lastName ?? '', u.role ?? '', u.isActive ?? '', u.createdAt]),
+        filtered.map((u) => [u.id, u.email, u.firstName ?? '', u.lastName ?? '', u.role ?? '', String(u.isActive ?? ''), u.createdAt]),
       );
     } catch (err) {
       alert(err instanceof Error ? err.message : 'Export failed');

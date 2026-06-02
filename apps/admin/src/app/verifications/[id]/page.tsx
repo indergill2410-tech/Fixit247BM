@@ -5,7 +5,7 @@ import { use } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { AdminShell } from '@/components/shared/admin-shell';
-import { Card, CardContent, Badge, Button } from '@fixit247/ui';
+import { Card, CardContent, Button } from '@fixit247/ui';
 import { ArrowLeft, ShieldCheck, User, FileText, Shield, Star, Briefcase } from 'lucide-react';
 import { toast } from 'sonner';
 
