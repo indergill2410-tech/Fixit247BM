@@ -10,6 +10,7 @@ const NAV_LINKS = [
   { href: '/fixit-plus', label: 'Fixit Plus' },
   { href: '/join-as-tradie', label: 'For Tradies' },
   { href: '/about', label: 'About' },
+  { href: '/blog', label: 'Blog' },
 ] as const;
 
 export function MarketingNav() {
@@ -89,7 +90,7 @@ export function MarketingNav() {
               href="/register"
               className="hidden rounded-xl bg-brand-500 px-4 py-2 text-sm font-bold text-gray-900 transition-all hover:bg-brand-400 sm:inline-block"
             >
-              Post a job free
+              Get started free
             </Link>
             <button
               onClick={() => { setOpen((v) => !v); }}
@@ -167,7 +168,7 @@ export function MarketingNav() {
                 onClick={() => { setOpen(false); }}
                 className="w-full rounded-xl bg-brand-500 py-3 text-center text-sm font-bold text-gray-900 transition-colors hover:bg-brand-400"
               >
-                Post a job — free
+                Get started free
               </Link>
             </div>
 
