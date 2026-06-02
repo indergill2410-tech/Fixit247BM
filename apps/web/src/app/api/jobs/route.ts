@@ -7,6 +7,7 @@ import { rateLimit, rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api
 import { matchAndDispatch } from '@fixit247/matching';
 import { runFraudCheck } from '@fixit247/fraud';
 import { lookupPromoCode } from '@/lib/promo';
+import { waitUntil } from 'next/server';
 import { logger } from '@/lib/logger';
 
 // ── Lead price by trade (server-side authoritative) ───────────────────────────
