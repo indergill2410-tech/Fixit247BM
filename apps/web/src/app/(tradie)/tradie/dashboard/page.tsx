@@ -6,7 +6,7 @@ import { StatCard } from '@/components/shared/stat-card';
 import { Button, Card, CardContent, CardHeader, CardTitle, Badge } from '@fixit247/ui';
 import { TrustScoreMeter, TrustBadge } from '@fixit247/ui';
 import Link from 'next/link';
-import { CheckCircle, AlertTriangle } from 'lucide-react';
+import { FxIcon } from '@/components/ui/fx-icon';
 
 export const metadata: Metadata = { title: 'Tradie Dashboard' };
 
@@ -89,18 +89,18 @@ export default async function TradieDashboardPage() {
       />
 
       <StatsGrid cols={4}>
-        <StatCard title="Active Jobs" value={activeJobCount} icon="🔧" />
-        <StatCard title="Total Earnings" value={totalEarnings} delta="AUD lifetime" icon="💰" />
+        <StatCard title="Active Jobs" value={activeJobCount} icon={<FxIcon name="wrench" size={18} />} />
+        <StatCard title="Total Earnings" value={totalEarnings} delta="AUD lifetime" icon={<FxIcon name="dollar" size={18} />} />
         <StatCard
           title="Trust Score"
           value={trustScore > 0 ? `${trustScore}/100` : '—'}
-          icon="⭐"
+          icon={<FxIcon name="star" size={18} />}
         />
         <StatCard
           title="Avg Rating"
           value={ratingDisplay}
           delta={totalReviews > 0 ? `${totalReviews} review${totalReviews === 1 ? '' : 's'}` : 'No reviews yet'}
-          icon="⚡"
+          icon={<FxIcon name="zap" size={18} />}
         />
       </StatsGrid>
 

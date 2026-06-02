@@ -6,7 +6,7 @@ import { DashboardShell, PageHeader, StatsGrid } from '@/components/shared/dashb
 import { StatCard } from '@/components/shared/stat-card';
 import { Button } from '@fixit247/ui';
 import { RecentJobsList } from '@/components/features/jobs/recent-jobs-list';
-import { Zap } from 'lucide-react';
+import { FxIcon } from '@/components/ui/fx-icon';
 
 export const metadata: Metadata = { title: 'Dashboard' };
 
@@ -57,7 +57,7 @@ export default async function CustomerDashboardPage() {
         </div>
         <Button asChild variant="emergency" size="lg" className="shrink-0">
           <Link href="/jobs/emergency">
-            <Zap size={18} />
+            <FxIcon name="zap" size={18} />
             Get Help Now
           </Link>
         </Button>
@@ -74,14 +74,14 @@ export default async function CustomerDashboardPage() {
       />
 
       <StatsGrid cols={4}>
-        <StatCard title="Active Jobs" value={activeCount} icon="🔧" />
-        <StatCard title="Completed" value={completedCount} icon="✅" />
-        <StatCard title="Total Spent" value={totalSpent} delta="AUD lifetime" icon="💳" />
+        <StatCard title="Active Jobs" value={activeCount} icon={<FxIcon name="wrench" size={20} />} />
+        <StatCard title="Completed" value={completedCount} icon={<FxIcon name="checkCircle" size={20} />} />
+        <StatCard title="Total Spent" value={totalSpent} delta="AUD lifetime" icon={<FxIcon name="creditCard" size={20} />} />
         <StatCard
           title="Reviews Given"
           value={reviewsGiven > 0 ? reviewsGiven : '—'}
           delta={reviewsGiven > 0 ? `${reviewsGiven} review${reviewsGiven === 1 ? '' : 's'}` : 'No reviews yet'}
-          icon="⭐"
+          icon={<FxIcon name="star" size={20} />}
         />
       </StatsGrid>
 
