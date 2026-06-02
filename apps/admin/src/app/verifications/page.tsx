@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { Card, CardContent, Badge, Button } from '@fixit247/ui';
+import { ShieldCheck } from 'lucide-react';
 import { db } from '@fixit247/database';
 import Link from 'next/link';
 
@@ -35,8 +36,8 @@ export default async function VerificationsPage() {
     <AdminShell>
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900">Tradie Verifications</h1>
-          <p className="mt-1.5 text-sm text-gray-500">
+          <h1 className="flex items-center gap-2 text-2xl font-bold text-foreground"><ShieldCheck size={22} className="text-amber-500" />Tradie Verifications</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
             Review and approve tradie identity, licence, and insurance documents
           </p>
         </div>
@@ -51,25 +52,25 @@ export default async function VerificationsPage() {
         <CardContent className="p-0">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-gray-100 bg-gray-50">
+              <tr className="border-b bg-muted/50">
                 {['Tradie', 'Trades', 'Documents', 'Submitted', 'Status', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase text-gray-500">{h}</th>
+                  <th key={h} className="px-4 py-3 text-left text-xs font-semibold uppercase text-muted-foreground">{h}</th>
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-100">
+            <tbody className="divide-y">
               {profiles.map((p: typeof profiles[number]) => {
                 const docs = [
                   ...p.licences.map((l) => l.licenceType ?? 'Licence'),
                   ...p.insurances.map(() => 'Insurance'),
                 ];
                 return (
-                  <tr key={p.id} className="hover:bg-gray-50">
+                  <tr key={p.id} className="hover:bg-muted/30 transition-colors">
                     <td className="px-4 py-4">
-                      <p className="font-medium text-gray-900">{p.user.firstName} {p.user.lastName}</p>
-                      <p className="text-xs text-gray-500">{p.user.email}</p>
+                      <p className="font-medium text-foreground">{p.user.firstName} {p.user.lastName}</p>
+                      <p className="text-xs text-muted-foreground">{p.user.email}</p>
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-700">
+                    <td className="px-4 py-4 text-sm text-foreground">
                       {p.trades.slice(0, 2).map((t) => TRADE_LABELS[t] ?? t).join(', ')}
                       {p.trades.length > 2 && ` +${p.trades.length - 2}`}
                     </td>
@@ -81,7 +82,7 @@ export default async function VerificationsPage() {
                         }
                       </div>
                     </td>
-                    <td className="px-4 py-4 text-sm text-gray-500">
+                    <td className="px-4 py-4 text-sm text-muted-foreground">
                       {p.createdAt.toLocaleDateString('en-AU', { day: 'numeric', month: 'short' })}
                     </td>
                     <td className="px-4 py-4">
@@ -100,7 +101,7 @@ export default async function VerificationsPage() {
             </tbody>
           </table>
           {profiles.length === 0 && (
-            <p className="py-12 text-center text-sm text-gray-400">No pending verifications</p>
+            <p className="py-12 text-center text-sm text-muted-foreground">No pending verifications</p>
           )}
         </CardContent>
       </Card>

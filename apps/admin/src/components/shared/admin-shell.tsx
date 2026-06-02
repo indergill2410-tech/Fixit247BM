@@ -50,14 +50,22 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
     <DashboardLayout
       sidebar={
         <Sidebar collapsed={collapsed}>
-          <div className="flex h-16 items-center justify-between px-4">
-            <HeaderBrand name="Fixit247 Admin" />
-            <button
-              onClick={() => { setCollapsed(!collapsed); }}
-              className="rounded-lg p-1 hover:bg-muted"
-              aria-label="Toggle sidebar"
-            >
-              {collapsed ? <Menu size={18} /> : <X size={18} />}
+          <div className="flex h-16 items-center justify-between px-4 border-b">
+            <div className="flex items-center gap-2.5">
+              <svg width="28" height="28" viewBox="0 0 172 176" fill="none">
+                <defs>
+                  <linearGradient id="admlogo" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#FCD34D"/>
+                    <stop offset="100%" stopColor="#D97706"/>
+                  </linearGradient>
+                </defs>
+                <rect x="0" y="4" width="172" height="172" rx="36" fill="url(#admlogo)"/>
+                <path d="M118 22C138 22 154 37 156 57C157 69 152 80 143 87L90 140L95 145C98 148 98 154 95 157L65 187C59 193 49 193 43 187C37 181 37 171 43 165L73 135C76 132 82 132 85 135L90 140L143 87C151 80 156 69 154 57C151 38 136 22 118 22Z M118 42C128 42 136 50 136 60C136 67 132 73 127 77L108 58C112 53 115 48 116 42C116.7 42 117.3 42 118 42Z" fill="#1E2235" fillRule="evenodd"/>
+              </svg>
+              {!collapsed && <span className="text-sm font-bold text-foreground">Fixit<span className="text-amber-500">247</span> Admin</span>}
+            </div>
+            <button onClick={() => { setCollapsed(!collapsed); }} className="rounded-lg p-1.5 hover:bg-muted text-muted-foreground" aria-label="Toggle sidebar">
+              {collapsed ? <Menu size={16} /> : <X size={16} />}
             </button>
           </div>
           <nav className="flex-1 overflow-y-auto px-2 py-4">
@@ -144,8 +152,20 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
       header={
         <Header>
           <div className="flex flex-1 items-center justify-between">
-            <HeaderBrand name="Fixit247 Admin" />
-            <span className="rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-semibold text-red-700">
+            <div className="flex items-center gap-2">
+              <svg width="24" height="24" viewBox="0 0 172 176" fill="none">
+                <defs>
+                  <linearGradient id="admlogo2" x1="0" y1="0" x2="1" y2="1">
+                    <stop offset="0%" stopColor="#FCD34D"/>
+                    <stop offset="100%" stopColor="#D97706"/>
+                  </linearGradient>
+                </defs>
+                <rect x="0" y="4" width="172" height="172" rx="36" fill="url(#admlogo2)"/>
+                <path d="M118 22C138 22 154 37 156 57C157 69 152 80 143 87L90 140L95 145C98 148 98 154 95 157L65 187C59 193 49 193 43 187C37 181 37 171 43 165L73 135C76 132 82 132 85 135L90 140L143 87C151 80 156 69 154 57C151 38 136 22 118 22Z M118 42C128 42 136 50 136 60C136 67 132 73 127 77L108 58C112 53 115 48 116 42C116.7 42 117.3 42 118 42Z" fill="#1E2235" fillRule="evenodd"/>
+              </svg>
+              <span className="text-sm font-bold text-foreground">Fixit<span className="text-amber-500">247</span> Admin</span>
+            </div>
+            <span className="rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-semibold text-amber-700 dark:bg-amber-500/20 dark:text-amber-400">
               ADMIN CONSOLE
             </span>
           </div>
