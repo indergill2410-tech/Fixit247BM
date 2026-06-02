@@ -13,7 +13,10 @@ FROM base AS installer
 WORKDIR /app
 COPY --from=pruner /app/out/json/ .
 COPY --from=pruner /app/out/pnpm-lock.yaml ./pnpm-lock.yaml
-RUN pnpm install --frozen-lockfile
+# Skip lifecycle scripts: the root postinstall runs `prisma generate`, but the
+# schema isn't in the pruned json layer yet. We run generate explicitly in the
+# builder stage below, once the full source (incl. schema) is present.
+RUN pnpm install --frozen-lockfile --ignore-scripts
 
 # ── Build ────────────────────────────────────────────────────────────────────
 FROM base AS builder
