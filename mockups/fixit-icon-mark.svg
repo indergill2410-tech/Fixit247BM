@@ -9,11 +9,6 @@
   <!-- Amber rounded square -->
   <rect x="0" y="4" width="172" height="172" rx="36" fill="url(#amber)"/>
 
-  <!-- 3 speed lines (left of wrench, dark charcoal) -->
-  <line x1="16" y1="80"  x2="52" y2="80"  stroke="#1E2235" stroke-width="9" stroke-linecap="round"/>
-  <line x1="11" y1="100" x2="47" y2="100" stroke="#1E2235" stroke-width="9" stroke-linecap="round"/>
-  <line x1="16" y1="120" x2="48" y2="120" stroke="#1E2235" stroke-width="8" stroke-linecap="round"/>
-
   <!-- Wrench (open jaw upper-right, handle lower-left, angled ~-45deg) -->
   <path
     d="
@@ -46,19 +41,5 @@
       C130.6 36 131.3 36 132 36Z
     "
     fill="url(#amber)"
-  />
-  <!-- Lower jaw arm -->
-  <path
-    d="
-      M164 48
-      C165 38 160 28 152 22
-      L140 36
-      C145 39 148 45 148 52
-      C148 55 147 58 145 60
-      L158 74
-      C162 68 164 59 164 48Z
-    "
-    fill="#1E2235"
-    opacity="0"
   />
 </svg>
