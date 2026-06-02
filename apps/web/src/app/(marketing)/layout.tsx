@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { MarketingNav } from '@/components/layout/marketing-nav';
+import { FxIcon } from '@/components/ui/fx-icon';
 
 export default function MarketingLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,7 +22,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
               { label: 'Available 24/7 across Australia' },
             ].map((item) => (
               <div key={item.label} className="flex items-center gap-2 text-xs text-foreground-muted">
-                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-brand-500/20 text-brand-600 text-[10px] font-bold">✓</span>
+                <FxIcon name="checkCircle" size={12} className="text-brand-600 dark:text-brand-400" />
                 {item.label}
               </div>
             ))}
@@ -30,7 +31,11 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
           <div className="grid gap-8 md:grid-cols-4">
             <div>
               <div className="mb-3 flex items-center gap-2 text-base font-extrabold text-foreground">
-                <span className="text-brand-500">🔑</span>
+                <svg width="20" height="20" viewBox="0 0 172 176" fill="none">
+                  <defs><linearGradient id="ftrlogo" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stopColor="#FCD34D"/><stop offset="100%" stopColor="#D97706"/></linearGradient></defs>
+                  <rect x="0" y="4" width="172" height="172" rx="36" fill="url(#ftrlogo)"/>
+                  <path d="M118 22C138 22 154 37 156 57C157 69 152 80 143 87L90 140L95 145C98 148 98 154 95 157L65 187C59 193 49 193 43 187C37 181 37 171 43 165L73 135C76 132 82 132 85 135L90 140L143 87C151 80 156 69 154 57C151 38 136 22 118 22Z M118 42C128 42 136 50 136 60C136 67 132 73 127 77L108 58C112 53 115 48 116 42C116.7 42 117.3 42 118 42Z" fill="#1E2235" fillRule="evenodd"/>
+                </svg>
                 Fixit <span className="text-brand-500">24/7</span>
               </div>
               <p className="text-sm text-foreground-muted leading-relaxed">
@@ -72,7 +77,7 @@ export default function MarketingLayout({ children }: { children: React.ReactNod
                 <a href="mailto:hello@fixit247.com.au" className="block transition-colors hover:text-foreground">hello@fixit247.com.au</a>
                 <a href="tel:1800348498" className="block transition-colors hover:text-foreground">1800-FIXIT-247</a>
                 <p className="text-[11px] text-foreground-subtle">Available 24 hours, 7 days</p>
-                <Link href="/emergency" className="mt-1 block font-medium text-brand-600 transition-colors hover:text-brand-500">Emergency Dispatch →</Link>
+                <Link href="/emergency" className="mt-1 block font-medium text-brand-600 transition-colors hover:text-brand-500 dark:text-brand-400 dark:hover:text-brand-300">Emergency Dispatch →</Link>
               </div>
             </div>
           </div>
