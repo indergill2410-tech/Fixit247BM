@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { StatCard } from '@/components/shared/stat-card';
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@fixit247/ui';
-import { RefreshCw, Zap, Clock, AlertTriangle, Radio } from 'lucide-react';
+import { RefreshCw, Zap, Clock, AlertTriangle, Radio, Wrench, Users, } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface LiveData {
@@ -91,7 +91,7 @@ export default function AdminLivePage() {
       <div className="mb-8 flex items-center justify-between">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-3xl font-bold text-gray-900">Live Operations</h1>
+            <h1 className="text-3xl font-bold text-foreground">Live Operations</h1>
             <span className={`flex h-2.5 w-2.5 rounded-full ${autoRefresh ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
           </div>
           <p className="mt-1 text-sm text-gray-500">
@@ -116,10 +116,10 @@ export default function AdminLivePage() {
 
       {/* KPIs */}
       <div className="mb-8 grid grid-cols-2 gap-4 lg:grid-cols-4">
-        <StatCard title="Active Jobs" value={data?.activeJobs.length ?? '—'} icon="🔧" />
-        <StatCard title="Online Tradies" value={data?.onlineTradieCount ?? '—'} icon="👷" />
-        <StatCard title="Pending Dispatch" value={data?.pendingDispatchCount ?? '—'} icon="⏳" delta="Awaiting tradie" />
-        <StatCard title="Emergency Jobs" value={emergencyJobs.length} icon="🚨" delta={emergencyJobs.length > 0 ? 'Needs priority' : 'All clear'} />
+        <StatCard title="Active Jobs" value={data?.activeJobs.length ?? '—'} icon={<Wrench size={18} />} color="amber" />
+        <StatCard title="Online Tradies" value={data?.onlineTradieCount ?? '—'} icon={<Users size={18} />} color="blue" />
+        <StatCard title="Pending Dispatch" value={data?.pendingDispatchCount ?? '—'} icon={<Clock size={18} />} color="default" delta="Awaiting tradie" />
+        <StatCard title="Emergency Jobs" value={emergencyJobs.length} icon={<AlertTriangle size={18} />} color="red" delta={emergencyJobs.length > 0 ? 'Needs priority' : 'All clear'} highlight={emergencyJobs.length > 0} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
