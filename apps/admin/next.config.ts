@@ -31,6 +31,7 @@ const nextConfig: NextConfig = {
     '@fixit247/fraud',
     '@fixit247/trust',
     '@fixit247/notifications',
+    '@fixit247/realtime',
   ],
   images: {
     remotePatterns: [
