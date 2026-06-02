@@ -2,13 +2,7 @@ import type { NextRequest } from 'next/server';
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
-
-// Static promo codes — no DB model required
-const PROMO_CODES: Partial<Record<string, { discountPercent: number; description: string }>> = {
-  'FIRST20':      { discountPercent: 20, description: '20% off your first job' },
-  'WELCOME10':    { discountPercent: 10, description: '10% off for new customers' },
-  'EMERGENCY15':  { discountPercent: 15, description: '15% off emergency callouts' },
-};
+import { lookupPromoCode } from '@/lib/promo';
 
 const Schema = z.object({
   code: z.string().min(1).max(50),
@@ -20,8 +14,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json() as unknown;
     const { code, jobValue } = Schema.parse(body);
 
-    const normalised = code.trim().toUpperCase();
-    const promo = PROMO_CODES[normalised];
+    const promo = await lookupPromoCode(code);
 
     if (!promo) {
       return NextResponse.json({ valid: false, message: 'Invalid or expired promo code' });

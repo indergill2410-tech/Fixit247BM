@@ -19,7 +19,8 @@ interface PricingConfig {
   [key: string]: string;
 }
 
-// ── Feature flags (static — UI only) ─────────────────────────────────────────
+// ── Feature flags ─────────────────────────────────────────────────────────────
+// Persisted in PlatformConfig as `flag_<key>` = 'true' | 'false' (default ON).
 
 const FEATURE_FLAGS = [
   { key: 'emergency_dispatch', label: 'Emergency Dispatch', description: 'Allow customers to raise emergency jobs with priority routing' },
@@ -91,6 +92,48 @@ function FeeRow({ label, fieldKey, value, onSave }: {
           {saving ? 'Saving…' : 'Save'}
         </button>
       </div>
+    </div>
+  );
+}
+
+// ── Feature flag toggle row ────────────────────────────────────────────────────
+
+function FlagRow({ label, description, enabled, onToggle }: {
+  label: string;
+  description: string;
+  enabled: boolean;
+  onToggle: (next: boolean) => Promise<void>;
+}) {
+  const [saving, setSaving] = useState(false);
+
+  async function handleClick() {
+    setSaving(true);
+    try {
+      await onToggle(!enabled);
+      toast.success(`${label} ${!enabled ? 'enabled' : 'disabled'}`);
+    } catch {
+      toast.error(`Failed to update ${label}`);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-between gap-4 py-4">
+      <div>
+        <p className="text-sm font-medium text-gray-800">{label}</p>
+        <p className="text-xs text-gray-500">{description}</p>
+      </div>
+      <button
+        onClick={handleClick}
+        disabled={saving}
+        role="switch"
+        aria-checked={enabled}
+        aria-label={label}
+        className={`relative h-6 w-11 shrink-0 rounded-full transition-colors disabled:opacity-50 ${enabled ? 'bg-green-500' : 'bg-gray-300'}`}
+      >
+        <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${enabled ? 'left-5 -translate-x-0.5' : 'left-0.5'}`} />
+      </button>
     </div>
   );
 }
@@ -190,17 +233,19 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent>
             <div className="divide-y">
-              {FEATURE_FLAGS.map((flag) => (
-                <div key={flag.key} className="flex items-center justify-between gap-4 py-4">
-                  <div>
-                    <p className="text-sm font-medium text-gray-800">{flag.label}</p>
-                    <p className="text-xs text-gray-500">{flag.description}</p>
-                  </div>
-                  <span className="shrink-0 rounded-full bg-green-100 px-3 py-0.5 text-xs font-semibold text-green-700">
-                    ON
-                  </span>
-                </div>
-              ))}
+              {FEATURE_FLAGS.map((flag) => {
+                // Default ON: only an explicit 'false' disables a flag.
+                const enabled = (config?.[`flag_${flag.key}`] ?? 'true') !== 'false';
+                return (
+                  <FlagRow
+                    key={flag.key}
+                    label={flag.label}
+                    description={flag.description}
+                    enabled={enabled}
+                    onToggle={(next) => handleSave(`flag_${flag.key}`, next ? 'true' : 'false')}
+                  />
+                );
+              })}
             </div>
           </CardContent>
         </Card>

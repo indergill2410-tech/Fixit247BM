@@ -4,6 +4,7 @@ import { createServerClient } from '@supabase/ssr';
 import { db } from '@fixit247/database';
 import type { TradeCategory } from '@fixit247/database';
 import { sendWelcomeTradieEmail } from '@fixit247/notifications';
+import { runFraudCheck } from '@fixit247/fraud';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -153,6 +154,13 @@ export async function POST(request: Request) {
     await supabase.auth.updateUser({ data: { onboardingComplete: true } });
     await db.user.update({ where: { id: user.id }, data: { onboardingComplete: true } });
     await sendWelcomeTradieEmail(user.id);
+
+    // Fire-and-forget: fraud scoring for new tradies (multi-account / fake-review
+    // signals) — auto-flags high risk for admin review without blocking signup.
+    void runFraudCheck(user.id, 'tradie').catch((err: unknown) => {
+      logger.error('Fraud check failed', { userId: user.id, error: String(err) });
+    });
+
     return NextResponse.json({ success: true, freeCreditsAwarded: 10 });
   } catch (err) {
     logger.error('Tradie onboarding error:', err);

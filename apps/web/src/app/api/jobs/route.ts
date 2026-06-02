@@ -5,6 +5,8 @@ import { requireApiSession } from '@/lib/auth/session';
 import { db } from '@fixit247/database';
 import { rateLimit, rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api/rate-limit';
 import { matchAndDispatch } from '@fixit247/matching';
+import { runFraudCheck } from '@fixit247/fraud';
+import { lookupPromoCode } from '@/lib/promo';
 import { logger } from '@/lib/logger';
 
 // ── Lead price by trade (server-side authoritative) ───────────────────────────
@@ -75,17 +77,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Customer profile not found' }, { status: 404 });
     }
 
-    // Validate optional promo code (static lookup — no DB round-trip)
-    const PROMO_CODES: Partial<Record<string, { discountPercent: number; description: string }>> = {
-      'FIRST20':     { discountPercent: 20, description: '20% off your first job' },
-      'WELCOME10':   { discountPercent: 10, description: '10% off for new customers' },
-      'EMERGENCY15': { discountPercent: 15, description: '15% off emergency callouts' },
-    };
-
+    // Validate optional promo code (DB-first, static fallback — see lib/promo).
     let promoDiscount: { discountPercent: number; description: string } | null = null;
     if (data.promoCode) {
-      const normalised = data.promoCode.trim().toUpperCase();
-      promoDiscount = PROMO_CODES[normalised] ?? null;
+      promoDiscount = await lookupPromoCode(data.promoCode);
       if (!promoDiscount) {
         return NextResponse.json({ error: 'Invalid or expired promo code' }, { status: 400 });
       }
@@ -158,6 +153,12 @@ export async function POST(req: NextRequest) {
     // Fire-and-forget: trigger matching engine — never blocks job creation
     void matchAndDispatch(job).catch((err: unknown) => {
       logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
+    });
+
+    // Fire-and-forget: fraud scoring (auto-flags high-risk customers for admin
+    // review, e.g. fake-job / refund-abuse patterns). Never blocks job creation.
+    void runFraudCheck(session.id, 'customer').catch((err: unknown) => {
+      logger.error('Fraud check failed', { userId: session.id, error: String(err) });
     });
 
     return NextResponse.json({
