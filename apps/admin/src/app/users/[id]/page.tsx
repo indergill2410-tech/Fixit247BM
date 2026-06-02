@@ -11,6 +11,7 @@ import { toast } from 'sonner';
 // ── Types ─────────────────────────────────────────────────────────────────────
 
 interface TradieProfile {
+  id: string;
   businessName: string | null;
   abn: string | null;
   trades: string[];
@@ -199,7 +200,8 @@ export default function UserDetailPage() {
   const { user, recentJobs, recentPayments, stats } = data;
   const initials = `${user.firstName[0] ?? ''}${user.lastName[0] ?? ''}`.toUpperCase();
 
-  // We identify role by checking if the job's tradieId matches the user's tradieProfile.id
+  // Role on each job: tradieId matching the tradie profile = "as Tradie", otherwise "as Customer"
+  const tradieProfileId = user.tradieProfile?.id ?? null;
 
   return (
     <AdminShell>
@@ -341,7 +343,7 @@ export default function UserDetailPage() {
                           </span>
                         </td>
                         <td className="py-3 pr-4 text-xs text-gray-500">
-                          {job.customerId === customerProfileId ? 'as Customer' : 'as Tradie'}
+                          {job.tradieId === tradieProfileId && tradieProfileId ? 'as Tradie' : 'as Customer'}
                         </td>
                         <td className="py-3 pr-4 text-xs text-gray-400">{fmtDate(job.createdAt)}</td>
                         <td className="py-3 text-sm text-gray-700">

@@ -15,7 +15,8 @@ export async function GET(req: NextRequest) {
     const status = searchParams.get('status');
     const trade = searchParams.get('trade');
     const isEmergency = searchParams.get('isEmergency');
-    const limit = Math.min(Number(searchParams.get('limit') ?? '50'), 200);
+    const isExport = searchParams.get('export') === 'true';
+    const limit = Math.min(Number(searchParams.get('limit') ?? '50'), isExport ? 10000 : 200);
     const offset = Number(searchParams.get('offset') ?? '0');
 
     const where: Record<string, unknown> = {};

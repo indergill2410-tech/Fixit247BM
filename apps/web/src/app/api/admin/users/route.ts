@@ -14,7 +14,8 @@ export async function GET(req: NextRequest) {
     const role = searchParams.get('role');
     const isActiveParam = searchParams.get('isActive');
     const search = searchParams.get('search');
-    const limit = Math.min(Number(searchParams.get('limit') ?? '50'), 100);
+    const isExport = searchParams.get('export') === 'true';
+    const limit = Math.min(Number(searchParams.get('limit') ?? '50'), isExport ? 10000 : 100);
     const offset = Number(searchParams.get('offset') ?? '0');
 
     const where: Record<string, unknown> = {};

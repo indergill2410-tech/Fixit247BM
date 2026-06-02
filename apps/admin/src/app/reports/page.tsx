@@ -48,7 +48,7 @@ export default function ReportsPage() {
   async function handleJobsExport() {
     setJobsLoading(true);
     try {
-      const res = await fetch('/api/admin/jobs?limit=1000');
+      const res = await fetch('/api/admin/jobs?limit=10000&export=true');
       if (!res.ok) throw new Error('Failed to fetch jobs');
       const data = await res.json();
       const jobs: {
@@ -109,7 +109,7 @@ export default function ReportsPage() {
   async function handleUsersExport() {
     setUsersLoading(true);
     try {
-      const res = await fetch('/api/admin/users?limit=5000');
+      const res = await fetch('/api/admin/users?limit=10000&export=true');
       if (!res.ok) throw new Error('Failed to fetch users');
       const data = await res.json();
       const users: {

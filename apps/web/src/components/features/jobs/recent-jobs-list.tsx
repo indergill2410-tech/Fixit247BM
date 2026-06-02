@@ -22,9 +22,12 @@ const CATEGORY_ICON: Record<string, FxIconName> = {
 
 export async function RecentJobsList() {
   const session = await getSession();
-  const jobs = session
+  const customerProfile = session
+    ? await db.customerProfile.findUnique({ where: { userId: session.id }, select: { id: true } })
+    : null;
+  const jobs = customerProfile
     ? await db.job.findMany({
-        where: { customerId: session.id },
+        where: { customerId: customerProfile.id },
         orderBy: { createdAt: 'desc' },
         take: 5,
         select: {

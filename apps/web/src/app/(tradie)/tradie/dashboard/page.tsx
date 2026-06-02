@@ -62,10 +62,13 @@ export default async function TradieDashboardPage() {
       : Promise.resolve([]),
     tradieProfile
       ? db.payment.findMany({
-          where: { tradieId: tradieProfile.id, status: 'RELEASED' },
+          where: {
+            tradieId: tradieProfile.id,
+            status: 'RELEASED',
+            createdAt: { gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) },
+          },
           select: { amount: true, createdAt: true },
           orderBy: { createdAt: 'desc' },
-          take: 200,
         })
       : Promise.resolve([]),
   ]);

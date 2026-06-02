@@ -82,8 +82,11 @@ function SkeletonRows() {
   );
 }
 
+interface JobStats { total: number; active: number; completed: number; cancelled: number; }
+
 export default function JobsPage() {
   const [data, setData] = useState<JobsData | null>(null);
+  const [stats, setStats] = useState<JobStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('ALL');
   const [tradeFilter, setTradeFilter] = useState('ALL');
@@ -97,8 +100,26 @@ export default function JobsPage() {
       if (statusFilter !== 'ALL') params.set('status', statusFilter);
       if (tradeFilter !== 'ALL') params.set('trade', tradeFilter);
       if (emergencyOnly) params.set('isEmergency', 'true');
-      const res = await fetch(`/api/admin/jobs?${params.toString()}`);
-      if (res.ok) setData(await res.json());
+      const [jobsRes, allRes, activeRes, completedRes, cancelledRes] = await Promise.all([
+        fetch(`/api/admin/jobs?${params.toString()}`),
+        fetch('/api/admin/jobs?limit=1'),
+        fetch('/api/admin/jobs?limit=1&status=OPEN'),
+        fetch('/api/admin/jobs?limit=1&status=COMPLETED'),
+        fetch('/api/admin/jobs?limit=1&status=CANCELLED'),
+      ]);
+      if (jobsRes.ok) setData(await jobsRes.json());
+      const [allD, activeD, completedD, cancelledD] = await Promise.all([
+        allRes.ok ? allRes.json() : { total: 0 },
+        activeRes.ok ? activeRes.json() : { total: 0 },
+        completedRes.ok ? completedRes.json() : { total: 0 },
+        cancelledRes.ok ? cancelledRes.json() : { total: 0 },
+      ]);
+      setStats({
+        total: allD.total ?? 0,
+        active: activeD.total ?? 0,
+        completed: completedD.total ?? 0,
+        cancelled: cancelledD.total ?? 0,
+      });
     } catch {
       toast.error('Failed to load jobs');
     } finally {
@@ -109,10 +130,10 @@ export default function JobsPage() {
   useEffect(() => { fetchData(); }, [fetchData]);
 
   const jobs = data?.jobs ?? [];
-  const total = data?.total ?? 0;
-  const active = jobs.filter((j) => ['OPEN', 'CLAIMED', 'IN_PROGRESS', 'EN_ROUTE', 'ARRIVED'].includes(j.status)).length;
-  const completed = jobs.filter((j) => j.status === 'COMPLETED').length;
-  const cancelled = jobs.filter((j) => j.status === 'CANCELLED').length;
+  const total = stats?.total ?? data?.total ?? 0;
+  const active = stats?.active ?? 0;
+  const completed = stats?.completed ?? 0;
+  const cancelled = stats?.cancelled ?? 0;
 
   async function redispatch(jobId: string) {
     setDispatching(jobId);

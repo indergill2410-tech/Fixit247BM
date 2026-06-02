@@ -63,7 +63,9 @@ export function FixitPlusPlans({ plans }: FixitPlusPlansProps) {
           {plans.map((plan) => {
             const displayPrice = annual ? Math.round(plan.price * 10) : plan.price;
             const displayPeriod = annual ? 'year' : 'month';
-            const href = annual ? `${plan.href}&billing=annual` : plan.href;
+            const href = annual
+              ? plan.href.includes('?') ? `${plan.href}&billing=annual` : `${plan.href}?billing=annual`
+              : plan.href;
 
             return (
               <div

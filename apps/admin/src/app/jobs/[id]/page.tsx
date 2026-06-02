@@ -81,10 +81,11 @@ function formatAUD(amount: number) {
 }
 
 function Initials({ name }: { name: string }) {
-  const parts = name.split(' ');
+  const parts = name.trim().split(/\s+/);
+  const initials = parts.map((p) => p[0]).filter(Boolean).slice(0, 2).join('').toUpperCase();
   return (
     <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-700">
-      {parts.map((p) => p[0]).slice(0, 2).join('').toUpperCase()}
+      {initials || '?'}
     </div>
   );
 }

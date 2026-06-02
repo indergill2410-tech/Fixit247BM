@@ -89,6 +89,10 @@ export async function PATCH(
           where: { tradieId: id, status: 'PENDING' },
           data: { status: 'VERIFIED', verifiedAt: new Date() },
         }),
+        db.insurance.updateMany({
+          where: { tradieId: id, status: 'PENDING' },
+          data: { status: 'VERIFIED', verifiedAt: new Date() },
+        }),
         db.adminAuditLog.create({
           data: {
             adminId: session.id,
