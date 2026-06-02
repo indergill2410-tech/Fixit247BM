@@ -15,12 +15,18 @@ const AvailabilitySchema = z.object({
   isAutoAccept: z.boolean().optional(),
   workingHours: z
     .array(
-      z.object({
-        dayOfWeek: z.number().int().min(0).max(6),
-        startTime: z.string().regex(TIME_RE),
-        endTime: z.string().regex(TIME_RE),
-        isAvailable: z.boolean(),
-      }),
+      z
+        .object({
+          dayOfWeek: z.number().int().min(0).max(6),
+          startTime: z.string().regex(TIME_RE),
+          endTime: z.string().regex(TIME_RE),
+          isAvailable: z.boolean(),
+        })
+        // For available days, the start time must come before the end time.
+        .refine((v) => !v.isAvailable || v.startTime < v.endTime, {
+          message: 'startTime must be before endTime',
+          path: ['endTime'],
+        }),
     )
     .max(7)
     .optional(),

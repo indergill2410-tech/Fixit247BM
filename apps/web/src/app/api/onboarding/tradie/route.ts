@@ -5,7 +5,7 @@ import { db } from '@fixit247/database';
 import type { TradeCategory } from '@fixit247/database';
 import { sendWelcomeTradieEmail } from '@fixit247/notifications';
 import { runFraudCheck } from '@fixit247/fraud';
-import { waitUntil } from 'next/server';
+import { after } from 'next/server';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
@@ -158,10 +158,10 @@ export async function POST(request: Request) {
 
     // Fraud scoring for new tradies (multi-account / fake-review
     // signals) — auto-flags high risk for admin review without blocking signup.
-    waitUntil(
+    after(() =>
       runFraudCheck(user.id, 'tradie').catch((err: unknown) => {
         logger.error('Fraud check failed', { userId: user.id, error: String(err) });
-      })
+      }),
     );
 
     return NextResponse.json({ success: true, freeCreditsAwarded: 10 });

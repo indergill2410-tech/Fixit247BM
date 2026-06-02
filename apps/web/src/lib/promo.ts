@@ -36,7 +36,12 @@ export async function lookupPromoCode(rawCode: string): Promise<PromoCode | null
     if (row) {
       const parsed = JSON.parse(row.value) as StoredPromo;
       if (parsed.active === false) return null;
-      if (parsed.expiresAt && new Date(parsed.expiresAt).getTime() < Date.now()) return null;
+      if (parsed.expiresAt) {
+        // A malformed date string yields NaN; NaN < now is false, which would
+        // silently bypass expiry. Treat unparseable or past dates as expired.
+        const expiryTime = new Date(parsed.expiresAt).getTime();
+        if (Number.isNaN(expiryTime) || expiryTime < Date.now()) return null;
+      }
       if (typeof parsed.discountPercent !== 'number') return null;
       return { discountPercent: parsed.discountPercent, description: parsed.description };
     }

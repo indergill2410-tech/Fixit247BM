@@ -7,7 +7,7 @@ import { rateLimit, rateLimitByUser, rateLimitResponse, LIMITS } from '@/lib/api
 import { matchAndDispatch } from '@fixit247/matching';
 import { runFraudCheck } from '@fixit247/fraud';
 import { lookupPromoCode } from '@/lib/promo';
-import { waitUntil } from 'next/server';
+import { after } from 'next/server';
 import { logger } from '@/lib/logger';
 
 // ── Lead price by trade (server-side authoritative) ───────────────────────────
@@ -96,12 +96,15 @@ export async function POST(req: NextRequest) {
     }
 
     // Idempotency guard: a double-clicked submit or a network retry can fire the
-    // same POST twice. If this customer already created an identical job in the
-    // last 30s, return that one instead of creating a duplicate.
+    // same POST twice. If this customer already created an identical job (title,
+    // category AND description all match) in the last 30s, return that one instead
+    // of creating a duplicate. Matching on description too avoids false positives
+    // when a customer legitimately posts two distinct same-titled jobs.
     const recentDuplicate = await db.job.findFirst({
       where: {
         customerId: customerProfile.id,
         title: data.title,
+        description: data.description,
         category: data.category as never,
         createdAt: { gte: new Date(Date.now() - 30_000) },
       },
@@ -151,16 +154,22 @@ export async function POST(req: NextRequest) {
       return newJob;
     });
 
-    // Fire-and-forget: trigger matching engine — never blocks job creation
-    void matchAndDispatch(job).catch((err: unknown) => {
-      logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
-    });
+    // Background work via after(): keeps these off the response path while
+    // ensuring the serverless runtime doesn't tear down before they finish.
+    // Matching engine — never blocks job creation.
+    after(() =>
+      matchAndDispatch(job).catch((err: unknown) => {
+        logger.error('Matching engine failed', { jobId: job.id, error: String(err) });
+      }),
+    );
 
-    // Fire-and-forget: fraud scoring (auto-flags high-risk customers for admin
-    // review, e.g. fake-job / refund-abuse patterns). Never blocks job creation.
-    void runFraudCheck(session.id, 'customer').catch((err: unknown) => {
-      logger.error('Fraud check failed', { userId: session.id, error: String(err) });
-    });
+    // Fraud scoring (auto-flags high-risk customers for admin review, e.g.
+    // fake-job / refund-abuse patterns).
+    after(() =>
+      runFraudCheck(session.id, 'customer').catch((err: unknown) => {
+        logger.error('Fraud check failed', { userId: session.id, error: String(err) });
+      }),
+    );
 
     return NextResponse.json({
       job,

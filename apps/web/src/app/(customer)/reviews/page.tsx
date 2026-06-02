@@ -37,7 +37,13 @@ export default async function ReviewsPage() {
       responseText: true,
       respondedAt: true,
       job: { select: { id: true, title: true } },
-      reviewee: { select: { firstName: true, lastName: true } },
+      reviewee: {
+        select: {
+          firstName: true,
+          lastName: true,
+          tradieProfile: { select: { businessName: true } },
+        },
+      },
     },
   });
 
@@ -65,7 +71,10 @@ export default async function ReviewsPage() {
       ) : (
         <div className="mt-6 space-y-4">
           {reviews.map((review) => {
-            const tradieName = `${review.reviewee.firstName} ${review.reviewee.lastName}`.trim();
+            const businessName = review.reviewee.tradieProfile?.businessName?.trim();
+            const tradieName = businessName
+              ? businessName
+              : `${review.reviewee.firstName} ${review.reviewee.lastName}`.trim();
             return (
               <div key={review.id} className="rounded-2xl border border-white/8 bg-white/4 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-3">
