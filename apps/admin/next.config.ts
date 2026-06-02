@@ -23,6 +23,11 @@ const csp = [
 const nextConfig: NextConfig = {
   output: 'standalone',
   outputFileTracingRoot: path.resolve(__dirname, '../../'),
+  // Linting runs as a dedicated CI job. The pruned production Docker stage does
+  // not include the ESLint toolchain (@typescript-eslint/parser / eslint-config-next),
+  // so `next build` would otherwise fail with spurious "import is reserved" parse
+  // errors. Skip lint during the build; type checking still runs.
+  eslint: { ignoreDuringBuilds: true },
   transpilePackages: [
     '@fixit247/ui',
     '@fixit247/auth',
