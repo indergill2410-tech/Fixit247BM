@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { AdminShell } from '@/components/shared/admin-shell';
 import { StatCard } from '@/components/shared/stat-card';
 import { Card, CardContent, CardHeader, CardTitle, Badge, Button } from '@fixit247/ui';
-import { Users, Wrench, DollarSign, ShieldCheck, AlertOctagon } from 'lucide-react';
+import { Users, Wrench, DollarSign, ShieldCheck, Shield, CheckCircle, Star } from 'lucide-react';
 import { db } from '@fixit247/database';
 import Link from 'next/link';
 
@@ -25,6 +25,7 @@ function fmtAud(n: number) {
 export default async function AdminDashboardPage() {
   const now = new Date();
   const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+  const startOfToday = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
   const [
     totalUsers,
@@ -34,6 +35,10 @@ export default async function AdminDashboardPage() {
     revenueResult,
     verificationQueue,
     openDisputes,
+    plusCount,
+    completedToday,
+    avgRatingResult,
+    topTrades,
   ] = await Promise.all([
     db.user.count(),
     db.job.count({ where: { status: { in: ['OPEN', 'CLAIMED', 'IN_PROGRESS'] } } }),
@@ -59,9 +64,21 @@ export default async function AdminDashboardPage() {
       orderBy: { createdAt: 'desc' },
       include: { job: { select: { title: true, id: true } } },
     }),
+    db.subscription.count({ where: { tier: { not: 'FREE' }, status: 'ACTIVE' } }),
+    db.job.count({ where: { status: 'COMPLETED', completedAt: { gte: startOfToday } } }),
+    db.tradieProfile.aggregate({ _avg: { avgRating: true } }),
+    db.job.groupBy({
+      by: ['category'],
+      where: { createdAt: { gte: startOfToday } },
+      _count: { id: true },
+      orderBy: { _count: { id: 'desc' } },
+      take: 5,
+    }),
   ]);
 
   const revenueMtd = Number(revenueResult._sum.platformFee ?? 0);
+  const avgRating = avgRatingResult._avg.avgRating?.toFixed(1) ?? '—';
+  const maxTrades = Math.max(1, ...topTrades.map((t) => t._count.id));
 
   return (
     <AdminShell>
@@ -155,6 +172,73 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
       </div>
+      {/* Platform Health */}
+      <Card className="mt-8">
+        <CardHeader>
+          <CardTitle>Platform Health</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-3">
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+                <Shield size={20} className="text-amber-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{plusCount.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Fixit Plus Members</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-green-500/10">
+                <CheckCircle size={20} className="text-green-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{completedToday.toLocaleString()}</p>
+                <p className="text-xs text-muted-foreground">Jobs Completed Today</p>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
+                <Star size={20} className="text-amber-600" />
+              </div>
+              <div>
+                <p className="text-2xl font-bold text-foreground">{avgRating}</p>
+                <p className="text-xs text-muted-foreground">Avg Tradie Rating</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Top Trades Today */}
+      <div className="mt-6 grid gap-6 lg:grid-cols-2">
+        <Card>
+          <CardHeader>
+            <CardTitle>Top Trades Today</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {topTrades.length === 0 ? (
+              <p className="py-4 text-center text-sm text-muted-foreground">No jobs posted today yet</p>
+            ) : (
+              <div className="space-y-3">
+                {topTrades.map((trade) => (
+                  <div key={trade.category} className="flex items-center gap-3">
+                    <span className="w-28 shrink-0 truncate text-sm text-foreground">{trade.category}</span>
+                    <div className="flex-1 overflow-hidden rounded-full bg-muted h-2">
+                      <div
+                        className="h-2 rounded-full bg-amber-500"
+                        style={{ width: `${(trade._count.id / maxTrades) * 100}%` }}
+                      />
+                    </div>
+                    <span className="w-6 shrink-0 text-right text-xs font-semibold text-muted-foreground">{trade._count.id}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
       <div className="mt-6 grid gap-3 sm:grid-cols-4">
         {[
           { label: 'Review Verifications', href: '/verifications', color: 'bg-amber-500 hover:bg-amber-400 text-gray-900' },

@@ -94,7 +94,7 @@ export default function AdminLivePage() {
             <h1 className="text-3xl font-bold text-foreground">Live Operations</h1>
             <span className={`flex h-2.5 w-2.5 rounded-full ${autoRefresh ? 'bg-green-500 animate-pulse' : 'bg-gray-300'}`} />
           </div>
-          <p className="mt-1 text-sm text-gray-500">
+          <p className="mt-1 text-sm text-muted-foreground">
             Real-time job dispatch · {data ? `Updated ${timeAgo(data.timestamp)} ago` : '—'}
           </p>
         </div>
@@ -137,10 +137,10 @@ export default function AdminLivePage() {
           <CardContent>
             {loading ? (
               <div className="space-y-3">
-                {[...Array(5)].map((_, i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-gray-100" />)}
+                {[...Array(5)].map((_, i) => <div key={i} className="h-12 animate-pulse rounded-lg bg-muted" />)}
               </div>
             ) : !data?.activeJobs.length ? (
-              <p className="py-8 text-center text-sm text-gray-400">No active jobs right now</p>
+              <p className="py-8 text-center text-sm text-muted-foreground">No active jobs right now</p>
             ) : (
               <div className="divide-y">
                 {data.activeJobs.map((job) => (
@@ -148,9 +148,9 @@ export default function AdminLivePage() {
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-2">
                         {job.isEmergency && <AlertTriangle size={12} className="shrink-0 text-red-500" />}
-                        <p className="truncate text-sm font-medium text-gray-900">{job.title}</p>
+                        <p className="truncate text-sm font-medium text-foreground">{job.title}</p>
                       </div>
-                      <p className="text-xs text-gray-400">{job.suburb} · {timeAgo(job.createdAt)} ago</p>
+                      <p className="text-xs text-muted-foreground">{job.suburb} · {timeAgo(job.createdAt)} ago</p>
                     </div>
                     <div className="ml-3 flex items-center gap-2">
                       <span className={`rounded-full px-2 py-0.5 text-[11px] font-semibold ${STATUS_COLORS[job.status] ?? 'bg-gray-100 text-gray-600'}`}>
@@ -184,18 +184,18 @@ export default function AdminLivePage() {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-10 animate-pulse rounded-lg bg-gray-100" />)}</div>
+                <div className="space-y-2">{[...Array(3)].map((_, i) => <div key={i} className="h-10 animate-pulse rounded-lg bg-muted" />)}</div>
               ) : !data?.onlineTradies.length ? (
-                <p className="text-sm text-gray-400">No tradies online</p>
+                <p className="text-sm text-muted-foreground">No tradies online</p>
               ) : (
                 <div className="space-y-2">
                   {data.onlineTradies.slice(0, 8).map((t) => (
-                    <div key={t.tradieId} className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2">
+                    <div key={t.tradieId} className="flex items-center justify-between rounded-lg bg-muted/50 px-3 py-2">
                       <div className="flex items-center gap-2">
                         <span className={`h-2 w-2 rounded-full ${t.onlineStatus === 'ONLINE' ? 'bg-green-500' : t.onlineStatus === 'EMERGENCY_ONLY' ? 'bg-red-500' : 'bg-yellow-500'}`} />
-                        <span className="text-xs font-medium text-gray-700">{t.tradieId.slice(-8)}</span>
+                        <span className="text-xs font-medium text-foreground">{t.tradieId.slice(-8)}</span>
                       </div>
-                      <span className="text-xs text-gray-400">{t.activeJobCount} job{t.activeJobCount !== 1 ? 's' : ''}</span>
+                      <span className="text-xs text-muted-foreground">{t.activeJobCount} job{t.activeJobCount !== 1 ? 's' : ''}</span>
                     </div>
                   ))}
                 </div>
@@ -213,15 +213,15 @@ export default function AdminLivePage() {
             </CardHeader>
             <CardContent>
               {loading ? (
-                <div className="space-y-2">{[...Array(4)].map((_, i) => <div key={i} className="h-8 animate-pulse rounded bg-gray-100" />)}</div>
+                <div className="space-y-2">{[...Array(4)].map((_, i) => <div key={i} className="h-8 animate-pulse rounded bg-muted" />)}</div>
               ) : !data?.recentEvents.length ? (
-                <p className="text-xs text-gray-400">No events yet</p>
+                <p className="text-xs text-muted-foreground">No events yet</p>
               ) : (
                 <div className="space-y-1.5 max-h-48 overflow-y-auto">
                   {data.recentEvents.map((ev) => (
                     <div key={ev.id} className="flex items-center justify-between text-xs">
-                      <span className="text-gray-600 truncate max-w-[160px]">{ev.type.replace('JOB_', '')}</span>
-                      <span className="shrink-0 text-gray-400">{timeAgo(ev.createdAt)}</span>
+                      <span className="text-foreground truncate max-w-[160px]">{ev.type.replace('JOB_', '')}</span>
+                      <span className="shrink-0 text-muted-foreground">{timeAgo(ev.createdAt)}</span>
                     </div>
                   ))}
                 </div>
