@@ -5,6 +5,7 @@ import { db } from '@fixit247/database';
 import type { TradeCategory } from '@fixit247/database';
 import { sendWelcomeTradieEmail } from '@fixit247/notifications';
 import { runFraudCheck } from '@fixit247/fraud';
+import { waitUntil } from 'next/server';
 import { z } from 'zod';
 import { logger } from '@/lib/logger';
 
