@@ -2,15 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
-import { CheckCircle } from 'lucide-react';
-import type { LucideIcon } from 'lucide-react';
+import { CheckCircle, Home, Shield, type LucideIcon } from 'lucide-react';
+
+const ICON_MAP: Record<string, LucideIcon> = { Home, Shield };
 
 interface Plan {
   name: string;
   price: number;
   period: string;
   highlight: boolean;
-  Icon: LucideIcon;
+  iconName: string;
   tagline: string;
   features: string[];
   cta: string;
@@ -82,7 +83,7 @@ export function FixitPlusPlans({ plans }: FixitPlusPlansProps) {
                   </div>
                 )}
                 <div className="mb-2 flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500/15 text-brand-500">
-                  <plan.Icon size={22} />
+                  {(() => { const Icon = ICON_MAP[plan.iconName]; return Icon ? <Icon size={22} /> : null; })()}
                 </div>
                 <p className="text-xs font-semibold uppercase tracking-widest text-foreground-subtle">{plan.tagline}</p>
                 <h3 className="mt-1 text-xl font-bold text-foreground">{plan.name}</h3>

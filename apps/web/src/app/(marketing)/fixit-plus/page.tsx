@@ -54,13 +54,13 @@ const PLUS_FAQS = [
   },
 ];
 
-export const PLANS = [
+const PLANS = [
   {
     name: 'Fixit Plus Home',
     price: 29,
     period: 'month',
     highlight: false,
-    Icon: Home,
+    iconName: 'Home',
     tagline: 'Everything covered at home',
     features: [
       'Unlimited call-outs — no per-job fees',
@@ -78,7 +78,7 @@ export const PLANS = [
     price: 49,
     period: 'month',
     highlight: true,
-    Icon: Shield,
+    iconName: 'Shield',
     tagline: 'Home + on the road',
     features: [
       'Everything in Home, plus:',
@@ -96,42 +96,42 @@ export const PLANS = [
 
 const COVER_SCENARIOS = [
   {
-    Icon: Droplets,
+    icon: <Droplets size={20} className="text-amber-500" />,
     title: 'Burst Pipe at 2am',
     scenario: 'Water flooding your kitchen. We dispatch a licensed plumber to your door — no call-out fee, no wait.',
     cover: 'Home + Total',
     totalOnly: false,
   },
   {
-    Icon: KeyRound,
+    icon: <KeyRound size={20} className="text-amber-500" />,
     title: 'Locked Out of Home',
     scenario: 'Forgot your keys on a Sunday night. Our locksmith is there in under 30 minutes.',
     cover: 'Home + Total',
     totalOnly: false,
   },
   {
-    Icon: Zap,
+    icon: <Zap size={20} className="text-amber-500" />,
     title: 'Power Goes Out',
     scenario: 'RCD tripping and you don\'t know why. A licensed electrician diagnoses and fixes it — covered.',
     cover: 'Home + Total',
     totalOnly: false,
   },
   {
-    Icon: Car,
+    icon: <Car size={20} className="text-amber-500" />,
     title: 'Locked Out of Your Car',
     scenario: 'Keys inside the car at the shops. Fixit Plus Total dispatches a locksmith wherever you are.',
     cover: 'Total only',
     totalOnly: true,
   },
   {
-    Icon: CloudLightning,
+    icon: <CloudLightning size={20} className="text-amber-500" />,
     title: 'Storm Damage',
     scenario: 'Roof damaged in a storm. Emergency tarping and repair team dispatched same day.',
     cover: 'Total only',
     totalOnly: true,
   },
   {
-    Icon: Wind,
+    icon: <Wind size={20} className="text-amber-500" />,
     title: 'AC Fails in a Heatwave',
     scenario: '42°C outside, AC dead. Priority HVAC dispatch gets you cooling within the hour.',
     cover: 'Home + Total',
@@ -224,7 +224,7 @@ export default function FixitPlusPage() {
                 >
                   <div className="mb-3 flex items-start justify-between gap-3">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-amber-500/10">
-                      <s.Icon size={20} className="text-amber-500" />
+                      {s.icon}
                     </div>
                     <span className={`shrink-0 rounded-full px-2.5 py-0.5 text-xs font-bold ${s.totalOnly ? 'bg-brand-500/20 text-brand-500' : 'bg-blue-500/10 text-blue-600 dark:text-blue-400'}`}>
                       {s.cover}
