@@ -27,6 +27,9 @@ FROM base AS builder
 WORKDIR /app
 COPY --from=installer /app/node_modules ./node_modules
 COPY --from=pruner /app/out/full/ .
+# turbo prune omits the root tsconfig.json; copy it explicitly so apps/admin/tsconfig.json
+# (which extends ../../tsconfig.json) can resolve it during the build.
+COPY --from=pruner /app/tsconfig.json ./tsconfig.json
 COPY --from=installer /app/apps/admin/node_modules ./apps/admin/node_modules
 # Carry the already-generated Prisma client and database dependencies from the installer stage
 COPY --from=installer /app/packages/database/node_modules ./packages/database/node_modules
