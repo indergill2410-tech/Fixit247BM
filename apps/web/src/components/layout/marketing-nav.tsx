@@ -9,6 +9,7 @@ const NAV_LINKS = [
   { href: '/how-it-works', label: 'How it works' },
   { href: '/fixit-plus', label: 'Fixit Plus' },
   { href: '/join-as-tradie', label: 'For Tradies' },
+  { href: '/blog', label: 'Blog' },
   { href: '/about', label: 'About' },
 ] as const;
 
