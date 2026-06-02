@@ -67,12 +67,19 @@ export async function POST(request: NextRequest) {
       hasDbProfile = true;
     }
   } catch {
-    await supabase.auth.signOut();
-    return json({ error: 'Admin database is temporarily unavailable.', code: 'profile_unavailable' }, 503);
+    // DB unavailable — fall back to Supabase app_metadata role so login still
+    // works if DATABASE_URL is not yet configured, or during a DB outage.
+    const appMetaFallback = data.user.app_metadata as Record<string, unknown>;
+    if (!isAdminRole(appMetaFallback.role)) {
+      await supabase.auth.signOut();
+      return json({ error: 'Admin database is temporarily unavailable.', code: 'profile_unavailable' }, 503);
+    }
+    role = appMetaFallback.role as Role;
+    active = true;
   }
 
-  const appMeta = data.user.app_metadata as Record<string, unknown>;
-  role ??= isAdminRole(appMeta.role) ? appMeta.role : undefined;
+  const appMeta = (data.user.app_metadata as Record<string, unknown> | null) ?? {};
+  if (!role) role = isAdminRole(appMeta.role) ? appMeta.role : undefined;
 
   if (!hasDbProfile && role) {
     active = true;

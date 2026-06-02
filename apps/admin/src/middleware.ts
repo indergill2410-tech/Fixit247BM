@@ -61,7 +61,7 @@ export async function middleware(request: NextRequest) {
       : NextResponse.redirect(new URL('/login?error=profile_unavailable', request.url));
   }
 
-  const appMeta = (user.app_metadata ?? {}) as Record<string, unknown>;
+  const appMeta = (user.app_metadata as Record<string, unknown> | null) ?? {};
   const metadataRole = appMeta.role === 'ADMIN' || appMeta.role === 'SUPER_ADMIN'
     ? appMeta.role as Role
     : undefined;

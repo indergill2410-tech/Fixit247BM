@@ -28,9 +28,9 @@ WORKDIR /app
 COPY --from=installer /app/node_modules ./node_modules
 COPY --from=pruner /app/out/full/ .
 COPY --from=installer /app/apps/admin/node_modules ./apps/admin/node_modules
-
-# Generate Prisma client
-RUN pnpm --filter @fixit247/database exec prisma generate
+# Carry the already-generated Prisma client and database dependencies from the installer stage
+COPY --from=installer /app/packages/database/node_modules ./packages/database/node_modules
+COPY --from=installer /app/packages/database/src/generated ./packages/database/src/generated
 
 # Public NEXT_PUBLIC_* values are inlined into the client bundle at build time.
 ARG NEXT_PUBLIC_SUPABASE_URL
