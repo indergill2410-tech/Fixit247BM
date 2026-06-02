@@ -60,7 +60,7 @@ const PLANS = [
     price: 29,
     period: 'month',
     highlight: false,
-    Icon: Home,
+    iconName: 'Home',
     tagline: 'Everything covered at home',
     features: [
       'Unlimited call-outs — no per-job fees',
@@ -78,7 +78,7 @@ const PLANS = [
     price: 49,
     period: 'month',
     highlight: true,
-    Icon: Shield,
+    iconName: 'Shield',
     tagline: 'Home + on the road',
     features: [
       'Everything in Home, plus:',
