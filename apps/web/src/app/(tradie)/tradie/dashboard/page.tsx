@@ -66,12 +66,6 @@ export default async function TradieDashboardPage() {
 
   const hasLicence = (tradieProfile?.licences.length ?? 0) > 0;
   const hasInsurance = (tradieProfile?.insurances.length ?? 0) > 0;
-  const responseTimeDisplay = tradieProfile?.responseTimeMinutes
-    ? `${tradieProfile.responseTimeMinutes} min`
-    : 'Not tracked';
-  const completionRateDisplay = tradieProfile?.completionRate
-    ? `${Number(tradieProfile.completionRate).toFixed(0)}%`
-    : '100%';
 
   return (
     <DashboardShell role="TRADIE">
@@ -81,9 +75,7 @@ export default async function TradieDashboardPage() {
         actions={
           <div className="flex items-center gap-2">
             <Badge variant="success">● Available</Badge>
-            <Button asChild size="sm" variant="outline">
-              <Link href="/tradie/availability">Update availability</Link>
-            </Button>
+            <Button size="sm" variant="outline">Toggle availability</Button>
           </div>
         }
       />
@@ -113,25 +105,25 @@ export default async function TradieDashboardPage() {
               <Badge variant="warning">{incomingJobs.length} new</Badge>
             </CardHeader>
             <CardContent>
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-white/8">
                 {incomingJobs.length === 0 ? (
                   <div className="py-10 text-center">
-                    <p className="text-sm font-medium text-foreground-muted">No open jobs right now</p>
-                    <p className="mt-1 text-xs text-foreground-subtle">New jobs will appear here as customers post them.</p>
+                    <p className="text-sm font-medium text-gray-400">No open jobs right now</p>
+                    <p className="mt-1 text-xs text-gray-600">New jobs will appear here as customers post them.</p>
                   </div>
                 ) : (
                   incomingJobs.map((job) => (
                     <div key={job.id} className="flex items-start justify-between py-4">
                       <div className="flex-1">
                         <div className="flex items-center gap-2">
-                          <p className="font-medium text-foreground">{job.title}</p>
+                          <p className="font-medium text-white">{job.title}</p>
                           {job.isEmergency && <Badge variant="emergency">EMERGENCY</Badge>}
                         </div>
-                        <p className="mt-0.5 text-sm text-foreground-muted">{job.category.replace(/_/g, ' ')}</p>
-                        <p className="mt-1 text-xs text-foreground-subtle">{new Date(job.createdAt).toLocaleString()}</p>
+                        <p className="mt-0.5 text-sm text-gray-500">{job.category.replace(/_/g, ' ')}</p>
+                        <p className="mt-1 text-xs text-gray-400">{new Date(job.createdAt).toLocaleString()}</p>
                       </div>
                       <div className="flex flex-col items-end gap-2 pl-4">
-                        <p className="font-semibold text-foreground">{job.budgetMin ? `$${job.budgetMin}` : 'Quote required'}</p>
+                        <p className="font-semibold text-white">{job.budgetMin ? `$${job.budgetMin}` : 'Quote required'}</p>
                         <Button size="sm" asChild>
                           <Link href={`/tradie/jobs/${job.id}`}>View job</Link>
                         </Button>
@@ -159,7 +151,7 @@ export default async function TradieDashboardPage() {
                     <TrustBadge key={badge} variant={badge as never} />
                   ))}
                 </div>
-                <p className="text-center text-xs text-foreground-muted">
+                <p className="text-xs text-gray-500 text-center">
                   {completedJobs > 0
                     ? `${completedJobs} completed job${completedJobs === 1 ? '' : 's'}`
                     : 'Complete your first job to build your score'}
@@ -179,33 +171,15 @@ export default async function TradieDashboardPage() {
               ].map((item) => (
                 <div key={item.label} className="flex items-center gap-2 py-1.5">
                   {item.done
-                    ? <CheckCircle size={16} className="text-green-500 shrink-0" />
-                    : <AlertTriangle size={16} className="text-amber-500 shrink-0" />}
-                  <span className="text-sm text-foreground-muted">{item.label}</span>
+                    ? <FxIcon name="checkCircle" size={16} className="text-green-500 shrink-0" />
+                    : <FxIcon name="alertTriangle" size={16} className="text-amber-500 shrink-0" />}
+                  <span className="text-sm text-gray-300">{item.label}</span>
                   {!item.done && <span className="ml-auto text-xs text-amber-600">Needed</span>}
                 </div>
               ))}
               <Button asChild size="sm" className="mt-3 w-full" variant="outline">
                 <Link href="/tradie/documents">Complete verification →</Link>
               </Button>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader><CardTitle className="text-sm">Performance pulse</CardTitle></CardHeader>
-            <CardContent className="space-y-3 text-sm">
-              <div className="flex items-center justify-between">
-                <span className="text-foreground-muted">Response time</span>
-                <span className="font-semibold text-foreground">{responseTimeDisplay}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-foreground-muted">Completion rate</span>
-                <span className="font-semibold text-foreground">{completionRateDisplay}</span>
-              </div>
-              <div className="flex items-center justify-between">
-                <span className="text-foreground-muted">Documents</span>
-                <span className="font-semibold text-foreground">{hasLicence && hasInsurance ? 'Ready' : 'Action needed'}</span>
-              </div>
             </CardContent>
           </Card>
         </div>
