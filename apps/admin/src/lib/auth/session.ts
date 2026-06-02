@@ -50,7 +50,7 @@ export async function getSession(): Promise<SessionUser | null> {
     };
   }
 
-  const meta = (user.user_metadata ?? {}) as Record<string, unknown>;
+  const meta = (user.user_metadata as Record<string, unknown> | null) ?? {};
   return {
     id: user.id,
     email: user.email ?? '',

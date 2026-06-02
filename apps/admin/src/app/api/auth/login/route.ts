@@ -78,8 +78,8 @@ export async function POST(request: NextRequest) {
     active = true;
   }
 
-  const appMeta = data.user.app_metadata as Record<string, unknown>;
-  role ??= isAdminRole(appMeta.role) ? appMeta.role : undefined;
+  const appMeta = (data.user.app_metadata as Record<string, unknown> | null) ?? {};
+  if (!role) role = isAdminRole(appMeta.role) ? appMeta.role : undefined;
 
   if (!hasDbProfile && role) {
     active = true;
