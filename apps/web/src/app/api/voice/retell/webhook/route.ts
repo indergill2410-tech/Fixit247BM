@@ -54,6 +54,19 @@ function asOptionalString(value: unknown): string | null {
   return typeof value === 'string' && value.trim() ? value.trim() : null;
 }
 
+function asOptionalInteger(value: unknown): number | null {
+  return typeof value === 'number' && Number.isInteger(value) && value >= 0 ? value : null;
+}
+
+function leadStatusFromOutcome(event: string, successful: boolean | null, outcome: string | null) {
+  if (event === 'call_started') return 'CONNECTED';
+  if (outcome === 'not_interested' || outcome === 'wrong_person') return 'LOST';
+  if (outcome === 'callback_booked') return 'BOOKED';
+  if (outcome === 'signed_up' || outcome === 'property_added' || outcome === 'first_job_posted') return 'WON';
+  if (outcome === 'signup_link_sent' || outcome === 'human_transfer' || outcome === 'qualified') return 'QUALIFIED';
+  return successful ? 'QUALIFIED' : 'NURTURE';
+}
+
 async function persistSalesLink(input: {
   voiceCallId: string;
   call: RetellCall;
@@ -63,7 +76,11 @@ async function persistSalesLink(input: {
   const leadId = asOptionalString(metadata.sales_lead_id);
   const campaignId = asOptionalString(metadata.sales_campaign_id);
   const analysis = input.call.call_analysis;
-  const outcome = asOptionalString(analysis?.custom_analysis_data?.outcome);
+  const custom = analysis?.custom_analysis_data ?? {};
+  const outcome = asOptionalString(custom.outcome);
+  const targetSegment = asOptionalString(custom.target_segment);
+  const propertyCount = asOptionalInteger(custom.property_count);
+  const fitScore = asOptionalInteger(custom.fit_score);
   const sentiment = asOptionalString(analysis?.user_sentiment);
   const summary = asOptionalString(analysis?.call_summary);
   const retellCallId = asOptionalString(input.call.call_id);
@@ -119,24 +136,38 @@ async function persistSalesLink(input: {
     `;
 
     if (leadId) {
-      const status =
-        input.event === 'call_started'
-          ? 'CONNECTED'
-          : analysis?.call_successful
-            ? outcome === 'booked_meeting' || outcome === 'callback_booked'
-              ? 'BOOKED'
-              : 'QUALIFIED'
-            : 'NURTURE';
+      const status = leadStatusFromOutcome(input.event, successful, outcome);
 
       await db.$executeRaw`
         UPDATE sales_leads
         SET
-          status = ${status},
+          status = CASE WHEN status = 'DO_NOT_CALL' THEN status ELSE ${status} END,
+          lead_score = COALESCE(${fitScore}, lead_score),
+          property_count = COALESCE(${propertyCount}, property_count),
+          target_segment = CASE
+            WHEN ${targetSegment} IN ('PROPERTY_MANAGER', 'REAL_ESTATE_AGENCY', 'LANDLORD', 'PROPERTY_OWNER', 'OTHER')
+              THEN ${targetSegment}
+            ELSE target_segment
+          END,
+          propertysafe_stage = CASE
+            WHEN propertysafe_stage = 'NEW' AND ${successful} = TRUE THEN 'QUALIFIED'
+            ELSE propertysafe_stage
+          END,
           last_contact_at = NOW(),
           updated_at = NOW()
         WHERE id = CAST(${leadId} AS UUID)
-          AND status <> 'DO_NOT_CALL'
       `;
+
+      if (input.event === 'call_analyzed' && successful === true) {
+        await db.$executeRaw`
+          INSERT INTO propertysafe_activation_events (lead_id, event_type, metadata)
+          SELECT CAST(${leadId} AS UUID), 'QUALIFIED', ${JSON.stringify({ outcome, retellCallId })}::jsonb
+          WHERE NOT EXISTS (
+            SELECT 1 FROM propertysafe_activation_events
+            WHERE lead_id = CAST(${leadId} AS UUID) AND event_type = 'QUALIFIED'
+          )
+        `;
+      }
     }
   } catch (error) {
     // Voice-call persistence remains useful even if the sales migration has not yet been applied.
@@ -237,7 +268,7 @@ export async function POST(req: Request) {
 
     await persistSalesLink({ voiceCallId: voiceCall.id, call, event });
 
-    logger.info('[retell-webhook] Call event persisted', {
+    logger.info('[retell-webhook] PropertySafe call event persisted', {
       event,
       retellCallId: call.call_id,
       twilioCallSid,
