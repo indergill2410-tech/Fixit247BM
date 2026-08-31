@@ -70,26 +70,28 @@ export async function POST(req: Request) {
 
   const leadId = optionalText(body.leadId);
   const campaignId = optionalText(body.campaignId);
-  const dynamicVariables: Record<string, string | number | boolean> = {
-    first_name: optionalText(body.firstName) ?? 'there',
-    company_name: optionalText(body.companyName) ?? '',
-    role_title: optionalText(body.roleTitle) ?? '',
-    suburb: optionalText(body.suburb) ?? '',
-    booking_url: process.env.AI_SALES_BOOKING_URL ?? '',
-    ...(typeof body.dynamicVariables === 'object' && body.dynamicVariables
-      ? Object.fromEntries(
-          Object.entries(body.dynamicVariables as Record<string, unknown>).filter(
-            (entry): entry is [string, string | number | boolean] =>
-              ['string', 'number', 'boolean'].includes(typeof entry[1]),
-          ),
-        )
-      : {}),
-  };
+  let leadContext: {
+    firstName?: string;
+    companyName?: string;
+    roleTitle?: string;
+    suburb?: string;
+    targetSegment?: string;
+    propertyCount?: number;
+  } = {};
 
   try {
     if (leadId) {
-      const matching = await db.$queryRaw<Array<{ phone_number: string; status: string }>>`
-        SELECT phone_number, status
+      const matching = await db.$queryRaw<Array<{
+        phone_number: string;
+        status: string;
+        first_name: string | null;
+        company_name: string | null;
+        role_title: string | null;
+        suburb: string | null;
+        target_segment: string;
+        property_count: number | null;
+      }>>`
+        SELECT phone_number, status, first_name, company_name, role_title, suburb, target_segment, property_count
         FROM sales_leads
         WHERE id = CAST(${leadId} AS UUID)
         LIMIT 1
@@ -107,7 +109,38 @@ export async function POST(req: Request) {
       if (lead.status === 'DO_NOT_CALL') {
         return NextResponse.json({ error: 'Sales lead is marked do-not-call.' }, { status: 409 });
       }
+
+      leadContext = {
+        firstName: lead.first_name ?? undefined,
+        companyName: lead.company_name ?? undefined,
+        roleTitle: lead.role_title ?? undefined,
+        suburb: lead.suburb ?? undefined,
+        targetSegment: lead.target_segment,
+        propertyCount: lead.property_count ?? undefined,
+      };
     }
+
+    const dynamicVariables: Record<string, string | number | boolean> = {
+      first_name: leadContext.firstName ?? optionalText(body.firstName) ?? 'there',
+      company_name: leadContext.companyName ?? optionalText(body.companyName) ?? '',
+      role_title: leadContext.roleTitle ?? optionalText(body.roleTitle) ?? '',
+      suburb: leadContext.suburb ?? optionalText(body.suburb) ?? '',
+      target_segment: leadContext.targetSegment ?? optionalText(body.targetSegment) ?? 'OTHER',
+      property_count:
+        leadContext.propertyCount ??
+        (typeof body.propertyCount === 'number' && Number.isFinite(body.propertyCount) ? body.propertyCount : 0),
+      propertysafe_signup_url: process.env.PROPERTYSAFE_SIGNUP_URL ?? 'https://www.fixit247.com.au/propertysafe',
+      post_job_url: process.env.FIXIT247_POST_JOB_URL ?? 'https://www.fixit247.com.au/post-job',
+      booking_url: process.env.AI_SALES_BOOKING_URL ?? '',
+      ...(typeof body.dynamicVariables === 'object' && body.dynamicVariables
+        ? Object.fromEntries(
+            Object.entries(body.dynamicVariables as Record<string, unknown>).filter(
+              (entry): entry is [string, string | number | boolean] =>
+                ['string', 'number', 'boolean'].includes(typeof entry[1]),
+            ),
+          )
+        : {}),
+    };
 
     const retellCall = await createRetellPhoneCall({
       fromNumber,
@@ -115,7 +148,8 @@ export async function POST(req: Request) {
       metadata: {
         sales_lead_id: leadId ?? null,
         sales_campaign_id: campaignId ?? null,
-        source: 'fixit247-ai-sales',
+        source: 'fixit247-propertysafe-ai-sales',
+        product: 'PropertySafe',
       },
       dynamicVariables,
     });
@@ -129,7 +163,7 @@ export async function POST(req: Request) {
       `;
     }
 
-    logger.info('[retell-outbound] Call created', {
+    logger.info('[retell-outbound] PropertySafe acquisition call created', {
       leadId,
       campaignId,
       toNumber,
@@ -142,7 +176,7 @@ export async function POST(req: Request) {
       callStatus: retellCall.call_status ?? 'registered',
     });
   } catch (error) {
-    logger.error('[retell-outbound] Failed to create outbound call', {
+    logger.error('[retell-outbound] Failed to create PropertySafe outbound call', {
       leadId,
       campaignId,
       toNumber,
